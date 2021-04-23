@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Custom stuff
+appsettings.[Dd]evelopment.json
+
 # User-specific files
 *.rsuser
 *.suo

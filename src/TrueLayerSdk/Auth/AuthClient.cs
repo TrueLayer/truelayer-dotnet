@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using TrueLayerSdk.Auth.Models;
 using TrueLayerSdk.Common;
 
 namespace TrueLayerSdk.Auth
@@ -50,6 +51,22 @@ namespace TrueLayerSdk.Auth
             });
             
             var apiResponse = await _apiClient.PostAsync<ExchangeCodeResponse>(path, cancellationToken, Functionality, content);
+            return apiResponse;
+        }
+        
+        public async Task<GetPaymentTokenResponse> GetPaymentToken(GetPaymentTokenRequest request, CancellationToken cancellationToken)
+        {
+            const string path = "connect/token";
+            
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                new KeyValuePair<string, string>("client_id", _configuration.ClientId),
+                new KeyValuePair<string, string>("client_secret", _configuration.ClientSecret),
+                new KeyValuePair<string, string>("scope", "payments"),
+            });
+            
+            var apiResponse = await _apiClient.PostAsync<GetPaymentTokenResponse>(path, cancellationToken, Functionality, content);
             return apiResponse;
         }
     }

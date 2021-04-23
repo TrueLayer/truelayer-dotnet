@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayerSdk.Common;
@@ -54,13 +56,30 @@ namespace TrueLayerSdk
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Post,
                 path: path,
+                accessToken: null,
                 httpContent: httpContent,
                 cancellationToken: cancellationToken,
                 functionality: functionality
             );
             return await DeserializeJsonAsync<TResult>(httpResponse);
         }
-        
+        public async Task<TResult> PostAsync<TResult>(string path, Functionality functionality, CancellationToken cancellationToken,
+            string accessToken, object request = null)
+        {
+            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+            if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
+
+            using var httpResponse = await SendJsonRequestAsync(
+                httpMethod: HttpMethod.Post,
+                path: path,
+                accessToken: accessToken,
+                request: request,
+                cancellationToken: cancellationToken,
+                functionality: functionality
+            );
+            return await DeserializeJsonAsync<TResult>(httpResponse);
+        }
+
         private async Task<TResult> DeserializeJsonAsync<TResult>(HttpResponseMessage httpResponse)
         {
             var result = await DeserializeJsonAsync(httpResponse, typeof(TResult));
@@ -107,7 +126,18 @@ namespace TrueLayerSdk
             }
         }
 
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod httpMethod, string path, 
+        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, string path, string accessToken,
+            object request, CancellationToken cancellationToken, Functionality functionality)
+        {
+            HttpContent httpContent = null;
+            if (request != null)
+            {
+                httpContent = new StringContent(_serializer.Serialize(request), Encoding.UTF8, "application/json");
+            }
+            return SendRequestAsync(httpMethod, path, accessToken, httpContent, cancellationToken, functionality);
+        }
+        
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod httpMethod, string path, string accessToken,
             HttpContent httpContent, CancellationToken cancellationToken, Functionality functionality)
         {
             const string product = "truelayer-sdk-net";
@@ -121,6 +151,8 @@ namespace TrueLayerSdk
             };
 
             httpRequest.Headers.UserAgent.ParseAdd($"{product}/{productVersion}");
+            if (!string.IsNullOrEmpty(accessToken))
+                httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             // Logger.Info("{HttpMethod} {Uri}", httpMethod, httpRequest.RequestUri.AbsoluteUri);
 
@@ -137,7 +169,7 @@ namespace TrueLayerSdk
             {
                 httpResponse.Headers.TryGetValues("Tl-Request-Id", out var requestIdHeader);
                 var requestId = requestIdHeader?.FirstOrDefault();
-
+                // var content = await httpResponse.Content.ReadAsStringAsync();
                 // if (httpResponse.StatusCode == Unprocessable)
                 // {
                 //     var error = await DeserializeJsonAsync<ErrorResponse>(httpResponse);

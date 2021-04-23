@@ -5,9 +5,13 @@ namespace TrueLayerSdk.Data
     /// </summary>
     public class DataClient : IDataClient
     {
+        private readonly IApiClient _apiClient;
+        private readonly TruelayerConfiguration _configuration;
+
         public DataClient(IApiClient apiClient, TruelayerConfiguration configuration)
         {
-            throw new System.NotImplementedException();
+            _apiClient = apiClient;
+            _configuration = configuration;
         }
     }
 }
