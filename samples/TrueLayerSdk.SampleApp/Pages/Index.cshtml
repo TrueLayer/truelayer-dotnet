@@ -5,19 +5,126 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">TrueLayer SDK Sample App</h1>
+    <h1 class="display-5" style="margin-bottom: 30px">TrueLayer SDK Sample App</h1>
 </div>
-<a asp-page-handler="token" class="btn btn-primary mb-2">Get Token</a>
-<p style="word-wrap: break-word;"><b>Token</b>: @Model.Token</p>
-<form method="post" class="mb-2">
-    <button type="submit" class="btn btn-primary">Send Money</button>
-</form>
-<p><b>Payment ID</b>: @Model.PaymentId</p>
-<p style="word-wrap: break-word;">
-    <b>Auth Uri</b>: 
-    @if (!string.IsNullOrWhiteSpace(Model.AuthUri))
-    {
-        <a href="@Model.AuthUri">Click here to authenticate</a>
-    }
-</p>
+<div class="card border-secondary mb-3">
+    <div class="card-header">1. Gather Truelayer Token</div>
+    <div class="card-body text-secondary">
+        <a asp-page-handler="token" class="btn btn-secondary btn-sm mb-2">Get Token</a>
 
+        <p class="card-text" style="word-wrap: break-word;"><b>Token</b>: @Model.Token</p>
+    </div>
+</div>
+
+<div class="card border-secondary mb-3">
+    <div class="card-header">
+        2. Initiate Payment
+        <button onclick="prefill()" class="btn btn-outline-secondary btn-sm ml-2">Pre-fill</button>
+    </div>
+    <div class="card-body text-secondary">
+        <form method="post" class="mb-4">
+            <label>Remitter</label>
+            <div class="form-group">
+                <input asp-for="Payment.remitter_name" type="text" class="form-control form-control-sm" placeholder="Remitter name">
+            </div>
+            <div class="form-group">
+                <input asp-for="Payment.remitter_reference" type="text" class="form-control form-control-sm" placeholder="Remitter reference">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.remitter_provider_id" type="text" class="form-control form-control-sm" placeholder="Bank">
+                </div>
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.remitter_account_number" type="text" class="form-control form-control-sm" placeholder="Remitter account number">
+                </div>
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.remitter_sort_code" type="text" class="form-control form-control-sm" placeholder="Remitter sort code">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Beneficiary</label>
+                <input asp-for="Payment.beneficiary_name" type="text" class="form-control form-control-sm" placeholder="Beneficiary name">
+            </div>
+            <div class="form-group">
+                <input asp-for="Payment.beneficiary_reference" type="text" class="form-control form-control-sm" placeholder="Beneficiary reference">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <div class="input-group input-group-sm mr-sm-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">£</div>
+                        </div>
+                        <input asp-for="Payment.amount" type="number" class="form-control form-control-sm text-right" placeholder="Amount">
+                        <div class="input-group-append">
+                            <span class="input-group-text">.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.beneficiary_account_number" type="text" class="form-control form-control-sm" placeholder="Beneficiary account number">
+                </div>
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.beneficiary_sort_code" type="text" class="form-control form-control-sm" placeholder="Beneficiary sort code">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-secondary btn-sm">Send Money</button>
+        </form>
+        <p class="card-text"><b>Payment ID</b>: @Model.PaymentId</p>
+        <p id="auth_uri" class="card-text" style="word-wrap: break-word;">
+            <b>Auth Uri</b>:
+            @if (!string.IsNullOrWhiteSpace(Model.AuthUri))
+            {
+                <a href="@Model.AuthUri">Click here to authenticate</a>
+            }
+        </p>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        window.onload = () => {
+          @if (!string.IsNullOrWhiteSpace(Model.Position))
+          {
+              <text>
+                  const element = document.getElementById("@Model.Position");
+                  element.scrollIntoView({behavior: "smooth"});
+              </text>
+          }
+        };
+        
+        function prefill() {
+            @{ const string paymentName = nameof(Model.Payment); }
+            
+            const amount = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.amount)}")")[0];
+            amount.value = "1";
+            
+            const bank = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.remitter_provider_id)}")")[0];
+            bank.value = "ob-sandbox-natwest";
+            
+            const remName = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.remitter_name)}")")[0];
+            remName.value = "A less lucky someone";
+            
+            const remSort = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.remitter_sort_code)}")")[0];
+            remSort.value = "098765";
+            
+            const remAcc = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.remitter_account_number)}")")[0];
+            remAcc.value = "87654321";
+            
+            const remRef = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.remitter_reference)}")")[0];
+            remRef.value = "remitter ref";
+            
+            const benName = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.beneficiary_name)}")")[0];
+            benName.value = "A lucky someone";
+            
+            const benSort = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.beneficiary_sort_code)}")")[0];
+            benSort.value = "567890";
+            
+            const benAcc = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.beneficiary_account_number)}")")[0];
+            benAcc.value = "12345678";
+            
+            const benRef = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.beneficiary_reference)}")")[0];
+            benRef.value = "beneficiary ref";
+        }
+    </script>
+}
