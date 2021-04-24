@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayerSdk.Common;
@@ -23,6 +21,33 @@ namespace TrueLayerSdk.Payments
             _configuration = configuration;
         }
 
+        public async Task<SingleImmediatePaymentResponse> SingleImmediatePayment(SingleImmediatePaymentRequest request,
+            CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrEmpty(request.AccessToken)) throw new ArgumentNullException(nameof(request.AccessToken));
+
+            const string path = "single-immediate-payments";
+
+            var data = new SingleImmediatePaymentData
+            {
+                amount = 120000,
+                currency = "GBP",
+                remitter_provider_id = "ob-sandbox-natwest",
+                remitter_name = "A less lucky someone",
+                remitter_sort_code = "098765",
+                remitter_account_number = "87654321",
+                remitter_reference = "remitter ref",
+                beneficiary_name = "A lucky someone",
+                beneficiary_sort_code = "567890",
+                beneficiary_account_number = "12345678",
+                beneficiary_reference = "beneficiary ref",
+                redirect_uri = request.ReturnUri,
+            };
+            
+            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(path, Functionality, cancellationToken, request.AccessToken, data);
+            return apiResponse;
+        }
+        
         public async Task<SingleImmediatePaymentInitiationResponse> SingleImmediatePaymentInitiation(SingleImmediatePaymentInitiationRequest request,
             CancellationToken cancellationToken)
         {
@@ -35,8 +60,8 @@ namespace TrueLayerSdk.Payments
                 single_immediate_payment = new SingleImmediatePayment
                 {
                     single_immediate_payment_id = Guid.NewGuid().ToString(),
-                    provider_id = "uk-cs-mock",
-                    scheme_id = "sepa_credit_transfer",
+                    provider_id = "ob-sandbox-natwest",
+                    scheme_id = "faster_payments_service",
                     fee_option_id = "free",
                     amount_in_minor = 120000,
                     currency = "GBP",
@@ -45,9 +70,9 @@ namespace TrueLayerSdk.Payments
                         name = "A lucky someone",
                         account = new Account
                         {
+                            type = "sort_code_account_number",
                             account_number = "123456",
                             sort_code = "7890",
-                            type = "sort_code",
                         },
                     },
                     remitter = new Remitter
@@ -55,9 +80,9 @@ namespace TrueLayerSdk.Payments
                         name = "A less lucky someone",
                         account = new Account
                         {
+                            type = "sort_code_account_number",
                             account_number = "654321",
                             sort_code = "0987",
-                            type = "sort_code",
                         },
                     },
                     references = new References
@@ -70,8 +95,8 @@ namespace TrueLayerSdk.Payments
                 auth_flow = new AuthFlow {type = "redirect", return_uri = request.ReturnUri},
             };
             
-            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationResponse>(path, Functionality, cancellationToken, request.AccessToken, data);
-            return apiResponse;
+            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationData>(path, Functionality, cancellationToken, request.AccessToken, data);
+            return new SingleImmediatePaymentInitiationResponse {Data = apiResponse};
         }
     }
 }

@@ -29,6 +29,8 @@ namespace TrueLayerSdk.Payments.Models
     public class SingleImmediatePayment
     {
         public string single_immediate_payment_id { get; set; }
+        public string status { get; set; }
+        public string initiated_at { get; set; }
         public string provider_id { get; set; }
         public string scheme_id { get; set; }
         public string fee_option_id { get; set; }
@@ -43,6 +45,8 @@ namespace TrueLayerSdk.Payments.Models
     {
         public string type { get; set; }
         public string return_uri { get; set; }
+        public string uri { get; set; }
+        public string expiry { get; set; }
     }
 
     public class SingleImmediatePaymentInitiationData
