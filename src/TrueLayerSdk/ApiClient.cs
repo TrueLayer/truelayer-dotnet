@@ -95,35 +95,24 @@ namespace TrueLayerSdk
             var json = await httpResponse.Content.ReadAsStringAsync();
             if(!string.IsNullOrWhiteSpace(json))
                 return _serializer.Deserialize(json, resultType);
-            switch(httpResponse.StatusCode)
+            
+            return httpResponse.StatusCode switch
             {
-                case HttpStatusCode.OK:
-                    return new TruelayerOkApiResponse(httpResponse.Headers);
-                case HttpStatusCode.Accepted:
-                    return new TruelayerAcceptedApiResponse(httpResponse.Headers);
-                // case HttpStatusCode.NoContent:
-                //     return new TruelayerNoContentApiResponse(httpResponse.Headers);
-                case HttpStatusCode.BadRequest:
-                    return new TruelayerBadRequestApiResponse(httpResponse.Headers);
-                case HttpStatusCode.Unauthorized:
-                    return new TruelayerUnauthorizedApiResponse(httpResponse.Headers);
-                // case HttpStatusCode.Forbidden:
-                //     return new TruelayerForbiddenApiResponse(httpResponse.Headers);
-                // case HttpStatusCode.NotFound:
-                //     return new TruelayerNotFoundApiResponse(httpResponse.Headers);                
-                // case HttpStatusCode.Conflict:
-                //     return new TruelayerConflictApiResponse(httpResponse.Headers);
-                // case (HttpStatusCode)422:
-                //     return new TruelayerUnprocessableEntityApiResponse(httpResponse.Headers);
-                // case (HttpStatusCode)429:
-                //     return new TruelayerTooManyRequestsApiResponse(httpResponse.Headers);
-                case HttpStatusCode.InternalServerError:
-                    return new TruelayerInternalServerErrorApiResponse(httpResponse.Headers);
-                // case HttpStatusCode.BadGateway:
-                //     return new TruelayerBadGatewayApiResponse(httpResponse.Headers);
-                default:
-                    throw new NotImplementedException($"Handling a contentless API response with status code {httpResponse.StatusCode} is not implemented.");
-            }
+                HttpStatusCode.OK => new TruelayerOkApiResponse(httpResponse.Headers),
+                HttpStatusCode.Accepted => new TruelayerAcceptedApiResponse(httpResponse.Headers),
+                HttpStatusCode.NoContent => new TruelayerNoContentApiResponse(httpResponse.Headers),
+                HttpStatusCode.BadRequest => new TruelayerBadRequestApiResponse(httpResponse.Headers),
+                HttpStatusCode.Unauthorized => new TruelayerUnauthorizedApiResponse(httpResponse.Headers),
+                HttpStatusCode.Forbidden => new TruelayerForbiddenApiResponse(httpResponse.Headers),
+                HttpStatusCode.NotFound => new TruelayerNotFoundApiResponse(httpResponse.Headers),
+                HttpStatusCode.Conflict => new TruelayerConflictApiResponse(httpResponse.Headers),
+                (HttpStatusCode) 422 => new TruelayerUnprocessableEntityApiResponse(httpResponse.Headers),
+                (HttpStatusCode) 429 => new TruelayerTooManyRequestsApiResponse(httpResponse.Headers),
+                HttpStatusCode.InternalServerError => new TruelayerInternalServerErrorApiResponse(httpResponse.Headers),
+                HttpStatusCode.BadGateway => new TruelayerBadGatewayApiResponse(httpResponse.Headers),
+                _ => throw new NotImplementedException(
+                    $"Handling a contentless API response with status code {httpResponse.StatusCode} is not implemented.")
+            };
         }
 
         private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, string path, string accessToken,
