@@ -6,14 +6,12 @@
 
 <div class="text-center">
     <h1 class="display-4">TrueLayer SDK Sample App</h1>
-    <a asp-page-handler="token" class="btn btn-primary">Get Token</a>
 </div>
+<a asp-page-handler="token" class="btn btn-primary mb-2">Get Token</a>
 <p style="word-wrap: break-word;"><b>Token</b>: @Model.Token</p>
-<div class="text-center">
-    <form method="post">
-        <button type="submit" class="btn btn-primary">Send Money</button>
-    </form>
-</div>
+<form method="post" class="mb-2">
+    <button type="submit" class="btn btn-primary">Send Money</button>
+</form>
 <p><b>Payment ID</b>: @Model.PaymentId</p>
 <p style="word-wrap: break-word;">
     <b>Auth Uri</b>: 
