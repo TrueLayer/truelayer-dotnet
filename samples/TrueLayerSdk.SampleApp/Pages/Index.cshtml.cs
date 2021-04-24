@@ -48,7 +48,7 @@ namespace TrueLayerSdk.SampleApp.Pages
             {
                 AccessToken = _tokenStorage.AccessToken,
                 ReturnUri = "https://localhost:5001/callback",
-                amount = Payment.amount,
+                amount = Payment.amount * 100,
                 remitter_provider_id = Payment.remitter_provider_id,
                 remitter_name = Payment.remitter_name,
                 remitter_sort_code = Payment.remitter_sort_code,
