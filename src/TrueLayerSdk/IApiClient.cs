@@ -11,6 +11,18 @@ namespace TrueLayerSdk
     public interface IApiClient
     {
         /// <summary>
+        /// Executes a GET request to the specified <paramref name="path"/>. 
+        /// </summary>
+        /// <param name="path">The API resource path.</param>
+        /// <param name="functionality">The credentials used to authenticate the request.</param>
+        /// <param name="accessToken">The access token used to authenticate the request.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the underlying HTTP request.</param>
+        /// <typeparam name="TResult">The expected response type to be deserialized.</typeparam>
+        /// <returns>A task that upon completion contains the specified API response data.</returns>
+        Task<TResult> GetAsync<TResult>(string path, Functionality functionality, string accessToken,
+            CancellationToken cancellationToken);
+
+        /// <summary>
         /// Executes a POST request to the specified <paramref name="path"/>. 
         /// </summary>
         /// <param name="path">The API resource path.</param>
@@ -19,7 +31,8 @@ namespace TrueLayerSdk
         /// <param name="httpContent">Optional data that should be sent in the request body.</param>
         /// <typeparam name="TResult">The expected response type to be deserialized.</typeparam>
         /// <returns>A task that upon completion contains the specified API response data.</returns>
-        Task<TResult> PostAsync<TResult>(string path, CancellationToken cancellationToken, Functionality functionality, HttpContent httpContent = null);
+        Task<TResult> PostAsync<TResult>(string path, CancellationToken cancellationToken, Functionality functionality,
+            HttpContent httpContent = null);
 
         /// <summary>
         /// Executes a POST request to the specified <paramref name="path"/>. 

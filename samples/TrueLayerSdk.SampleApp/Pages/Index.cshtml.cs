@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -77,5 +78,10 @@ namespace TrueLayerSdk.SampleApp.Pages
         public string beneficiary_sort_code { get; set; }
         public string beneficiary_account_number { get; set; }
         public string beneficiary_reference { get; set; }
+        
+        public string simp_id { get; set; }
+        public DateTime created_at { get; set; }
+        public string status { get; set; }
+
     }
 }

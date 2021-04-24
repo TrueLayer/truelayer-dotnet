@@ -48,6 +48,22 @@ namespace TrueLayerSdk
             _httpClient = httpClientFactory.CreateClient();
         }
         
+        public async Task<TResult> GetAsync<TResult>(string path, Functionality functionality, string accessToken, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+            if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
+
+            using var httpResponse = await SendRequestAsync(
+                httpMethod: HttpMethod.Get,
+                path: path,
+                accessToken: accessToken,
+                httpContent: null,
+                cancellationToken: cancellationToken,
+                functionality: functionality
+            );
+            return await DeserializeJsonAsync<TResult>(httpResponse);
+        }
+        
         public async Task<TResult> PostAsync<TResult>(string path, CancellationToken cancellationToken,
             Functionality functionality, HttpContent httpContent = null)
         {

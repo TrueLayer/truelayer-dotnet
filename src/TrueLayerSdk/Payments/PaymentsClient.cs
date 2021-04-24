@@ -20,7 +20,16 @@ namespace TrueLayerSdk.Payments
             _apiClient = apiClient;
             _configuration = configuration;
         }
-
+        
+        public Task<GetPaymentStatusResponse> GetPaymentStatus(string paymentId, string accessToken, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(paymentId)) throw new ArgumentNullException(nameof(paymentId));
+            if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
+            
+            var path = $"single-immediate-payments/{paymentId}";
+            return _apiClient.GetAsync<GetPaymentStatusResponse>(path, Functionality, accessToken, cancellationToken);
+        }
+        
         public async Task<SingleImmediatePaymentResponse> SingleImmediatePayment(SingleImmediatePaymentRequest request,
             CancellationToken cancellationToken)
         {
@@ -30,7 +39,7 @@ namespace TrueLayerSdk.Payments
 
             var data = new SingleImmediatePaymentData
             {
-                amount = 120000,
+                amount = request.amount,
                 currency = "GBP",
                 remitter_provider_id = request.remitter_provider_id,
                 remitter_name = request.remitter_name,
@@ -47,7 +56,7 @@ namespace TrueLayerSdk.Payments
             var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(path, Functionality, cancellationToken, request.AccessToken, data);
             return apiResponse;
         }
-        
+
         public async Task<SingleImmediatePaymentInitiationResponse> SingleImmediatePaymentInitiation(SingleImmediatePaymentInitiationRequest request,
             CancellationToken cancellationToken)
         {
