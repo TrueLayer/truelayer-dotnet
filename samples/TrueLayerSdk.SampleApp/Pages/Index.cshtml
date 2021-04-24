@@ -1,0 +1,25 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">TrueLayer SDK Sample App</h1>
+    <a asp-page-handler="token" class="btn btn-primary">Get Token</a>
+</div>
+<p style="word-wrap: break-word;"><b>Token</b>: @Model.Token</p>
+<div class="text-center">
+    <form method="post">
+        <button type="submit" class="btn btn-primary">Send Money</button>
+    </form>
+</div>
+<p><b>Payment ID</b>: @Model.PaymentId</p>
+<p style="word-wrap: break-word;">
+    <b>Auth Uri</b>: 
+    @if (!string.IsNullOrWhiteSpace(Model.AuthUri))
+    {
+        <a href="@Model.AuthUri">Click here to authenticate</a>
+    }
+</p>
+
