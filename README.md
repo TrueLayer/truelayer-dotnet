@@ -2,7 +2,8 @@
 The **TrueLayer SDK for .NET** enables .NET developers to easily work with [TrueLayer.com APIs](https://docs.truelayer.com/). It supports .NET Core and .NET 5. It is (heavily) inspired to [Checkout's .NET Sdk](https://github.com/checkout/checkout-sdk-net).
 
 ## Quickstart
-Make sure you fill the `clientId` and `clientSecret` fields inside your `appsettings.json`. You can obtain them by signing up on [Truelayer's console](https://console.truelayer.com/?auto=signup).
+Make sure you fill the `clientId` and `clientSecret` fields inside your `appsettings.json`.
+You can obtain them by signing up at [Truelayer's console](https://console.truelayer.com/?auto=signup).
 ```JavaScript
 {
   "Truelayer": {
