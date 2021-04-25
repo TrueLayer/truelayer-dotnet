@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TrueLayerSdk.Auth.Models;
 using TrueLayerSdk.Payments.Models;
+using TrueLayerSdk.SampleApp.Models;
 
 namespace TrueLayerSdk.SampleApp.Pages
 {
@@ -64,24 +64,5 @@ namespace TrueLayerSdk.SampleApp.Pages
             AuthUri = result.results.First().auth_uri;
             Position = "auth_uri";
         }
-    }
-
-    public class PaymentData
-    {
-        public int amount { get; set; }
-        public string remitter_provider_id { get; set; }
-        public string remitter_name { get; set; }
-        public string remitter_sort_code { get; set; }
-        public string remitter_account_number { get; set; }
-        public string remitter_reference { get; set; }
-        public string beneficiary_name { get; set; }
-        public string beneficiary_sort_code { get; set; }
-        public string beneficiary_account_number { get; set; }
-        public string beneficiary_reference { get; set; }
-        
-        public string simp_id { get; set; }
-        public DateTime created_at { get; set; }
-        public string status { get; set; }
-
     }
 }

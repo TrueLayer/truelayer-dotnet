@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
+using TrueLayerSdk.SampleApp.Models;
 
 namespace TrueLayerSdk.SampleApp.Pages
 {
@@ -20,12 +21,25 @@ namespace TrueLayerSdk.SampleApp.Pages
         public PaymentData Payment;
         private readonly TruelayerApi _api;
         
-        public string Token { get; set; }
-
-        public async Task OnGet([FromQuery] string payment_id)
+        public string Token { get; }
+        public ErrorEntity Error { get; set; }
+        
+        public async Task OnGet([FromQuery(Name = "payment_id")] string paymentId)
         {
+            if (string.IsNullOrEmpty(paymentId))
+            {
+                Error = new ErrorEntity("Payment ID is required", "Payment id is required to fetch status");
+                return;
+            }
+            
+            if (string.IsNullOrEmpty(_tokenStorage.AccessToken))
+            {
+                Error = new ErrorEntity("Access token is required", "Access token is required to fetch payment status");
+                return;
+            }
+            
             var result =
-                await _api.Payments.GetPaymentStatus(payment_id, _tokenStorage.AccessToken, CancellationToken.None);
+                await _api.Payments.GetPaymentStatus(paymentId, _tokenStorage.AccessToken, CancellationToken.None);
             var paymentData = result.results.First();
             Payment = new PaymentData
             {

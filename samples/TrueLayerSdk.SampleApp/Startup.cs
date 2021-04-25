@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TrueLayerSdk.SampleApp.Data;
 
 namespace TrueLayerSdk.SampleApp
 {
@@ -18,6 +20,9 @@ namespace TrueLayerSdk.SampleApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<PaymentsDbContext>(options =>
+                options.UseSqlite(@"Data Source=payments.db"));
+            
             services.AddSingleton<TokenStorage>();
             services.AddRazorPages().AddRazorRuntimeCompilation();
         }

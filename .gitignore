@@ -5,6 +5,7 @@
 
 # Custom stuff
 appsettings.[Dd]evelopment.json
+payments.db
 
 # User-specific files
 *.rsuser
