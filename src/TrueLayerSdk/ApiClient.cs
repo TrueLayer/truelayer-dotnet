@@ -178,7 +178,7 @@ namespace TrueLayerSdk
                 // if (httpResponse.StatusCode == Unprocessable)
                 // {
                 //     var error = await DeserializeJsonAsync<ErrorResponse>(httpResponse);
-                //     throw new CheckoutValidationException(error, httpResponse.StatusCode, requestId);
+                //     throw new TruelayerValidationException(error, httpResponse.StatusCode, requestId);
                 // }
 
                 if (httpResponse.StatusCode == HttpStatusCode.NotFound)

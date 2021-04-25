@@ -22,7 +22,8 @@ namespace TrueLayerSdk.SampleApp
         {
             services.AddDbContext<PaymentsDbContext>(options =>
                 options.UseSqlite(@"Data Source=payments.db"));
-            
+
+            services.AddTruelayerSdk(Configuration);
             services.AddSingleton<TokenStorage>();
             services.AddRazorPages().AddRazorRuntimeCompilation();
         }

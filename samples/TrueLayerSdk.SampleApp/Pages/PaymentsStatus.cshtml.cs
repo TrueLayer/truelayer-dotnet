@@ -22,7 +22,7 @@ namespace TrueLayerSdk.SampleApp.Pages
             Payments = await _context.Payments.ToListAsync();
         }
         
-        public async Task<IActionResult> OnGetStatus(string paymentId)
+        public IActionResult OnGetStatus(string paymentId)
         {
             return RedirectToPage("Callback", new {payment_id = paymentId});
         }

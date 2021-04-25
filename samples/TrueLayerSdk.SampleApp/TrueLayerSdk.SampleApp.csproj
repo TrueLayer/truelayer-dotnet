@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\TrueLayerSdk.Extensions.Microsoft\TrueLayerSdk.Extensions.Microsoft.csproj" />
       <ProjectReference Include="..\..\src\TrueLayerSdk\TrueLayerSdk.csproj" />
     </ItemGroup>
 

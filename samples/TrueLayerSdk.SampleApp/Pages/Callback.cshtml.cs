@@ -12,18 +12,18 @@ namespace TrueLayerSdk.SampleApp.Pages
 {
     public class Callback : PageModel
     {
-        public Callback(IConfiguration config, TokenStorage tokenStorage, PaymentsDbContext context)
+        public Callback(IConfiguration config, TokenStorage tokenStorage, PaymentsDbContext context, ITruelayerApi api)
         {
             _tokenStorage = tokenStorage;
             _context = context;
-            _api = TruelayerApi.Create(config["clientId"], config["clientSecret"], true);
+            _api = api;
             Token = _tokenStorage.AccessToken;
         }
         
         private readonly TokenStorage _tokenStorage;
         private readonly PaymentsDbContext _context;
         public PaymentData Payment;
-        private readonly TruelayerApi _api;
+        private readonly ITruelayerApi _api;
         
         public string Token { get; }
         public ErrorEntity Error { get; set; }

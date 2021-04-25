@@ -18,7 +18,7 @@ namespace TrueLayerSdk.SampleApp.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly TokenStorage _tokenStorage;
         private readonly PaymentsDbContext _context;
-        private readonly TruelayerApi _api;
+        private readonly ITruelayerApi _api;
         public string Token;
         public string PaymentId;
         public string AuthUri;
@@ -26,12 +26,13 @@ namespace TrueLayerSdk.SampleApp.Pages
         [BindProperty]
         public PaymentData Payment { get; set; }
         
-        public IndexModel(ILogger<IndexModel> logger, IConfiguration config, TokenStorage tokenStorage, PaymentsDbContext context)
+        public IndexModel(ILogger<IndexModel> logger, IConfiguration config, TokenStorage tokenStorage,
+            PaymentsDbContext context, ITruelayerApi api)
         {
             _logger = logger;
             _tokenStorage = tokenStorage;
             _context = context;
-            _api = TruelayerApi.Create(config["clientId"], config["clientSecret"], true);
+            _api = api;
             Token = _tokenStorage.AccessToken;
         }
 
