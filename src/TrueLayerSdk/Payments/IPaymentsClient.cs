@@ -23,7 +23,7 @@ namespace TrueLayerSdk.Payments
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<SingleImmediatePaymentInitiationResponse> SingleImmediatePaymentInitiation(
-            SingleImmediatePaymentInitiationRequest request, CancellationToken cancellationToken);
+            SingleImmediatePaymentInitiationRequest request, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// v1
@@ -32,6 +32,6 @@ namespace TrueLayerSdk.Payments
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<SingleImmediatePaymentResponse> SingleImmediatePayment(SingleImmediatePaymentRequest request,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
     }
 }

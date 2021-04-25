@@ -41,7 +41,7 @@ namespace TrueLayerSdk.SampleApp.Pages
 
         public async Task OnGetToken()
         {
-            var result = await _api.Auth.GetPaymentToken(new GetPaymentTokenRequest(), CancellationToken.None);
+            var result = await _api.Auth.GetPaymentToken(new GetPaymentTokenRequest());
             _tokenStorage.SetToken(result.AccessToken, result.ExpiresIn);
             Token = _tokenStorage.AccessToken;
         }
@@ -63,7 +63,7 @@ namespace TrueLayerSdk.SampleApp.Pages
                 beneficiary_account_number = Payment.beneficiary_account_number,
                 beneficiary_reference = Payment.beneficiary_reference,
             };
-            var result = await _api.Payments.SingleImmediatePayment(request, CancellationToken.None);
+            var result = await _api.Payments.SingleImmediatePayment(request);
             PaymentId = result.results.First().simp_id;
             AuthUri = result.results.First().auth_uri;
             Position = "auth_uri";
