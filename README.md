@@ -24,7 +24,7 @@ var response = await api.Payments.SingleImmediatePayment(request);
 var paymentId = response.results.First().simp_id;
 var authUri = response.results.First().auth_uri;
 ```
-All API operations return an ApiResponse<TResult> where TResult contains the result of the API call. Get more details on [Truelayer's API documentation](https://docs.truelayer.com/).
+All API operations return an `ApiResponse<TResult>` where `TResult` contains the result of the API call. Get more details on [Truelayer's API documentation](https://docs.truelayer.com/).
 
 ## .NET Core / .NET 5 Applications
 You can leverage the .NET built-in Dependency Injection system to add the Truelayer SDK inside your application.
