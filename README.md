@@ -3,6 +3,15 @@ The **TrueLayer SDK for .NET** enables .NET developers to easily work with [True
 
 ## Quickstart
 Make sure you fill the `clientId` and `clientSecret` fields inside your `appsettings.json`. You can obtain them by signing up on [Truelayer's console](https://console.truelayer.com/?auto=signup).
+```JavaScript
+{
+  "Truelayer": {
+    "ClientId": "",
+    "ClientSecret": "",
+    "UseSandbox": ""
+  }
+}
+```
 
 Initialize a TruelayerApi instance to access the operations for each API:
 ```C#
@@ -16,6 +25,25 @@ var paymentId = response.results.First().simp_id;
 var authUri = response.results.First().auth_uri;
 ```
 All API operations return an ApiResponse<TResult> where TResult contains the result of the API call. Get more details on [Truelayer's API documentation](https://docs.truelayer.com/).
+
+## .NET Core / .NET 5 Applications
+You can leverage the .NET built-in Dependency Injection system to add the Truelayer SDK inside your application.
+
+Reference directly the `TrueLayerSdk.Extensions.Microsoft` project or install the nuget when available, and register the SDK with the built-in DI container in `Startup.cs`:
+
+```C#
+public IConfiguration Configuration { get; }
+
+public void ConfigureServices(IServiceCollection services)
+{
+    // ...
+    services.AddTruelayerSdk(Configuration);
+    // OR
+    var tlConfiguration = new TruelayerConfiguration("clientId", "clientSecret", useSandbox: true);
+    services.AddTruelayerSdk(tlConfiguration);
+    //...
+}
+```
 
 # Pre-alpha checklist
 
