@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TrueLayerSdk.Auth.Models;
 using TrueLayerSdk.Payments.Models;
+using TrueLayerSdk.SampleApp.Data;
 using TrueLayerSdk.SampleApp.Models;
 
 namespace TrueLayerSdk.SampleApp.Pages
@@ -15,6 +17,7 @@ namespace TrueLayerSdk.SampleApp.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly TokenStorage _tokenStorage;
+        private readonly PaymentsDbContext _context;
         private readonly TruelayerApi _api;
         public string Token;
         public string PaymentId;
@@ -23,10 +26,11 @@ namespace TrueLayerSdk.SampleApp.Pages
         [BindProperty]
         public PaymentData Payment { get; set; }
         
-        public IndexModel(ILogger<IndexModel> logger, IConfiguration config, TokenStorage tokenStorage)
+        public IndexModel(ILogger<IndexModel> logger, IConfiguration config, TokenStorage tokenStorage, PaymentsDbContext context)
         {
             _logger = logger;
             _tokenStorage = tokenStorage;
+            _context = context;
             _api = TruelayerApi.Create(config["clientId"], config["clientSecret"], true);
             Token = _tokenStorage.AccessToken;
         }
@@ -63,6 +67,9 @@ namespace TrueLayerSdk.SampleApp.Pages
             PaymentId = result.results.First().simp_id;
             AuthUri = result.results.First().auth_uri;
             Position = "auth_uri";
+            await _context.Payments.AddAsync(new PaymentEntity
+                {PaymentEntityId = PaymentId, CreatedAt = DateTime.UtcNow, Status = result.results.First().status});
+            await _context.SaveChangesAsync();
         }
     }
 }

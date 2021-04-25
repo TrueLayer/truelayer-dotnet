@@ -14,5 +14,6 @@ namespace TrueLayerSdk.SampleApp.Data
     {
         public string PaymentEntityId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string Status { get; set; }
     }
 }

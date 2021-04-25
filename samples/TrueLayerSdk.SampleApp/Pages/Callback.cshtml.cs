@@ -3,21 +3,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using TrueLayerSdk.SampleApp.Data;
 using TrueLayerSdk.SampleApp.Models;
 
 namespace TrueLayerSdk.SampleApp.Pages
 {
     public class Callback : PageModel
     {
-        public Callback(IConfiguration config, TokenStorage tokenStorage)
+        public Callback(IConfiguration config, TokenStorage tokenStorage, PaymentsDbContext context)
         {
             _tokenStorage = tokenStorage;
+            _context = context;
             _api = TruelayerApi.Create(config["clientId"], config["clientSecret"], true);
             Token = _tokenStorage.AccessToken;
         }
         
         private readonly TokenStorage _tokenStorage;
+        private readonly PaymentsDbContext _context;
         public PaymentData Payment;
         private readonly TruelayerApi _api;
         
@@ -47,6 +51,9 @@ namespace TrueLayerSdk.SampleApp.Pages
                 created_at = paymentData.created_at,
                 status = paymentData.status,
             };
+            var entity = await _context.Payments.FirstAsync(p => p.PaymentEntityId == paymentData.simp_id);
+            entity.Status = paymentData.status;
+            await _context.SaveChangesAsync();
         }
     }
 }
