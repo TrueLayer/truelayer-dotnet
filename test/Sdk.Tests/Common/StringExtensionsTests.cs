@@ -12,7 +12,7 @@ namespace TrueLayer.Sdk.Tests.Common
         
         public static IEnumerable<object[]> SnakeCaseData()
         {
-            var snakeCaseSamples = new List<object[]>()
+            var snakeCaseSamples = new List<object[]>
             {
                 new object[] {50, 50},
                 new object[] {"url_value", "URLValue"},

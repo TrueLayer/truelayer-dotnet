@@ -2,56 +2,56 @@ namespace TrueLayerSdk.Payments.Models
 {
     public class Account
     {
-        public string type { get; set; }
-        public string sort_code { get; set; }
-        public string account_number { get; set; }
+        public string Type { get; set; }
+        public string SortCode { get; set; }
+        public string AccountNumber { get; set; }
     }
 
     public class Beneficiary
     {
-        public Account account { get; set; }
-        public string name { get; set; }
+        public Account Account { get; set; }
+        public string Name { get; set; }
     }
 
     public class Remitter
     {
-        public Account account { get; set; }
-        public string name { get; set; }
+        public Account Account { get; set; }
+        public string Name { get; set; }
     }
 
     public class References
     {
-        public string type { get; set; }
-        public string beneficiary { get; set; }
-        public string remitter { get; set; }
+        public string Type { get; set; }
+        public string Beneficiary { get; set; }
+        public string Remitter { get; set; }
     }
 
     public class SingleImmediatePayment
     {
-        public string single_immediate_payment_id { get; set; }
-        public string status { get; set; }
-        public string initiated_at { get; set; }
-        public string provider_id { get; set; }
-        public string scheme_id { get; set; }
-        public string fee_option_id { get; set; }
-        public int amount_in_minor { get; set; }
-        public string currency { get; set; }
-        public Beneficiary beneficiary { get; set; }
-        public Remitter remitter { get; set; }
-        public References references { get; set; }
+        public string SingleImmediatePaymentId { get; set; }
+        public string Status { get; set; }
+        public string InitiatedAt { get; set; }
+        public string ProviderId { get; set; }
+        public string SchemeId { get; set; }
+        public string FeeOptionId { get; set; }
+        public int AmountInMinor { get; set; }
+        public string Currency { get; set; }
+        public Beneficiary Beneficiary { get; set; }
+        public Remitter Remitter { get; set; }
+        public References References { get; set; }
     }
 
     public class AuthFlow
     {
-        public string type { get; set; }
-        public string return_uri { get; set; }
-        public string uri { get; set; }
-        public string expiry { get; set; }
+        public string Type { get; set; }
+        public string ReturnUri { get; set; }
+        public string Uri { get; set; }
+        public string Expiry { get; set; }
     }
 
     public class SingleImmediatePaymentInitiationData
     {
-        public SingleImmediatePayment single_immediate_payment { get; set; }
-        public AuthFlow auth_flow { get; set; }
+        public SingleImmediatePayment SingleImmediatePayment { get; set; }
+        public AuthFlow AuthFlow { get; set; }
     }
 }
