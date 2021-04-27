@@ -2,7 +2,7 @@ using System.Text;
 
 namespace TrueLayerSdk.Common
 {
-    public static class StringUtils
+    public static class StringExtensions
     {
         private enum SnakeCaseState
         {
