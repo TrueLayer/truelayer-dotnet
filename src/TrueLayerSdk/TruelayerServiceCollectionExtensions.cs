@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using TrueLayerSdk;
 
@@ -17,16 +18,16 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="configuration">The Truelayer configuration.</param>
         /// <returns>The service collection with registered Truelayer SDK services.</returns>
         public static IServiceCollection AddTruelayerSdk(this IServiceCollection services,
-            TruelayerConfiguration configuration)
+            TruelayerConfiguration configuration, Action<HttpClient>? configureHttpClient = null)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            if (services is null) throw new ArgumentNullException(nameof(services));
+            if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-            services.AddSingleton<IHttpClientFactory>(new DefaultHttpClientFactory());
+            services.AddHttpClient<ApiClient>(configureHttpClient);
             services.AddSingleton<ISerializer>(new JsonSerializer());
+            services.AddTransient<IApiClient, ApiClient>();
+            services.AddTransient<ITruelayerApi, TruelayerApi>();
             services.AddSingleton(configuration);
-            services.AddSingleton<IApiClient, ApiClient>();
-            services.AddSingleton<ITruelayerApi, TruelayerApi>();
 
             return services;
         }
@@ -37,13 +38,14 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="services">The service collection to add to.</param>
         /// <param name="configuration">The Microsoft configuration used to obtain the Truelayer SDK configuration.</param>
         /// <returns>The service collection with registered Truelayer SDK services.</returns>
-        public static IServiceCollection AddTruelayerSdk(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddTruelayerSdk(this IServiceCollection services, 
+            IConfiguration configuration, Action<HttpClient> configureHttpClient = null)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            if (services is null) throw new ArgumentNullException(nameof(services));
+            if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-            var truelayerOptions = configuration.GetTruelayerOptions();
-            return services.AddTruelayerSdk(truelayerOptions.CreateConfiguration());
+            TruelayerOptions truelayerOptions = configuration.GetTruelayerOptions();
+            return services.AddTruelayerSdk(truelayerOptions.CreateConfiguration(), configureHttpClient);
         }
     }
 }
