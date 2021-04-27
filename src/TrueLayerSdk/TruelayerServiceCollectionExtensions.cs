@@ -26,8 +26,8 @@ namespace Microsoft.Extensions.DependencyInjection
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-            services.AddHttpClient<ApiClient>(configureHttpClient ?? NullOpHttpClient)
-                .AddHttpMessageHandler<UserAgentHandler>();
+            services.AddHttpClient<IApiClient, ApiClient>(configureHttpClient ?? NullOpHttpClient)
+                .AddHttpMessageHandler(() => new UserAgentHandler());
 
             services.AddSingleton<ISerializer>(new JsonSerializer());
             services.AddTransient<IApiClient, ApiClient>();
