@@ -1,5 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrueLayerSdk", "src\TrueLayerSdk\TrueLayerSdk.csproj", "{3CAD6ACA-344B-4FC3-965E-8C116759B50A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A28C8509-D982-426E-A9DC-83A169621955}"
@@ -8,7 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{2306
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrueLayerSdk.SampleApp", "samples\TrueLayerSdk.SampleApp\TrueLayerSdk.SampleApp.csproj", "{D30E35EB-7B77-47DB-9DDE-B67868AB1401}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrueLayerSdk.Extensions.Microsoft", "src\TrueLayerSdk.Extensions.Microsoft\TrueLayerSdk.Extensions.Microsoft.csproj", "{220B502A-81A4-4DED-B8B8-3B6F0B6179E5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F7D3A645-D715-4EE6-A2B2-1D557A60B9D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdk.AcceptanceTests", "test\Sdk.AcceptanceTests\Sdk.AcceptanceTests.csproj", "{0352DE5D-88E6-4AEA-AC76-592841F9F105}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,14 +27,14 @@ Global
 		{D30E35EB-7B77-47DB-9DDE-B67868AB1401}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D30E35EB-7B77-47DB-9DDE-B67868AB1401}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D30E35EB-7B77-47DB-9DDE-B67868AB1401}.Release|Any CPU.Build.0 = Release|Any CPU
-		{220B502A-81A4-4DED-B8B8-3B6F0B6179E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{220B502A-81A4-4DED-B8B8-3B6F0B6179E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{220B502A-81A4-4DED-B8B8-3B6F0B6179E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{220B502A-81A4-4DED-B8B8-3B6F0B6179E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0352DE5D-88E6-4AEA-AC76-592841F9F105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0352DE5D-88E6-4AEA-AC76-592841F9F105}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0352DE5D-88E6-4AEA-AC76-592841F9F105}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0352DE5D-88E6-4AEA-AC76-592841F9F105}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3CAD6ACA-344B-4FC3-965E-8C116759B50A} = {A28C8509-D982-426E-A9DC-83A169621955}
 		{D30E35EB-7B77-47DB-9DDE-B67868AB1401} = {2306201C-78D1-4C56-A029-3D15F4B9C9F9}
-		{220B502A-81A4-4DED-B8B8-3B6F0B6179E5} = {A28C8509-D982-426E-A9DC-83A169621955}
+		{0352DE5D-88E6-4AEA-AC76-592841F9F105} = {F7D3A645-D715-4EE6-A2B2-1D557A60B9D2}
 	EndGlobalSection
 EndGlobal

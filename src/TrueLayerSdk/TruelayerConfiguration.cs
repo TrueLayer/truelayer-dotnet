@@ -22,8 +22,8 @@ namespace TrueLayerSdk
         /// <param name="useSandbox">Whether to connect to the Truelayer Sandbox. False indicates the live environment should be used.</param>
         public TruelayerConfiguration(string clientId, string clientSecret, bool useSandbox)
         {
-            if (string.IsNullOrEmpty(clientId)) throw new ArgumentException($"Your client id is required", nameof(clientId));
-            if (string.IsNullOrEmpty(clientSecret)) throw new ArgumentException($"Your API secret key is required", nameof(clientSecret));
+            if (string.IsNullOrWhiteSpace(clientId)) throw new ArgumentException($"Your client id is required", nameof(clientId));
+            if (string.IsNullOrWhiteSpace(clientSecret)) throw new ArgumentException($"Your API secret key is required", nameof(clientSecret));
 
             ClientId = clientId;
             ClientSecret = clientSecret;

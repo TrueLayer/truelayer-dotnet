@@ -2,49 +2,58 @@
 The **TrueLayer SDK for .NET** enables .NET developers to easily work with [TrueLayer.com APIs](https://docs.truelayer.com/). It supports .NET Core and .NET 5. It is (heavily) inspired to [Checkout's .NET Sdk](https://github.com/checkout/checkout-sdk-net).
 
 ## Quickstart
-Make sure you fill the `clientId` and `clientSecret` fields inside your `appsettings.json`.
-You can obtain them by signing up at [Truelayer's console](https://console.truelayer.com/?auto=signup).
-```JavaScript
+
+Install the TrueLayer SDK NuGet package:
+
+```
+dotnet add package TrueLayerSDK
+```
+
+Add your `ClientId` and `ClientSecret` to `appsettings.json`. You can obtain them by signing up at [Truelayer's console](https://console.truelayer.com/?auto=signup).
+
+
+```json
 {
   "Truelayer": {
-    "ClientId": "",
-    "ClientSecret": "",
-    "UseSandbox": ""
+    "ClientId": "your id",
+    "ClientSecret": "your secret",
+    "UseSandbox": true
   }
 }
 ```
 
-Initialize a TruelayerApi instance to access the operations for each API:
-```C#
-var api = TruelayerApi.Create(config["clientId"], config["clientSecret"], useSandbox: true);
+Register the TrueLayer SDK in `Startup.cs`:
 
-// Gather an access token which will be used for the payment request
-var auth = await api.Auth.GetPaymentToken(new GetPaymentTokenRequest());
-// Initiate a payment
-var response = await api.Payments.SingleImmediatePayment(request);
-var paymentId = response.results.First().simp_id;
-var authUri = response.results.First().auth_uri;
-```
-All API operations return an `ApiResponse<TResult>` where `TResult` contains the result of the API call. Get more details on [Truelayer's API documentation](https://docs.truelayer.com/).
-
-## .NET Core / .NET 5 Applications
-You can leverage the .NET built-in Dependency Injection system to add the Truelayer SDK inside your application.
-
-Reference directly the `TrueLayerSdk.Extensions.Microsoft` project or install the nuget when available, and register the SDK with the built-in DI container in `Startup.cs`:
-
-```C#
+```c#
 public IConfiguration Configuration { get; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-    // ...
     services.AddTruelayerSdk(Configuration);
-    // OR
-    var tlConfiguration = new TruelayerConfiguration("clientId", "clientSecret", useSandbox: true);
-    services.AddTruelayerSdk(tlConfiguration);
-    //...
 }
 ```
+
+Inject `ITrueLayerApi` into your classes:
+
+```c#
+class MyService
+{
+    private readonly ITruelayerApi _api;
+
+    public MyService(ITruelayerApi api)
+    {
+        _api = api;
+    }
+
+    public async Task MakePayment()
+    {
+        var request = new SingleImmediatePaymentRequest();
+        var response = await _api.Payments.SingleImmediatePayment(request);
+    }
+}
+```
+
+All API operations return an `ApiResponse<TResult>` where `TResult` contains the result of the API call. Get more details on [Truelayer's API documentation](https://docs.truelayer.com/).
 
 # Pre-alpha checklist
 
