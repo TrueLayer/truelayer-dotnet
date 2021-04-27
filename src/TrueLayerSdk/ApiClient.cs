@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using TrueLayerSdk.Common;
 using TrueLayerSdk.Common.CustomHttpResponses;
 using TrueLayerSdk.Common.Exceptions;
+using TrueLayerSdk.Common.Serialization;
 
 namespace TrueLayerSdk
 {

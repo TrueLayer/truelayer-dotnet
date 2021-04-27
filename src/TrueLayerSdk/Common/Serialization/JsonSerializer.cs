@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json;
 
-namespace TrueLayerSdk
+namespace TrueLayerSdk.Common.Serialization
 {
     public class JsonSerializer : ISerializer
     {
@@ -44,10 +44,7 @@ namespace TrueLayerSdk
             var settings = new JsonSerializerOptions
             {
                 IgnoreNullValues = true,
-                // ContractResolver = new DefaultContractResolver()
-                // {
-                //     NamingStrategy = new SnakeCaseNamingStrategy()
-                // },
+                PropertyNamingPolicy = SnakeCaseNamingPolicy.Instance,
                 // Converters = new[] { new StringEnumConverter() }
             };
 
