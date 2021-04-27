@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;
 using TrueLayerSdk;
 using TrueLayerSdk.Common.Serialization;
@@ -26,7 +27,9 @@ namespace Microsoft.Extensions.DependencyInjection
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-            services.AddHttpClient<ApiClient>(configureHttpClient ?? NullOpHttpClient);
+            services.AddHttpClient<ApiClient>(configureHttpClient ?? NullOpHttpClient)
+                .AddHttpMessageHandler<UserAgentHandler>();
+
             services.AddSingleton<ISerializer>(new JsonSerializer());
             services.AddTransient<IApiClient, ApiClient>();
             services.AddTransient<ITruelayerApi, TruelayerApi>();

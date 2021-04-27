@@ -135,9 +135,6 @@ namespace TrueLayerSdk
         private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod httpMethod, string path, string accessToken,
             HttpContent httpContent, CancellationToken cancellationToken, Functionality functionality)
         {
-            const string product = "truelayer-sdk-net";
-            var productVersion = "v1";
-
             if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
 
             var httpRequest = new HttpRequestMessage(httpMethod, GetRequestUri(path, functionality))
@@ -145,7 +142,6 @@ namespace TrueLayerSdk
                 Content = httpContent
             };
 
-            httpRequest.Headers.UserAgent.ParseAdd($"{product}/{productVersion}");
             if (!string.IsNullOrEmpty(accessToken))
                 httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
