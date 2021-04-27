@@ -4,7 +4,7 @@ namespace TrueLayerSdk.Common
 {
     public static class StringUtils
     {
-        private enum SeparatedCaseState
+        private enum SnakeCaseState
         {
             Start,
             Lower,
@@ -21,62 +21,55 @@ namespace TrueLayerSdk.Common
             }
 
             var sb = new StringBuilder();
-            var state = SeparatedCaseState.Start;
+            var state = SnakeCaseState.Start;
 
             for (var i = 0; i < s.Length; i++)
             {
                 if (s[i] == ' ')
                 {
-                    if (state != SeparatedCaseState.Start)
+                    if (state != SnakeCaseState.Start)
                     {
-                        state = SeparatedCaseState.NewWord;
+                        state = SnakeCaseState.NewWord;
                     }
                 }
                 else if (char.IsUpper(s[i]))
                 {
                     switch (state)
                     {
-                        case SeparatedCaseState.Upper:
-                            bool hasNext = (i + 1 < s.Length);
+                        case SnakeCaseState.Upper:
+                            var hasNext = (i + 1 < s.Length);
                             if (i > 0 && hasNext)
                             {
-                                char nextChar = s[i + 1];
+                                var nextChar = s[i + 1];
                                 if (!char.IsUpper(nextChar) && nextChar != separator)
                                 {
                                     sb.Append(separator);
                                 }
                             }
                             break;
-                        case SeparatedCaseState.Lower:
-                        case SeparatedCaseState.NewWord:
+                        case SnakeCaseState.Lower:
+                        case SnakeCaseState.NewWord:
                             sb.Append(separator);
                             break;
                     }
 
-                    char c;
-#if HAVE_CHAR_TO_LOWER_WITH_CULTURE
-                    c = char.ToLower(s[i], CultureInfo.InvariantCulture);
-#else
-                    c = char.ToLowerInvariant(s[i]);
-#endif
-                    sb.Append(c);
-
-                    state = SeparatedCaseState.Upper;
+                    sb.Append(char.ToLowerInvariant(s[i]));
+                    state = SnakeCaseState.Upper;
                 }
                 else if (s[i] == separator)
                 {
                     sb.Append(separator);
-                    state = SeparatedCaseState.Start;
+                    state = SnakeCaseState.Start;
                 }
                 else
                 {
-                    if (state == SeparatedCaseState.NewWord)
+                    if (state == SnakeCaseState.NewWord)
                     {
                         sb.Append(separator);
                     }
 
                     sb.Append(s[i]);
-                    state = SeparatedCaseState.Lower;
+                    state = SnakeCaseState.Lower;
                 }
             }
 
