@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayerSdk.Auth.Models;
-using TrueLayerSdk.Common;
 
 namespace TrueLayerSdk.Auth
 {
@@ -12,8 +12,6 @@ namespace TrueLayerSdk.Auth
     /// </summary>
     public class AuthClient : IAuthClient
     {
-        private const Functionality Functionality = Common.Functionality.Auth;
-        
         private readonly IApiClient _apiClient;
         private readonly TruelayerConfiguration _configuration;
 
@@ -50,7 +48,7 @@ namespace TrueLayerSdk.Auth
                 new KeyValuePair<string, string>("redirect_uri", request.RedirectUri),
             });
             
-            var apiResponse = await _apiClient.PostAsync<ExchangeCodeResponse>(path, cancellationToken, Functionality, content);
+            var apiResponse = await _apiClient.PostAsync<ExchangeCodeResponse>(GetRequestUri(path), cancellationToken, content);
             return apiResponse;
         }
         
@@ -66,8 +64,10 @@ namespace TrueLayerSdk.Auth
                 new KeyValuePair<string, string>("scope", "payments"),
             });
             
-            var apiResponse = await _apiClient.PostAsync<GetPaymentTokenResponse>(path, cancellationToken, Functionality, content);
+            var apiResponse = await _apiClient.PostAsync<GetPaymentTokenResponse>(GetRequestUri(path), cancellationToken, content);
             return apiResponse;
         }
+        
+        private Uri GetRequestUri(string path) => new (_configuration.AuthUri, path);
     }
 }
