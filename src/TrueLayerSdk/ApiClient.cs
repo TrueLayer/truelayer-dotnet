@@ -6,7 +6,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayerSdk.Common;
 using TrueLayerSdk.Common.CustomHttpResponses;
 using TrueLayerSdk.Common.Exceptions;
 using TrueLayerSdk.Common.Serialization;
@@ -151,7 +150,6 @@ namespace TrueLayerSdk
         
         private async Task ValidateResponseAsync(HttpResponseMessage httpResponse)
         {
-            await Task.CompletedTask;
             if (!httpResponse.IsSuccessStatusCode)
             {
                 httpResponse.Headers.TryGetValues("Tl-Request-Id", out var requestIdHeader);
