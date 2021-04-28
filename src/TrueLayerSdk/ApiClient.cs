@@ -38,50 +38,47 @@ namespace TrueLayerSdk
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
         
-        public async Task<TResult> GetAsync<TResult>(string path, Functionality functionality, string accessToken, CancellationToken cancellationToken)
+        public async Task<TResult> GetAsync<TResult>(Uri uri, string accessToken, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+            if (uri is null) throw new ArgumentNullException(nameof(uri));
             if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
 
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Get,
-                path: path,
+                uri: uri,
                 accessToken: accessToken,
                 httpContent: null,
-                cancellationToken: cancellationToken,
-                functionality: functionality
+                cancellationToken: cancellationToken
             );
             return await DeserializeJsonAsync<TResult>(httpResponse);
         }
         
-        public async Task<TResult> PostAsync<TResult>(string path, CancellationToken cancellationToken,
-            Functionality functionality, HttpContent httpContent = null)
+        public async Task<TResult> PostAsync<TResult>(Uri uri, CancellationToken cancellationToken,
+            HttpContent httpContent = null)
         {
-            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+            if (uri is null) throw new ArgumentNullException(nameof(uri));
 
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Post,
-                path: path,
+                uri: uri,
                 accessToken: null,
                 httpContent: httpContent,
-                cancellationToken: cancellationToken,
-                functionality: functionality
+                cancellationToken: cancellationToken
             );
             return await DeserializeJsonAsync<TResult>(httpResponse);
         }
-        public async Task<TResult> PostAsync<TResult>(string path, Functionality functionality, CancellationToken cancellationToken,
+        public async Task<TResult> PostAsync<TResult>(Uri uri, CancellationToken cancellationToken,
             string accessToken, object request = null)
         {
-            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+            if (uri is null) throw new ArgumentNullException(nameof(uri));
             if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
 
             using var httpResponse = await SendJsonRequestAsync(
                 httpMethod: HttpMethod.Post,
-                path: path,
+                uri: uri,
                 accessToken: accessToken,
                 request: request,
-                cancellationToken: cancellationToken,
-                functionality: functionality
+                cancellationToken: cancellationToken
             );
             return await DeserializeJsonAsync<TResult>(httpResponse);
         }
@@ -121,23 +118,23 @@ namespace TrueLayerSdk
             };
         }
 
-        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, string path, string accessToken,
-            object request, CancellationToken cancellationToken, Functionality functionality)
+        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, Uri uri, string accessToken,
+            object request, CancellationToken cancellationToken)
         {
             HttpContent httpContent = null;
             if (request != null)
             {
                 httpContent = new StringContent(_serializer.Serialize(request), Encoding.UTF8, "application/json");
             }
-            return SendRequestAsync(httpMethod, path, accessToken, httpContent, cancellationToken, functionality);
+            return SendRequestAsync(httpMethod, uri, accessToken, httpContent, cancellationToken);
         }
         
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod httpMethod, string path, string accessToken,
-            HttpContent httpContent, CancellationToken cancellationToken, Functionality functionality)
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod httpMethod, Uri uri, string accessToken,
+            HttpContent httpContent, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+            if (uri is null) throw new ArgumentNullException(nameof(uri));
 
-            var httpRequest = new HttpRequestMessage(httpMethod, GetRequestUri(path, functionality))
+            var httpRequest = new HttpRequestMessage(httpMethod, uri)
             {
                 Content = httpContent
             };
@@ -171,20 +168,6 @@ namespace TrueLayerSdk
 
                 throw new TruelayerApiException(httpResponse.StatusCode, requestId);
             }
-        }
-        
-        private Uri GetRequestUri(string path, Functionality functionality)
-        {
-            var baseUri = functionality switch
-            {
-                Functionality.Auth => new Uri(_configuration.AuthUri),
-                Functionality.Data => new Uri(_configuration.DataUri),
-                Functionality.Payments => new Uri(_configuration.PaymentsUri),
-                _ => throw new ArgumentOutOfRangeException(nameof(functionality), functionality, null)
-            };
-            Uri.TryCreate(baseUri, path, out var uri);
-
-            return uri;
         }
     }
 }

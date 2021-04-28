@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayerSdk.Common;
 using TrueLayerSdk.Payments.Models;
 
 namespace TrueLayerSdk.Payments
@@ -13,7 +12,6 @@ namespace TrueLayerSdk.Payments
     {
         private readonly IApiClient _apiClient;
         private readonly TruelayerConfiguration _configuration;
-        private const Functionality Functionality = Common.Functionality.Payments;
 
         public PaymentsClient(IApiClient apiClient, TruelayerConfiguration configuration)
         {
@@ -27,7 +25,7 @@ namespace TrueLayerSdk.Payments
             if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
             
             var path = $"single-immediate-payments/{paymentId}";
-            return _apiClient.GetAsync<GetPaymentStatusResponse>(path, Functionality, accessToken, cancellationToken);
+            return _apiClient.GetAsync<GetPaymentStatusResponse>(GetRequestUri(path), accessToken, cancellationToken);
         }
         
         public async Task<SingleImmediatePaymentResponse> SingleImmediatePayment(SingleImmediatePaymentRequest request,
@@ -53,7 +51,7 @@ namespace TrueLayerSdk.Payments
                 RedirectUri = request.ReturnUri,
             };
             
-            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(path, Functionality, cancellationToken, request.AccessToken, data);
+            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), cancellationToken, request.AccessToken, data);
             return apiResponse;
         }
 
@@ -104,8 +102,14 @@ namespace TrueLayerSdk.Payments
                 AuthFlow = new AuthFlow {Type = "redirect", ReturnUri = request.ReturnUri},
             };
             
-            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationData>(path, Functionality, cancellationToken, request.AccessToken, data);
+            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationData>(GetRequestUri(path), cancellationToken, request.AccessToken, data);
             return new SingleImmediatePaymentInitiationResponse {Data = apiResponse};
+        }
+        
+        private Uri GetRequestUri(string path)
+        {
+            Uri.TryCreate(new Uri(_configuration.PaymentsUri), path, out var uri);
+            return uri;
         }
     }
 }
