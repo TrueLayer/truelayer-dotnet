@@ -125,30 +125,30 @@ namespace TrueLayerSdk
                 httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             }
 
-            // Logger.Info("{HttpMethod} {Uri}", httpMethod, httpRequest.RequestUri.AbsoluteUri);
             var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
-            await ValidateResponseAsync(httpResponse);
+            await ValidateResponseAsync(httpResponse, cancellationToken);
 
             return httpResponse;
         }
         
-        private async Task ValidateResponseAsync(HttpResponseMessage httpResponse)
+        private async Task ValidateResponseAsync(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
         {
             if (!httpResponse.IsSuccessStatusCode)
             {
-                httpResponse.Headers.TryGetValues("Tl-Request-Id", out var requestIdHeader);
-                var requestId = requestIdHeader?.FirstOrDefault();
-                // var content = await httpResponse.Content.ReadAsStringAsync();
-                // if (httpResponse.StatusCode == Unprocessable)
-                // {
-                //     var error = await DeserializeJsonAsync<ErrorResponse>(httpResponse);
-                //     throw new TruelayerValidationException(error, httpResponse.StatusCode, requestId);
-                // }
+                httpResponse.Headers.TryGetValues("X-Request-Id", out var requestIdHeader);
+                string requestId = requestIdHeader?.FirstOrDefault();
 
-                if (httpResponse.StatusCode == HttpStatusCode.NotFound)
-                    throw new TruelayerResourceNotFoundException(requestId);
-
-                throw new TruelayerApiException(httpResponse.StatusCode, requestId);
+                switch (httpResponse.StatusCode)
+                {
+                    case HttpStatusCode.NotFound:
+                        throw new TrueLayerResourceNotFoundException(requestId);
+                    case HttpStatusCode.BadRequest:
+                    case HttpStatusCode.UnprocessableEntity:
+                        var errorResponse = await DeserializeJsonAsync<ErrorResponse>(httpResponse, cancellationToken);
+                        throw new TrueLayerValidationException(errorResponse, httpResponse.StatusCode, requestId);
+                    default:
+                        throw new TrueLayerApiException(httpResponse.StatusCode, requestId);
+                }
             }
         }
     }
