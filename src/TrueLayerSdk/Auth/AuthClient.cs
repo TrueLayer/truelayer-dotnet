@@ -7,7 +7,6 @@ using TrueLayerSdk.Auth.Models;
 
 namespace TrueLayerSdk.Auth
 {
-
     /// <summary>
     /// Default implementation of <see cref="IAuthClient"/>.
     /// </summary>
