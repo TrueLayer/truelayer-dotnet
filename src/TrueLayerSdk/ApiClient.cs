@@ -15,7 +15,7 @@ namespace TrueLayerSdk
     /// <summary>
     /// Handles the authentication, serialization and sending of HTTP requests to Truelayer APIs.
     /// </summary>
-    public class ApiClient : IApiClient
+    internal class ApiClient : IApiClient
     {
         private readonly TruelayerConfiguration _configuration;
         private readonly HttpClient _httpClient;

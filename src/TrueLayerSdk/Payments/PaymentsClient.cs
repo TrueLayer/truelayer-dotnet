@@ -51,8 +51,7 @@ namespace TrueLayerSdk.Payments
                 RedirectUri = request.ReturnUri,
             };
             
-            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), cancellationToken, request.AccessToken, data);
-            return apiResponse;
+            return await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), cancellationToken, request.AccessToken, data);
         }
 
         public async Task<SingleImmediatePaymentInitiationResponse> SingleImmediatePaymentInitiation(SingleImmediatePaymentInitiationRequest request,
@@ -69,8 +68,8 @@ namespace TrueLayerSdk.Payments
                     SingleImmediatePaymentId = Guid.NewGuid().ToString(),
                     ProviderId = "ob-sandbox-natwest",
                     SchemeId = "faster_payments_service",
-                    FeeOptionId = "free",
-                    AmountInMinor = 120000,
+                    // FeeOptionId = "free",
+                    AmountInMinor = 100,
                     Currency = "GBP",
                     Beneficiary = new Beneficiary
                     {
@@ -78,8 +77,8 @@ namespace TrueLayerSdk.Payments
                         Account = new Account
                         {
                             Type = "sort_code_account_number",
-                            AccountNumber = "123456",
-                            SortCode = "7890",
+                            AccountNumber = "12345678",
+                            SortCode = "567890",
                         },
                     },
                     Remitter = new Remitter
@@ -88,8 +87,8 @@ namespace TrueLayerSdk.Payments
                         Account = new Account
                         {
                             Type = "sort_code_account_number",
-                            AccountNumber = "654321",
-                            SortCode = "0987",
+                            AccountNumber = "12345602",
+                            SortCode = "500000",
                         },
                     },
                     References = new References
@@ -102,8 +101,7 @@ namespace TrueLayerSdk.Payments
                 AuthFlow = new AuthFlow {Type = "redirect", ReturnUri = request.ReturnUri},
             };
             
-            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationData>(GetRequestUri(path), cancellationToken, request.AccessToken, data);
-            return new SingleImmediatePaymentInitiationResponse {Data = apiResponse};
+            return await _apiClient.PostAsync<SingleImmediatePaymentInitiationResponse>(GetRequestUri(path), cancellationToken, request.AccessToken, data);
         }
         
         private Uri GetRequestUri(string path) => new (_configuration.PaymentsUri, path);
