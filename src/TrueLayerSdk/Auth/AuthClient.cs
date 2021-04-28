@@ -10,7 +10,7 @@ namespace TrueLayerSdk.Auth
     /// <summary>
     /// Default implementation of <see cref="IAuthClient"/>.
     /// </summary>
-    public class AuthClient : IAuthClient
+    internal class AuthClient : IAuthClient
     {
         private readonly IApiClient _apiClient;
         private readonly TruelayerConfiguration _configuration;
@@ -48,7 +48,7 @@ namespace TrueLayerSdk.Auth
                 new KeyValuePair<string, string>("redirect_uri", request.RedirectUri),
             });
             
-            var apiResponse = await _apiClient.PostAsync<ExchangeCodeResponse>(GetRequestUri(path), cancellationToken, content);
+            var apiResponse = await _apiClient.PostAsync<ExchangeCodeResponse>(GetRequestUri(path), content, cancellationToken);
             return apiResponse;
         }
         
@@ -64,7 +64,7 @@ namespace TrueLayerSdk.Auth
                 new KeyValuePair<string, string>("scope", "payments"),
             });
             
-            var apiResponse = await _apiClient.PostAsync<GetPaymentTokenResponse>(GetRequestUri(path), cancellationToken, content);
+            var apiResponse = await _apiClient.PostAsync<GetPaymentTokenResponse>(GetRequestUri(path), content, cancellationToken);
             return apiResponse;
         }
         
