@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
@@ -6,7 +7,6 @@ using TrueLayerSdk.Auth.Models;
 
 namespace TrueLayerSdk.Auth
 {
-    using System;
 
     /// <summary>
     /// Default implementation of <see cref="IAuthClient"/>.
