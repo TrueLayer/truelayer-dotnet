@@ -147,14 +147,13 @@ namespace TrueLayerSdk
 
             // Logger.Info("{HttpMethod} {Uri}", httpMethod, httpRequest.RequestUri.AbsoluteUri);
             var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
-            await ValidateResponseAsync(httpResponse);
+            ValidateResponseAsync(httpResponse);
 
             return httpResponse;
         }
         
-        private async Task ValidateResponseAsync(HttpResponseMessage httpResponse)
+        private void ValidateResponseAsync(HttpResponseMessage httpResponse)
         {
-            await Task.CompletedTask;
             if (!httpResponse.IsSuccessStatusCode)
             {
                 httpResponse.Headers.TryGetValues("Tl-Request-Id", out var requestIdHeader);
