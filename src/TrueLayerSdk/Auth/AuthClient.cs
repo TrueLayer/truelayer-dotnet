@@ -68,10 +68,6 @@ namespace TrueLayerSdk.Auth
             return apiResponse;
         }
         
-        private Uri GetRequestUri(string path)
-        {
-            Uri.TryCreate(new Uri(_configuration.AuthUri), path, out var uri);
-            return uri;
-        }
+        private Uri GetRequestUri(string path) => new (_configuration.AuthUri, path);
     }
 }

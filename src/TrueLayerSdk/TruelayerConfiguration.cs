@@ -5,14 +5,14 @@ namespace TrueLayerSdk
     public class TruelayerConfiguration
     {
         // PROD
-        public const string AuthProductionUri = "https://auth.truelayer.com/";
-        public const string DataProductionUri = "https://api.truelayer.com/";
-        public const string PaymentsProductionUri = "https://pay-api.truelayer.com/";
+        private static readonly Uri AuthProductionUri = new ("https://auth.truelayer.com/");
+        private static readonly Uri DataProductionUri = new ("https://api.truelayer.com/");
+        private static readonly Uri PaymentsProductionUri = new ("https://pay-api.truelayer.com/");
 
         // SANDBOX
-        public const string AuthSandboxUri = "https://auth.truelayer-sandbox.com/";
-        public const string DataSandboxUri = "https://api.truelayer-sandbox.com/";
-        public const string PaymentsSandboxUri = "https://pay-api.truelayer-sandbox.com/";
+        private static readonly Uri AuthSandboxUri = new ("https://auth.truelayer-sandbox.com/");
+        private static readonly Uri DataSandboxUri = new ("https://api.truelayer-sandbox.com/");
+        private static readonly Uri PaymentsSandboxUri = new ("https://pay-api.truelayer-sandbox.com/");
         
         /// <summary>
         /// Creates a new <see cref="TruelayerConfiguration"/> instance, explicitly setting the API's base URI. 
@@ -45,16 +45,16 @@ namespace TrueLayerSdk
         /// <summary>
         /// Gets the Uri of the Truelayer Authentication API to connect to.
         /// </summary>
-        public string AuthUri { get; }
+        public Uri AuthUri { get; }
         
         /// <summary>
         /// Gets the Uri of the Truelayer Data API to connect to.
         /// </summary>
-        public string DataUri { get; }
+        public Uri DataUri { get; }
         
         /// <summary>
         /// Gets the Uri of the Truelayer Payments API to connect to.
         /// </summary>
-        public string PaymentsUri { get; }
+        public Uri PaymentsUri { get; }
     }
 }

@@ -106,10 +106,6 @@ namespace TrueLayerSdk.Payments
             return new SingleImmediatePaymentInitiationResponse {Data = apiResponse};
         }
         
-        private Uri GetRequestUri(string path)
-        {
-            Uri.TryCreate(new Uri(_configuration.PaymentsUri), path, out var uri);
-            return uri;
-        }
+        private Uri GetRequestUri(string path) => new (_configuration.PaymentsUri, path);
     }
 }
