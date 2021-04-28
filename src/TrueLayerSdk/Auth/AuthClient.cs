@@ -13,7 +13,6 @@ namespace TrueLayerSdk.Auth
     /// </summary>
     public class AuthClient : IAuthClient
     {
-        
         private readonly IApiClient _apiClient;
         private readonly TruelayerConfiguration _configuration;
 
