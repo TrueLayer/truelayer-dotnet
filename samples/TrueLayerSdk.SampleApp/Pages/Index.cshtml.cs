@@ -53,23 +53,23 @@ namespace TrueLayerSdk.SampleApp.Pages
             {
                 AccessToken = _tokenStorage.AccessToken,
                 ReturnUri = "https://localhost:5001/callback",
-                amount = Payment.amount * 100,
-                remitter_provider_id = Payment.remitter_provider_id,
-                remitter_name = Payment.remitter_name,
-                remitter_sort_code = Payment.remitter_sort_code,
-                remitter_account_number = Payment.remitter_account_number,
-                remitter_reference = Payment.remitter_reference,
-                beneficiary_name = Payment.beneficiary_name,
-                beneficiary_sort_code = Payment.beneficiary_sort_code,
-                beneficiary_account_number = Payment.beneficiary_account_number,
-                beneficiary_reference = Payment.beneficiary_reference,
+                Amount = Payment.amount * 100,
+                RemitterProviderId = Payment.remitter_provider_id,
+                RemitterName = Payment.remitter_name,
+                RemitterSortCode = Payment.remitter_sort_code,
+                RemitterAccountNumber = Payment.remitter_account_number,
+                RemitterReference = Payment.remitter_reference,
+                BeneficiaryName = Payment.beneficiary_name,
+                BeneficiarySortCode = Payment.beneficiary_sort_code,
+                BeneficiaryAccountNumber = Payment.beneficiary_account_number,
+                BeneficiaryReference = Payment.beneficiary_reference,
             };
             var result = await _api.Payments.SingleImmediatePayment(request);
-            PaymentId = result.results.First().simp_id;
-            AuthUri = result.results.First().auth_uri;
+            PaymentId = result.Results.First().SimpId;
+            AuthUri = result.Results.First().AuthUri;
             Position = "auth_uri";
             await _context.Payments.AddAsync(new PaymentEntity
-                {PaymentEntityId = PaymentId, CreatedAt = DateTime.UtcNow, Status = result.results.First().status});
+                {PaymentEntityId = PaymentId, CreatedAt = DateTime.UtcNow, Status = result.Results.First().Status});
             await _context.SaveChangesAsync();
         }
     }

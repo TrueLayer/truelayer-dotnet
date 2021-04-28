@@ -5,15 +5,15 @@ namespace TrueLayerSdk.Payments.Models
         public string AccessToken { get; set; }
         public string ReturnUri { get; set; }
         
-        public int amount { get; set; }
-        public string remitter_provider_id { get; set; }
-        public string remitter_name { get; set; }
-        public string remitter_sort_code { get; set; }
-        public string remitter_account_number { get; set; }
-        public string remitter_reference { get; set; }
-        public string beneficiary_name { get; set; }
-        public string beneficiary_sort_code { get; set; }
-        public string beneficiary_account_number { get; set; }
-        public string beneficiary_reference { get; set; }
+        public int Amount { get; set; }
+        public string RemitterProviderId { get; set; }
+        public string RemitterName { get; set; }
+        public string RemitterSortCode { get; set; }
+        public string RemitterAccountNumber { get; set; }
+        public string RemitterReference { get; set; }
+        public string BeneficiaryName { get; set; }
+        public string BeneficiarySortCode { get; set; }
+        public string BeneficiaryAccountNumber { get; set; }
+        public string BeneficiaryReference { get; set; }
     }
 }

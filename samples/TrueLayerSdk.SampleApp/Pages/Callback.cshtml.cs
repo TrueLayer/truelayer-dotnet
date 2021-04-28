@@ -44,15 +44,15 @@ namespace TrueLayerSdk.SampleApp.Pages
             
             var result =
                 await _api.Payments.GetPaymentStatus(paymentId, _tokenStorage.AccessToken, CancellationToken.None);
-            var paymentData = result.results.First();
+            var paymentData = result.Results.First();
             Payment = new PaymentData
             {
-                simp_id = paymentData.simp_id,
-                created_at = paymentData.created_at,
-                status = paymentData.status,
+                simp_id = paymentData.SimpId,
+                created_at = paymentData.CreatedAt,
+                status = paymentData.Status,
             };
-            var entity = await _context.Payments.FirstAsync(p => p.PaymentEntityId == paymentData.simp_id);
-            entity.Status = paymentData.status;
+            var entity = await _context.Payments.FirstAsync(p => p.PaymentEntityId == paymentData.SimpId);
+            entity.Status = paymentData.Status;
             await _context.SaveChangesAsync();
         }
     }

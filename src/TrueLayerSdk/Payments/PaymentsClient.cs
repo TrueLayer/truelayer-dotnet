@@ -39,18 +39,18 @@ namespace TrueLayerSdk.Payments
 
             var data = new SingleImmediatePaymentData
             {
-                amount = request.amount,
-                currency = "GBP",
-                remitter_provider_id = request.remitter_provider_id,
-                remitter_name = request.remitter_name,
-                remitter_sort_code = request.remitter_sort_code,
-                remitter_account_number = request.remitter_account_number,
-                remitter_reference = request.remitter_reference,
-                beneficiary_name = request.beneficiary_name,
-                beneficiary_sort_code = request.beneficiary_sort_code,
-                beneficiary_account_number = request.beneficiary_account_number,
-                beneficiary_reference = request.beneficiary_reference,
-                redirect_uri = request.ReturnUri,
+                Amount = request.Amount,
+                Currency = "GBP",
+                RemitterProviderId = request.RemitterProviderId,
+                RemitterName = request.RemitterName,
+                RemitterSortCode = request.RemitterSortCode,
+                RemitterAccountNumber = request.RemitterAccountNumber,
+                RemitterReference = request.RemitterReference,
+                BeneficiaryName = request.BeneficiaryName,
+                BeneficiarySortCode = request.BeneficiarySortCode,
+                BeneficiaryAccountNumber = request.BeneficiaryAccountNumber,
+                BeneficiaryReference = request.BeneficiaryReference,
+                RedirectUri = request.ReturnUri,
             };
             
             var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(path, Functionality, cancellationToken, request.AccessToken, data);
@@ -66,42 +66,42 @@ namespace TrueLayerSdk.Payments
 
             var data = new SingleImmediatePaymentInitiationData
             {
-                single_immediate_payment = new SingleImmediatePayment
+                SingleImmediatePayment = new SingleImmediatePayment
                 {
-                    single_immediate_payment_id = Guid.NewGuid().ToString(),
-                    provider_id = "ob-sandbox-natwest",
-                    scheme_id = "faster_payments_service",
-                    fee_option_id = "free",
-                    amount_in_minor = 120000,
-                    currency = "GBP",
-                    beneficiary = new Beneficiary
+                    SingleImmediatePaymentId = Guid.NewGuid().ToString(),
+                    ProviderId = "ob-sandbox-natwest",
+                    SchemeId = "faster_payments_service",
+                    FeeOptionId = "free",
+                    AmountInMinor = 120000,
+                    Currency = "GBP",
+                    Beneficiary = new Beneficiary
                     {
-                        name = "A lucky someone",
-                        account = new Account
+                        Name = "A lucky someone",
+                        Account = new Account
                         {
-                            type = "sort_code_account_number",
-                            account_number = "123456",
-                            sort_code = "7890",
+                            Type = "sort_code_account_number",
+                            AccountNumber = "123456",
+                            SortCode = "7890",
                         },
                     },
-                    remitter = new Remitter
+                    Remitter = new Remitter
                     {
-                        name = "A less lucky someone",
-                        account = new Account
+                        Name = "A less lucky someone",
+                        Account = new Account
                         {
-                            type = "sort_code_account_number",
-                            account_number = "654321",
-                            sort_code = "0987",
+                            Type = "sort_code_account_number",
+                            AccountNumber = "654321",
+                            SortCode = "0987",
                         },
                     },
-                    references = new References
+                    References = new References
                     {
-                        type = "separate",
-                        beneficiary = "beneficiary ref",
-                        remitter = "remitter ref",
+                        Type = "separate",
+                        Beneficiary = "beneficiary ref",
+                        Remitter = "remitter ref",
                     },
                 },
-                auth_flow = new AuthFlow {type = "redirect", return_uri = request.ReturnUri},
+                AuthFlow = new AuthFlow {Type = "redirect", ReturnUri = request.ReturnUri},
             };
             
             var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationData>(path, Functionality, cancellationToken, request.AccessToken, data);
