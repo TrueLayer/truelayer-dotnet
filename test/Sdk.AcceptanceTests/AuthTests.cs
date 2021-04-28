@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Shouldly;
-using TrueLayerSdk.Auth.Models;
+using TrueLayer.Auth.Model;
 using Xunit;
 
 namespace TrueLayer.Acceptance.Tests

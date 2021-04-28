@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Shouldly;
-using TrueLayerSdk.Auth.Models;
-using TrueLayerSdk.Payments.Models;
+using TrueLayer.Auth.Model;
+using TrueLayer.Payments.Model;
 using Xunit;
 
 namespace TrueLayer.Acceptance.Tests

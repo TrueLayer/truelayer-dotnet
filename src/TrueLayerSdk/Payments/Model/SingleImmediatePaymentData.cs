@@ -1,4 +1,4 @@
-namespace TrueLayerSdk.Payments.Models
+namespace TrueLayer.Payments.Model
 {
     public class SingleImmediatePaymentData
     {

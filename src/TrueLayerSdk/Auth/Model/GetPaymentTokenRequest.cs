@@ -1,4 +1,4 @@
-namespace TrueLayerSdk.Auth.Models
+namespace TrueLayer.Auth.Model
 {
     public class GetPaymentTokenRequest
     {

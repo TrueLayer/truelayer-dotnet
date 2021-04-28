@@ -17,22 +17,16 @@ namespace TrueLayerSdk
     /// </summary>
     internal class ApiClient : IApiClient
     {
-        private readonly TruelayerConfiguration _configuration;
         private readonly HttpClient _httpClient;
         private readonly ISerializer _serializer;
         
         /// <summary>
         /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
         /// </summary>
-        /// <param name="configuration">The Truelayer configuration required to configure the client.</param>
         /// <param name="httpClient">The client used to make HTTP requests.</param>
         /// <param name="serializer">A serializer used to serialize and deserialize HTTP payloads.</param>
-        public ApiClient(
-            TruelayerConfiguration configuration,
-            HttpClient httpClient,
-            ISerializer serializer)
+        public ApiClient(HttpClient httpClient, ISerializer serializer)
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
@@ -143,12 +137,12 @@ namespace TrueLayerSdk
 
             // Logger.Info("{HttpMethod} {Uri}", httpMethod, httpRequest.RequestUri.AbsoluteUri);
             var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
-            await ValidateResponseAsync(httpResponse);
+            ValidateResponseAsync(httpResponse);
 
             return httpResponse;
         }
         
-        private async Task ValidateResponseAsync(HttpResponseMessage httpResponse)
+        private void ValidateResponseAsync(HttpResponseMessage httpResponse)
         {
             if (!httpResponse.IsSuccessStatusCode)
             {
