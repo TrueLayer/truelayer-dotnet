@@ -38,7 +38,7 @@ namespace TrueLayerSdk
         }
         
         /// <inheritdoc />
-        public async Task<TResult> GetAsync<TResult>(Uri uri, string accessToken, CancellationToken cancellationToken = default)
+        public async Task<TResult> GetAsync<TResult>(Uri uri, string accessToken = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -54,14 +54,14 @@ namespace TrueLayerSdk
         }
         
         /// <inheritdoc />
-        public async Task<TResult> PostAsync<TResult>(Uri uri, HttpContent httpContent = null, CancellationToken cancellationToken = default)
+        public async Task<TResult> PostAsync<TResult>(Uri uri, HttpContent httpContent = null, string accessToken = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Post,
                 uri: uri,
-                accessToken: null,
+                accessToken: accessToken,
                 httpContent: httpContent,
                 cancellationToken: cancellationToken
             );
@@ -70,7 +70,7 @@ namespace TrueLayerSdk
         }
 
         /// <inheritdoc />
-        public async Task<TResult> PostAsync<TResult>(Uri uri, string accessToken, object request = null, CancellationToken cancellationToken = default)
+        public async Task<TResult> PostAsync<TResult>(Uri uri, object request = null, string accessToken = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -89,7 +89,7 @@ namespace TrueLayerSdk
         {
             string json = await httpResponse.Content?.ReadAsStringAsync(cancellationToken);
             
-            if (json is null)
+            if (string.IsNullOrWhiteSpace(json))
             {
                 return default;
             }
@@ -102,7 +102,7 @@ namespace TrueLayerSdk
         {
             HttpContent httpContent = null;
             
-            if (request is null)
+            if (request is {})
             {
                 httpContent = new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
             }
@@ -135,7 +135,7 @@ namespace TrueLayerSdk
         {
             if (!httpResponse.IsSuccessStatusCode)
             {
-                httpResponse.Headers.TryGetValues("X-Request-Id", out var requestIdHeader);
+                httpResponse.Headers.TryGetValues(CustomHeaders.RequestId, out var requestIdHeader);
                 string requestId = requestIdHeader?.FirstOrDefault();
 
                 switch (httpResponse.StatusCode)

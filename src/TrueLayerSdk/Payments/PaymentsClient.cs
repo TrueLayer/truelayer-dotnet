@@ -52,7 +52,7 @@ namespace TrueLayerSdk.Payments
             };
             
             var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), 
-                request.AccessToken, data, cancellationToken);
+                data, request.AccessToken, cancellationToken);
             return apiResponse;
         }
 
@@ -104,7 +104,7 @@ namespace TrueLayerSdk.Payments
             };
             
             var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationData>(
-                GetRequestUri(path), request.AccessToken, data, cancellationToken);
+                GetRequestUri(path), data, request.AccessToken, cancellationToken);
             
             return new SingleImmediatePaymentInitiationResponse {Data = apiResponse};
         }

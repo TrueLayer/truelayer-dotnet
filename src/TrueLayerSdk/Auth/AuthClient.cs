@@ -48,7 +48,7 @@ namespace TrueLayerSdk.Auth
                 new KeyValuePair<string, string>("redirect_uri", request.RedirectUri),
             });
             
-            var apiResponse = await _apiClient.PostAsync<ExchangeCodeResponse>(GetRequestUri(path), content, cancellationToken);
+            var apiResponse = await _apiClient.PostAsync<ExchangeCodeResponse>(GetRequestUri(path), content, null, cancellationToken);
             return apiResponse;
         }
         
@@ -64,7 +64,7 @@ namespace TrueLayerSdk.Auth
                 new KeyValuePair<string, string>("scope", "payments"),
             });
             
-            var apiResponse = await _apiClient.PostAsync<GetPaymentTokenResponse>(GetRequestUri(path), content, cancellationToken);
+            var apiResponse = await _apiClient.PostAsync<GetPaymentTokenResponse>(GetRequestUri(path), content, null, cancellationToken);
             return apiResponse;
         }
         
