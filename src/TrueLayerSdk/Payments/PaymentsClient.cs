@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayerSdk.Payments.Models;
+using TrueLayer.Payments.Model;
 
 namespace TrueLayerSdk.Payments
 {
@@ -35,25 +35,7 @@ namespace TrueLayerSdk.Payments
 
             const string path = "single-immediate-payments";
 
-            var data = new SingleImmediatePaymentData
-            {
-                Amount = request.Amount,
-                Currency = "GBP",
-                RemitterProviderId = request.RemitterProviderId,
-                RemitterName = request.RemitterName,
-                RemitterSortCode = request.RemitterSortCode,
-                RemitterAccountNumber = request.RemitterAccountNumber,
-                RemitterReference = request.RemitterReference,
-                BeneficiaryName = request.BeneficiaryName,
-                BeneficiarySortCode = request.BeneficiarySortCode,
-                BeneficiaryAccountNumber = request.BeneficiaryAccountNumber,
-                BeneficiaryReference = request.BeneficiaryReference,
-                RedirectUri = request.ReturnUri,
-            };
-            
-            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), 
-                data, request.AccessToken, cancellationToken);
-            return apiResponse;
+            return await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), request.Data, request.AccessToken, cancellationToken);
         }
 
         public async Task<SingleImmediatePaymentInitiationResponse> SingleImmediatePaymentInitiation(SingleImmediatePaymentInitiationRequest request,
@@ -63,50 +45,7 @@ namespace TrueLayerSdk.Payments
 
             const string path = "v2/single-immediate-payment-initiation-requests";
 
-            var data = new SingleImmediatePaymentInitiationData
-            {
-                SingleImmediatePayment = new SingleImmediatePayment
-                {
-                    SingleImmediatePaymentId = Guid.NewGuid().ToString(),
-                    ProviderId = "ob-sandbox-natwest",
-                    SchemeId = "faster_payments_service",
-                    FeeOptionId = "free",
-                    AmountInMinor = 120000,
-                    Currency = "GBP",
-                    Beneficiary = new Beneficiary
-                    {
-                        Name = "A lucky someone",
-                        Account = new Account
-                        {
-                            Type = "sort_code_account_number",
-                            AccountNumber = "123456",
-                            SortCode = "7890",
-                        },
-                    },
-                    Remitter = new Remitter
-                    {
-                        Name = "A less lucky someone",
-                        Account = new Account
-                        {
-                            Type = "sort_code_account_number",
-                            AccountNumber = "654321",
-                            SortCode = "0987",
-                        },
-                    },
-                    References = new References
-                    {
-                        Type = "separate",
-                        Beneficiary = "beneficiary ref",
-                        Remitter = "remitter ref",
-                    },
-                },
-                AuthFlow = new AuthFlow {Type = "redirect", ReturnUri = request.ReturnUri},
-            };
-            
-            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationData>(
-                GetRequestUri(path), data, request.AccessToken, cancellationToken);
-            
-            return new SingleImmediatePaymentInitiationResponse {Data = apiResponse};
+            return await _apiClient.PostAsync<SingleImmediatePaymentInitiationResponse>(GetRequestUri(path), request.Data, request.AccessToken, cancellationToken);
         }
         
         private Uri GetRequestUri(string path) => new (_configuration.PaymentsUri, path);

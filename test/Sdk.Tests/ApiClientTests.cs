@@ -32,7 +32,6 @@ namespace TrueLayer.Sdk.Tests
             _jsonSerializer = new JsonSerializer();
 
             _apiClient = new ApiClient(
-                new TruelayerConfiguration("client_id", "secret", true),
                 _httpMessageHandler.ToHttpClient(),
                 _jsonSerializer
             );
@@ -52,7 +51,7 @@ namespace TrueLayer.Sdk.Tests
                 .Expect(HttpMethod.Get, "http://localhost/get-json")
                 .WithHeaders("Authorization", "Bearer access-token")
                 .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, _jsonSerializer.Serialize(_stub));
-            
+
             TestResponse response = await _apiClient.GetAsync<TestResponse>(
                 new Uri("http://localhost/get-json"),
                 "access-token"
@@ -64,10 +63,11 @@ namespace TrueLayer.Sdk.Tests
         [Fact]
         public async Task Posts_http_content_and_returns_deserialized_json()
         {
-            string requestJson = _jsonSerializer.Serialize(new {
+            string requestJson = _jsonSerializer.Serialize(new
+            {
                 data = "http-content"
             });
-            
+
             _httpMessageHandler
                 .Expect(HttpMethod.Post, "http://localhost/post-http-content")
                 .WithHeaders("Authorization", "Bearer access-token")
@@ -86,12 +86,13 @@ namespace TrueLayer.Sdk.Tests
         [Fact]
         public async Task Posts_serialized_object_and_returns_deserialized_json()
         {
-            var obj = new {
+            var obj = new
+            {
                 data = "object"
             };
 
             var json = _jsonSerializer.Serialize(obj);
-            
+
             _httpMessageHandler
                 .Expect(HttpMethod.Post, "http://localhost/post-object")
                 .WithHeaders("Authorization", "Bearer access-token")
@@ -112,12 +113,13 @@ namespace TrueLayer.Sdk.Tests
         {
             _httpMessageHandler
                 .Expect(HttpMethod.Get, "http://localhost/not-found")
-                .Respond(() => {
+                .Respond(() =>
+                {
                     var response = new HttpResponseMessage(HttpStatusCode.NotFound);
                     response.Headers.TryAddWithoutValidation(CustomHeaders.RequestId, "request-id");
                     return Task.FromResult(response);
                 });
-            
+
             var exception = await Assert.ThrowsAsync<TrueLayerResourceNotFoundException>(
                 () => _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/not-found"))
             );
@@ -132,12 +134,13 @@ namespace TrueLayer.Sdk.Tests
         {
             _httpMessageHandler
                 .Expect(HttpMethod.Get, "http://localhost/bad-request")
-                .Respond(() => {
+                .Respond(() =>
+                {
                     var response = new HttpResponseMessage(httpStatusCode);
                     response.Headers.TryAddWithoutValidation(CustomHeaders.RequestId, "request-id");
                     return Task.FromResult(response);
                 });
-            
+
             var exception = await Assert.ThrowsAsync<TrueLayerValidationException>(
                 () => _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/bad-request"))
             );
@@ -163,16 +166,17 @@ namespace TrueLayer.Sdk.Tests
                     }
                 }
             };
-            
+
             _httpMessageHandler
                 .Expect(HttpMethod.Get, "http://localhost/bad-request-error-details")
-                .Respond(() => {
+                .Respond(() =>
+                {
                     var response = new HttpResponseMessage(httpStatusCode);
                     response.Content = new StringContent(_jsonSerializer.Serialize(error));
                     response.Headers.TryAddWithoutValidation(CustomHeaders.RequestId, "request-id");
                     return Task.FromResult(response);
                 });
-            
+
             var exception = await Assert.ThrowsAsync<TrueLayerValidationException>(
                 () => _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/bad-request-error-details"))
             );
@@ -190,12 +194,13 @@ namespace TrueLayer.Sdk.Tests
         {
             _httpMessageHandler
                 .Expect(HttpMethod.Get, "http://localhost/non-successful")
-                .Respond(() => {
+                .Respond(() =>
+                {
                     var response = new HttpResponseMessage(httpStatusCode);
                     response.Headers.TryAddWithoutValidation(CustomHeaders.RequestId, "request-id");
                     return Task.FromResult(response);
                 });
-            
+
             var exception = await Assert.ThrowsAsync<TrueLayerApiException>(
                 () => _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/non-successful"))
             );
@@ -215,15 +220,15 @@ namespace TrueLayer.Sdk.Tests
         {
             error.Error.ShouldBe(expected.Error);
             error.ErrorDescription.ShouldBe(expected.ErrorDescription);
-            
+
             if (expected.ErrorDetails is not null)
             {
                 error.ErrorDetails.ShouldNotBeNull();
-                
+
                 if (expected.ErrorDetails.Parameters is not null)
                 {
                     error.ErrorDetails.ShouldNotBeNull();
-                    
+
                     foreach (var param in expected.ErrorDetails.Parameters)
                     {
                         error.ErrorDetails.Parameters[param.Key].ShouldBe(param.Value);

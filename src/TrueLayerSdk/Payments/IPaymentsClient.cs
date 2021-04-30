@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayerSdk.Payments.Models;
+using TrueLayer.Payments.Model;
 
 namespace TrueLayerSdk.Payments
 {

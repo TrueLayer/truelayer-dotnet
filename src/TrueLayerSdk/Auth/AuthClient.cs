@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayerSdk.Auth.Models;
+using TrueLayer.Auth.Model;
 
 namespace TrueLayerSdk.Auth
 {

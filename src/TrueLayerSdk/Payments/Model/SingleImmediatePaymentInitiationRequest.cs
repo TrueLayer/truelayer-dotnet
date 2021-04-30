@@ -1,8 +1,8 @@
-namespace TrueLayerSdk.Payments.Models
+namespace TrueLayer.Payments.Model
 {
     public class SingleImmediatePaymentInitiationRequest
     {
         public string AccessToken { get; set; }
-        public string ReturnUri { get; set; }
+        public SingleImmediatePaymentInitiationData Data { get; set; }
     }
 }

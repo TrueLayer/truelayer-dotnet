@@ -15,24 +15,18 @@ namespace TrueLayerSdk
     /// <summary>
     /// Handles the authentication, serialization and sending of HTTP requests to Truelayer APIs.
     /// </summary>
-    public class ApiClient : IApiClient
+    internal class ApiClient : IApiClient
     {
-        private readonly TruelayerConfiguration _configuration;
         private readonly HttpClient _httpClient;
         private readonly ISerializer _serializer;
         
         /// <summary>
         /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
         /// </summary>
-        /// <param name="configuration">The Truelayer configuration required to configure the client.</param>
         /// <param name="httpClient">The client used to make HTTP requests.</param>
         /// <param name="serializer">A serializer used to serialize and deserialize HTTP payloads.</param>
-        public ApiClient(
-            TruelayerConfiguration configuration,
-            HttpClient httpClient,
-            ISerializer serializer)
+        public ApiClient(HttpClient httpClient, ISerializer serializer)
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }

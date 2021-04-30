@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using TrueLayerSdk.Auth.Models;
-using TrueLayerSdk.Payments.Models;
+using TrueLayer.Auth.Model;
+using TrueLayer.Payments.Model;
 using TrueLayerSdk.SampleApp.Data;
 using TrueLayerSdk.SampleApp.Models;
 
@@ -52,17 +51,21 @@ namespace TrueLayerSdk.SampleApp.Pages
             var request = new SingleImmediatePaymentRequest
             {
                 AccessToken = _tokenStorage.AccessToken,
-                ReturnUri = "https://localhost:5001/callback",
-                Amount = Payment.amount * 100,
-                RemitterProviderId = Payment.remitter_provider_id,
-                RemitterName = Payment.remitter_name,
-                RemitterSortCode = Payment.remitter_sort_code,
-                RemitterAccountNumber = Payment.remitter_account_number,
-                RemitterReference = Payment.remitter_reference,
-                BeneficiaryName = Payment.beneficiary_name,
-                BeneficiarySortCode = Payment.beneficiary_sort_code,
-                BeneficiaryAccountNumber = Payment.beneficiary_account_number,
-                BeneficiaryReference = Payment.beneficiary_reference,
+                Data = new SingleImmediatePaymentData
+                {
+                    RedirectUri = "https://localhost:5001/callback",
+                    Amount = Payment.amount * 100,
+                    Currency = "GBP",
+                    RemitterProviderId = Payment.remitter_provider_id,
+                    RemitterName = Payment.remitter_name,
+                    RemitterSortCode = Payment.remitter_sort_code,
+                    RemitterAccountNumber = Payment.remitter_account_number,
+                    RemitterReference = Payment.remitter_reference,
+                    BeneficiaryName = Payment.beneficiary_name,
+                    BeneficiarySortCode = Payment.beneficiary_sort_code,
+                    BeneficiaryAccountNumber = Payment.beneficiary_account_number,
+                    BeneficiaryReference = Payment.beneficiary_reference,
+                },
             };
             var result = await _api.Payments.SingleImmediatePayment(request);
             PaymentId = result.Results.First().SimpId;

@@ -3,9 +3,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
 using TrueLayerSdk;
-using TrueLayerSdk.Auth.Models;
+using TrueLayer.Auth.Model;
 using TrueLayerSdk.Common.Exceptions;
 using Xunit;
 
