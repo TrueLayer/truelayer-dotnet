@@ -4,7 +4,7 @@ using TrueLayerSdk.Payments;
 
 namespace TrueLayerSdk
 {
-    public class TruelayerApi : ITruelayerApi
+    internal class TruelayerApi : ITruelayerApi
     {
         /// <summary>
         /// Creates a new <see cref="TruelayerApi"/> instance and initializes each underlying API client.

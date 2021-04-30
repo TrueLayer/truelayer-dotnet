@@ -8,7 +8,7 @@ namespace TrueLayerSdk.Payments
     /// <summary>
     /// Default implementation of <see cref="IPaymentsClient"/>.
     /// </summary>
-    public class PaymentsClient : IPaymentsClient
+    internal class PaymentsClient : IPaymentsClient
     {
         private readonly IApiClient _apiClient;
         private readonly TruelayerConfiguration _configuration;
@@ -35,7 +35,7 @@ namespace TrueLayerSdk.Payments
 
             const string path = "single-immediate-payments";
 
-            return await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), cancellationToken, request.AccessToken, request.Data);
+            return await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), request.Data, request.AccessToken, cancellationToken);
         }
 
         public async Task<SingleImmediatePaymentInitiationResponse> SingleImmediatePaymentInitiation(SingleImmediatePaymentInitiationRequest request,
@@ -45,7 +45,7 @@ namespace TrueLayerSdk.Payments
 
             const string path = "v2/single-immediate-payment-initiation-requests";
 
-            return await _apiClient.PostAsync<SingleImmediatePaymentInitiationResponse>(GetRequestUri(path), cancellationToken, request.AccessToken, request.Data);
+            return await _apiClient.PostAsync<SingleImmediatePaymentInitiationResponse>(GetRequestUri(path), request.Data, request.AccessToken, cancellationToken);
         }
         
         private Uri GetRequestUri(string path) => new (_configuration.PaymentsUri, path);

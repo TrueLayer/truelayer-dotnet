@@ -28,7 +28,7 @@ namespace TrueLayer.Sdk.Tests
                 .BuildServiceProvider();
 
             var api = services.GetRequiredService<ITruelayerApi>();
-            await Assert.ThrowsAsync<TruelayerResourceNotFoundException>(async () => await api.Auth.GetPaymentToken(new GetPaymentTokenRequest()));
+            await Assert.ThrowsAsync<TrueLayerResourceNotFoundException>(async () => await api.Auth.GetPaymentToken(new GetPaymentTokenRequest()));
         }
 
         class FakeHandler : HttpMessageHandler

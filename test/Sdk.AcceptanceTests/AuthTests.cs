@@ -21,6 +21,8 @@ namespace TrueLayer.Acceptance.Tests
             response.ShouldNotBeNull();
             response.AccessToken.ShouldNotBeNullOrEmpty();
             response.ExpiresIn.ShouldBeGreaterThan(0);
+            response.TokenType.ShouldBe("Bearer");
+            response.Scope.ShouldBe("payments");
         }
     }
 }

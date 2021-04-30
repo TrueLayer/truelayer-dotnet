@@ -6,9 +6,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayerSdk.Common.CustomHttpResponses;
 using TrueLayerSdk.Common.Exceptions;
 using TrueLayerSdk.Common.Serialization;
+using System.Net.Mime;
 
 namespace TrueLayerSdk
 {
@@ -31,10 +31,10 @@ namespace TrueLayerSdk
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
         
-        public async Task<TResult> GetAsync<TResult>(Uri uri, string accessToken, CancellationToken cancellationToken)
+        /// <inheritdoc />
+        public async Task<TResult> GetAsync<TResult>(Uri uri, string accessToken = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
-            if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
 
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Get,
@@ -43,28 +43,30 @@ namespace TrueLayerSdk
                 httpContent: null,
                 cancellationToken: cancellationToken
             );
-            return await DeserializeJsonAsync<TResult>(httpResponse);
+
+            return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken);
         }
         
-        public async Task<TResult> PostAsync<TResult>(Uri uri, CancellationToken cancellationToken,
-            HttpContent httpContent = null)
+        /// <inheritdoc />
+        public async Task<TResult> PostAsync<TResult>(Uri uri, HttpContent httpContent = null, string accessToken = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Post,
                 uri: uri,
-                accessToken: null,
+                accessToken: accessToken,
                 httpContent: httpContent,
                 cancellationToken: cancellationToken
             );
-            return await DeserializeJsonAsync<TResult>(httpResponse);
+
+            return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken);
         }
-        public async Task<TResult> PostAsync<TResult>(Uri uri, CancellationToken cancellationToken,
-            string accessToken, object request = null)
+
+        /// <inheritdoc />
+        public async Task<TResult> PostAsync<TResult>(Uri uri, object request = null, string accessToken = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
-            if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
 
             using var httpResponse = await SendJsonRequestAsync(
                 httpMethod: HttpMethod.Post,
@@ -73,52 +75,32 @@ namespace TrueLayerSdk
                 request: request,
                 cancellationToken: cancellationToken
             );
-            return await DeserializeJsonAsync<TResult>(httpResponse);
+
+            return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken);
         }
 
-        private async Task<TResult> DeserializeJsonAsync<TResult>(HttpResponseMessage httpResponse)
+        private async Task<TResult> DeserializeJsonAsync<TResult>(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
         {
-            var result = await DeserializeJsonAsync(httpResponse, typeof(TResult));
-            return (TResult)result;
-        }
-        
-        private async Task<dynamic> DeserializeJsonAsync(HttpResponseMessage httpResponse, Type resultType)
-        {
-            // TODO: chech why expression is always false
-            // if (httpResponse.Content == null)
-            //     return null;
-
-            var json = await httpResponse.Content.ReadAsStringAsync();
-            if(!string.IsNullOrWhiteSpace(json))
-                return _serializer.Deserialize(json, resultType);
+            string json = await httpResponse.Content?.ReadAsStringAsync(cancellationToken);
             
-            return httpResponse.StatusCode switch
+            if (string.IsNullOrWhiteSpace(json))
             {
-                HttpStatusCode.OK => new TruelayerOkApiResponse(httpResponse.Headers),
-                HttpStatusCode.Accepted => new TruelayerAcceptedApiResponse(httpResponse.Headers),
-                HttpStatusCode.NoContent => new TruelayerNoContentApiResponse(httpResponse.Headers),
-                HttpStatusCode.BadRequest => new TruelayerBadRequestApiResponse(httpResponse.Headers),
-                HttpStatusCode.Unauthorized => new TruelayerUnauthorizedApiResponse(httpResponse.Headers),
-                HttpStatusCode.Forbidden => new TruelayerForbiddenApiResponse(httpResponse.Headers),
-                HttpStatusCode.NotFound => new TruelayerNotFoundApiResponse(httpResponse.Headers),
-                HttpStatusCode.Conflict => new TruelayerConflictApiResponse(httpResponse.Headers),
-                (HttpStatusCode) 422 => new TruelayerUnprocessableEntityApiResponse(httpResponse.Headers),
-                (HttpStatusCode) 429 => new TruelayerTooManyRequestsApiResponse(httpResponse.Headers),
-                HttpStatusCode.InternalServerError => new TruelayerInternalServerErrorApiResponse(httpResponse.Headers),
-                HttpStatusCode.BadGateway => new TruelayerBadGatewayApiResponse(httpResponse.Headers),
-                _ => throw new NotImplementedException(
-                    $"Handling a contentless API response with status code {httpResponse.StatusCode} is not implemented.")
-            };
+                return default;
+            }
+
+            return (TResult)_serializer.Deserialize(json, typeof(TResult));
         }
 
-        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, Uri uri, string accessToken,
+        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, Uri uri, string accessToken, 
             object request, CancellationToken cancellationToken)
         {
             HttpContent httpContent = null;
-            if (request != null)
+            
+            if (request is {})
             {
-                httpContent = new StringContent(_serializer.Serialize(request), Encoding.UTF8, "application/json");
+                httpContent = new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
             }
+            
             return SendRequestAsync(httpMethod, uri, accessToken, httpContent, cancellationToken);
         }
         
@@ -132,33 +114,35 @@ namespace TrueLayerSdk
                 Content = httpContent
             };
 
-            if (!string.IsNullOrEmpty(accessToken))
+            if (!string.IsNullOrWhiteSpace(accessToken))
+            {
                 httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            }
 
-            // Logger.Info("{HttpMethod} {Uri}", httpMethod, httpRequest.RequestUri.AbsoluteUri);
             var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
-            ValidateResponseAsync(httpResponse);
+            await ValidateResponseAsync(httpResponse, cancellationToken);
 
             return httpResponse;
         }
         
-        private void ValidateResponseAsync(HttpResponseMessage httpResponse)
+        private async Task ValidateResponseAsync(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
         {
             if (!httpResponse.IsSuccessStatusCode)
             {
-                httpResponse.Headers.TryGetValues("Tl-Request-Id", out var requestIdHeader);
-                var requestId = requestIdHeader?.FirstOrDefault();
-                // var content = await httpResponse.Content.ReadAsStringAsync();
-                // if (httpResponse.StatusCode == Unprocessable)
-                // {
-                //     var error = await DeserializeJsonAsync<ErrorResponse>(httpResponse);
-                //     throw new TruelayerValidationException(error, httpResponse.StatusCode, requestId);
-                // }
+                httpResponse.Headers.TryGetValues(CustomHeaders.RequestId, out var requestIdHeader);
+                string requestId = requestIdHeader?.FirstOrDefault();
 
-                if (httpResponse.StatusCode == HttpStatusCode.NotFound)
-                    throw new TruelayerResourceNotFoundException(requestId);
-
-                throw new TruelayerApiException(httpResponse.StatusCode, requestId);
+                switch (httpResponse.StatusCode)
+                {
+                    case HttpStatusCode.NotFound:
+                        throw new TrueLayerResourceNotFoundException(requestId);
+                    case HttpStatusCode.BadRequest:
+                    case HttpStatusCode.UnprocessableEntity:
+                        var errorResponse = await DeserializeJsonAsync<ErrorResponse>(httpResponse, cancellationToken);
+                        throw new TrueLayerValidationException(errorResponse, httpResponse.StatusCode, requestId);
+                    default:
+                        throw new TrueLayerApiException(httpResponse.StatusCode, requestId);
+                }
             }
         }
     }
