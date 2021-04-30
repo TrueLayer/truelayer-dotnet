@@ -3,9 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using TrueLayerSdk;
 using TrueLayer.Auth.Model;
-using TrueLayerSdk.Common.Exceptions;
 using Xunit;
 
 namespace TrueLayer.Sdk.Tests
@@ -27,7 +25,7 @@ namespace TrueLayer.Sdk.Tests
                     => builder.ConfigurePrimaryHttpMessageHandler(() => new FakeHandler()))
                 .BuildServiceProvider();
 
-            var api = services.GetRequiredService<ITruelayerApi>();
+            var api = services.GetRequiredService<ITrueLayerApi>();
             await Assert.ThrowsAsync<TrueLayerResourceNotFoundException>(async () => await api.Auth.GetPaymentToken(new GetPaymentTokenRequest()));
         }
 

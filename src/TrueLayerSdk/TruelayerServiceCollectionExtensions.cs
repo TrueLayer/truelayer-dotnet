@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
-using TrueLayerSdk;
-using TrueLayerSdk.Common.Serialization;
+using TrueLayer;
+using TrueLayer.Serialization;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
             configureBuilder?.Invoke(httpClientBuilder);
 
             services.AddSingleton<ISerializer>(new JsonSerializer());
-            services.AddTransient<ITruelayerApi, TruelayerApi>();
+            services.AddTransient<ITrueLayerApi, TrueLayerApi>();
             services.AddSingleton(configuration);
 
             return services;

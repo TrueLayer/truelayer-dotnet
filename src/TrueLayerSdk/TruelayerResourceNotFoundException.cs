@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace TrueLayerSdk.Common.Exceptions
+namespace TrueLayer
 {
     /// <summary>
     /// Exception thrown following a HTTP 404 (Not Found) response.

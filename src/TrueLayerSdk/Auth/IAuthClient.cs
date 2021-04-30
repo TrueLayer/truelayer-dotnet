@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth.Model;
 
-namespace TrueLayerSdk.Auth
+namespace TrueLayer.Auth
 {
     public interface IAuthClient
     {

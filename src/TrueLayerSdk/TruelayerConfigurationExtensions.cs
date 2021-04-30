@@ -3,7 +3,7 @@ namespace Microsoft.Extensions.Configuration
     /// <summary>
     /// Truelayer SDK extensions for <see cref="Microsoft.Extensions.Configuration.IConfiguration"/>.
     /// </summary>
-    public static class TruelayerConfigurationExtensions
+    public static class TrueLayerConfigurationExtensions
     {
         /// <summary>
         /// Gets the options from the "Truelayer" configuration section needed to configure the Truelayer.com SDK for .NET.

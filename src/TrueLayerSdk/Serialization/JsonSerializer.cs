@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json;
 
-namespace TrueLayerSdk.Common.Serialization
+namespace TrueLayer.Serialization
 {
     public class JsonSerializer : ISerializer
     {

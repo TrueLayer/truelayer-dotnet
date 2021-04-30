@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using TrueLayerSdk.Common;
+using TrueLayer.Serialization;
 using Xunit;
 
-namespace TrueLayer.Sdk.Tests.Common
+namespace TrueLayer.Sdk.Tests.Serialization
 {
     public class StringExtensionsTests
     {

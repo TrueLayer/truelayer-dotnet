@@ -1,8 +1,8 @@
 using System.Text;
 
-namespace TrueLayerSdk.Common
+namespace TrueLayer.Serialization
 {
-    public static class StringExtensions
+    internal static class StringExtensions
     {
         private enum SnakeCaseState
         {

@@ -1,4 +1,4 @@
-namespace TrueLayerSdk
+namespace TrueLayer
 {
     internal static class CustomHeaders
     {

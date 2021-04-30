@@ -1,6 +1,6 @@
 using System;
 
-namespace TrueLayerSdk.Common.Serialization
+namespace TrueLayer.Serialization
 {
     /// <summary>
     /// Defines an interface for classes that provide serialization to and from string formats such as JSON.

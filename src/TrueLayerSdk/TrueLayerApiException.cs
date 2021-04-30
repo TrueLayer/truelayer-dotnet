@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace TrueLayerSdk.Common.Exceptions
+namespace TrueLayer
 {
     /// <summary>
     /// Exception type for errors resulting from API operations.

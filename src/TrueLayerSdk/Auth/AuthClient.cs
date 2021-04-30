@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth.Model;
 
-namespace TrueLayerSdk.Auth
+namespace TrueLayer.Auth
 {
     /// <summary>
     /// Default implementation of <see cref="IAuthClient"/>.

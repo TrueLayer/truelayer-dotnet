@@ -1,10 +1,10 @@
 using System;
 using System.Text.Json;
-using TrueLayerSdk.Common.Serialization;
+using TrueLayer.Serialization;
 using Xunit;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace TrueLayer.Sdk.Tests.Common.Serialization
+namespace TrueLayer.Sdk.Tests.Serialization
 {
     public class SnakeCaseNamingPolicyTests
     {

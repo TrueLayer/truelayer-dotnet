@@ -4,12 +4,12 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TrueLayerSdk
+namespace TrueLayer
 {
     internal class UserAgentHandler : DelegatingHandler
     {
         private static readonly ProductInfoHeaderValue UserAgentHeader
-            = new ProductInfoHeaderValue("truelayer-sdk-net", ReflectionUtils.GetAssemblyVersion<ITruelayerApi>());
+            = new ProductInfoHeaderValue("truelayer-sdk-net", ReflectionUtils.GetAssemblyVersion<ITrueLayerApi>());
         
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {

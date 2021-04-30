@@ -1,4 +1,4 @@
-using TrueLayerSdk;
+using TrueLayer;
 
 namespace Microsoft.Extensions.Configuration
 {
@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.Configuration
     /// using the Microsoft configuration framework.
     /// </summary>
     public class TruelayerOptions
-    {
+    {        
         /// <summary>
         /// Gets or sets your Truelayer client id.
         /// </summary>

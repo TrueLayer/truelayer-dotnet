@@ -1,4 +1,4 @@
-namespace TrueLayerSdk.Auth
+namespace TrueLayer.Auth
 {
     public class ExchangeCodeResponse
     {

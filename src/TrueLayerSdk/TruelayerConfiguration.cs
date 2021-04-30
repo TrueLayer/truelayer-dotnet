@@ -1,6 +1,6 @@
 using System;
 
-namespace TrueLayerSdk
+namespace TrueLayer
 {
     public class TruelayerConfiguration
     {

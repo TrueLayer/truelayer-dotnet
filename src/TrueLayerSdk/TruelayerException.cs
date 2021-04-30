@@ -1,6 +1,6 @@
 using System;
 
-namespace TrueLayerSdk.Common.Exceptions
+namespace TrueLayer
 {
     /// <summary>
     /// Base class for exceptions thrown by the Truelayer.com SDK for .NET.

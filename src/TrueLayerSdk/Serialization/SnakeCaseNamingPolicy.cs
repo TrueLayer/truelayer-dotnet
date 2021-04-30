@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace TrueLayerSdk.Common.Serialization
+namespace TrueLayer.Serialization
 {
     internal class SnakeCaseNamingPolicy : JsonNamingPolicy
     {

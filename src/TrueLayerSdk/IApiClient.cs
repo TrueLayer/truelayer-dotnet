@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TrueLayerSdk
+namespace TrueLayer
 {
     /// <summary>
     /// Defines the operations used for communicating with Truelayer.com APIs.

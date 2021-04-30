@@ -1,4 +1,4 @@
-namespace TrueLayerSdk
+namespace TrueLayer
 {
     /// <summary>
     /// Validation error response returned by TrueLayer APIs

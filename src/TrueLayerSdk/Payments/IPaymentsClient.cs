@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Payments.Model;
 
-namespace TrueLayerSdk.Payments
+namespace TrueLayer.Payments
 {
     public interface IPaymentsClient
     {

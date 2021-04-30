@@ -1,23 +1,17 @@
-using TrueLayerSdk.Auth;
-using TrueLayerSdk.Data;
-using TrueLayerSdk.Payments;
+using TrueLayer.Auth;
+using TrueLayer.Payments;
 
-namespace TrueLayerSdk
+namespace TrueLayer
 {
     /// <summary>
     /// Convenience interface that provides access to the available Truelayer.com APIs.
     /// </summary>
-    public interface ITruelayerApi
+    public interface ITrueLayerApi
     {
         /// <summary>
         /// Gets the Auth API.
         /// </summary>
-        public IAuthClient Auth { get; }
-        
-        /// <summary>
-        /// Gets the Data API.
-        /// </summary>
-        public IDataClient Data { get; }
+        IAuthClient Auth { get; }
         
         /// <summary>
         /// Gets the Payments API.

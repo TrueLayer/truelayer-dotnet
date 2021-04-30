@@ -6,11 +6,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayerSdk.Common.Exceptions;
-using TrueLayerSdk.Common.Serialization;
 using System.Net.Mime;
+using TrueLayer.Serialization;
 
-namespace TrueLayerSdk
+namespace TrueLayer
 {
     /// <summary>
     /// Handles the authentication, serialization and sending of HTTP requests to Truelayer APIs.

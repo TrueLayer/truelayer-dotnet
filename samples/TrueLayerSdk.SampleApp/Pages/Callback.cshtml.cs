@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using TrueLayer;
 using TrueLayerSdk.SampleApp.Data;
 using TrueLayerSdk.SampleApp.Models;
 
@@ -12,7 +13,7 @@ namespace TrueLayerSdk.SampleApp.Pages
 {
     public class Callback : PageModel
     {
-        public Callback(IConfiguration config, TokenStorage tokenStorage, PaymentsDbContext context, ITruelayerApi api)
+        public Callback(IConfiguration config, TokenStorage tokenStorage, PaymentsDbContext context, ITrueLayerApi api)
         {
             _tokenStorage = tokenStorage;
             _context = context;
@@ -23,7 +24,7 @@ namespace TrueLayerSdk.SampleApp.Pages
         private readonly TokenStorage _tokenStorage;
         private readonly PaymentsDbContext _context;
         public PaymentData Payment;
-        private readonly ITruelayerApi _api;
+        private readonly ITrueLayerApi _api;
         
         public string Token { get; }
         public ErrorEntity Error { get; set; }

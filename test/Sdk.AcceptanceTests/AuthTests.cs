@@ -3,7 +3,7 @@ using Shouldly;
 using TrueLayer.Auth.Model;
 using Xunit;
 
-namespace TrueLayer.Acceptance.Tests
+namespace TrueLayer.Sdk.Acceptance.Tests
 {
     public class AuthTests : IClassFixture<ApiTestFixture>
     {

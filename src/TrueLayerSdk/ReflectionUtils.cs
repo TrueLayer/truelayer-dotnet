@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace TrueLayerSdk
+namespace TrueLayer
 {
     internal static class ReflectionUtils
     {

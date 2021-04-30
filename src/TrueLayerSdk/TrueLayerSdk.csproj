@@ -2,8 +2,8 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>TrueLayer</RootNamespace>
-        <AssemblyName>TrueLayerSDK</AssemblyName>
-        <PackageId>TrueLayerSDK</PackageId>
+        <AssemblyName>TrueLayerSdk</AssemblyName>
+        <PackageId>TrueLayerSdk</PackageId>
         <Description>.NET SDK for the TrueLayer API</Description>
         <PackageIcon>icon.png</PackageIcon>
     </PropertyGroup>
