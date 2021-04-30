@@ -5,15 +5,15 @@ namespace TrueLayerSdk.Common.Exceptions
     /// <summary>
     /// Exception type for errors resulting from API operations.
     /// </summary>
-    public class TruelayerApiException : TruelayerException
+    public class TrueLayerApiException : TrueLayerException
     {
         /// <summary>
-        /// Creates a new <see cref="TruelayerApiException"/> instance.
+        /// Creates a new <see cref="TrueLayerApiException"/> instance.
         /// </summary>
         /// <param name="httpStatusCode">The HTTP status code of the API response.</param>
         /// <param name="requestId">The unique identifier of the API request.</param>
         /// <param name="additionalInformation">Additional details about the error.</param>
-        public TruelayerApiException(HttpStatusCode httpStatusCode, string requestId, string additionalInformation = null) 
+        public TrueLayerApiException(HttpStatusCode httpStatusCode, string requestId, string additionalInformation = null) 
             : base(GenerateMessage(httpStatusCode, additionalInformation))
         {
             HttpStatusCode = httpStatusCode;

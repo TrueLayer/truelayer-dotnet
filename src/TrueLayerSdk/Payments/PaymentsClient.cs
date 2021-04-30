@@ -8,7 +8,7 @@ namespace TrueLayerSdk.Payments
     /// <summary>
     /// Default implementation of <see cref="IPaymentsClient"/>.
     /// </summary>
-    public class PaymentsClient : IPaymentsClient
+    internal class PaymentsClient : IPaymentsClient
     {
         private readonly IApiClient _apiClient;
         private readonly TruelayerConfiguration _configuration;
@@ -51,7 +51,8 @@ namespace TrueLayerSdk.Payments
                 RedirectUri = request.ReturnUri,
             };
             
-            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), cancellationToken, request.AccessToken, data);
+            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), 
+                data, request.AccessToken, cancellationToken);
             return apiResponse;
         }
 
@@ -102,7 +103,9 @@ namespace TrueLayerSdk.Payments
                 AuthFlow = new AuthFlow {Type = "redirect", ReturnUri = request.ReturnUri},
             };
             
-            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationData>(GetRequestUri(path), cancellationToken, request.AccessToken, data);
+            var apiResponse = await _apiClient.PostAsync<SingleImmediatePaymentInitiationData>(
+                GetRequestUri(path), data, request.AccessToken, cancellationToken);
+            
             return new SingleImmediatePaymentInitiationResponse {Data = apiResponse};
         }
         

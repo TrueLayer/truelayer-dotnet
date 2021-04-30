@@ -3,7 +3,7 @@ namespace TrueLayerSdk.Data
     /// <summary>
     /// Default implementation of <see cref="IDataClient"/>.
     /// </summary>
-    public class DataClient : IDataClient
+    internal class DataClient : IDataClient
     {
         private readonly IApiClient _apiClient;
         private readonly TruelayerConfiguration _configuration;
