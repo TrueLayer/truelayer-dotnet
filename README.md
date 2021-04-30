@@ -6,7 +6,7 @@ The **TrueLayer SDK for .NET** enables .NET developers to easily work with [True
 Install the TrueLayer SDK NuGet package:
 
 ```
-dotnet add package TrueLayerSDK
+dotnet add package TrueLayerSdk
 ```
 
 Add your `ClientId` and `ClientSecret` to `appsettings.json`. You can obtain them by signing up at [Truelayer's console](https://console.truelayer.com/?auto=signup).

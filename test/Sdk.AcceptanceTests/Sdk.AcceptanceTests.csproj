@@ -22,7 +22,7 @@
     <PackageReference Include="Moq" Version="4.16.1"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TrueLayerSdk\TrueLayerSdk.csproj"/>
+    <ProjectReference Include="..\..\src\Sdk\Sdk.csproj"/>
   </ItemGroup>
   <ItemGroup Label="Config Files">
     <None Update="appsettings.*" CopyToOutputDirectory="PreserveNewest" />
