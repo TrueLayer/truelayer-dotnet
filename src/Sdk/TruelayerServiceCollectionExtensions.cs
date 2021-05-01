@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration">The Truelayer configuration.</param>
         /// <returns>The service collection with registered Truelayer SDK services.</returns>
         public static IServiceCollection AddTruelayerSdk(this IServiceCollection services,
-            TruelayerConfiguration configuration, Action<IHttpClientBuilder> configureBuilder = null)
+            TruelayerConfiguration configuration, Action<IHttpClientBuilder>? configureBuilder = null)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration">The Microsoft configuration used to obtain the Truelayer SDK configuration.</param>
         /// <returns>The service collection with registered Truelayer SDK services.</returns>
         public static IServiceCollection AddTruelayerSdk(this IServiceCollection services,
-            IConfiguration configuration, Action<IHttpClientBuilder> configureBuilder = null)
+            IConfiguration configuration, Action<IHttpClientBuilder>? configureBuilder = null)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));

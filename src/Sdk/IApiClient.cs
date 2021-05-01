@@ -18,7 +18,7 @@ namespace TrueLayer
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the underlying HTTP request.</param>
         /// <typeparam name="TResult">The expected response type to be deserialized.</typeparam>
         /// <returns>A task that upon completion contains the specified API response data.</returns>
-        Task<TResult> GetAsync<TResult>(Uri uri, string accessToken = null, CancellationToken cancellationToken = default);
+        Task<TResult> GetAsync<TResult>(Uri uri, string? accessToken = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Executes a POST request to the specified <paramref name="uri"/>. 
@@ -29,7 +29,7 @@ namespace TrueLayer
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the underlying HTTP request.</param>
         /// <typeparam name="TResult">The expected response type to be deserialized.</typeparam>
         /// <returns>A task that upon completion contains the specified API response data.</returns>
-        Task<TResult> PostAsync<TResult>(Uri uri, HttpContent httpContent = null, string accessToken = null, CancellationToken cancellationToken = default);
+        Task<TResult> PostAsync<TResult>(Uri uri, HttpContent? httpContent = null, string? accessToken = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Executes a POST request to the specified <paramref name="uri"/>. 
@@ -40,6 +40,6 @@ namespace TrueLayer
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the underlying HTTP request.</param>
         /// <typeparam name="TResult">The expected response type to be deserialized.</typeparam>
         /// <returns>A task that upon completion contains the specified API response data.</returns>
-        Task<TResult> PostAsync<TResult>(Uri uri, object request = null, string accessToken = null, CancellationToken cancellationToken = default);
+        Task<TResult> PostAsync<TResult>(Uri uri, object? request = null, string? accessToken = null, CancellationToken cancellationToken = default);
     }
 }

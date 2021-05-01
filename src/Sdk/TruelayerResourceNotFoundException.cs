@@ -11,7 +11,7 @@ namespace TrueLayer
         /// Createa a new <see cref="TrueLayerResourceNotFoundException"/> instance.
         /// </summary>
         /// <param name="requestId">The unique identifier of the API request.</param>
-        public TrueLayerResourceNotFoundException(string requestId) 
+        public TrueLayerResourceNotFoundException(string? requestId) 
             : base(HttpStatusCode.NotFound, requestId)
         {
         }

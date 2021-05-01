@@ -31,7 +31,7 @@ namespace TrueLayer
         }
         
         /// <inheritdoc />
-        public async Task<TResult> GetAsync<TResult>(Uri uri, string accessToken = null, CancellationToken cancellationToken = default)
+        public async Task<TResult> GetAsync<TResult>(Uri uri, string? accessToken = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -43,11 +43,11 @@ namespace TrueLayer
                 cancellationToken: cancellationToken
             );
 
-            return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken);
+            return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken) ?? throw new ArgumentNullException();
         }
         
         /// <inheritdoc />
-        public async Task<TResult> PostAsync<TResult>(Uri uri, HttpContent httpContent = null, string accessToken = null, CancellationToken cancellationToken = default)
+        public async Task<TResult> PostAsync<TResult>(Uri uri, HttpContent? httpContent = null, string? accessToken = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -59,11 +59,11 @@ namespace TrueLayer
                 cancellationToken: cancellationToken
             );
 
-            return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken);
+            return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken) ?? throw new ArgumentNullException();
         }
 
         /// <inheritdoc />
-        public async Task<TResult> PostAsync<TResult>(Uri uri, object request = null, string accessToken = null, CancellationToken cancellationToken = default)
+        public async Task<TResult> PostAsync<TResult>(Uri uri, object? request = null, string? accessToken = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -75,25 +75,25 @@ namespace TrueLayer
                 cancellationToken: cancellationToken
             );
 
-            return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken);
+            return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken) ?? throw new ArgumentNullException();
         }
 
-        private async Task<TResult> DeserializeJsonAsync<TResult>(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
+        private async Task<TResult?> DeserializeJsonAsync<TResult>(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
         {
-            string json = await httpResponse.Content?.ReadAsStringAsync(cancellationToken);
+            string? json = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
             
             if (string.IsNullOrWhiteSpace(json))
             {
                 return default;
             }
 
-            return (TResult)_serializer.Deserialize(json, typeof(TResult));
+            return (TResult?)_serializer.Deserialize(json, typeof(TResult));
         }
 
-        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, Uri uri, string accessToken, 
-            object request, CancellationToken cancellationToken)
+        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, Uri uri, string? accessToken, 
+            object? request, CancellationToken cancellationToken)
         {
-            HttpContent httpContent = null;
+            HttpContent? httpContent = null;
             
             if (request is {})
             {
@@ -103,8 +103,8 @@ namespace TrueLayer
             return SendRequestAsync(httpMethod, uri, accessToken, httpContent, cancellationToken);
         }
         
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod httpMethod, Uri uri, string accessToken,
-            HttpContent httpContent, CancellationToken cancellationToken)
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod httpMethod, Uri uri, string? accessToken,
+            HttpContent? httpContent, CancellationToken cancellationToken)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -129,7 +129,7 @@ namespace TrueLayer
             if (!httpResponse.IsSuccessStatusCode)
             {
                 httpResponse.Headers.TryGetValues(CustomHeaders.RequestId, out var requestIdHeader);
-                string requestId = requestIdHeader?.FirstOrDefault();
+                string? requestId = requestIdHeader?.FirstOrDefault();
 
                 switch (httpResponse.StatusCode)
                 {

@@ -12,7 +12,7 @@ namespace TrueLayer.Serialization
         /// System.Text.Json serializer settings.
         /// </summary>
         /// <param name="configureOptions">An action to be run against the System.Text.Json serializer options.</param>
-        public JsonSerializer(Action<JsonSerializerOptions> configureOptions = null)
+        public JsonSerializer(Action<JsonSerializerOptions>? configureOptions = null)
         {
             _serializerOptions = CreateSerializerSettings(configureOptions);
         }
@@ -24,7 +24,7 @@ namespace TrueLayer.Serialization
         /// <returns>The input serialized as JSON.</returns>
         public string Serialize(object input)
         {
-            if (input == null) throw new ArgumentNullException(nameof(input));
+            if (input is null) throw new ArgumentNullException(nameof(input));
             return System.Text.Json.JsonSerializer.Serialize(input, _serializerOptions);
         }
 
@@ -34,12 +34,22 @@ namespace TrueLayer.Serialization
         /// <param name="input">The JSON input to deserialize.</param>
         /// <param name="objectType">The object type to deserialize to.</param>
         /// <returns>The deserialized object.</returns>
-        public object Deserialize(string input, Type objectType)
+        public object? Deserialize(string input, Type objectType)
         {
+            if (input is null)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
+
+            if (objectType is null)
+            {
+                throw new ArgumentNullException(nameof(objectType));
+            }
+
             return System.Text.Json.JsonSerializer.Deserialize(input, objectType, _serializerOptions);
         }
         
-        private static JsonSerializerOptions CreateSerializerSettings(Action<JsonSerializerOptions> configureOptions)
+        private static JsonSerializerOptions CreateSerializerSettings(Action<JsonSerializerOptions>? configureOptions)
         {
             var settings = new JsonSerializerOptions
             {

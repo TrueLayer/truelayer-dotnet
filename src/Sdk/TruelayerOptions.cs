@@ -11,12 +11,12 @@ namespace Microsoft.Extensions.Configuration
         /// <summary>
         /// Gets or sets your Truelayer client id.
         /// </summary>
-        public string ClientId { get; set; }
+        public string? ClientId { get; set; }
         
         /// <summary>
         /// Gets or sets your Truelayer client secret.
         /// </summary>
-        public string ClientSecret { get; set; }
+        public string? ClientSecret { get; set; }
         
         /// <summary>
         /// Gets or sets a value indicating whether to connect to the Truelayer Sandbox. 

@@ -13,7 +13,7 @@ namespace TrueLayer
         /// <param name="error">The validation error details.</param>
         /// <param name="httpStatusCode">The HTTP status code of the API response.</param>
         /// <param name="requestId">The unique identifier of the API request.</param>
-        public TrueLayerValidationException(ErrorResponse error, HttpStatusCode httpStatusCode, string requestId)
+        public TrueLayerValidationException(ErrorResponse? error, HttpStatusCode httpStatusCode, string? requestId)
          : base(httpStatusCode, requestId, GenerateDetailsMessage(error))
         {
             Error = error;
@@ -22,9 +22,9 @@ namespace TrueLayer
         /// <summary>
         /// Gets the error response.
         /// </summary>
-        public ErrorResponse Error { get; }
+        public ErrorResponse? Error { get; }
 
-        private static string GenerateDetailsMessage(ErrorResponse error)
+        private static string GenerateDetailsMessage(ErrorResponse? error)
             => error is null
                 ? "An unspecified validation error occurred"
                 : $"A validation error of type {error.Error} occurred with error codes [{string.Join(",", error.ErrorDetails.Parameters)}].";

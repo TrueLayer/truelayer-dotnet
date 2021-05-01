@@ -19,7 +19,7 @@ namespace TrueLayer.Payments
             _configuration = configuration;
         }
         
-        public Task<GetPaymentStatusResponse> GetPaymentStatus(string paymentId, string accessToken, CancellationToken cancellationToken = default)
+        public Task<GetPaymentStatusResponse> GetPaymentStatus(string paymentId, string? accessToken, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(paymentId)) throw new ArgumentNullException(nameof(paymentId));
             if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));

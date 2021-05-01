@@ -1,5 +1,10 @@
 <Project>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+    <PropertyGroup>
+        <!-- Enable nullable and treat their warnings as errors -->
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable;</WarningsAsErrors>
+      </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="SecurityCodeScan.VS2019" Version="5.0.0" PrivateAssets="all" />
         <PackageReference Include="MinVer" Version="2.4.0" PrivateAssets="All" />
