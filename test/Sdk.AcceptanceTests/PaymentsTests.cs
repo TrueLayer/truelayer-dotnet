@@ -4,7 +4,7 @@ using TrueLayer.Auth.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
 
-namespace TrueLayer.Acceptance.Tests
+namespace TrueLayer.Sdk.Acceptance.Tests
 {
     using System;
 

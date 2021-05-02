@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Shouldly;
-using TrueLayerSdk;
 using Xunit;
 
 namespace TrueLayer.Sdk.Tests
@@ -25,7 +24,7 @@ namespace TrueLayer.Sdk.Tests
             response.Headers.TryGetValues("User-Agent", out var value).ShouldBeTrue();
             ProductHeaderValue.TryParse(value.FirstOrDefault(), out var product).ShouldBeTrue();
             product.Name.ShouldBe("truelayer-sdk-net");
-            product.Version.ShouldBe(ReflectionUtils.GetAssemblyVersion<ITruelayerApi>());
+            product.Version.ShouldBe(ReflectionUtils.GetAssemblyVersion<ITrueLayerApi>());
         }
 
         class EchoHandler : HttpMessageHandler

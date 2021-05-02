@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <RootNamespace>TrueLayer.Acceptance.Tests</RootNamespace>
-    <AssemblyName>TrueLayer.Acceptance.Tests</AssemblyName>
+    <RootNamespace>TrueLayer.Sdk.Acceptance.Tests</RootNamespace>
+    <AssemblyName>TrueLayer.Sdk.Acceptance.Tests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1"/>
@@ -22,7 +22,7 @@
     <PackageReference Include="Moq" Version="4.16.1"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TrueLayerSdk\TrueLayerSdk.csproj"/>
+    <ProjectReference Include="..\..\src\Sdk\Sdk.csproj"/>
   </ItemGroup>
   <ItemGroup Label="Config Files">
     <None Update="appsettings.*" CopyToOutputDirectory="PreserveNewest" />

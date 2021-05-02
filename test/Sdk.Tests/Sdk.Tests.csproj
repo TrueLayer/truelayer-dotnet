@@ -21,7 +21,7 @@
     <PackageReference Include="RichardSzalay.MockHttp" Version="6.0.0"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TrueLayerSdk\TrueLayerSdk.csproj"/>
+    <ProjectReference Include="..\..\src\Sdk\Sdk.csproj"/>
   </ItemGroup>
   <ItemGroup Label="Config Files">
     <None Update="appsettings.*" CopyToOutputDirectory="PreserveNewest"/>
