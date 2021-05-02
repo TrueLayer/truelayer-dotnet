@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Microsoft.Extensions.Configuration
 {
     /// <summary>
@@ -13,5 +15,19 @@ namespace Microsoft.Extensions.Configuration
         /// <returns>The Truelayer options initialized with values from the provided configuration.</returns>
         public static TruelayerOptions GetTruelayerOptions(this IConfiguration configuration, string sectionName = "TrueLayer") =>
             configuration.GetSection(sectionName).Get<TruelayerOptions>();
+
+        /// <summary>
+        /// Helper method to try extract a value from dictionary without throwing.
+        /// </summary>
+        /// <param name="dict">The dictionary.</param>
+        /// <param name="key">The key we're looking for.</param>
+        /// <typeparam name="TKey">Type of the key.</typeparam>
+        /// <typeparam name="TResult">Type of the result we expect.</typeparam>
+        /// <returns></returns>
+        public static TResult GetValueSafe<TKey, TResult>(this IReadOnlyDictionary<TKey, TResult> dict, TKey key)
+        {
+            if (dict is null) return default;
+            return dict.TryGetValue(key, out var uri) ? uri : default;
+        }
     }
 }
