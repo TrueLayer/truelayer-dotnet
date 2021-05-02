@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using TrueLayer;
 using TrueLayer.Auth.Model;
 using TrueLayer.Payments.Model;
 using TrueLayerSdk.SampleApp.Data;
@@ -17,7 +18,7 @@ namespace TrueLayerSdk.SampleApp.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly TokenStorage _tokenStorage;
         private readonly PaymentsDbContext _context;
-        private readonly ITruelayerApi _api;
+        private readonly ITrueLayerApi _api;
         public string Token;
         public string PaymentId;
         public string AuthUri;
@@ -26,7 +27,7 @@ namespace TrueLayerSdk.SampleApp.Pages
         public PaymentData Payment { get; set; }
         
         public IndexModel(ILogger<IndexModel> logger, IConfiguration config, TokenStorage tokenStorage,
-            PaymentsDbContext context, ITruelayerApi api)
+            PaymentsDbContext context, ITrueLayerApi api)
         {
             _logger = logger;
             _tokenStorage = tokenStorage;

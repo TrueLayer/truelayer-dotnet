@@ -3,9 +3,8 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TrueLayerSdk;
 
-namespace TrueLayer.Acceptance.Tests
+namespace TrueLayer.Sdk.Acceptance.Tests
 {
     public class ApiTestFixture
     {
@@ -17,11 +16,11 @@ namespace TrueLayer.Acceptance.Tests
                 .AddTruelayerSdk(configuration)
                 .BuildServiceProvider();
             
-            Api = ServiceProvider.GetRequiredService<ITruelayerApi>();
+            Api = ServiceProvider.GetRequiredService<ITrueLayerApi>();
         }
 
         public IServiceProvider ServiceProvider { get; }
-        public ITruelayerApi Api { get; }
+        public ITrueLayerApi Api { get; }
 
         private static IConfiguration LoadConfiguration()
             => new ConfigurationBuilder()
