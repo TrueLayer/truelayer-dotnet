@@ -16,6 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The service collection to add to.</param>
         /// <param name="configuration">The Truelayer configuration.</param>
+        /// <param name="configureBuilder">Action to override the HttpClientBuilder.</param>
         /// <returns>The service collection with registered Truelayer SDK services.</returns>
         public static IServiceCollection AddTruelayerSdk(this IServiceCollection services,
             TruelayerConfiguration configuration, Action<IHttpClientBuilder> configureBuilder = null)
@@ -40,6 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The service collection to add to.</param>
         /// <param name="configuration">The Microsoft configuration used to obtain the Truelayer SDK configuration.</param>
+        /// <param name="configureBuilder">Action to override the HttpClientBuilder.</param>
         /// <returns>The service collection with registered Truelayer SDK services.</returns>
         public static IServiceCollection AddTruelayerSdk(this IServiceCollection services,
             IConfiguration configuration, Action<IHttpClientBuilder> configureBuilder = null)

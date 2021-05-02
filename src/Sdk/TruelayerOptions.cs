@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.Configuration
         public bool? UseSandbox { get; init; }
         
         /// <summary>
-        /// Creates a <see cref="TrueLayerSdk.TruelayerConfiguration"/> needed to configure the SDK.
+        /// Creates a <see cref="TrueLayer.TruelayerConfiguration"/> needed to configure the SDK.
         /// </summary>
         /// <returns>The initializes configuration.</returns>
         public TruelayerConfiguration CreateConfiguration()
