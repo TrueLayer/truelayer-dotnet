@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configureBuilder">Action to override the HttpClientBuilder.</param>
         /// <returns>The service collection with registered Truelayer SDK services.</returns>
         public static IServiceCollection AddTruelayerSdk(this IServiceCollection services,
-            TruelayerOptions options, Action<IHttpClientBuilder> configureBuilder = null)
+            TruelayerOptions options, Action<IHttpClientBuilder>? configureBuilder = null)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (options is null) throw new ArgumentNullException(nameof(options));
@@ -44,7 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configureBuilder">Action to override the HttpClientBuilder.</param>
         /// <returns>The service collection with registered Truelayer SDK services.</returns>
         public static IServiceCollection AddTruelayerSdk(this IServiceCollection services,
-            IConfiguration configuration, Action<IHttpClientBuilder> configureBuilder = null)
+            IConfiguration configuration, Action<IHttpClientBuilder>? configureBuilder = null)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));

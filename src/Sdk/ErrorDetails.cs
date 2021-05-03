@@ -4,6 +4,6 @@ namespace TrueLayer
 {
     public class ErrorDetails
     {
-        public Dictionary<string, string[]> Parameters { get; set; }
+        public Dictionary<string, string[]>? Parameters { get; set; }
     }
 }

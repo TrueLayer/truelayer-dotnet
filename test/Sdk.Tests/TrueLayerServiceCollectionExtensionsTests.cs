@@ -38,7 +38,7 @@ namespace TrueLayer.Sdk.Tests
                 .BuildServiceProvider();
 
             var api = services.GetRequiredService<ITrueLayerApi>();
-            await Assert.ThrowsAsync<TrueLayerResourceNotFoundException>(async () => await api.Auth.GetPaymentToken(new GetPaymentTokenRequest()));
+            await Assert.ThrowsAsync<TrueLayerResourceNotFoundException>(async () => await api.Auth.GetPaymentToken());
         }
 
         [Theory]

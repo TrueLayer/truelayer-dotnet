@@ -5,7 +5,7 @@ namespace TrueLayer
 {
     internal static class ReflectionUtils
     {
-        public static string GetAssemblyVersion<T>() 
+        public static string? GetAssemblyVersion<T>() 
         {
             Assembly containingAssembly = typeof(T).Assembly;
 

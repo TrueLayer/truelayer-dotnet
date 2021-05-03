@@ -20,6 +20,6 @@ namespace TrueLayer.Serialization
         /// <param name="input">The input to deserialize.</param>
         /// <param name="objectType">The object type to deserialize to.</param>
         /// <returns>The deserialized object.</returns>
-        object Deserialize(string input, Type objectType);
+        object? Deserialize(string input, Type objectType);
     }
 }

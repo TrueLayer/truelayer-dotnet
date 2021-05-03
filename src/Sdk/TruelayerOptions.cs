@@ -11,21 +11,21 @@ namespace TrueLayer
         /// <summary>
         /// Gets or sets your Truelayer client id.
         /// </summary>
-        public string ClientId { get; init; }
+        public string? ClientId { get; init; }
         
         /// <summary>
         /// Gets or sets your Truelayer client secret.
         /// </summary>
-        public string ClientSecret { get; init; }
+        public string? ClientSecret { get; init; }
         
         /// <summary>
         /// Gets or sets a value indicating whether to connect to the Truelayer Sandbox. 
         /// </summary>
         public bool? UseSandbox { get; init; }
 
-        public ApiOptions Auth { get; set; }
-        public ApiOptions Payments { get; set; }
-        public ApiOptions Data { get; set; }
+        public ApiOptions? Auth { get; set; }
+        public ApiOptions? Payments { get; set; }
+        public ApiOptions? Data { get; set; }
 
         public void Validate()
         {

@@ -29,7 +29,7 @@ namespace TrueLayer.Auth
         }
 
         public async Task<GetAuthUriResponse> GetAuthUri(GetAuthUriRequest request)
-        {
+        {           
             var response = new GetAuthUriResponse
             {
                 AuthUri = "https://auth.truelayer-sandbox.com/?response_type=code" +
@@ -46,32 +46,32 @@ namespace TrueLayer.Auth
         {
             const string path = "connect/token";
             
-            var content = new FormUrlEncodedContent(new[]
+            var content = new FormUrlEncodedContent(new KeyValuePair<string?, string?>[]
             {
-                new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                new KeyValuePair<string, string>("code", request.Code),
-                new KeyValuePair<string, string>("client_id", _options.ClientId),
-                new KeyValuePair<string, string>("client_secret", _options.ClientSecret),
-                new KeyValuePair<string, string>("redirect_uri", request.RedirectUri),
+                new ("grant_type", "authorization_code"),
+                new ("code", request.Code),
+                new ("client_id", _options.ClientId),
+                new ("client_secret", _options.ClientSecret),
+                new ("redirect_uri", request.RedirectUri),
             });
             
             var apiResponse = await _apiClient.PostAsync<ExchangeCodeResponse>(GetRequestUri(path), content, null, cancellationToken);
             return apiResponse;
         }
         
-        public async Task<GetPaymentTokenResponse> GetPaymentToken(GetPaymentTokenRequest request, CancellationToken cancellationToken)
-        {
+        public async Task<AuthTokenResponse> GetPaymentToken(CancellationToken cancellationToken = default)
+        {            
             const string path = "connect/token";
             
-            var content = new FormUrlEncodedContent(new[]
+            var content = new FormUrlEncodedContent(new KeyValuePair<string?, string?>[]
             {
-                new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                new KeyValuePair<string, string>("client_id", _options.ClientId),
-                new KeyValuePair<string, string>("client_secret", _options.ClientSecret),
-                new KeyValuePair<string, string>("scope", "payments"),
+                new ("grant_type", "client_credentials"),
+                new ("client_id", _options.ClientId),
+                new ("client_secret", _options.ClientSecret),
+                new ("scope", "payments"),
             });
             
-            var apiResponse = await _apiClient.PostAsync<GetPaymentTokenResponse>(GetRequestUri(path), content, null, cancellationToken);
+            var apiResponse = await _apiClient.PostAsync<AuthTokenResponse>(GetRequestUri(path), content, null, cancellationToken);
             return apiResponse;
         }
         

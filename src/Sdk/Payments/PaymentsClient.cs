@@ -23,34 +23,15 @@ namespace TrueLayer.Payments
             BaseUri = options.Payments?.Uri ?? 
                        new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
-        
-        public Task<GetPaymentStatusResponse> GetPaymentStatus(string paymentId, string accessToken, CancellationToken cancellationToken = default)
-        {
-            if (string.IsNullOrEmpty(paymentId)) throw new ArgumentNullException(nameof(paymentId));
-            if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
-            
-            var path = $"single-immediate-payments/{paymentId}";
-            return _apiClient.GetAsync<GetPaymentStatusResponse>(GetRequestUri(path), accessToken, cancellationToken);
-        }
-        
-        public async Task<SingleImmediatePaymentResponse> SingleImmediatePayment(SingleImmediatePaymentRequest request,
-            CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrEmpty(request.AccessToken)) throw new ArgumentNullException(nameof(request.AccessToken));
 
-            const string path = "single-immediate-payments";
-
-            return await _apiClient.PostAsync<SingleImmediatePaymentResponse>(GetRequestUri(path), request.Data, request.AccessToken, cancellationToken);
-        }
-
-        public async Task<SingleImmediatePaymentInitiationResponse> SingleImmediatePaymentInitiation(SingleImmediatePaymentInitiationRequest request,
-            CancellationToken cancellationToken)
+        public async Task<InitiatePaymentResponse> InitiatePayment(InitiatePaymentRequest request, string accessToken, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(request.AccessToken)) throw new ArgumentNullException(nameof(request.AccessToken));
+            request.NotNull(nameof(request));
+            accessToken.NotNullOrWhiteSpace(nameof(accessToken));
 
             const string path = "v2/single-immediate-payment-initiation-requests";
 
-            return await _apiClient.PostAsync<SingleImmediatePaymentInitiationResponse>(GetRequestUri(path), request.Data, request.AccessToken, cancellationToken);
+            return await _apiClient.PostAsync<InitiatePaymentResponse>(GetRequestUri(path), request, accessToken, cancellationToken);
         }
         
         private Uri GetRequestUri(string path) => new (BaseUri, path);
