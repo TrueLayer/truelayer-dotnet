@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
-using TrueLayer;
 
-namespace Microsoft.Extensions.Configuration
+namespace TrueLayer
 {
     /// <summary>
     /// Defines the options needed to configure the Truelayer.com SDK for .NET that can be initialized
@@ -24,42 +22,19 @@ namespace Microsoft.Extensions.Configuration
         /// Gets or sets a value indicating whether to connect to the Truelayer Sandbox. 
         /// </summary>
         public bool? UseSandbox { get; init; }
-        
-        /// <summary>
-        /// Creates a <see cref="TrueLayer.TruelayerConfiguration"/> needed to configure the SDK.
-        /// </summary>
-        /// <returns>The initializes configuration.</returns>
-        public TruelayerConfiguration CreateConfiguration()
-        {
-            Dictionary<Platform, Uri> uris = new();
-            if (!string.IsNullOrWhiteSpace(AuthUri))
-            {
-                uris.Add(Platform.Auth, new Uri(AuthUri));
-            }
-            if (!string.IsNullOrWhiteSpace(DataUri))
-            {
-                uris.Add(Platform.Data, new Uri(DataUri));
-            }
-            if (!string.IsNullOrWhiteSpace(PaymentsUri))
-            {
-                uris.Add(Platform.Payment, new Uri(PaymentsUri));
-            }
-            return new(ClientId, ClientSecret, UseSandbox ?? true, uris);
-        }
 
-        /// <summary>
-        /// Override for the authentication URI.
-        /// </summary>
-        public string AuthUri { get; init; }
-        
-        /// <summary>
-        /// Override for the data uri.
-        /// </summary>
-        public string DataUri { get; init; }
-        
-        /// <summary>
-        /// Override for the payments uri.
-        /// </summary>
-        public string PaymentsUri { get; init; }
+        public ApiOptions Auth { get; set; }
+        public ApiOptions Payments { get; set; }
+        public ApiOptions Data { get; set; }
+
+        public void Validate()
+        {
+            if (string.IsNullOrWhiteSpace(ClientId)) throw new ArgumentException($"Your client id is required", nameof(ClientId));
+            if (string.IsNullOrWhiteSpace(ClientSecret)) throw new ArgumentException($"Your API secret key is required", nameof(ClientSecret));
+            
+            Auth?.Validate();
+            Payments?.Validate();
+            Data?.Validate();
+        }
     }
 }
