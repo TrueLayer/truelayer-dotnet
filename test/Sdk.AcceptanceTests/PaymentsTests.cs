@@ -11,7 +11,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
     public class PaymentsTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
-        
+
         public PaymentsTests(ApiTestFixture fixture)
         {
             _fixture = fixture;
@@ -20,55 +20,53 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         [Fact]
         public async Task Can_initiate_payment()
         {
-            var response = await _fixture.Api.Auth.GetPaymentToken(new GetPaymentTokenRequest());
-            response.ShouldNotBeNull();
-            response.AccessToken.ShouldNotBeNullOrEmpty();
-            response.ExpiresIn.ShouldBeGreaterThan(0);
+            var authResponse = await _fixture.Api.Auth.GetPaymentToken();
+            authResponse.ShouldNotBeNull();
+            authResponse.AccessToken.ShouldNotBeNullOrEmpty();
+            authResponse.ExpiresIn.ShouldBeGreaterThan(0);
 
-            var req = new SingleImmediatePaymentInitiationRequest
-            {
-                AccessToken = response.AccessToken, Data = MockPaymentRequestData()
-            };
-            var resp = await _fixture.Api.Payments.SingleImmediatePaymentInitiation(req);
-            resp.ShouldNotBeNull();
-            resp.Result.ShouldNotBeNull();
-            resp.Result.SingleImmediatePayment.ShouldNotBeNull();
-            resp.Result.SingleImmediatePayment.SingleImmediatePaymentId.ShouldNotBeNullOrEmpty();
-            resp.Result.AuthFlow.ShouldNotBeNull();
-            resp.Result.AuthFlow.Uri.ShouldNotBeNullOrEmpty();
+            var req = MockPaymentRequestData();
+
+            var paymentResponse = await _fixture.Api.Payments.InitiatePayment(req, authResponse.AccessToken);
+            paymentResponse.ShouldNotBeNull();
+            paymentResponse.Result.ShouldNotBeNull();
+            paymentResponse.Result.SingleImmediatePayment.ShouldNotBeNull();
+            paymentResponse.Result.SingleImmediatePayment.SingleImmediatePaymentId.ShouldNotBe(Guid.Empty);
+            paymentResponse.Result.AuthFlow.ShouldNotBeNull();
+            //paymentResponse.Result.AuthFlow.Uri.ShouldNotBeNullOrEmpty();
         }
 
-        private static SingleImmediatePaymentInitiationData MockPaymentRequestData()
+        private static InitiatePaymentRequest MockPaymentRequestData()
         {
-            return new()
-            {
-                SingleImmediatePayment = new SingleImmediatePayment
-                {
-                    SingleImmediatePaymentId = Guid.NewGuid().ToString(),
-                    ProviderId = "ob-sandbox-natwest",
-                    SchemeId = "faster_payments_service",
-                    // FeeOptionId = "free",
-                    AmountInMinor = 100,
-                    Currency = "GBP",
-                    Beneficiary = new Beneficiary
-                    {
-                        Name = "A lucky someone",
-                        Account = new Account
+            return new(
+                new SingleImmediatePayment(
+                    amountInMinor: 100,
+                    currency: "GBP",
+                    providerId: "ob-sandbox-natwest",
+                    schemeId: "faster_payments_service",
+                    beneficiary: new Beneficiary(
+                        new Account
                         {
                             Type = "sort_code_account_number",
                             AccountNumber = "12345678",
-                            SortCode = "567890",
-                        },
-                    },
-                    Remitter = new Remitter
+                            SortCode = "567890"
+                        }
+                    )
                     {
-                        Name = "A less lucky someone",
-                        Account = new Account
+                        Name = "A lucky someone"
+                    }
+                )
+                {
+                    Remitter = new Remitter(
+                        new Account
                         {
                             Type = "sort_code_account_number",
                             AccountNumber = "12345602",
                             SortCode = "500000",
-                        },
+                        }
+                    )
+                    {
+                        Name = "A less lucky someone"
                     },
                     References = new References
                     {
@@ -77,8 +75,11 @@ namespace TrueLayer.Sdk.Acceptance.Tests
                         Remitter = "remitter ref",
                     },
                 },
-                AuthFlow = new AuthFlow {Type = "redirect", ReturnUri = "https://localhost:5001/home/callback"},
-            };
+                new AuthFlow(type: "redirect")
+                {
+                    ReturnUri = "https://localhost:5001/home/callback"
+                }
+            );
         }
     }
 }

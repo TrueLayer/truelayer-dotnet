@@ -17,7 +17,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         [Fact]
         public async Task Can_request_payments_access_token_using_client_credentials()
         {
-            GetPaymentTokenResponse response = await _fixture.Api.Auth.GetPaymentToken(new GetPaymentTokenRequest());
+            AuthTokenResponse response = await _fixture.Api.Auth.GetPaymentToken();
             response.ShouldNotBeNull();
             response.AccessToken.ShouldNotBeNullOrEmpty();
             response.ExpiresIn.ShouldBeGreaterThan(0);

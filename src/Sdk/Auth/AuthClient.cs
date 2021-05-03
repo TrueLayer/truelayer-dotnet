@@ -39,7 +39,7 @@ namespace TrueLayer.Auth
         {
             const string path = "connect/token";
             
-            var content = new FormUrlEncodedContent(new KeyValuePair<string, string>[]
+            var content = new FormUrlEncodedContent(new KeyValuePair<string?, string?>[]
             {
                 new ("grant_type", "authorization_code"),
                 new ("code", request.Code),
@@ -52,16 +52,11 @@ namespace TrueLayer.Auth
             return apiResponse;
         }
         
-        public async Task<GetPaymentTokenResponse> GetPaymentToken(GetPaymentTokenRequest request, CancellationToken cancellationToken)
-        {
-            if (request is null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-            
+        public async Task<AuthTokenResponse> GetPaymentToken(CancellationToken cancellationToken = default)
+        {            
             const string path = "connect/token";
             
-            var content = new FormUrlEncodedContent(new KeyValuePair<string, string>[]
+            var content = new FormUrlEncodedContent(new KeyValuePair<string?, string?>[]
             {
                 new ("grant_type", "client_credentials"),
                 new ("client_id", _configuration.ClientId),
@@ -69,7 +64,7 @@ namespace TrueLayer.Auth
                 new ("scope", "payments"),
             });
             
-            var apiResponse = await _apiClient.PostAsync<GetPaymentTokenResponse>(GetRequestUri(path), content, null, cancellationToken);
+            var apiResponse = await _apiClient.PostAsync<AuthTokenResponse>(GetRequestUri(path), content, null, cancellationToken);
             return apiResponse;
         }
         

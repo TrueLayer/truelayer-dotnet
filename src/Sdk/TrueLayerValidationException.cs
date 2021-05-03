@@ -25,8 +25,18 @@ namespace TrueLayer
         public ErrorResponse? Error { get; }
 
         private static string GenerateDetailsMessage(ErrorResponse? error)
-            => error is null
-                ? "An unspecified validation error occurred"
-                : $"A validation error of type {error.Error} occurred with error codes [{string.Join(",", error.ErrorDetails.Parameters)}].";
+        {
+            if (error is null)
+            {
+                return "An unspecified validation error occurred";
+            }
+
+            if (error?.ErrorDetails?.Parameters != null)
+            {
+                return $"A validation error of type {error.Error} occurred with error codes [{string.Join(",", error.ErrorDetails.Parameters)}].";
+            }
+
+            return "$A validation error of type {error.Error} occurred";
+        }
     }
 }

@@ -8,6 +8,6 @@ namespace TrueLayer.Auth
     {
         Task<GetAuthUriResponse> GetAuthUri(GetAuthUriRequest request);
         Task<ExchangeCodeResponse> ExchangeCode(ExchangeCodeRequest request, CancellationToken cancellationToken = default);
-        Task<GetPaymentTokenResponse> GetPaymentToken(GetPaymentTokenRequest request, CancellationToken cancellationToken = default);
+        Task<AuthTokenResponse> GetPaymentToken(CancellationToken cancellationToken = default);
     }
 }

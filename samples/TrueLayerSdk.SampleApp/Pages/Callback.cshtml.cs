@@ -31,30 +31,32 @@ namespace TrueLayerSdk.SampleApp.Pages
         
         public async Task OnGet([FromQuery(Name = "payment_id")] string paymentId)
         {
-            if (string.IsNullOrEmpty(paymentId))
-            {
-                Error = new ErrorEntity("Payment ID is required", "Payment id is required to fetch status");
-                return;
-            }
+            // if (string.IsNullOrEmpty(paymentId))
+            // {
+            //     Error = new ErrorEntity("Payment ID is required", "Payment id is required to fetch status");
+            //     return;
+            // }
             
-            if (string.IsNullOrEmpty(_tokenStorage.AccessToken))
-            {
-                Error = new ErrorEntity("Access token is required", "Access token is required to fetch payment status");
-                return;
-            }
+            // if (string.IsNullOrEmpty(_tokenStorage.AccessToken))
+            // {
+            //     Error = new ErrorEntity("Access token is required", "Access token is required to fetch payment status");
+            //     return;
+            // }
             
-            var result =
-                await _api.Payments.GetPaymentStatus(paymentId, _tokenStorage.AccessToken, CancellationToken.None);
-            var paymentData = result.Results.First();
-            Payment = new PaymentData
-            {
-                simp_id = paymentData.SimpId,
-                created_at = paymentData.CreatedAt,
-                status = paymentData.Status,
-            };
-            var entity = await _context.Payments.FirstAsync(p => p.PaymentEntityId == paymentData.SimpId);
-            entity.Status = paymentData.Status;
-            await _context.SaveChangesAsync();
+            // var result =
+            //     await _api.Payments.GetPaymentStatus(paymentId, _tokenStorage.AccessToken, CancellationToken.None);
+            // var paymentData = result.Results.First();
+            // Payment = new PaymentData
+            // {
+            //     simp_id = paymentData.SimpId,
+            //     created_at = paymentData.CreatedAt,
+            //     status = paymentData.Status,
+            // };
+            // var entity = await _context.Payments.FirstAsync(p => p.PaymentEntityId == paymentData.SimpId);
+            // entity.Status = paymentData.Status;
+            // await _context.SaveChangesAsync();
+
+            await Task.CompletedTask;
         }
     }
 }
