@@ -10,13 +10,18 @@ namespace TrueLayer.Payments
     /// </summary>
     internal class PaymentsClient : IPaymentsClient
     {
-        private readonly IApiClient _apiClient;
-        private readonly TruelayerConfiguration _configuration;
+        internal const string ProdUrl = "https://pay-api.truelayer.com/";
+        internal const string SandboxUrl = "https://pay-api.truelayer-sandbox.com/";
 
-        public PaymentsClient(IApiClient apiClient, TruelayerConfiguration configuration)
+        private readonly IApiClient _apiClient;
+        internal readonly Uri BaseUri;
+
+        public PaymentsClient(IApiClient apiClient, TruelayerOptions options)
         {
             _apiClient = apiClient;
-            _configuration = configuration;
+            
+            BaseUri = options.Payments?.Uri ?? 
+                       new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
         
         public Task<GetPaymentStatusResponse> GetPaymentStatus(string paymentId, string accessToken, CancellationToken cancellationToken = default)
@@ -48,6 +53,6 @@ namespace TrueLayer.Payments
             return await _apiClient.PostAsync<SingleImmediatePaymentInitiationResponse>(GetRequestUri(path), request.Data, request.AccessToken, cancellationToken);
         }
         
-        private Uri GetRequestUri(string path) => new (_configuration.PaymentsUri, path);
+        private Uri GetRequestUri(string path) => new (BaseUri, path);
     }
 }
