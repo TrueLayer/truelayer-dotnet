@@ -10,7 +10,7 @@ namespace TrueLayer
         /// </summary>
         /// <param name="apiClient">The API client used to send API requests and handle responses.</param>
         /// <param name="options">A options object containing authentication and API specific information.</param>
-        public TrueLayerApi(IApiClient apiClient, TruelayerOptions options)
+        public TrueLayerApi(IApiClient apiClient, TrueLayerOptions options)
         {
             Auth = new AuthClient(apiClient, options);
             Payments = new PaymentsClient(apiClient, options);

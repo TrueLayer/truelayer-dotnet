@@ -1,4 +1,4 @@
-# Truelayer Sample Application
+# TrueLayer Sample Application
 A very lightweight Razor Pages application to demonstrate how to use the TrueLayer's .NET Sdk.
 
 ## Running the application
@@ -6,7 +6,7 @@ Make sure to fill the `clientId` and `clientSecret` fields inside your `appsetti
 You can obtain them by signing up at [TrueLayer's console](https://console.truelayer.com/?auto=signup):
 ```JSON
 {
-  "Truelayer": {
+  "TrueLayer": {
     "ClientId": "",
     "ClientSecret": "",
     "UseSandbox": ""

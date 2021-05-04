@@ -17,11 +17,11 @@ namespace TrueLayer.Sdk.Tests
 
     public class TrueLayerServiceCollectionExtensionsTests
     {
-        private readonly TruelayerOptions _options;
+        private readonly TrueLayerOptions _options;
 
         public TrueLayerServiceCollectionExtensionsTests()
         {
-            _options = new TruelayerOptions
+            _options = new TrueLayerOptions
             {
                 ClientId = "client_id",
                 ClientSecret = "secret",
@@ -33,7 +33,7 @@ namespace TrueLayer.Sdk.Tests
         public async Task Can_customise_http_client_builder()
         {
             var services = new ServiceCollection()       
-                .AddTruelayerSdk(_options, builder 
+                .AddTrueLayerSdk(_options, builder 
                     => builder.ConfigurePrimaryHttpMessageHandler(() => new FakeHandler()))
                 .BuildServiceProvider();
 
@@ -46,7 +46,7 @@ namespace TrueLayer.Sdk.Tests
         public void Can_customise_uris(string overrideUri)
         {
             // ARRANGE
-            var options = new TruelayerOptions
+            var options = new TrueLayerOptions
             {
                 ClientId = "client-id",
                 ClientSecret = "client-secret",
@@ -73,7 +73,7 @@ namespace TrueLayer.Sdk.Tests
             // ARRANGE
             const string json = "{\"ClientId\":\"client-id\",\"ClientSecret\":\"client-secret\",\"UseSandbox\":true," +
                                 "\"Auth\":{\"Uri\":\"not-a-valid-uri\"}}";
-            var options = JsonSerializer.Deserialize<TruelayerOptions>(json);
+            var options = JsonSerializer.Deserialize<TrueLayerOptions>(json);
             
             // ACT
             var ex = Record.Exception(() => options?.Validate());

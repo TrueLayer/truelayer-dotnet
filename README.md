@@ -9,12 +9,12 @@ Install the TrueLayer SDK NuGet package:
 dotnet add package TrueLayerSdk
 ```
 
-Add your `ClientId` and `ClientSecret` to `appsettings.json`. You can obtain them by signing up at [Truelayer's console](https://console.truelayer.com/?auto=signup).
+Add your `ClientId` and `ClientSecret` to `appsettings.json`. You can obtain them by signing up at [TrueLayer's console](https://console.truelayer.com/?auto=signup).
 
 
 ```json
 {
-  "Truelayer": {
+  "TrueLayer": {
     "ClientId": "your id",
     "ClientSecret": "your secret",
     "UseSandbox": true
@@ -29,7 +29,7 @@ public IConfiguration Configuration { get; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddTruelayerSdk(Configuration);
+    services.AddTrueLayerSdk(Configuration);
 }
 ```
 
@@ -38,9 +38,9 @@ Inject `ITrueLayerApi` into your classes:
 ```c#
 class MyService
 {
-    private readonly ITruelayerApi _api;
+    private readonly ITrueLayerApi _api;
 
-    public MyService(ITruelayerApi api)
+    public MyService(ITrueLayerApi api)
     {
         _api = api;
     }
@@ -53,7 +53,7 @@ class MyService
 }
 ```
 
-All API operations return an `ApiResponse<TResult>` where `TResult` contains the result of the API call. Get more details on [Truelayer's API documentation](https://docs.truelayer.com/).
+All API operations return an `ApiResponse<TResult>` where `TResult` contains the result of the API call. Get more details on [TrueLayer's API documentation](https://docs.truelayer.com/).
 
 # Pre-alpha checklist
 

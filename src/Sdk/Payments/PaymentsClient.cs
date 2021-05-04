@@ -16,7 +16,7 @@ namespace TrueLayer.Payments
         private readonly IApiClient _apiClient;
         internal readonly Uri BaseUri;
 
-        public PaymentsClient(IApiClient apiClient, TruelayerOptions options)
+        public PaymentsClient(IApiClient apiClient, TrueLayerOptions options)
         {
             _apiClient = apiClient;
             
