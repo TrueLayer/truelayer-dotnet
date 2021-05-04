@@ -6,20 +6,20 @@ using TrueLayer.Serialization;
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// This class adds extension methods to IServiceCollection making it easier to add the Truelayer client
+    /// This class adds extension methods to IServiceCollection making it easier to add the TrueLayer client
     /// to the NET Core dependency injection framework.
     /// </summary>
-    public static class TruelayerServiceCollectionExtensions
+    public static class TrueLayerServiceCollectionExtensions
     {
         /// <summary>
-        /// Registers the default Truelayer SDK services to the provided <paramref name="services"/>.
+        /// Registers the default TrueLayer SDK services to the provided <paramref name="services"/>.
         /// </summary>
         /// <param name="services">The service collection to add to.</param>
-        /// <param name="options">The Truelayer options.</param>
+        /// <param name="options">The TrueLayer options.</param>
         /// <param name="configureBuilder">Action to override the HttpClientBuilder.</param>
-        /// <returns>The service collection with registered Truelayer SDK services.</returns>
-        public static IServiceCollection AddTruelayerSdk(this IServiceCollection services,
-            TruelayerOptions options, Action<IHttpClientBuilder>? configureBuilder = null)
+        /// <returns>The service collection with registered TrueLayer SDK services.</returns>
+        public static IServiceCollection AddTrueLayerSdk(this IServiceCollection services,
+            TrueLayerOptions options, Action<IHttpClientBuilder>? configureBuilder = null)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (options is null) throw new ArgumentNullException(nameof(options));
@@ -37,21 +37,21 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Registers the default Truelayer SDK services to the provided <paramref name="services"/>.
+        /// Registers the default TrueLayer SDK services to the provided <paramref name="services"/>.
         /// </summary>
         /// <param name="services">The service collection to add to.</param>
-        /// <param name="configuration">The Microsoft configuration used to obtain the Truelayer SDK configuration.</param>
+        /// <param name="configuration">The Microsoft configuration used to obtain the TrueLayer SDK configuration.</param>
         /// <param name="configureBuilder">Action to override the HttpClientBuilder.</param>
-        /// <returns>The service collection with registered Truelayer SDK services.</returns>
-        public static IServiceCollection AddTruelayerSdk(this IServiceCollection services,
+        /// <returns>The service collection with registered TrueLayer SDK services.</returns>
+        public static IServiceCollection AddTrueLayerSdk(this IServiceCollection services,
             IConfiguration configuration, Action<IHttpClientBuilder>? configureBuilder = null)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-            TruelayerOptions truelayerOptions = configuration.GetTruelayerOptions();
+            TrueLayerOptions truelayerOptions = configuration.GetTrueLayerOptions();
             truelayerOptions.Validate();
-            return services.AddTruelayerSdk(truelayerOptions, configureBuilder);
+            return services.AddTrueLayerSdk(truelayerOptions, configureBuilder);
         }
     }
 }

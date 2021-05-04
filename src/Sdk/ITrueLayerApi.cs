@@ -4,7 +4,7 @@ using TrueLayer.Payments;
 namespace TrueLayer
 {
     /// <summary>
-    /// Convenience interface that provides access to the available Truelayer.com APIs.
+    /// Convenience interface that provides access to the available TrueLayer.com APIs.
     /// </summary>
     public interface ITrueLayerApi
     {

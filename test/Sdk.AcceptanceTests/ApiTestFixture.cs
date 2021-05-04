@@ -13,7 +13,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             IConfiguration configuration = LoadConfiguration();
 
             ServiceProvider = new ServiceCollection()
-                .AddTruelayerSdk(configuration)
+                .AddTrueLayerSdk(configuration)
                 .BuildServiceProvider();
             
             Api = ServiceProvider.GetRequiredService<ITrueLayerApi>();

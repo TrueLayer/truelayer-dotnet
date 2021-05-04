@@ -3,7 +3,7 @@ using System;
 namespace TrueLayer
 {
     /// <summary>
-    /// Base class for exceptions thrown by the Truelayer.com SDK for .NET.
+    /// Base class for exceptions thrown by the TrueLayer.com SDK for .NET.
     /// </summary>
     public class TrueLayerException : Exception
     {

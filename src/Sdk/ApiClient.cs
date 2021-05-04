@@ -12,7 +12,7 @@ using TrueLayer.Serialization;
 namespace TrueLayer
 {
     /// <summary>
-    /// Handles the authentication, serialization and sending of HTTP requests to Truelayer APIs.
+    /// Handles the authentication, serialization and sending of HTTP requests to TrueLayer APIs.
     /// </summary>
     internal class ApiClient : IApiClient
     {

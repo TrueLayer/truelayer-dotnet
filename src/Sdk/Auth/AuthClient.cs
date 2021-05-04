@@ -16,10 +16,10 @@ namespace TrueLayer.Auth
         internal const string SandboxUrl = "https://auth.truelayer-sandbox.com/";
 
         private readonly IApiClient _apiClient;
-        private readonly TruelayerOptions _options;
+        private readonly TrueLayerOptions _options;
         internal readonly Uri BaseUri;
         
-        public AuthClient(IApiClient apiClient, TruelayerOptions options)
+        public AuthClient(IApiClient apiClient, TrueLayerOptions options)
         {
             _apiClient = apiClient;
             _options = options;
