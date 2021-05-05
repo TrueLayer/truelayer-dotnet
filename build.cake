@@ -291,11 +291,11 @@ Task("Default")
     .IsDependentOn("GenerateReports");
 
 Task("CI")
-    .IsDependentOn("SonarBegin")
+    //.IsDependentOn("SonarBegin")
     .IsDependentOn("Default")
     .IsDependentOn("BuildDocs")
-    .IsDependentOn("UploadCoverage")
-    .IsDependentOn("SonarEnd");
+    .IsDependentOn("UploadCoverage");
+    //.IsDependentOn("SonarEnd");
 
 Task("Publish")
     .IsDependentOn("CI")
