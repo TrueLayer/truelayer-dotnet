@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TrueLayer;
-using TrueLayer.Auth.Model;
 using TrueLayer.Payments.Model;
 using TrueLayerSdk.SampleApp.Data;
 using TrueLayerSdk.SampleApp.Models;
+using System.Threading;
 
 namespace TrueLayerSdk.SampleApp.Pages
 {
@@ -23,6 +22,7 @@ namespace TrueLayerSdk.SampleApp.Pages
         public string PaymentId;
         public string AuthUri;
         public string Position;
+
         [BindProperty]
         public PaymentData Payment { get; set; }
         
@@ -42,6 +42,11 @@ namespace TrueLayerSdk.SampleApp.Pages
 
         public async Task OnGetToken()
         {
+            if (!_tokenStorage.IsExpired())
+            {
+                Token = _tokenStorage.AccessToken;
+                return;
+            }
             var result = await _api.Auth.GetPaymentToken();
             _tokenStorage.SetToken(result.AccessToken, result.ExpiresIn);
             Token = _tokenStorage.AccessToken;
@@ -49,32 +54,42 @@ namespace TrueLayerSdk.SampleApp.Pages
 
         public async Task OnPost()
         {
-            // var request = new SingleImmediatePaymentRequest
-            // {
-            //     AccessToken = _tokenStorage.AccessToken,
-            //     Data = new SingleImmediatePaymentData
-            //     {
-            //         RedirectUri = "https://localhost:5001/callback",
-            //         Amount = Payment.amount * 100,
-            //         Currency = "GBP",
-            //         RemitterProviderId = Payment.remitter_provider_id,
-            //         RemitterName = Payment.remitter_name,
-            //         RemitterSortCode = Payment.remitter_sort_code,
-            //         RemitterAccountNumber = Payment.remitter_account_number,
-            //         RemitterReference = Payment.remitter_reference,
-            //         BeneficiaryName = Payment.beneficiary_name,
-            //         BeneficiarySortCode = Payment.beneficiary_sort_code,
-            //         BeneficiaryAccountNumber = Payment.beneficiary_account_number,
-            //         BeneficiaryReference = Payment.beneficiary_reference,
-            //     },
-            // };
-            // var result = await _api.Payments.SingleImmediatePayment(request);
-            // PaymentId = result.Results.First().SimpId;
-            // AuthUri = result.Results.First().AuthUri;
-            // Position = "auth_uri";
-            // await _context.Payments.AddAsync(new PaymentEntity
-            //     {PaymentEntityId = PaymentId, CreatedAt = DateTime.UtcNow, Status = result.Results.First().Status});
-            // await _context.SaveChangesAsync();
+            var benAccount = new Account
+            {
+                AccountNumber = Payment.beneficiary_account_number,
+                SortCode = Payment.beneficiary_sort_code,
+                Type = "sort_code_account_number",
+            };
+            var remAccount = new Account
+            {
+                AccountNumber = Payment.remitter_account_number,
+                SortCode = Payment.remitter_sort_code,
+                Type = "sort_code_account_number",
+            };
+            var beneficiary = new Beneficiary(benAccount) {Name = Payment.beneficiary_name};
+            var payment = new SingleImmediatePayment(Payment.amount * 100, "GBP", Payment.remitter_provider_id,
+                "faster_payments_service", beneficiary, Guid.NewGuid())
+            {
+                Remitter = new Remitter(remAccount)
+                {
+                    Name = Payment.remitter_name,
+                },
+                References = new References
+                {
+                    Beneficiary = Payment.remitter_reference,
+                    Remitter = Payment.beneficiary_reference,
+                    Type = "separate",
+                },
+            };
+            var authFlow = new AuthFlow("redirect") {ReturnUri = "https://localhost:5001/callback"};
+            var request = new InitiatePaymentRequest(payment, authFlow);
+            var result = await _api.Payments.InitiatePayment(request, _tokenStorage.AccessToken, CancellationToken.None);
+            PaymentId = result.Result.SingleImmediatePayment.SingleImmediatePaymentId.ToString();
+            AuthUri = result.Result.AuthFlow.Uri;
+            Position = "auth_uri";
+            await _context.Payments.AddAsync(new PaymentEntity
+                {PaymentEntityId = PaymentId, CreatedAt = DateTime.UtcNow, Status = result.Result.SingleImmediatePayment.Status});
+            await _context.SaveChangesAsync();
 
             await Task.CompletedTask;
         }
