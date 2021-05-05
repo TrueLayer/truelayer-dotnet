@@ -7,4 +7,6 @@ jobs:
 
     steps:
       - checkout
-      - run: ./build.sh
+      - run:
+          name: Run Cake script
+          command: ./build.sh --target CI
