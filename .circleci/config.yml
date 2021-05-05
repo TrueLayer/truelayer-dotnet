@@ -6,7 +6,6 @@ jobs:
       - image: mcr.microsoft.com/dotnet/sdk:5.0
 
     steps:
-      - run: apt update && apt install -yq default-jre # required for Sonar
       - checkout
       - run:
           name: Run Cake script
