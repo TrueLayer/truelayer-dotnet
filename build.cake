@@ -151,33 +151,24 @@ Task("GenerateReports")
     });
 
 Task("UploadCoverage")
-    .WithCriteria(!string.IsNullOrEmpty(coverallsToken) && BuildSystem.IsRunningOnGitHubActions)
+    .WithCriteria(!string.IsNullOrEmpty(coverallsToken) && !BuildSystem.IsLocalBuild)
     .Does(() => 
     {
-        var workflow = BuildSystem.GitHubActions.Environment.Workflow;
-
-        Dictionary<string, object> @event = default;
-        if (workflow.EventName == "pull_request")
-        {
-            string eventJson = System.IO.File.ReadAllText(workflow.EventPath); 
-            @event = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(eventJson);
-        }
-
         var args = new ProcessArgumentBuilder()
                     .Append($"--repoToken {coverallsToken}")
                     .Append("--lcov")
                     .Append("--useRelativePaths")
                     .Append("-i ./artifacts/lcov.info")
-                    .Append($"--commitId {workflow.Sha}") 
-                    .Append($"--commitBranch {workflow.Ref}")
-                    .Append($"--serviceNumber {workflow.RunNumber}")
-                    .Append($"--jobId {workflow.RunId}");
+                    .Append($"--commitId {EnvironmentVariable("CIRCLE_SHA1")}") 
+                    .Append($"--commitBranch {EnvironmentVariable("CIRCLE_BRANCH")}")
+                    .Append($"--serviceNumber {EnvironmentVariable("CIRCLE_BUILD_NUM")}")
+                    .Append($"--jobId {EnvironmentVariable("CIRCLE_JOB")}");
                     //.Append("--serviceName github")
                     //.Append("--dryrun");
 
         if (BuildSystem.IsPullRequest)
         {
-            args.Append($"--pullRequest {@event["number"].ToString()}");
+            args.Append($"--pullRequest {EnvironmentVariable("CIRCLE_PR_NUMBER")}");
         }
 
         var settings = new ProcessSettings { Arguments = args };
