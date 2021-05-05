@@ -56,28 +56,28 @@ namespace TrueLayerSdk.SampleApp.Pages
         {
             var benAccount = new Account
             {
-                AccountNumber = Payment.beneficiary_account_number,
-                SortCode = Payment.beneficiary_sort_code,
+                AccountNumber = Payment.BeneficiaryAccountNumber,
+                SortCode = Payment.BeneficiarySortCode,
                 Type = "sort_code_account_number",
             };
             var remAccount = new Account
             {
-                AccountNumber = Payment.remitter_account_number,
-                SortCode = Payment.remitter_sort_code,
+                AccountNumber = Payment.RemitterAccountNumber,
+                SortCode = Payment.RemitterSortCode,
                 Type = "sort_code_account_number",
             };
-            var beneficiary = new Beneficiary(benAccount) {Name = Payment.beneficiary_name};
-            var payment = new SingleImmediatePayment(Payment.amount * 100, "GBP", Payment.remitter_provider_id,
+            var beneficiary = new Beneficiary(benAccount) {Name = Payment.BeneficiaryName};
+            var payment = new SingleImmediatePayment(Payment.Amount * 100, "GBP", Payment.RemitterProviderId,
                 "faster_payments_service", beneficiary, Guid.NewGuid())
             {
                 Remitter = new Remitter(remAccount)
                 {
-                    Name = Payment.remitter_name,
+                    Name = Payment.RemitterName,
                 },
                 References = new References
                 {
-                    Beneficiary = Payment.remitter_reference,
-                    Remitter = Payment.beneficiary_reference,
+                    Beneficiary = Payment.RemitterReference,
+                    Remitter = Payment.BeneficiaryReference,
                     Type = "separate",
                 },
             };

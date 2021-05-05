@@ -23,7 +23,7 @@
         {
             <tr>
                 <td style="vertical-align: middle">@p.PaymentEntityId</td>
-                <td style="vertical-align: middle">@p.CreatedAt</td>
+                <td style="vertical-align: middle">@p.CreatedAt.ToString("R")</td>
                 <td style="vertical-align: middle">@p.Status</td>
                 <td style="vertical-align: middle"><a asp-page-handler="status" asp-route-paymentid="@p.PaymentEntityId" class="btn btn-outline-secondary btn-sm">Status</a></td>
             </tr>

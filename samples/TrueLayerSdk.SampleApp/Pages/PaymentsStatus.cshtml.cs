@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TrueLayerSdk.SampleApp.Data;
+using System.Linq;
 
 namespace TrueLayerSdk.SampleApp.Pages
 {
@@ -19,12 +20,12 @@ namespace TrueLayerSdk.SampleApp.Pages
         
         public async Task OnGet()
         {
-            Payments = await _context.Payments.ToListAsync();
+            Payments = await _context.Payments.OrderByDescending(p => p.CreatedAt).ToListAsync();
         }
         
         public IActionResult OnGetStatus(string paymentId)
         {
-            return RedirectToPage("Callback", new {payment_id = paymentId});
+            return RedirectToPage("Callback", new {single_immediate_payment_id = paymentId});
         }
     }
 }

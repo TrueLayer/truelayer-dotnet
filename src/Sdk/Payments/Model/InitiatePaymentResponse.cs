@@ -69,13 +69,19 @@ namespace TrueLayer.Payments.Model
     public record AuthFlowResponse
     {
         /// <summary>
-        /// Auth flow type
+        /// Value indicating the type of authorisation flow, i.e. redirect
         /// </summary>
         public string Type { get; init; } = null!;
 
         /// <summary>
-        /// Bank authentication URI.
+        /// The URI for the end user to authorise the payment in the bank’s UI.
         /// </summary>
         public string Uri { get; set; } = null!;
+
+        /// <summary>
+        /// An expiry time, if one is known, after which the URI to authorise the payment will become invalid. In UTC, 
+        /// formatted as an ISO 8601 string (YYYY-MM-DDThh:mm:ss.sssZ).
+        /// </summary>
+        public DateTime Expiry { get; set; }
     }
 }
