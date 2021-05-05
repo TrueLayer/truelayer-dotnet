@@ -151,7 +151,7 @@ Task("GenerateReports")
     });
 
 Task("UploadCoverage")
-    .WithCriteria(!string.IsNullOrEmpty(coverallsToken) && !BuildSystem.IsLocalBuild)
+    .WithCriteria(!string.IsNullOrEmpty(coverallsToken))
     .Does(() => 
     {
         var args = new ProcessArgumentBuilder()
