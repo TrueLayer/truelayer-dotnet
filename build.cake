@@ -151,7 +151,7 @@ Task("GenerateReports")
     });
 
 Task("UploadCoverage")
-    .WithCriteria(!string.IsNullOrEmpty(coverallsToken))
+    .WithCriteria(!string.IsNullOrEmpty(coverallsToken) && EnvironmentVariable<bool>("CIRCLECI", false))
     .Does(() => 
     {
         var args = new ProcessArgumentBuilder()
@@ -163,12 +163,11 @@ Task("UploadCoverage")
                     .Append($"--commitBranch {EnvironmentVariable("CIRCLE_BRANCH")}")
                     .Append($"--serviceNumber {EnvironmentVariable("CIRCLE_BUILD_NUM")}")
                     .Append($"--jobId {EnvironmentVariable("CIRCLE_JOB")}");
-                    //.Append("--serviceName github")
-                    //.Append("--dryrun");
 
-        if (BuildSystem.IsPullRequest)
+        string pullRequestUrl = EnvironmentVariable("CIRCLE_PULL_REQUEST");
+        if (!string.IsNullOrWhiteSpace(pullRequestUrl))
         {
-            args.Append($"--pullRequest {EnvironmentVariable("CIRCLE_PR_NUMBER")}");
+            args.Append($"--pullRequest {pullRequestUrl.Substring(pullRequestUrl.LastIndexOf('/'))}");
         }
 
         var settings = new ProcessSettings { Arguments = args };
