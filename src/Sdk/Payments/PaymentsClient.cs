@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Payments.Model;
+using TrueLayer.Auth;
 
 namespace TrueLayer.Payments
 {
@@ -14,23 +15,25 @@ namespace TrueLayer.Payments
         internal const string SandboxUrl = "https://pay-api.truelayer-sandbox.com/";
 
         private readonly IApiClient _apiClient;
+        private readonly IAuthClient _authClient;
         internal readonly Uri BaseUri;
 
-        public PaymentsClient(IApiClient apiClient, TrueLayerOptions options)
+        public PaymentsClient(IApiClient apiClient, TrueLayerOptions options, IAuthClient authClient)
         {
             _apiClient = apiClient;
-            
+            _authClient = authClient;
+
             BaseUri = options.Payments?.Uri ?? 
-                       new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
+                      new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 
-        public async Task<InitiatePaymentResponse> InitiatePayment(InitiatePaymentRequest request, string accessToken, CancellationToken cancellationToken)
+        public async Task<InitiatePaymentResponse> InitiatePayment(InitiatePaymentRequest request, CancellationToken cancellationToken)
         {
             request.NotNull(nameof(request));
-            accessToken.NotNullOrWhiteSpace(nameof(accessToken));
 
             const string path = "v2/single-immediate-payment-initiation-requests";
 
+            var accessToken = (await _authClient.GetPaymentToken(cancellationToken)).AccessToken;
             return await _apiClient.PostAsync<InitiatePaymentResponse>(GetRequestUri(path), request, accessToken, cancellationToken);
         }
         

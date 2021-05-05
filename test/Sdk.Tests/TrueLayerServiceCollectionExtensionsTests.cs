@@ -6,15 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TrueLayer.Auth;
-using TrueLayer.Auth.Model;
 using TrueLayer.Payments;
 using Xunit;
 using Moq;
 
 namespace TrueLayer.Sdk.Tests
 {
-    
-
     public class TrueLayerServiceCollectionExtensionsTests
     {
         private readonly TrueLayerOptions _options;
@@ -59,8 +56,8 @@ namespace TrueLayer.Sdk.Tests
             var apiClient = Mock.Of<IApiClient>();
             
             // ACT
-            var authClient = new AuthClient(apiClient, options);
-            var payClients = new PaymentsClient(apiClient, options);
+            var authClient = new AuthClient(apiClient, options, new TrueLayerTokenManager());
+            var payClients = new PaymentsClient(apiClient, options, authClient);
 
             // ASSERT
             Assert.Equal(new Uri(overrideUri).AbsoluteUri, authClient.BaseUri.AbsoluteUri);
