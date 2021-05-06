@@ -1,13 +1,11 @@
+using System;
 using System.Threading.Tasks;
 using Shouldly;
-using TrueLayer.Auth.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
 
 namespace TrueLayer.Sdk.Acceptance.Tests
 {
-    using System;
-
     public class PaymentsTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;

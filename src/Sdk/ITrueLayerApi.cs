@@ -1,5 +1,6 @@
 using TrueLayer.Auth;
 using TrueLayer.Payments;
+using TrueLayer.Payouts;
 
 namespace TrueLayer
 {
@@ -17,5 +18,10 @@ namespace TrueLayer
         /// Gets the Payments API.
         /// </summary>
         IPaymentsClient Payments { get; }
+
+        /// <summary>
+        /// Gets the Payouts API.
+        /// </summary>
+        IPayoutsClient Payouts { get; }
     }
 }

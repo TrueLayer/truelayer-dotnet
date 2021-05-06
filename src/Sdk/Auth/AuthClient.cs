@@ -74,6 +74,23 @@ namespace TrueLayer.Auth
             var apiResponse = await _apiClient.PostAsync<AuthTokenResponse>(GetRequestUri(path), content, null, cancellationToken);
             return apiResponse;
         }
+
+        public Task<AuthTokenResponse> GetOAuthToken(string[] scopes, CancellationToken cancellationToken = default)
+        {
+            scopes.NotNull(nameof(scopes));
+            
+            const string path = "connect/token";
+           
+           var content = new FormUrlEncodedContent(new KeyValuePair<string?, string?>[]
+            {
+                new ("grant_type", "client_credentials"),
+                new ("client_id", _options.ClientId),
+                new ("client_secret", _options.ClientSecret),
+                new ("scope", string.Join(' ', scopes)),
+            });
+            
+            return _apiClient.PostAsync<AuthTokenResponse>(GetRequestUri(path), content, null, cancellationToken);
+        }
         
         private Uri GetRequestUri(string path) => new (BaseUri, path);
     }
