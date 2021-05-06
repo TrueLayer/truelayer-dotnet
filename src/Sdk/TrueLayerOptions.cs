@@ -1,4 +1,5 @@
 using System;
+using TrueLayer.Payouts;
 
 namespace TrueLayer
 {
@@ -26,7 +27,7 @@ namespace TrueLayer
         public ApiOptions? Auth { get; set; }
         public ApiOptions? Payments { get; set; }
         public ApiOptions? Data { get; set; }
-        public ApiOptions? Payouts { get; set; }
+        public PayoutsOptions? Payouts { get; set; }
 
         public void Validate()
         {

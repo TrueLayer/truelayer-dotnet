@@ -30,5 +30,33 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             defaultAccount.CurrentBalanceInMinor.ShouldBeGreaterThan(0);
             defaultAccount.AvailableBalanceInMinor.ShouldBeGreaterThan(0);
         }
+
+        [Fact]
+        public async Task Can_validate_signing_key()
+        {
+            try
+            {
+                await _fixture.Api.Payouts.ValidateSigningKey();
+            }
+            catch (TrueLayerApiException apiex)
+            {   
+
+            }
+        }
+
+        [Fact]
+        public async Task Can_initiate_payout()
+        {
+            var payoutRequest = new InitiatePayoutRequest(
+                1,
+                "GBP",
+                "Ben Foster",
+                "GB17CLRB04066800000072",
+                "Good graces",
+                "withdrawal"
+            );
+
+            await _fixture.Api.Payouts.InitiatePayout(payoutRequest);
+        }
     }
 }

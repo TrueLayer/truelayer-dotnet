@@ -1,9 +1,14 @@
 using System;
+using System.IO;
+using System.Net.Http;
+using System.Net.Mime;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
 using TrueLayer.Auth.Model;
 using TrueLayer.Payouts.Model;
+using TrueLayer.Serialization;
 
 namespace TrueLayer.Payouts
 {
@@ -18,12 +23,14 @@ namespace TrueLayer.Payouts
 
         private readonly IApiClient _apiClient;
         private readonly IAuthClient _authClient;
+        private readonly PayoutsOptions _options;
         private readonly Uri _baseUri;
 
         public PayoutsClient(IApiClient apiClient, IAuthClient authClient, TrueLayerOptions options)
         {
-            _apiClient = apiClient;
-            _authClient = authClient;
+            _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
+            _authClient = authClient ?? throw new ArgumentNullException(nameof(authClient));
+            _options = options?.Payouts ?? throw new ArgumentNullException(nameof(options));
             _baseUri = options.Payouts?.Uri ??
                        new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
@@ -35,6 +42,28 @@ namespace TrueLayer.Payouts
 
             AuthTokenResponse authToken = await _authClient.GetOAuthToken(RequiredScopes, cancellationToken);
             return await _apiClient.GetAsync<QueryResponse<AccountBalance>>(GetRequestUri(path), authToken.AccessToken, cancellationToken);
+        }
+
+        public async Task InitiatePayout(InitiatePayoutRequest request, CancellationToken cancellationToken = default)
+        {
+            request.NotNull(nameof(request));
+            
+            const string path = "payouts";
+            
+            AuthTokenResponse authToken = await _authClient.GetOAuthToken(RequiredScopes, cancellationToken);
+            _ = await _apiClient.PostAsync<Empty>(GetRequestUri(path), request, authToken.AccessToken, _options.SigningKey, cancellationToken);
+        }
+
+        public async Task ValidateSigningKey(CancellationToken cancellationToken = default)
+        {
+            const string path = "test";
+
+            var request = new {
+                nonce = Guid.NewGuid().ToString()
+            };
+
+            AuthTokenResponse authToken = await _authClient.GetOAuthToken(RequiredScopes, cancellationToken);
+            _ = await _apiClient.PostAsync<Empty>(GetRequestUri(path), request, authToken.AccessToken, _options.SigningKey, cancellationToken);
         }
 
         private Uri GetRequestUri(string path) => new(_baseUri, path);

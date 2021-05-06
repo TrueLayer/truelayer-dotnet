@@ -31,7 +31,7 @@ namespace TrueLayer.Payments
 
             const string path = "v2/single-immediate-payment-initiation-requests";
 
-            return await _apiClient.PostAsync<InitiatePaymentResponse>(GetRequestUri(path), request, accessToken, cancellationToken);
+            return await _apiClient.PostAsync<InitiatePaymentResponse>(GetRequestUri(path), request, accessToken, null, cancellationToken);
         }
         
         private Uri GetRequestUri(string path) => new (BaseUri, path);

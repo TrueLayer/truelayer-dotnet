@@ -24,7 +24,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Sdk\Sdk.csproj"/>
   </ItemGroup>
-  <ItemGroup Label="Config Files">
+  <ItemGroup Label="Output Files">
     <None Update="appsettings.*" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="*.pem" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
