@@ -2,6 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Payments.Model;
+using System.Linq;
+using System.Web;
 
 namespace TrueLayer.Payments
 {
@@ -34,13 +36,37 @@ namespace TrueLayer.Payments
             return await _apiClient.PostAsync<InitiatePaymentResponse>(GetRequestUri(path), request, accessToken, cancellationToken);
         }
 
-        public Task<GetPaymentStatusResponse> GetPayment(string paymentId, string accessToken, CancellationToken cancellationToken)
+        public async Task<GetPaymentStatusResponse> GetPayment(string paymentId, string accessToken, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(paymentId)) throw new ArgumentNullException(nameof(paymentId));
             if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
             
             var path = $"v2/single-immediate-payments/{paymentId}";
-            return _apiClient.GetAsync<GetPaymentStatusResponse>(GetRequestUri(path), accessToken, cancellationToken);
+            return await _apiClient.GetAsync<GetPaymentStatusResponse>(GetRequestUri(path), accessToken, cancellationToken);
+        }
+
+        public async Task<GetProvidersResponse> GetProviders(GetProvidersRequest request, CancellationToken cancellationToken = default)
+        {
+            const string path = "v2/single-immediate-payments-providers";
+
+            Uri BuildProvidersUriWithParams()
+            {
+                var requestUri = GetRequestUri(path);
+            
+                var query = HttpUtility.ParseQueryString(string.Empty);
+                query["client_id"] = request.ClientId;
+                query["auth_flow_type"] = request.AuthFlowType.Aggregate((a,b) => $"{a},{b}");
+                query["account_type"] = request.AccountType.Aggregate((a,b) => $"{a},{b}");;
+                query["currency"] = request.Currency.Aggregate((a,b) => $"{a},{b}");
+                if (request.Country is { }) query["country"] = request.Country?.Aggregate((a,b) => $"{a},{b}");
+                if (request.AdditionalInputType is { }) query["additional_input_type"] = request.AdditionalInputType?.Aggregate((a,b) => $"{a},{b}");
+                if (request.ReleaseChannel is { }) query["release_channel"] = request.ReleaseChannel;
+            
+                var builder = new UriBuilder(requestUri) {Query = query.ToString()};
+                return builder.Uri;
+            };
+
+            return await _apiClient.GetAsync<GetProvidersResponse>(BuildProvidersUriWithParams(), string.Empty, cancellationToken);
         }
 
         private Uri GetRequestUri(string path) => new (BaseUri, path);

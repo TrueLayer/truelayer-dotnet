@@ -17,10 +17,12 @@ namespace TrueLayer.Sdk.Acceptance.Tests
                 .BuildServiceProvider();
             
             Api = ServiceProvider.GetRequiredService<ITrueLayerApi>();
+            Options = ServiceProvider.GetRequiredService<TrueLayerOptions>();
         }
 
         public IServiceProvider ServiceProvider { get; }
         public ITrueLayerApi Api { get; }
+        public TrueLayerOptions Options { get; }
 
         private static IConfiguration LoadConfiguration()
             => new ConfigurationBuilder()

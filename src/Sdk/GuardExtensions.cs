@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -50,6 +51,14 @@ namespace TrueLayer
         public static T NotNull<T>([NotNull] this T value, string name)
         {
             return value ?? throw new ArgumentNullException(name);
+        }
+
+        [DebuggerStepThrough]
+        public static T NotEmptyList<T>([NotNull] this T value, string name) where T : IList
+        {
+            return (value is not {} or {Count: 0})
+                ? throw new InvalidOperationException($"Sequence '{name}' contains no elements")
+                : value;
         }
     }
 }

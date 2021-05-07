@@ -23,5 +23,15 @@ namespace TrueLayer.Payments
         /// <returns>A task that upon completion contains the payment details.</returns>
         Task<GetPaymentStatusResponse> GetPayment(string paymentId, string accessToken,
             CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Returns all the banks which are currently active.
+        /// Gives you the assets to build out a selection screen e.g. logos and display names.
+        /// Tells you the available schemes, auth flows, and input requirements for each provider.
+        /// </summary>
+        /// <param name="request">The request with all the parameter to request specifc providers.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the underlying HTTP request.</param>
+        /// <returns></returns>
+        Task<GetProvidersResponse> GetProviders(GetProvidersRequest request, CancellationToken cancellationToken = default);
     }
 }

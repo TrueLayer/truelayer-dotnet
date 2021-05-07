@@ -1,13 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Shouldly;
-using TrueLayer.Auth.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
 
 namespace TrueLayer.Sdk.Acceptance.Tests
 {
-    using System;
-
     public class PaymentsTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
@@ -35,7 +35,30 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             paymentResponse.Result.AuthFlow.ShouldNotBeNull();
             //paymentResponse.Result.AuthFlow.Uri.ShouldNotBeNullOrEmpty();
         }
+        
+        [Fact]
+        public async Task Can_fetch_providers()
+        {
+            // Arrange
+            List<string> authFlowType = new() {"redirect", "embedded"};
+            List<string> accountType = new() {"sort_code_account_number", "iban"};
+            List<string> currency = new() {"GBP", "EUR"};
+            var request = new GetProvidersRequest(
+                _fixture.Options.ClientId ?? throw new ArgumentNullException(nameof(_fixture.Options.ClientId)),
+                authFlowType,
+                accountType,
+                currency);
 
+            // Act
+            var resp = await _fixture.Api.Payments.GetProviders(request);
+
+            // Assert
+            resp.ShouldNotBeNull();
+            resp.Results.ShouldNotBeNull().ShouldNotBeEmpty();
+            resp.Results.First().ProviderId.ShouldNotBeNullOrWhiteSpace();
+            resp.Results.First().SingleImmediatePaymentSchemes.ShouldNotBeNull().ShouldNotBeEmpty();
+        }
+        
         private static InitiatePaymentRequest MockPaymentRequestData()
         {
             return new(
