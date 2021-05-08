@@ -12,7 +12,7 @@ namespace TrueLayer.Payments
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<InitiatePaymentResponse> InitiatePayment(InitiatePaymentRequest request, string accessToken, CancellationToken cancellationToken = default);
+        Task<InitiatePaymentResponse> InitiatePayment(InitiatePaymentRequest request, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns the status of the payment with the specified identifier string.
