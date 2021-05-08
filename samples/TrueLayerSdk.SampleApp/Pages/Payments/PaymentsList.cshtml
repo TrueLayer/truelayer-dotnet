@@ -1,0 +1,40 @@
+@page
+@model PaymentsList
+
+@{
+    ViewData["Title"] = "Payments page";
+}
+
+<div class="text-center">
+    <h1 class="display-5" style="margin-bottom: 30px">List of payments payment</h1>
+</div>
+
+@if (Model.Payments is {Count: > 0})
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Payment Id</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in Model.Payments)
+        {
+            <tr>
+                <td style="vertical-align: middle">@p.PaymentEntityId</td>
+                <td style="vertical-align: middle">@p.CreatedAt.ToString("R")</td>
+                <td style="vertical-align: middle">@p.Status</td>
+                <td style="vertical-align: middle"><a asp-page-handler="status" asp-route-paymentid="@p.PaymentEntityId" class="btn btn-outline-secondary btn-sm">Status</a></td>
+            </tr>
+        }
+        
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No payments found.</p>
+}

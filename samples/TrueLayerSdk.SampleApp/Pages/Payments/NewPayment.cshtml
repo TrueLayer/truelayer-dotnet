@@ -1,0 +1,129 @@
+@page
+@model NewPayment
+
+@{
+    ViewData["Title"] = "New payment page";
+}
+
+<div class="text-center">
+    <h1 class="display-5" style="margin-bottom: 30px">New payment</h1>
+</div>
+
+<div class="card border-secondary mb-3">
+    <div class="card-header">
+        1. Initiate Payment
+        <button onclick="prefill()" class="btn btn-outline-secondary btn-sm ml-2">Pre-fill</button>
+    </div>
+    <div class="card-body text-secondary">
+        <form method="post">
+            <label>Remitter</label>
+            <div class="form-group">
+                <input asp-for="Payment.RemitterName" type="text" class="form-control form-control-sm" placeholder="Remitter name">
+            </div>
+            <div class="form-group">
+                <input asp-for="Payment.RemitterReference" type="text" class="form-control form-control-sm" placeholder="Remitter reference">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.RemitterProviderId" type="text" class="form-control form-control-sm" placeholder="Bank">
+                </div>
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.RemitterAccountNumber" type="text" class="form-control form-control-sm" placeholder="Remitter account number">
+                </div>
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.RemitterSortCode" type="text" class="form-control form-control-sm" placeholder="Remitter sort code">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Beneficiary</label>
+                <input asp-for="Payment.BeneficiaryName" type="text" class="form-control form-control-sm" placeholder="Beneficiary name">
+            </div>
+            <div class="form-group">
+                <input asp-for="Payment.BeneficiaryReference" type="text" class="form-control form-control-sm" placeholder="Beneficiary reference">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <div class="input-group input-group-sm mr-sm-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">£</div>
+                        </div>
+                        <input asp-for="Payment.Amount" type="number" class="form-control form-control-sm text-right" placeholder="Amount">
+                        <div class="input-group-append">
+                            <span class="input-group-text">.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.BeneficiaryAccountNumber" type="text" class="form-control form-control-sm" placeholder="Beneficiary account number">
+                </div>
+                <div class="form-group col-md-4">
+                    <input asp-for="Payment.BeneficiarySortCode" type="text" class="form-control form-control-sm" placeholder="Beneficiary sort code">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-secondary btn-sm">Send Money</button>
+        </form>
+    </div>
+</div>
+
+<div class="card border-secondary mb-3">
+    <div class="card-header">2. Authenticate</div>
+    <div class="card-body text-secondary">
+        <p class="card-text"><b>Payment ID</b>: @Model.PaymentId</p>
+        <p id="auth_uri" class="card-text" style="word-wrap: break-word;">
+            <b>Auth Uri</b>:
+            @if (!string.IsNullOrWhiteSpace(Model.AuthUri))
+            {
+                <a href="@Model.AuthUri">Click here to authenticate</a>
+            }
+        </p>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        window.onload = () => {
+          @if (!string.IsNullOrWhiteSpace(Model.Position))
+          {
+              <text>
+                  const element = document.getElementById("@Model.Position");
+                  element.scrollIntoView({behavior: "smooth"});
+              </text>
+          }
+        };
+        
+        function prefill() {
+            @{ const string paymentName = nameof(Model.Payment); }
+            
+            const amount = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.Amount)}")")[0];
+            amount.value = "1";
+            
+            const bank = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.RemitterProviderId)}")")[0];
+            bank.value = "ob-sandbox-natwest";
+            
+            const remName = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.RemitterName)}")")[0];
+            remName.value = "A less lucky someone";
+            
+            const remSort = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.RemitterSortCode)}")")[0];
+            remSort.value = "500000";
+            
+            const remAcc = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.RemitterAccountNumber)}")")[0];
+            remAcc.value = "12345602";
+            
+            const remRef = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.RemitterReference)}")")[0];
+            remRef.value = "remitter ref";
+            
+            const benName = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.BeneficiaryName)}")")[0];
+            benName.value = "A lucky someone";
+            
+            const benSort = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.BeneficiarySortCode)}")")[0];
+            benSort.value = "567890";
+            
+            const benAcc = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.BeneficiaryAccountNumber)}")")[0];
+            benAcc.value = "12345678";
+            
+            const benRef = document.getElementsByName("@($"{paymentName}.{nameof(Model.Payment.BeneficiaryReference)}")")[0];
+            benRef.value = "beneficiary ref";
+        }
+    </script>
+}
