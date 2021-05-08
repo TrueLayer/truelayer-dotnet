@@ -43,7 +43,7 @@ namespace TrueLayerSdk.SampleApp.Pages
             }
             
             var result =
-                await _api.Payments.GetPayment(paymentId, _tokenStorage.AccessToken, CancellationToken.None);
+                await _api.Payments.GetPayment(paymentId, CancellationToken.None);
             var paymentData = result.Result;
             Payment = new PaymentData
             {
