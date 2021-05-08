@@ -35,17 +35,15 @@ namespace TrueLayer.Payments
 
             const string path = "v2/single-immediate-payment-initiation-requests";
 
-            var accessToken = (await _authClient.GetPaymentToken(cancellationToken)).AccessToken;
-            return await _apiClient.PostAsync<InitiatePaymentResponse>(GetRequestUri(path), request, accessToken, cancellationToken);
+            return await _apiClient.PostAsync<InitiatePaymentResponse>(GetRequestUri(path), request, await GetAccessToken(cancellationToken), cancellationToken);
         }
 
-        public async Task<GetPaymentStatusResponse> GetPayment(string paymentId, string accessToken, CancellationToken cancellationToken)
+        public async Task<GetPaymentStatusResponse> GetPayment(string paymentId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(paymentId)) throw new ArgumentNullException(nameof(paymentId));
-            if (string.IsNullOrEmpty(accessToken)) throw new ArgumentNullException(nameof(accessToken));
             
             var path = $"v2/single-immediate-payments/{paymentId}";
-            return await _apiClient.GetAsync<GetPaymentStatusResponse>(GetRequestUri(path), accessToken, cancellationToken);
+            return await _apiClient.GetAsync<GetPaymentStatusResponse>(GetRequestUri(path), await GetAccessToken(cancellationToken), cancellationToken);
         }
 
         public async Task<GetProvidersResponse> GetProviders(GetProvidersRequest request, CancellationToken cancellationToken = default)
@@ -59,7 +57,7 @@ namespace TrueLayer.Payments
                 var query = HttpUtility.ParseQueryString(string.Empty);
                 query["client_id"] = request.ClientId;
                 query["auth_flow_type"] = request.AuthFlowType.Aggregate((a,b) => $"{a},{b}");
-                query["account_type"] = request.AccountType.Aggregate((a,b) => $"{a},{b}");;
+                query["account_type"] = request.AccountType.Aggregate((a,b) => $"{a},{b}");
                 query["currency"] = request.Currency.Aggregate((a,b) => $"{a},{b}");
                 if (request.Country is { }) query["country"] = request.Country?.Aggregate((a,b) => $"{a},{b}");
                 if (request.AdditionalInputType is { }) query["additional_input_type"] = request.AdditionalInputType?.Aggregate((a,b) => $"{a},{b}");
@@ -67,11 +65,13 @@ namespace TrueLayer.Payments
             
                 var builder = new UriBuilder(requestUri) {Query = query.ToString()};
                 return builder.Uri;
-            };
+            }
 
             return await _apiClient.GetAsync<GetProvidersResponse>(BuildProvidersUriWithParams(), string.Empty, cancellationToken);
         }
 
         private Uri GetRequestUri(string path) => new (BaseUri, path);
+        private async Task<string> GetAccessToken(CancellationToken token)
+            => (await _authClient.GetPaymentToken(token)).AccessToken;
     }
 }
