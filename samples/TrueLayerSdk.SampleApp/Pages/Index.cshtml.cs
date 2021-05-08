@@ -83,7 +83,7 @@ namespace TrueLayerSdk.SampleApp.Pages
             };
             var authFlow = new AuthFlow("redirect") {ReturnUri = "https://localhost:5001/callback"};
             var request = new InitiatePaymentRequest(payment, authFlow);
-            var result = await _api.Payments.InitiatePayment(request, _tokenStorage.AccessToken, CancellationToken.None);
+            var result = await _api.Payments.InitiatePayment(request, CancellationToken.None);
             PaymentId = result.Result.SingleImmediatePayment.SingleImmediatePaymentId.ToString();
             AuthUri = result.Result.AuthFlow.Uri;
             Position = "auth_uri";
