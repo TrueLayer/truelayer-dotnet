@@ -17,14 +17,12 @@ namespace TrueLayer.Auth
 
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
-        private readonly TrueLayerTokenManager _trueLayerTokenManager;
         internal readonly Uri BaseUri;
         
-        public AuthClient(IApiClient apiClient, TrueLayerOptions options, TrueLayerTokenManager trueLayerTokenManager)
+        public AuthClient(IApiClient apiClient, TrueLayerOptions options)
         {
             _apiClient = apiClient;
             _options = options;
-            _trueLayerTokenManager = trueLayerTokenManager;
 
             BaseUri = options.Auth?.Uri ?? 
                       new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
@@ -63,15 +61,6 @@ namespace TrueLayer.Auth
         
         public async Task<AuthTokenResponse> GetPaymentToken(CancellationToken cancellationToken = default)
         {
-            if (_trueLayerTokenManager.PaymentToken.IsValid()) 
-                return new AuthTokenResponse
-                {
-                    AccessToken = _trueLayerTokenManager.PaymentToken.Value,
-                    ExpiresIn = _trueLayerTokenManager.PaymentToken.ExpiresIn,
-                    Scope = _trueLayerTokenManager.PaymentToken.Scope,
-                    TokenType = _trueLayerTokenManager.PaymentToken.TokenType,
-                };
-
             const string path = "connect/token";
             
             var content = new FormUrlEncodedContent(new KeyValuePair<string?, string?>[]
@@ -83,9 +72,6 @@ namespace TrueLayer.Auth
             });
             
             var apiResponse = await _apiClient.PostAsync<AuthTokenResponse>(GetRequestUri(path), content, null, cancellationToken);
-            
-            _trueLayerTokenManager.SetPaymentToken(apiResponse.AccessToken, apiResponse.ExpiresIn, apiResponse.Scope!, apiResponse.TokenType);
-            
             return apiResponse;
         }
         
