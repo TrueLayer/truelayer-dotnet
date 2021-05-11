@@ -13,7 +13,7 @@ namespace TrueLayer
         public TrueLayerApi(IApiClient apiClient, TrueLayerOptions options)
         {
             Auth = new AuthClient(apiClient, options);
-            Payments = new PaymentsClient(apiClient, options);
+            Payments = new PaymentsClient(apiClient, options, Auth);
         }
         
         public IAuthClient Auth { get; }
