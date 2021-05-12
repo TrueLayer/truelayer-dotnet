@@ -8,7 +8,7 @@ namespace TrueLayer
         
         public virtual void Validate()
         {
-            if (Uri is not { IsAbsoluteUri: true })
+            if (Uri is { IsAbsoluteUri: false })
                 throw new InvalidOperationException($"{nameof(Uri)} must be a valid and absolute uri.");
         }
     }

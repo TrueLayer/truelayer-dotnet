@@ -25,6 +25,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             AccountBalance defaultAccount = accounts.Results.First();
             defaultAccount.Currency.ShouldNotBeNullOrWhiteSpace();
             defaultAccount.Iban.ShouldNotBeNullOrWhiteSpace();
+            defaultAccount.AccountOwner.ShouldNotBeNullOrWhiteSpace();
             defaultAccount.Status.ShouldBe("enabled");
             defaultAccount.Enabled.ShouldBeTrue();
             defaultAccount.CurrentBalanceInMinor.ShouldBeGreaterThan(0);

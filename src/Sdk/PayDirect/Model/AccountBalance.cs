@@ -1,4 +1,4 @@
-namespace TrueLayer.Payouts.Model
+namespace TrueLayer.PayDirect.Model
 {
     public record AccountBalance
     {

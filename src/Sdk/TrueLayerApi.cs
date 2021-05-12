@@ -1,4 +1,5 @@
 using TrueLayer.Auth;
+using TrueLayer.PayDirect.Model;
 using TrueLayer.Payments;
 using TrueLayer.Payouts;
 
@@ -13,13 +14,18 @@ namespace TrueLayer
         /// <param name="options">A options object containing authentication and API specific information.</param>
         public TrueLayerApi(IApiClient apiClient, TrueLayerOptions options)
         {
+            apiClient.NotNull(nameof(apiClient));
+            options.NotNull(nameof(options));
+            
             Auth = new AuthClient(apiClient, options);
             Payments = new PaymentsClient(apiClient, options);
             Payouts = new PayoutsClient(apiClient, Auth, options);
+            PayDirect = new PayDirectClient(apiClient, Auth, options);
         }
 
         public IAuthClient Auth { get; }
         public IPaymentsClient Payments { get; }
         public IPayoutsClient Payouts { get; }
+        public IPayDirectClient PayDirect { get; }
     }
 }

@@ -1,4 +1,5 @@
 using TrueLayer.Auth;
+using TrueLayer.PayDirect.Model;
 using TrueLayer.Payments;
 using TrueLayer.Payouts;
 
@@ -23,5 +24,10 @@ namespace TrueLayer
         /// Gets the Payouts API.
         /// </summary>
         IPayoutsClient Payouts { get; }
+
+        /// <summary>
+        /// Gets the client for the PayDirect APIs
+        /// </summary>
+        IPayDirectClient PayDirect { get; }
     }
 }
