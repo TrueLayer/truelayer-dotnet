@@ -22,7 +22,7 @@ namespace TrueLayer.PayDirect.Model
             _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
             _authClient = authClient ?? throw new ArgumentNullException(nameof(authClient));
             _options = options?.PayDirect ?? throw new ArgumentNullException(nameof(options));
-            _baseUri = options.Payouts?.Uri ??
+            _baseUri = options.PayDirect?.Uri ??
                        new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
 
             _options.Validate();

@@ -1,12 +1,14 @@
+using System;
 using TrueLayer.Auth;
 using TrueLayer.PayDirect.Model;
 using TrueLayer.Payments;
-using TrueLayer.Payouts;
 
 namespace TrueLayer
 {
     internal class TrueLayerApi : ITrueLayerApi
     {
+        private readonly Lazy<IPayDirectClient> _payDirect; 
+        
         /// <summary>
         /// Creates a new <see cref="TrueLayerApi"/> instance and initializes each underlying API client.
         /// </summary>
@@ -19,13 +21,12 @@ namespace TrueLayer
             
             Auth = new AuthClient(apiClient, options);
             Payments = new PaymentsClient(apiClient, options);
-            Payouts = new PayoutsClient(apiClient, Auth, options);
-            PayDirect = new PayDirectClient(apiClient, Auth, options);
+            
+            _payDirect = new Lazy<IPayDirectClient>(() => new PayDirectClient(apiClient, Auth, options));
         }
 
         public IAuthClient Auth { get; }
         public IPaymentsClient Payments { get; }
-        public IPayoutsClient Payouts { get; }
-        public IPayDirectClient PayDirect { get; }
+        public IPayDirectClient PayDirect => _payDirect.Value;
     }
 }
