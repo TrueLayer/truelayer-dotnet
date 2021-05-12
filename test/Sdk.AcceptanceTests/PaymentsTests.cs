@@ -18,22 +18,32 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         [Fact]
         public async Task Can_initiate_payment()
         {
-            var authResponse = await _fixture.Api.Auth.GetPaymentToken();
-            authResponse.ShouldNotBeNull();
-            authResponse.AccessToken.ShouldNotBeNullOrEmpty();
-            authResponse.ExpiresIn.ShouldBeGreaterThan(0);
-
+            // ARRANGE
             var req = MockPaymentRequestData();
 
-            var paymentResponse = await _fixture.Api.Payments.InitiatePayment(req, authResponse.AccessToken);
+            // ACT
+            var paymentResponse = await _fixture.Api.Payments.InitiatePayment(req);
+            
+            // ASSERT
             paymentResponse.ShouldNotBeNull();
             paymentResponse.Result.ShouldNotBeNull();
             paymentResponse.Result.SingleImmediatePayment.ShouldNotBeNull();
             paymentResponse.Result.SingleImmediatePayment.SingleImmediatePaymentId.ShouldNotBe(Guid.Empty);
             paymentResponse.Result.AuthFlow.ShouldNotBeNull();
-            //paymentResponse.Result.AuthFlow.Uri.ShouldNotBeNullOrEmpty();
         }
 
+        [Fact]
+        public async Task Can_fetch_payment_token()
+        {
+            // ACT
+            var authResponse = await _fixture.Api.Auth.GetPaymentToken();
+            
+            // ASSERT
+            authResponse.ShouldNotBeNull();
+            authResponse.AccessToken.ShouldNotBeNullOrEmpty();
+            authResponse.ExpiresIn.ShouldBeGreaterThan(0);
+        }
+        
         private static InitiatePaymentRequest MockPaymentRequestData()
         {
             return new(

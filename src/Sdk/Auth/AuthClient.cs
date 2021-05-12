@@ -25,7 +25,7 @@ namespace TrueLayer.Auth
             _options = options;
 
             BaseUri = options.Auth?.Uri ?? 
-                       new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
+                      new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 
         public async Task<GetAuthUriResponse> GetAuthUri(GetAuthUriRequest request)
@@ -60,7 +60,7 @@ namespace TrueLayer.Auth
         }
         
         public async Task<AuthTokenResponse> GetPaymentToken(CancellationToken cancellationToken = default)
-        {            
+        {
             const string path = "connect/token";
             
             var content = new FormUrlEncodedContent(new KeyValuePair<string?, string?>[]

@@ -20,8 +20,7 @@ namespace TrueLayer
             options.NotNull(nameof(options));
             
             Auth = new AuthClient(apiClient, options);
-            Payments = new PaymentsClient(apiClient, options);
-            
+            Payments = new PaymentsClient(apiClient, options, Auth);
             _payDirect = new(() => new PayDirectClient(apiClient, Auth, options));
         }
 
