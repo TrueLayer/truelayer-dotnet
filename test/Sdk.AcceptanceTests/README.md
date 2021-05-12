@@ -21,3 +21,30 @@ Alternatively create an `appsettings.local.json` file in the root of the tests w
   }
 }
 ```
+
+## Testing PayDirect
+
+To test PayDirect you will also need to provide a signing certificate. A public/private key pair is provided in this directory (`ec512-private-key.pem` and `ec512-public-key.pem`) which should only be used for testing in Sandbox.
+
+Upload the public certificate to the [TrueLayer Console](https://console.truelayer.com/) and then update your configuration with the generated key identifier:
+
+```json
+{
+  "TrueLayer": {
+    "UseSandbox": true,
+    "ClientId": "client_id",
+    "ClientSecret": "client_secret",
+    "PayDirect": {
+      "SigningKey": {
+        "KeyId": "key_id"
+      }
+    }
+  }
+}
+```
+
+Or using an Environment Variable:
+
+```
+SDK_TrueLayer__PayDirect__SigningKey__KeyId=key_id dotnet test
+```
