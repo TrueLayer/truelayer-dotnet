@@ -22,7 +22,7 @@ namespace TrueLayer
             Auth = new AuthClient(apiClient, options);
             Payments = new PaymentsClient(apiClient, options);
             
-            _payDirect = new Lazy<IPayDirectClient>(() => new PayDirectClient(apiClient, Auth, options));
+            _payDirect = new(() => new PayDirectClient(apiClient, Auth, options));
         }
 
         public IAuthClient Auth { get; }
