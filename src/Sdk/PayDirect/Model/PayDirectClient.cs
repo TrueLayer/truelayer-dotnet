@@ -48,6 +48,15 @@ namespace TrueLayer.PayDirect.Model
             return await _apiClient.PostAsync<ApiResult<InitiateDepositResponse>>(GetRequestUri(path), request, authToken.AccessToken, _options.SigningKey, cancellationToken);
         }
 
+        public async Task<Deposit> GetDeposit(Guid userId, Guid depositId, CancellationToken cancellationToken = default)
+        {
+            string path = $"users/{userId.ToString()}/deposits/{depositId.ToString()}";
+            
+            AuthTokenResponse authToken = await _authClient.GetOAuthToken(RequiredScopes, cancellationToken);
+
+            return await _apiClient.GetAsync<ApiResult<Deposit>>(GetRequestUri(path), authToken.AccessToken, cancellationToken);
+        }
+
         private Uri GetRequestUri(string path) => new(_baseUri, path);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Shouldly;
@@ -19,11 +20,10 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         [Fact]
         public async Task Can_retrieve_account_balances()
         {
-            QueryResponse<AccountBalance> accounts = await _fixture.Api.PayDirect.GetAccountBalances();
+            IEnumerable<AccountBalance> accounts = await _fixture.Api.PayDirect.GetAccountBalances();
             accounts.ShouldNotBeNull();
-            accounts.Results.ShouldNotBeNull();
 
-            AccountBalance defaultAccount = accounts.Results.First();
+            AccountBalance defaultAccount = accounts.First();
             defaultAccount.Currency.ShouldNotBeNullOrWhiteSpace();
             defaultAccount.Iban.ShouldNotBeNullOrWhiteSpace();
             defaultAccount.AccountOwner.ShouldNotBeNullOrWhiteSpace();
@@ -36,23 +36,45 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         [Fact]
         public async Task Can_initiate_deposit()
         {
-            var request = CreateDepositRequest(Guid.NewGuid());
+            var request = CreateDepositRequest();
 
             var depositResponse = await _fixture.Api.PayDirect.InitiateDeposit(request);
-            depositResponse.Result.ShouldNotBeNull();
-            depositResponse.Result.Deposit.ShouldNotBeNull();
-            depositResponse.Result.AuthFlow.ShouldNotBeNull();
-            depositResponse.Result.AuthFlow.Uri.ShouldNotBeNullOrEmpty();
+            depositResponse.ShouldNotBeNull();
+            depositResponse.Deposit.ShouldNotBeNull();
+            depositResponse.AuthFlow.ShouldNotBeNull();
+            depositResponse.AuthFlow.Uri.ShouldNotBeNullOrWhiteSpace();
         }
 
-        private static InitiateDepositRequest CreateDepositRequest(Guid userId)
+        [Fact]
+        public async Task Can_retrieve_deposit_details()
+        {
+            Guid userId = Guid.NewGuid();
+            Guid depositId = Guid.NewGuid();
+
+            InitiateDepositRequest depositRequest = CreateDepositRequest(userId, depositId);
+            InitiateDepositResponse depositResponse = await _fixture.Api.PayDirect.InitiateDeposit(depositRequest);
+
+            depositResponse.ShouldNotBeNull();
+
+            Deposit deposit = await _fixture.Api.PayDirect.GetDeposit(userId, depositId);
+
+            deposit.ShouldNotBeNull();
+            deposit.DepositId.ShouldBe(depositId);
+            deposit.Status.ShouldNotBeNullOrWhiteSpace();
+            deposit.ProviderId.ShouldBe(depositRequest.Deposit.ProviderId);
+            deposit.Currency.ShouldBe(depositRequest.Deposit.Currency);
+            deposit.AmountInMinor.ShouldBe(depositRequest.Deposit.AmountInMinor);
+        }
+
+        private static InitiateDepositRequest CreateDepositRequest(Guid? userId = null, Guid? depositId = null)
         {
             return new(
-                userId,
+                userId ?? Guid.NewGuid(),
                 new InitiateDepositRequest.DepositRequestDetails(
                     amountInMinor: 100,
                     currency: "GBP",
-                    providerId: "ob-sandbox-natwest"
+                    providerId: "ob-sandbox-natwest",
+                    depositId: depositId
                 )
                 {
                     SchemeId = "faster_payments_service",
