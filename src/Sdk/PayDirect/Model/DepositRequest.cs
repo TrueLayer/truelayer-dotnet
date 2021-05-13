@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace TrueLayer.PayDirect.Model
 {
-    public class InitiateDepositRequest
+    public class DepositRequest
     {
-        public InitiateDepositRequest(Guid userId, DepositRequestDetails deposit, AuthFlowRequestDetails authFlow)
+        public DepositRequest(Guid userId, DepositRequestDetails deposit, AuthFlowRequestDetails authFlow)
         {
             UserId = userId;
             Deposit = deposit ?? throw new ArgumentNullException(nameof(deposit));

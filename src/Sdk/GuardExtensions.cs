@@ -51,5 +51,16 @@ namespace TrueLayer
         {
             return value ?? throw new ArgumentNullException(name);
         }
+
+        [DebuggerStepThrough]
+        public static T GreaterThan<T>([NotNull] this T value, T greaterThan, string paramName) where T : IComparable
+        {
+            if (value.CompareTo(greaterThan) <= 0)
+            {
+                throw new ArgumentOutOfRangeException(paramName);
+            }
+
+            return value;
+        }
     }
 }

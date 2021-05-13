@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Shouldly;
 using TrueLayer.PayDirect.Model;
@@ -11,6 +14,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
     public class PayDirectTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
+        private readonly MockBankClient _mockBankClient = new();
 
         public PayDirectTests(ApiTestFixture fixture)
         {
@@ -38,7 +42,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         {
             var request = CreateDepositRequest();
 
-            var depositResponse = await _fixture.Api.PayDirect.InitiateDeposit(request);
+            var depositResponse = await _fixture.Api.PayDirect.Deposit(request);
             depositResponse.ShouldNotBeNull();
             depositResponse.Deposit.ShouldNotBeNull();
             depositResponse.AuthFlow.ShouldNotBeNull();
@@ -51,8 +55,8 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             Guid userId = Guid.NewGuid();
             Guid depositId = Guid.NewGuid();
 
-            InitiateDepositRequest depositRequest = CreateDepositRequest(userId, depositId);
-            InitiateDepositResponse depositResponse = await _fixture.Api.PayDirect.InitiateDeposit(depositRequest);
+            DepositRequest depositRequest = CreateDepositRequest(userId, depositId);
+            DepositResponse depositResponse = await _fixture.Api.PayDirect.Deposit(depositRequest);
 
             depositResponse.ShouldNotBeNull();
 
@@ -66,20 +70,103 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             deposit.AmountInMinor.ShouldBe(depositRequest.Deposit.AmountInMinor);
         }
 
-        private static InitiateDepositRequest CreateDepositRequest(Guid? userId = null, Guid? depositId = null)
+        [Fact]
+        public async Task Can_get_user_accounts()
+        {
+            DepositRequest depositRequest = CreateDepositRequest();
+            DepositResponse depositResponse = await _fixture.Api.PayDirect.Deposit(depositRequest);
+
+            await _mockBankClient.Authorize(depositResponse.AuthFlow.Uri);
+
+            await TestUtils.RepeatUntil(
+                () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
+                deposit => deposit.Status == "settled",
+                5,
+                TimeSpan.FromSeconds(3)
+            );
+
+            IEnumerable<UserAcccount> accounts = await _fixture.Api.PayDirect.GetUserAcccounts(depositRequest.UserId);
+            accounts.ShouldNotBeNull();
+            accounts.ShouldNotBeEmpty();
+        }
+
+        [Fact]
+        public async Task Can_perform_closed_loop_withdrawal()
+        {
+            DepositRequest depositRequest = CreateDepositRequest();
+            DepositResponse depositResponse = await _fixture.Api.PayDirect.Deposit(depositRequest);
+
+            // Authorize the deposit to ensure the user has an account
+            await _mockBankClient.Authorize(depositResponse.AuthFlow.Uri);
+
+            // Wait for the deposit to settle
+            Deposit deposit = await TestUtils.RepeatUntil(
+                () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
+                deposit => deposit.Status == "settled",
+                5,
+                TimeSpan.FromSeconds(3)
+            );
+            
+            // Withdraw funds from the account
+            WithdrawalResponse response = await _fixture.Api.PayDirect.Withdraw(new UserWithdrawalRequest(
+                depositRequest.UserId,
+                deposit.Settled.AccountId,
+                "Test Payment",
+                1,
+                "GBP",
+                Guid.NewGuid()
+            ));
+
+            response.ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async Task Can_perform_open_loop_withdrawal()
+        {
+            DepositRequest depositRequest = CreateDepositRequest();
+            DepositResponse depositResponse = await _fixture.Api.PayDirect.Deposit(depositRequest);
+
+            // Authorize the deposit to ensure the user has an account
+            await _mockBankClient.Authorize(depositResponse.AuthFlow.Uri);
+
+            // Wait for the deposit to settle
+            Deposit deposit = await TestUtils.RepeatUntil(
+                () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
+                deposit => deposit.Status == "settled",
+                5,
+                TimeSpan.FromSeconds(3)
+            );
+
+            UserAcccount account = (await _fixture.Api.PayDirect.GetUserAcccounts(depositRequest.UserId)).FirstOrDefault();
+            
+            // Withdraw funds from the account
+            WithdrawalResponse response = await _fixture.Api.PayDirect.Withdraw(new WithdrawalRequest(
+                account.Name,
+                account.Iban,
+                "Test Payment",
+                1,
+                "GBP",
+                "withdrawal",
+                Guid.NewGuid()
+            ));
+
+            response.ShouldNotBeNull();
+        }
+
+        private static DepositRequest CreateDepositRequest(Guid? userId = null, Guid? depositId = null)
         {
             return new(
                 userId ?? Guid.NewGuid(),
-                new InitiateDepositRequest.DepositRequestDetails(
+                new DepositRequest.DepositRequestDetails(
                     amountInMinor: 100,
                     currency: "GBP",
-                    providerId: "ob-sandbox-natwest",
+                    providerId: "mock-payments-gb-redirect",
                     depositId: depositId
                 )
                 {
                     SchemeId = "faster_payments_service",
-                    Remitter = new InitiateDepositRequest.ParticipantDetails(
-                        new InitiateDepositRequest.AccountIdentifierDetails(type: "sort_code_account_number")
+                    Remitter = new DepositRequest.ParticipantDetails(
+                        new DepositRequest.AccountIdentifierDetails(type: "sort_code_account_number")
                         {
                             AccountNumber = "12345602",
                             SortCode = "500000",
@@ -89,7 +176,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
                         Name = "A less lucky someone"
                     }
                 },
-                new InitiateDepositRequest.AuthFlowRequestDetails(type: "redirect")
+                new DepositRequest.AuthFlowRequestDetails(type: "redirect")
                 {
                     ReturnUri = "https://localhost:5001/home/callback"
                 }
