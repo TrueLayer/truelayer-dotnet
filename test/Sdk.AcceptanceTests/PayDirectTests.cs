@@ -80,7 +80,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
 
             await TestUtils.RepeatUntil(
                 () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
-                deposit => deposit.Status == "settled",
+                deposit => deposit.IsSettled,
                 5,
                 TimeSpan.FromSeconds(3)
             );
@@ -102,7 +102,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             // Wait for the deposit to settle
             Deposit deposit = await TestUtils.RepeatUntil(
                 () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
-                deposit => deposit.Status == "settled",
+                deposit => deposit.IsSettled,
                 5,
                 TimeSpan.FromSeconds(3)
             );
@@ -132,7 +132,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             // Wait for the deposit to settle
             Deposit deposit = await TestUtils.RepeatUntil(
                 () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
-                deposit => deposit.Status == "settled",
+                deposit => deposit.IsSettled,
                 5,
                 TimeSpan.FromSeconds(3)
             );
@@ -146,7 +146,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
                 "Test Payment",
                 1,
                 "GBP",
-                "withdrawal",
+                ContextCodes.Withdrawal,
                 Guid.NewGuid()
             ));
 

@@ -18,6 +18,11 @@ namespace TrueLayer.PayDirect.Model
         Deposit.SettlementDetails? Settled
     )
     {
+        /// <summary>
+        /// Gets whether the deposit has been settled
+        /// </summary>
+        public bool IsSettled => Status == "settled";
+        
         public record SettlementDetails(Guid AccountId, Guid TransactionId, DateTimeOffset SettledAt);
     }
 }
