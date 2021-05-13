@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace TrueLayer.PayDirect.Model
 {
@@ -10,7 +11,7 @@ namespace TrueLayer.PayDirect.Model
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<QueryResponse<AccountBalance>> GetAccountBalances(CancellationToken cancellationToken = default);
+        Task<IEnumerable<AccountBalance>> GetAccountBalances(CancellationToken cancellationToken = default);
         
         /// <summary>
         /// Initiate a deposit into your account
@@ -18,6 +19,6 @@ namespace TrueLayer.PayDirect.Model
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<ApiResponse<InitiateDepositResponse>> InitiateDeposit(InitiateDepositRequest request, CancellationToken cancellationToken = default);
+        Task<InitiateDepositResponse> InitiateDeposit(InitiateDepositRequest request, CancellationToken cancellationToken = default);
     }
 }

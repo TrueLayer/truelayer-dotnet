@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
@@ -28,23 +29,23 @@ namespace TrueLayer.PayDirect.Model
             _options.Validate();
         }
 
-        public async Task<QueryResponse<AccountBalance>> GetAccountBalances(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AccountBalance>> GetAccountBalances(CancellationToken cancellationToken = default)
         {
             const string path = "balances";
 
             AuthTokenResponse authToken = await _authClient.GetOAuthToken(RequiredScopes, cancellationToken);
 
-            return await _apiClient.GetAsync<QueryResponse<AccountBalance>>(GetRequestUri(path), authToken.AccessToken, cancellationToken);
+            return (await _apiClient.GetAsync<ApiResultCollection<AccountBalance>>(GetRequestUri(path), authToken.AccessToken, cancellationToken)).Results;
         }
 
-        public async Task<ApiResponse<InitiateDepositResponse>> InitiateDeposit(InitiateDepositRequest request, CancellationToken cancellationToken = default)
+        public async Task<InitiateDepositResponse> InitiateDeposit(InitiateDepositRequest request, CancellationToken cancellationToken = default)
         {
             request.NotNull(nameof(request));
 
             const string path = "users/deposits";
 
             AuthTokenResponse authToken = await _authClient.GetOAuthToken(RequiredScopes, cancellationToken);
-            return await _apiClient.PostAsync<ApiResponse<InitiateDepositResponse>>(GetRequestUri(path), request, authToken.AccessToken, _options.SigningKey, cancellationToken);
+            return await _apiClient.PostAsync<ApiResult<InitiateDepositResponse>>(GetRequestUri(path), request, authToken.AccessToken, _options.SigningKey, cancellationToken);
         }
 
         private Uri GetRequestUri(string path) => new(_baseUri, path);
