@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -5,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrueLayer.Sdk.Acceptance.Tests
 {
-    public class MockBankClient
+    public class MockBankClient : IDisposable
     {
         private readonly HttpClient _httpClient = new();
 
@@ -33,6 +34,11 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             string authId = parts[^3];
 
             return ($"https://pay-mock-connect.truelayer-sandbox.com/api/single-immediate-payments/{authId}/action", authToken);
+        }
+
+        public void Dispose()
+        {
+            _httpClient.Dispose();
         }
     }
 }

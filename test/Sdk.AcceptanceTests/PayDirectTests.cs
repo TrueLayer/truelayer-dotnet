@@ -8,14 +8,41 @@ using Xunit;
 
 namespace TrueLayer.Sdk.Acceptance.Tests
 {
-    public class PayDirectTests : IClassFixture<ApiTestFixture>
+    public class PayDirectTests : IClassFixture<ApiTestFixture>, IAsyncLifetime
     {
         private readonly ApiTestFixture _fixture;
         private readonly MockBankClient _mockBankClient = new();
 
+        private Guid _depositId;
+        private Guid _accountId;
+        private Guid _userId; 
+
         public PayDirectTests(ApiTestFixture fixture)
         {
             _fixture = fixture;
+        }
+
+        public async Task InitializeAsync()
+        {
+            DepositRequest depositRequest = CreateDepositRequest();
+            DepositResponse depositResponse = await _fixture.Api.PayDirect.Deposit(depositRequest);
+
+            _userId = depositRequest.UserId;
+            _depositId = depositRequest.Deposit.DepositId;
+
+            await _mockBankClient.Authorize(depositResponse.AuthFlow.Uri);
+
+            Deposit deposit = await TestUtils.RepeatUntil(
+                () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
+                deposit => deposit.IsSettled,
+                5,
+                TimeSpan.FromSeconds(3)
+            );
+
+            deposit.ShouldNotBeNull();
+            deposit.IsSettled.ShouldBeTrue();
+
+            _accountId = deposit.Settled.AccountId;
         }
 
         [Fact]
@@ -70,21 +97,14 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         [Fact]
         public async Task Can_get_user_accounts()
         {
-            DepositRequest depositRequest = CreateDepositRequest();
-            DepositResponse depositResponse = await _fixture.Api.PayDirect.Deposit(depositRequest);
-
-            await _mockBankClient.Authorize(depositResponse.AuthFlow.Uri);
-
-            await TestUtils.RepeatUntil(
-                () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
-                deposit => deposit.IsSettled,
-                5,
-                TimeSpan.FromSeconds(3)
-            );
-
-            IEnumerable<UserAcccount> accounts = await _fixture.Api.PayDirect.GetUserAcccounts(depositRequest.UserId);
+            IEnumerable<UserAcccount> accounts = await _fixture.Api.PayDirect.GetUserAcccounts(_userId);
             accounts.ShouldNotBeNull();
             accounts.ShouldNotBeEmpty();
+
+            UserAcccount defaultAccount = accounts.FirstOrDefault();
+            defaultAccount.AccountId.ShouldNotBe(Guid.Empty);
+            defaultAccount.Iban.ShouldNotBeNullOrWhiteSpace();
+            defaultAccount.Name.ShouldNotBeNullOrWhiteSpace();
         }
 
         [Fact]
@@ -144,6 +164,12 @@ namespace TrueLayer.Sdk.Acceptance.Tests
                 ContextCodes.Withdrawal,
                 Guid.NewGuid()
             ));
+        }
+
+        public Task DisposeAsync()
+        {
+            _mockBankClient.Dispose();
+            return Task.CompletedTask;
         }
 
         private static DepositRequest CreateDepositRequest(Guid? userId = null, Guid? depositId = null)
