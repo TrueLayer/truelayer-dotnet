@@ -1,6 +1,6 @@
 namespace TrueLayer
 {
-    internal struct Empty
+    internal struct EmptyResponse
     {
         
     }

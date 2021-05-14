@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using Shouldly;
 using TrueLayer.PayDirect.Model;
@@ -108,7 +105,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             );
             
             // Withdraw funds from the account
-            WithdrawalResponse response = await _fixture.Api.PayDirect.Withdraw(new UserWithdrawalRequest(
+            await _fixture.Api.PayDirect.Withdraw(new UserWithdrawalRequest(
                 depositRequest.UserId,
                 deposit.Settled.AccountId,
                 "Test Payment",
@@ -116,8 +113,6 @@ namespace TrueLayer.Sdk.Acceptance.Tests
                 "GBP",
                 Guid.NewGuid()
             ));
-
-            response.ShouldNotBeNull();
         }
 
         [Fact]
@@ -140,7 +135,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             UserAcccount account = (await _fixture.Api.PayDirect.GetUserAcccounts(depositRequest.UserId)).FirstOrDefault();
             
             // Withdraw funds from the account
-            WithdrawalResponse response = await _fixture.Api.PayDirect.Withdraw(new WithdrawalRequest(
+            await _fixture.Api.PayDirect.Withdraw(new WithdrawalRequest(
                 account.Name,
                 account.Iban,
                 "Test Payment",
@@ -149,8 +144,6 @@ namespace TrueLayer.Sdk.Acceptance.Tests
                 ContextCodes.Withdrawal,
                 Guid.NewGuid()
             ));
-
-            response.ShouldNotBeNull();
         }
 
         private static DepositRequest CreateDepositRequest(Guid? userId = null, Guid? depositId = null)

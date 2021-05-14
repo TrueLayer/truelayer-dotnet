@@ -46,7 +46,7 @@ namespace TrueLayer.PayDirect.Model
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<WithdrawalResponse> Withdraw(UserWithdrawalRequest request, CancellationToken cancellationToken = default);
+        Task Withdraw(UserWithdrawalRequest request, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Initiate an open-loop withdrawal for the specified user
@@ -54,6 +54,6 @@ namespace TrueLayer.PayDirect.Model
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<WithdrawalResponse> Withdraw(WithdrawalRequest request, CancellationToken cancellationToken = default);
+        Task Withdraw(WithdrawalRequest request, CancellationToken cancellationToken = default);
     }
 }

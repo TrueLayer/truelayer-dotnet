@@ -66,22 +66,22 @@ namespace TrueLayer.PayDirect.Model
             return (await _apiClient.GetAsync<ApiResultCollection<UserAcccount>>(GetRequestUri(path), authToken.AccessToken, cancellationToken)).Results;
         }
 
-        public async Task<WithdrawalResponse> Withdraw(UserWithdrawalRequest request, CancellationToken cancellationToken = default)
+        public async Task Withdraw(UserWithdrawalRequest request, CancellationToken cancellationToken = default)
         {
             request.NotNull(nameof(request));
 
             const string path = "users/withdrawals";
             AuthTokenResponse authToken = await _authClient.GetOAuthToken(RequiredScopes, cancellationToken);
-            return await _apiClient.PostAsync<ApiResult<WithdrawalResponse>>(GetRequestUri(path), request, authToken.AccessToken, _options.SigningKey, cancellationToken);
+            _ = await _apiClient.PostAsync<EmptyResponse>(GetRequestUri(path), request, authToken.AccessToken, _options.SigningKey, cancellationToken);
         }
 
-        public async Task<WithdrawalResponse> Withdraw(WithdrawalRequest request, CancellationToken cancellationToken = default)
+        public async Task Withdraw(WithdrawalRequest request, CancellationToken cancellationToken = default)
         {
             request.NotNull(nameof(request));
 
             const string path = "withdrawals";
             AuthTokenResponse authToken = await _authClient.GetOAuthToken(RequiredScopes, cancellationToken);
-            return await _apiClient.PostAsync<ApiResult<WithdrawalResponse>>(GetRequestUri(path), request, authToken.AccessToken, _options.SigningKey, cancellationToken);
+            _ = await _apiClient.PostAsync<EmptyResponse>(GetRequestUri(path), request, authToken.AccessToken, _options.SigningKey, cancellationToken);
         }
 
         private Uri GetRequestUri(string path) => new(_baseUri, path);
