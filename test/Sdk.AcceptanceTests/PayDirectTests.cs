@@ -110,24 +110,10 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         [Fact]
         public async Task Can_perform_closed_loop_withdrawal()
         {
-            DepositRequest depositRequest = CreateDepositRequest();
-            DepositResponse depositResponse = await _fixture.Api.PayDirect.Deposit(depositRequest);
-
-            // Authorize the deposit to ensure the user has an account
-            await _mockBankClient.Authorize(depositResponse.AuthFlow.Uri);
-
-            // Wait for the deposit to settle
-            Deposit deposit = await TestUtils.RepeatUntil(
-                () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
-                deposit => deposit.IsSettled,
-                5,
-                TimeSpan.FromSeconds(3)
-            );
-            
             // Withdraw funds from the account
             await _fixture.Api.PayDirect.Withdraw(new UserWithdrawalRequest(
-                depositRequest.UserId,
-                deposit.Settled.AccountId,
+                _userId,
+                _accountId,
                 "Test Payment",
                 1,
                 "GBP",
@@ -138,21 +124,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         [Fact]
         public async Task Can_perform_open_loop_withdrawal()
         {
-            DepositRequest depositRequest = CreateDepositRequest();
-            DepositResponse depositResponse = await _fixture.Api.PayDirect.Deposit(depositRequest);
-
-            // Authorize the deposit to ensure the user has an account
-            await _mockBankClient.Authorize(depositResponse.AuthFlow.Uri);
-
-            // Wait for the deposit to settle
-            Deposit deposit = await TestUtils.RepeatUntil(
-                () => _fixture.Api.PayDirect.GetDeposit(depositRequest.UserId, depositRequest.Deposit.DepositId),
-                deposit => deposit.IsSettled,
-                5,
-                TimeSpan.FromSeconds(3)
-            );
-
-            UserAcccount account = (await _fixture.Api.PayDirect.GetUserAcccounts(depositRequest.UserId)).FirstOrDefault();
+            UserAcccount account = (await _fixture.Api.PayDirect.GetUserAcccounts(_userId)).FirstOrDefault();
             
             // Withdraw funds from the account
             await _fixture.Api.PayDirect.Withdraw(new WithdrawalRequest(
