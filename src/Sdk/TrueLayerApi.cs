@@ -6,6 +6,7 @@ namespace TrueLayer
 {
     internal class TrueLayerApi : ITrueLayerApi
     {
+        private readonly Lazy<IAuthClient> _auth;
         private readonly Lazy<IPaymentsClient> _payments;
 
         /// <summary>
@@ -15,11 +16,11 @@ namespace TrueLayer
         /// <param name="options">A options object containing authentication and API specific information.</param>
         public TrueLayerApi(IApiClient apiClient, TrueLayerOptions options)
         {
-            Auth = new AuthClient(apiClient, options);
+            _auth = new(() => new AuthClient(apiClient, options));
             _payments = new(() => new PaymentsClient(apiClient, options, Auth));
         }
         
-        public IAuthClient Auth { get; }
+        public IAuthClient Auth => _auth.Value;
         public IPaymentsClient Payments => _payments.Value;
     }
 }
