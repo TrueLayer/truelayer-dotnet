@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Configuration;
 using TrueLayer;
 using TrueLayer.Payments.Model;
 using TrueLayerSdk.SampleApp.Data;
@@ -22,7 +21,7 @@ namespace TrueLayerSdk.SampleApp.Pages.Payments
         [BindProperty]
         public PaymentData Payment { get; set; }
         
-        public NewPayment(IConfiguration config, PaymentsDbContext context, ITrueLayerApi api)
+        public NewPayment(PaymentsDbContext context, ITrueLayerApi api)
         {
             _context = context;
             _api = api;

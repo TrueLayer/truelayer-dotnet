@@ -1,0 +1,33 @@
+@page
+@model ProvidersList
+
+@{
+    ViewData["Title"] = "Providers page";
+}
+
+<div class="text-center">
+    <h1 class="display-5" style="margin-bottom: 30px">List of providers</h1>
+</div>
+
+@if (Model.Providers is null || Model.Providers.Count == 0)
+{
+    <p>No providers found.</p>
+}
+else
+{
+    <ul class="list-unstyled">
+        @foreach(var p in Model.Providers)
+        {
+            <li>@p.Country - @p.DisplayName</li>
+            if (p.SingleImmediatePaymentSchemes is not null)
+            {
+                foreach (var scheme in p.SingleImmediatePaymentSchemes)
+                {
+                    <ul>
+                        <li>@scheme.SchemeId</li>
+                    </ul>
+                }
+            }
+        }
+    </ul>
+}
