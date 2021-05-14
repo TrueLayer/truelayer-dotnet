@@ -1,10 +1,13 @@
 using TrueLayer.Auth;
 using TrueLayer.Payments;
+using System;
 
 namespace TrueLayer
 {
     internal class TrueLayerApi : ITrueLayerApi
     {
+        private readonly Lazy<IPaymentsClient> _payments;
+
         /// <summary>
         /// Creates a new <see cref="TrueLayerApi"/> instance and initializes each underlying API client.
         /// </summary>
@@ -13,10 +16,10 @@ namespace TrueLayer
         public TrueLayerApi(IApiClient apiClient, TrueLayerOptions options)
         {
             Auth = new AuthClient(apiClient, options);
-            Payments = new PaymentsClient(apiClient, options, Auth);
+            _payments = new(() => new PaymentsClient(apiClient, options, Auth));
         }
         
         public IAuthClient Auth { get; }
-        public IPaymentsClient Payments { get; }
+        public IPaymentsClient Payments => _payments.Value;
     }
 }
