@@ -56,7 +56,7 @@ namespace TrueLayer.Sdk.Tests
             var apiClient = Mock.Of<IApiClient>();
             
             // ACT
-            var authClient = new AuthClient(apiClient, options);
+            var authClient = new AuthClient(apiClient,new LocalTokenCache(), options);
             var payClients = new PaymentsClient(apiClient, options, authClient);
 
             // ASSERT

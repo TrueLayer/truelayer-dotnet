@@ -16,12 +16,14 @@ namespace TrueLayer.Auth
         internal const string SandboxUrl = "https://auth.truelayer-sandbox.com/";
 
         private readonly IApiClient _apiClient;
+        private readonly ITokenCache _tokenCache;
         private readonly TrueLayerOptions _options;
         internal readonly Uri BaseUri;
         
-        public AuthClient(IApiClient apiClient, TrueLayerOptions options)
+        public AuthClient(IApiClient apiClient, ITokenCache tokenCache, TrueLayerOptions options)
         {
             _apiClient = apiClient;
+            _tokenCache = tokenCache;
             _options = options;
 
             BaseUri = options.Auth?.Uri ?? 
@@ -61,6 +63,15 @@ namespace TrueLayer.Auth
         
         public async Task<AuthTokenResponse> GetPaymentToken(CancellationToken cancellationToken = default)
         {
+            if (_tokenCache.PaymentToken.IsValid()) 
+                return new AuthTokenResponse
+                {
+                    AccessToken = _tokenCache.PaymentToken.Value,
+                    ExpiresIn = _tokenCache.PaymentToken.ExpiresIn,
+                    Scope = _tokenCache.PaymentToken.Scope,
+                    TokenType = _tokenCache.PaymentToken.TokenType,
+                };
+
             const string path = "connect/token";
             
             var content = new FormUrlEncodedContent(new KeyValuePair<string?, string?>[]
@@ -72,6 +83,9 @@ namespace TrueLayer.Auth
             });
             
             var apiResponse = await _apiClient.PostAsync<AuthTokenResponse>(GetRequestUri(path), content, null, cancellationToken);
+
+            await _tokenCache.SetPaymentToken(apiResponse.AccessToken, apiResponse.ExpiresIn, apiResponse.Scope!, apiResponse.TokenType);
+
             return apiResponse;
         }
         
