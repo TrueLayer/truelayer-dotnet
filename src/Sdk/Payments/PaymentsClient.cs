@@ -38,9 +38,9 @@ namespace TrueLayer.Payments
             return await _apiClient.PostAsync<InitiatePaymentResponse>(GetRequestUri(path), request, await GetAccessToken(cancellationToken), cancellationToken);
         }
 
-        public async Task<GetPaymentStatusResponse> GetPayment(string paymentId, CancellationToken cancellationToken)
+        public async Task<GetPaymentStatusResponse> GetPayment(Guid paymentId, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(paymentId)) throw new ArgumentNullException(nameof(paymentId));
+            paymentId.NotNull(nameof(paymentId));
             
             var path = $"v2/single-immediate-payments/{paymentId}";
             return await _apiClient.GetAsync<GetPaymentStatusResponse>(GetRequestUri(path), await GetAccessToken(cancellationToken), cancellationToken);

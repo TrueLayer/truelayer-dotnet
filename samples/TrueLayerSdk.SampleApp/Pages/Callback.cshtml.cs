@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,7 @@ namespace TrueLayerSdk.SampleApp.Pages
             }
 
             var result =
-                await _api.Payments.GetPayment(paymentId, CancellationToken.None);
+                await _api.Payments.GetPayment(Guid.Parse(paymentId), CancellationToken.None);
             var paymentData = result.Result;
             Payment = new PaymentData
             {
