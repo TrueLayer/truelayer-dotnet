@@ -4,8 +4,7 @@ namespace TrueLayer.Payments.Model
 {
     public record GetProvidersRequest
     {
-        public GetProvidersRequest(string clientId, List<string> authFlowType, List<string> accountType, List<string> currency, 
-            List<string>? country = default, List<string>? additionalInputType = default, string? releaseChannel = default)
+        public GetProvidersRequest(string clientId, List<string> authFlowType, List<string> accountType, List<string> currency)
         {
             clientId.NotNullOrWhiteSpace(nameof(clientId));
             authFlowType.NotNull(nameof(authFlowType)).NotEmpty(nameof(authFlowType));
@@ -16,10 +15,6 @@ namespace TrueLayer.Payments.Model
             AuthFlowType = authFlowType;
             AccountType = accountType;
             Currency = currency;
-
-            Country = country;
-            AdditionalInputType = additionalInputType;
-            ReleaseChannel = releaseChannel;
         }
 
         /// <summary>
@@ -49,7 +44,7 @@ namespace TrueLayer.Payments.Model
         /// ISO 3166-1 alpha-2 country codes: e.g. GB,FR. 
         /// Will only return providers from the listed countries.
         /// </summary>
-        public List<string>? Country { get; }
+        public List<string>? Country { get; set; }
 
         /// <summary>
         /// Will filter out any provider schemes that require additional_inputs field types not specified 
@@ -57,7 +52,7 @@ namespace TrueLayer.Payments.Model
         /// If omitted, will only return provider schemes that have no required additional inputs.
         /// Refer to <see cref="Constants.AdditionalInputType"/>
         /// </summary>
-        public List<string>? AdditionalInputType { get; }
+        public List<string>? AdditionalInputType { get; set; }
 
         /// <summary>
         /// Will filter out any providers that are not on the specified release channel 
@@ -65,6 +60,6 @@ namespace TrueLayer.Payments.Model
         /// If omitted, will only return providers that are generally available (equivalent to live).
         /// Refer to <see cref="Constants.ReleaseChannel"/>
         /// </summary>
-        public string? ReleaseChannel { get; }
+        public string? ReleaseChannel { get; set; }
     }
 }
