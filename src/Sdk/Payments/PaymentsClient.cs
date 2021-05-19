@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Payments.Model;
 using TrueLayer.Auth;
-using System.Linq;
 using System.Web;
 
 namespace TrueLayer.Payments
@@ -56,11 +55,11 @@ namespace TrueLayer.Payments
             
                 var query = HttpUtility.ParseQueryString(string.Empty);
                 query["client_id"] = request.ClientId;
-                query["auth_flow_type"] = request.AuthFlowType.Aggregate((a,b) => $"{a},{b}");
-                query["account_type"] = request.AccountType.Aggregate((a,b) => $"{a},{b}");
-                query["currency"] = request.Currency.Aggregate((a,b) => $"{a},{b}");
-                if (request.Country is { }) query["country"] = request.Country?.Aggregate((a,b) => $"{a},{b}");
-                if (request.AdditionalInputType is { }) query["additional_input_type"] = request.AdditionalInputType?.Aggregate((a,b) => $"{a},{b}");
+                query["auth_flow_type"] = string.Join(",", request.AuthFlowType);
+                query["account_type"] = string.Join(",", request.AccountType);
+                query["currency"] = string.Join(",", request.Currency);
+                if (request.Country is { }) query["country"] = string.Join(",", request.Country);
+                if (request.AdditionalInputType is { }) query["additional_input_type"] = string.Join(",", request.AdditionalInputType);
                 if (request.ReleaseChannel is { }) query["release_channel"] = request.ReleaseChannel;
             
                 var builder = new UriBuilder(requestUri) {Query = query.ToString()};
