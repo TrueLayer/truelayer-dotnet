@@ -11,7 +11,7 @@ namespace TrueLayer.Sdk.Tests
         public void ShouldThrow_WithNullOrEmptyList(List<string> list)
         {
             // Act
-            var ex = Record.Exception(() => list.NotEmptyList(nameof(list)));
+            var ex = Record.Exception(() => list.NotEmpty(nameof(list)));
             // Assert
             Assert.IsType<InvalidOperationException>(ex);
             Assert.Equal($"Sequence '{nameof(list)}' contains no elements", ex.Message);
@@ -23,7 +23,7 @@ namespace TrueLayer.Sdk.Tests
             // Arrange
             var list = new List<string> {"something"};
             // Act
-            var ex = Record.Exception(() => list.NotEmptyList(nameof(list)));
+            var ex = Record.Exception(() => list.NotEmpty(nameof(list)));
             // Assert
             Assert.Null(ex);
         }

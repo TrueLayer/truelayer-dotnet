@@ -8,9 +8,9 @@ namespace TrueLayer.Payments.Model
             List<string>? country = default, List<string>? additionalInputType = default, string? releaseChannel = default)
         {
             clientId.NotNullOrWhiteSpace(nameof(clientId));
-            authFlowType.NotNull(nameof(authFlowType)).NotEmptyList(nameof(authFlowType));
-            accountType.NotNull(nameof(accountType)).NotEmptyList(nameof(authFlowType));
-            currency.NotNull(nameof(currency)).NotEmptyList(nameof(authFlowType));
+            authFlowType.NotNull(nameof(authFlowType)).NotEmpty(nameof(authFlowType));
+            accountType.NotNull(nameof(accountType)).NotEmpty(nameof(authFlowType));
+            currency.NotNull(nameof(currency)).NotEmpty(nameof(authFlowType));
 
             ClientId = clientId;
             AuthFlowType = authFlowType;

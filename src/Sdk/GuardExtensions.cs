@@ -54,9 +54,9 @@ namespace TrueLayer
         }
 
         [DebuggerStepThrough]
-        public static T NotEmptyList<T>([NotNull] this T value, string name) where T : IList
+        public static T NotEmpty<T>([NotNull] this T value, string name) where T : IList
         {
-            return (value is not {} or {Count: 0})
+            return (value is not {Count: >0})
                 ? throw new InvalidOperationException($"Sequence '{name}' contains no elements")
                 : value;
         }
