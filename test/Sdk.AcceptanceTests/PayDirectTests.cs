@@ -148,7 +148,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
         {
             return new(
                 userId ?? Guid.NewGuid(),
-                new DepositRequest.DepositRequestDetails(
+                new DepositRequest.DepositDetails(
                     amountInMinor: 100,
                     currency: "GBP",
                     providerId: "mock-payments-gb-redirect",
@@ -156,8 +156,8 @@ namespace TrueLayer.Sdk.Acceptance.Tests
                 )
                 {
                     SchemeId = "faster_payments_service",
-                    Remitter = new DepositRequest.ParticipantDetails(
-                        new DepositRequest.AccountIdentifierDetails(type: "sort_code_account_number")
+                    Remitter = new DepositRequest.Remitter(
+                        new DepositRequest.AccountIdentifier(type: AccountIdentifierTypes.SortCodeAccountNumber)
                         {
                             AccountNumber = "12345602",
                             SortCode = "500000",
@@ -167,7 +167,7 @@ namespace TrueLayer.Sdk.Acceptance.Tests
                         Name = "A less lucky someone"
                     }
                 },
-                new DepositRequest.AuthFlowRequestDetails(type: "redirect")
+                new DepositRequest.DepositAuthFlow(type: AuthorizationFlows.Redirect)
                 {
                     ReturnUri = "https://localhost:5001/home/callback"
                 }

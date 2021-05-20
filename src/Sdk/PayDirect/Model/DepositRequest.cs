@@ -3,9 +3,18 @@ using System.Collections.Generic;
 
 namespace TrueLayer.PayDirect.Model
 {
+    /// <summary>
+    /// Request a deposit into a user's account
+    /// </summary>
     public class DepositRequest
     {
-        public DepositRequest(Guid userId, DepositRequestDetails deposit, AuthFlowRequestDetails authFlow)
+        /// <summary>
+        /// Creates a new <see cref="DepositRequest"/>
+        /// </summary>
+        /// <param name="userId">The identifier of the user to which you wish to deposit funds</param>
+        /// <param name="deposit">The deposit details</param>
+        /// <param name="authFlow">The authorization flow used to deposit the details</param>
+        public DepositRequest(Guid userId, DepositDetails deposit, DepositAuthFlow authFlow)
         {
             UserId = userId;
             Deposit = deposit ?? throw new ArgumentNullException(nameof(deposit));
@@ -20,12 +29,12 @@ namespace TrueLayer.PayDirect.Model
         /// <summary>
         /// Specifies the details of the payment to be created.
         /// </summary>
-        public DepositRequestDetails Deposit { get; }
+        public DepositDetails Deposit { get; }
 
         /// <summary>
         /// Specifies how the payment should be authorised.
         /// </summary>
-        public AuthFlowRequestDetails AuthFlow { get; }
+        public DepositAuthFlow AuthFlow { get; }
 
         /// <summary>
         /// An address to which payment webhooks with the status of the payment should be sent. 
@@ -33,16 +42,19 @@ namespace TrueLayer.PayDirect.Model
         /// </summary>
         public string? WebhookUri { get; set; }
 
-        public class DepositRequestDetails
+        /// <summary>
+        /// Represents the details of the deposit
+        /// </summary>
+        public class DepositDetails
         {
-            public DepositRequestDetails(
+            public DepositDetails(
                 long amountInMinor,
                 string currency,
                 string providerId,
                 Guid? depositId = null
             )
             {
-                AmountInMinor = amountInMinor;
+                AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
                 Currency = currency.NotNullOrWhiteSpace(nameof(currency));
                 ProviderId = providerId.NotNullOrWhiteSpace(nameof(providerId));
                 DepositId = depositId ?? Guid.NewGuid();
@@ -86,7 +98,7 @@ namespace TrueLayer.PayDirect.Model
             /// <summary>
             /// The details of the remitter sending the payment.
             /// </summary>
-            public ParticipantDetails? Remitter { get; set; }
+            public Remitter? Remitter { get; set; }
 
             /// <summary>
             /// The reference to appear on the remitters’ statement.
@@ -95,38 +107,80 @@ namespace TrueLayer.PayDirect.Model
         }
 
 
-        public class ParticipantDetails
+        /// <summary>
+        /// Represents the remitter of the deposit
+        /// </summary>
+        public class Remitter
         {
-            public ParticipantDetails(AccountIdentifierDetails account)
+            public Remitter(AccountIdentifier account)
             {
                 Account = account.NotNull(nameof(account));
             }
 
-
-            public AccountIdentifierDetails Account { get; set; }
+            /// <summary>
+            /// The identifier of the remitters account used to deposit the funds.
+            /// </summary>
+            /// <value></value>
+            public AccountIdentifier Account { get; }
+            
+            
+            /// <summary>
+            /// The name on the remitter's account.
+            /// </summary>
+            /// <value></value>
             public string? Name { get; set; }
         }
 
-        // TODO create factory methods to ensure different Account type fields are populated
-        public class AccountIdentifierDetails
+
+        /// <summary>
+        /// Represents the identity of a bank account
+        /// </summary>
+        public class AccountIdentifier
         {
-            public AccountIdentifierDetails(string type)
+            public AccountIdentifier(string type)
             {
                 Type = type.NotNullOrWhiteSpace(nameof(type));
             }
 
+            /// <summary>
+            /// The type of account identifier
+            /// </summary>
             public string Type { get; }
+            
+            /// <summary>
+            /// 6 digit sort code (no spaces or dashes)
+            /// </summary>
             public string? SortCode { get; set; }
+            
+            /// <summary>
+            /// 8 digit account number
+            /// </summary>
             public string? AccountNumber { get; set; }
+            
+            /// <summary>
+            /// Valid International Bank Account Number (no spaces). 
+            /// Consists of a 2 letter country code, followed by 2 check digits, and then by up to 30 alphanumeric characters (also known as the BBAN).
+            /// </summary>
             public string? Iban { get; set; }
+            
+            /// <summary>
+            /// Valid Basic Bank Account Number (no spaces). Consists of up to 30 alphanumeric characters, with a fixed length per country. 
+            /// </summary>
             public string? Bban { get; set; }
+            
+            /// <summary>
+            /// Valid Polish NRB (no spaces). Consists of 2 check digits, followed by an 8 digit bank branch number, and then by a 16 digit bank account number. 
+            /// Equivalent to a Polish IBAN with the country code removed.
+            /// </summary>
             public string? Nrb { get; set; }
         }
 
-        // TODO create factory methods to ensure different auth flow type fields are populated
-        public class AuthFlowRequestDetails
+        /// <summary>
+        /// Specifies how the deposit should be authorised
+        /// </summary>
+        public class DepositAuthFlow
         {
-            public AuthFlowRequestDetails(string type)
+            public DepositAuthFlow(string type)
             {
                 Type = type.NotNullOrWhiteSpace(nameof(type));
             }
