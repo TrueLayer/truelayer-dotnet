@@ -25,7 +25,7 @@ namespace TrueLayer
             _payments = new(() => new PaymentsClient(apiClient, options, Auth));
             _payDirect = new(() => new PayDirectClient(apiClient, Auth, options));
         }
-        
+
         public IAuthClient Auth => _auth.Value;
         public IPaymentsClient Payments => _payments.Value;
         public IPayDirectClient PayDirect => _payDirect.Value;
