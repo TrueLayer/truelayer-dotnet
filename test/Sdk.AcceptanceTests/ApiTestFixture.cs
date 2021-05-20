@@ -13,7 +13,9 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             IConfiguration configuration = LoadConfiguration();
 
             ServiceProvider = new ServiceCollection()
-                .AddTrueLayerSdk(configuration)
+                .AddTrueLayerSdk(configuration, options => {
+                    options.PayDirect.SigningKey.Certificate = File.ReadAllText("ec512-private-key.pem");
+                })
                 .BuildServiceProvider();
             
             Api = ServiceProvider.GetRequiredService<ITrueLayerApi>();

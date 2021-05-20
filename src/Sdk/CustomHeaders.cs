@@ -2,6 +2,6 @@ namespace TrueLayer
 {
     internal static class CustomHeaders
     {
-        public const string RequestId = "X-Request-Id";
+        public const string RequestId = "x-tl-correlation-id";
     }
 }

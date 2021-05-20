@@ -41,17 +41,19 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The service collection to add to.</param>
         /// <param name="configuration">The Microsoft configuration used to obtain the TrueLayer SDK configuration.</param>
+        /// <param name="configureOptions">Action to customise the TrueLayer options created from configuration.</param>
         /// <param name="configureBuilder">Action to override the HttpClientBuilder.</param>
         /// <returns>The service collection with registered TrueLayer SDK services.</returns>
         public static IServiceCollection AddTrueLayerSdk(this IServiceCollection services,
-            IConfiguration configuration, Action<IHttpClientBuilder>? configureBuilder = null)
+            IConfiguration configuration, Action<TrueLayerOptions>? configureOptions = null, Action<IHttpClientBuilder>? configureBuilder = null)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-            TrueLayerOptions truelayerOptions = configuration.GetTrueLayerOptions();
-            truelayerOptions.Validate();
-            return services.AddTrueLayerSdk(truelayerOptions, configureBuilder);
+            TrueLayerOptions options = configuration.GetTrueLayerOptions();
+            configureOptions?.Invoke(options);
+            options.Validate();
+            return services.AddTrueLayerSdk(options, configureBuilder);
         }
     }
 }
