@@ -18,7 +18,7 @@ namespace TrueLayer
     {
         private readonly HttpClient _httpClient;
         private readonly ISerializer _serializer;
-        
+
         /// <summary>
         /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
         /// </summary>
@@ -29,7 +29,7 @@ namespace TrueLayer
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
-        
+
         /// <inheritdoc />
         public async Task<TResult> GetAsync<TResult>(Uri uri, string? accessToken = null, CancellationToken cancellationToken = default)
         {
@@ -40,12 +40,13 @@ namespace TrueLayer
                 uri: uri,
                 accessToken: accessToken,
                 httpContent: null,
+                signature: null,
                 cancellationToken: cancellationToken
             );
 
             return await DeserializeJsonAsync<TResult>(httpResponse, cancellationToken) ?? throw new ArgumentNullException();
         }
-        
+
         /// <inheritdoc />
         public async Task<TResult> PostAsync<TResult>(Uri uri, HttpContent? httpContent = null, string? accessToken = null, CancellationToken cancellationToken = default)
         {
@@ -56,6 +57,7 @@ namespace TrueLayer
                 uri: uri,
                 accessToken: accessToken,
                 httpContent: httpContent,
+                signature: null,
                 cancellationToken: cancellationToken
             );
 
@@ -63,7 +65,7 @@ namespace TrueLayer
         }
 
         /// <inheritdoc />
-        public async Task<TResult> PostAsync<TResult>(Uri uri, object? request = null, string? accessToken = null, CancellationToken cancellationToken = default)
+        public async Task<TResult> PostAsync<TResult>(Uri uri, object? request = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -72,6 +74,7 @@ namespace TrueLayer
                 uri: uri,
                 accessToken: accessToken,
                 request: request,
+                signingKey: signingKey,
                 cancellationToken: cancellationToken
             );
 
@@ -81,7 +84,7 @@ namespace TrueLayer
         private async Task<TResult?> DeserializeJsonAsync<TResult>(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
         {
             string? json = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-            
+
             if (string.IsNullOrWhiteSpace(json))
             {
                 return default;
@@ -90,21 +93,29 @@ namespace TrueLayer
             return (TResult?)_serializer.Deserialize(json, typeof(TResult));
         }
 
-        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, Uri uri, string? accessToken, 
-            object? request, CancellationToken cancellationToken)
+        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, Uri uri, string? accessToken,
+            object? request, SigningKey? signingKey, CancellationToken cancellationToken)
         {
             HttpContent? httpContent = null;
-            
-            if (request is {})
+            string? signature = null;
+
+            if (request is { })
             {
+                string json = _serializer.Serialize(request);
+
+                if (signingKey != null)
+                {
+                    signature = RequestSigning.SignJson(json, signingKey);
+                }
+
                 httpContent = new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
             }
-            
-            return SendRequestAsync(httpMethod, uri, accessToken, httpContent, cancellationToken);
+
+            return SendRequestAsync(httpMethod, uri, accessToken, httpContent, signature, cancellationToken);
         }
-        
+
         private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod httpMethod, Uri uri, string? accessToken,
-            HttpContent? httpContent, CancellationToken cancellationToken)
+            HttpContent? httpContent, string? signature, CancellationToken cancellationToken)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -118,12 +129,17 @@ namespace TrueLayer
                 httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             }
 
+            if (!string.IsNullOrWhiteSpace(signature))
+            {
+                httpRequest.Headers.Add("X-Tl-Signature", signature); 
+            }
+
             var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
             await ValidateResponseAsync(httpResponse, cancellationToken);
 
             return httpResponse;
         }
-        
+
         private async Task ValidateResponseAsync(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
         {
             if (!httpResponse.IsSuccessStatusCode)

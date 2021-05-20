@@ -37,9 +37,10 @@ namespace TrueLayer
         /// <param name="uri">The API resource path.</param>
         /// <param name="request">Optional data that should be sent in the request body.</param>
         /// <param name="accessToken">The access token used to authenticate the request.</param>
+        /// <param name="signingKey">ES512 signing certificate used to sign the request with a JSON Web Signature</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the underlying HTTP request.</param>
         /// <typeparam name="TResult">The expected response type to be deserialized.</typeparam>
         /// <returns>A task that upon completion contains the specified API response data.</returns>
-        Task<TResult> PostAsync<TResult>(Uri uri, object? request = null, string? accessToken = null, CancellationToken cancellationToken = default);
+        Task<TResult> PostAsync<TResult>(Uri uri, object? request = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default);
     }
 }

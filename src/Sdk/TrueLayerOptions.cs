@@ -1,5 +1,5 @@
 using System;
-
+using TrueLayer.PayDirect;
 namespace TrueLayer
 {
     /// <summary>
@@ -26,6 +26,7 @@ namespace TrueLayer
         public ApiOptions? Auth { get; set; }
         public ApiOptions? Payments { get; set; }
         public ApiOptions? Data { get; set; }
+        public PayDirectOptions? PayDirect { get; set; }
 
         public void Validate()
         {
