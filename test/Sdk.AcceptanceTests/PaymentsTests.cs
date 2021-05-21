@@ -69,6 +69,22 @@ namespace TrueLayer.Sdk.Acceptance.Tests
             resp.Results.First().SingleImmediatePaymentSchemes.ShouldNotBeNull().ShouldNotBeEmpty();
         }
 
+        [Fact]
+        public async Task Can_fetch_payment_status()
+        {
+            // ARRANGE
+            var req = MockPaymentRequestData();
+            var paymentResponse = await _fixture.Api.Payments.InitiatePayment(req);
+
+            // ACT
+            var getPaymentResponse =
+                await _fixture.Api.Payments.GetPayment(paymentResponse.Result.SingleImmediatePayment
+                    .SingleImmediatePaymentId);
+
+            // ASSERT
+            Assert.True(getPaymentResponse.Result.Status == "initiated");
+        }
+
         private static InitiatePaymentRequest MockPaymentRequestData()
         {
             return new(
