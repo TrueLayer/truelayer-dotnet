@@ -32,8 +32,9 @@ namespace TrueLayer
             if (string.IsNullOrWhiteSpace(ClientId)) throw new ArgumentException($"Your client id is required", nameof(ClientId));
             if (string.IsNullOrWhiteSpace(ClientSecret)) throw new ArgumentException($"Your API secret key is required", nameof(ClientSecret));
             
+            // Only call validate on the Options that must be present for any use of the library
+            // otherwise each API client should be responsible for validating it's options internally
             Auth?.Validate();
-            Payments?.Validate();
         }
     }
 }
