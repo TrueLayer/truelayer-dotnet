@@ -15,7 +15,7 @@ namespace TrueLayer
             options.NotNull(nameof(options));
 
             Auth = new AuthApi(apiClient, options);
-            _payments = new(() => new PaymentsApi(apiClient, options));
+            _payments = new(() => new PaymentsApi(apiClient, Auth, options));
         }
 
         public IAuthApi Auth { get; }

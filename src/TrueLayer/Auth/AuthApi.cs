@@ -13,14 +13,14 @@ namespace TrueLayer.Auth
 
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
-        internal readonly Uri BaseUri;
+        private readonly Uri _baseUri;
 
         public AuthApi(IApiClient apiClient, TrueLayerOptions options)
         {
             _apiClient = apiClient.NotNull(nameof(apiClient));
             _options = options.NotNull(nameof(options));
 
-            BaseUri = options.Auth?.Uri ??
+            _baseUri = options.Auth?.Uri ??
                       new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 
@@ -41,9 +41,7 @@ namespace TrueLayer.Auth
             }
 
             return _apiClient.PostAsync<GetAuthTokenResponse>(
-                GetRequestUri("connect/token"), new FormUrlEncodedContent(values), null, cancellationToken);
+                new Uri(_baseUri, "connect/token"), new FormUrlEncodedContent(values), null, cancellationToken);
         }
-
-        private Uri GetRequestUri(string path) => new(BaseUri, path);
     }
 }

@@ -29,7 +29,6 @@ namespace Microsoft.Extensions.DependencyInjection
             
             configureBuilder?.Invoke(httpClientBuilder);
 
-            services.AddSingleton<ISerializer>(new JsonSerializer());
             services.AddTransient<ITrueLayerClient, TrueLayerClient>();
             services.AddSingleton(options);
 

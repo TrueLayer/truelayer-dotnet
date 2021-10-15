@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Mime;
 using TrueLayer.Serialization;
+using System.Text.Json;
 
 namespace TrueLayer
 {
@@ -16,17 +17,15 @@ namespace TrueLayer
     internal class ApiClient : IApiClient
     {
         private readonly HttpClient _httpClient;
-        private readonly ISerializer _serializer;
 
         /// <summary>
         /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
         /// </summary>
         /// <param name="httpClient">The client used to make HTTP requests.</param>
         /// <param name="serializer">A serializer used to serialize and deserialize HTTP payloads.</param>
-        public ApiClient(HttpClient httpClient, ISerializer serializer)
+        public ApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
 
         /// <inheritdoc />
@@ -96,7 +95,7 @@ namespace TrueLayer
                 var problemDetails = await DeserializeJsonAsync<ProblemDetails>(httpResponse, traceId, cancellationToken);
                 return new ApiResponse<TData>(problemDetails, httpResponse.StatusCode, traceId);
             }
-            
+
             return new ApiResponse<TData>(httpResponse.StatusCode, traceId);
         }
 
@@ -109,7 +108,8 @@ namespace TrueLayer
                 throw new TrueLayerApiException(httpResponse.StatusCode, traceId, additionalInformation: "The response body cannot be null");
             }
 
-            return (TData)_serializer.Deserialize(json, typeof(TData));
+            return JsonSerializer.Deserialize<TData>(json, SerializerOptions.Default)
+                ?? throw new JsonException($"Failed to deserialize to type {typeof(TData).Name}");
         }
 
         private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, Uri uri, string? accessToken,
@@ -120,14 +120,14 @@ namespace TrueLayer
 
             if (request is { })
             {
-                string json = _serializer.Serialize(request);
+                string json = Serialize(request);
 
                 if (signingKey != null)
                 {
                     signature = RequestSigning.SignJson(json, signingKey);
                 }
 
-                httpContent = new StringContent(_serializer.Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
+                httpContent = new StringContent(Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
             }
 
             return SendRequestAsync(httpMethod, uri, accessToken, httpContent, signature, cancellationToken);
@@ -150,10 +150,13 @@ namespace TrueLayer
 
             if (!string.IsNullOrWhiteSpace(signature))
             {
-                httpRequest.Headers.Add("X-Tl-Signature", signature); 
+                httpRequest.Headers.Add("X-Tl-Signature", signature);
             }
 
             return _httpClient.SendAsync(httpRequest, cancellationToken);
         }
+
+        public static string Serialize(object value)
+            => JsonSerializer.Serialize(value, value.GetType(), SerializerOptions.Default);
     }
 }

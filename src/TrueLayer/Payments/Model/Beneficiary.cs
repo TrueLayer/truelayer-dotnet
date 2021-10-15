@@ -1,14 +1,20 @@
 namespace TrueLayer.Payments.Model
 {
-    public interface IBeneficiary
+    using System.Text.Json.Serialization;
+    using TrueLayer.Serialization;
+
+    public interface IBeneficiary : IDiscriminated
     {
         string Type { get; }
     }
 
     public static class Beneficiary
     {
-        public static MerchantAccountBeneficiary ToMerchantAccount(string id)
-            => new MerchantAccountBeneficiary(id);
+        public static MerchantAccountBeneficiary ToMerchantAccount(string id, string? name)
+            => new MerchantAccountBeneficiary(id)
+            {
+                Name = name
+            };
 
         public static ExternalAccountBeneficiary ToExternalAccount(string name, string reference, ISchemeIdentifier schemeIdentifier)
             => new ExternalAccountBeneficiary(name, reference, schemeIdentifier);
@@ -72,6 +78,7 @@ namespace TrueLayer.Payments.Model
         /// Gets the unique scheme identifier for the external account
         /// </summary>
         /// <value></value>
+        [JsonConverter(typeof(DiscriminatedJsonConverter))]
         public ISchemeIdentifier SchemeIdentifier { get; }
     }
 }

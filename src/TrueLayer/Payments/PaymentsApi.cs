@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TrueLayer.Auth;
 using TrueLayer.Payments.Model;
 
 namespace TrueLayer.Payments
@@ -14,22 +15,39 @@ namespace TrueLayer.Payments
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
         private readonly Uri _baseUri;
+        private readonly IAuthApi _auth;
 
-        public PaymentsApi(IApiClient apiClient, TrueLayerOptions options)
+        public PaymentsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
         {
             _apiClient = apiClient.NotNull(nameof(apiClient));
             _options = options.NotNull(nameof(options)); 
+            _auth = auth.NotNull(nameof(auth));
 
             options.Validate();
 
             _baseUri = options.Payments?.Uri ??
                        new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
-
         }
         
-        public Task<ApiResponse<CreatePaymentResponse>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<CreatePaymentResponse>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            paymentRequest.NotNull(nameof(paymentRequest));
+            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new ApiResponse<CreatePaymentResponse>(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync<CreatePaymentResponse>(
+                new Uri(_baseUri, "payments"),
+                paymentRequest,
+                authResponse.Data!.AccessToken,
+                _options.Payments!.SigningKey,
+                cancellationToken
+            );
         }
     }
 }

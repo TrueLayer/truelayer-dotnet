@@ -1,6 +1,6 @@
 namespace TrueLayer.Payments.Model
 {
-    public interface ISchemeIdentifier
+    public interface ISchemeIdentifier : IDiscriminated
     {
         string Type { get; }
     }

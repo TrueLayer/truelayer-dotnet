@@ -1,5 +1,8 @@
 namespace TrueLayer.Payments.Model
 {
+    using System.Text.Json.Serialization;
+    using TrueLayer.Serialization;
+
     /// <summary>
     /// Represents a request for payment
     /// </summary>
@@ -38,6 +41,7 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Gets the beneficiary details
         /// </summary>
+        [JsonConverter(typeof(DiscriminatedJsonConverter))]
         public IBeneficiary Beneficiary { get; }
     }
 }

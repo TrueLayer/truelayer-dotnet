@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Shouldly;
 using TrueLayer.Serialization;
 using Xunit;
@@ -5,16 +6,14 @@ using Xunit;
 namespace TrueLayer.Tests.Serialization
 {
     public class SerializationTests
-    {
-        private readonly JsonSerializer _serializer = new();
-        
+    {        
         [Fact]
         public void Can_handle_nullable_fields_with_record_constructors()
         {
             TestRecord obj = new ("Required", null);
-            string json = _serializer.Serialize(obj);    
+            string json = JsonSerializer.Serialize(obj, SerializerOptions.Default);    
 
-            TestRecord? deserialized = _serializer.Deserialize(json, typeof(TestRecord)) as TestRecord;
+            TestRecord? deserialized = JsonSerializer.Deserialize<TestRecord>(json, SerializerOptions.Default);
             deserialized.ShouldNotBeNull();
             deserialized.RequiredField.ShouldBe(obj.RequiredField);
             deserialized.OptionalField.ShouldBe(obj.OptionalField);

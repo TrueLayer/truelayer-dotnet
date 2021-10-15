@@ -9,30 +9,22 @@ using RichardSzalay.MockHttp;
 using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text;
+using System.Text.Json;
 
 namespace TrueLayer.Sdk.Tests
 {
     public class ApiClientTests : IDisposable
     {
-        private static System.Text.Json.JsonSerializerOptions SerializerOptions = new()
-        {
-            IgnoreNullValues = true,
-            PropertyNamingPolicy = JsonSnakeCaseNamingPolicy.Instance
-        };
-
         private readonly MockHttpMessageHandler _httpMessageHandler;
         private readonly ApiClient _apiClient;
-        private readonly ISerializer _jsonSerializer;
         private readonly TestResponse _stub;
 
         public ApiClientTests()
         {
             _httpMessageHandler = new MockHttpMessageHandler();
-            _jsonSerializer = new JsonSerializer();
 
             _apiClient = new ApiClient(
-                _httpMessageHandler.ToHttpClient(),
-                _jsonSerializer
+                _httpMessageHandler.ToHttpClient()
             );
 
             _stub = new TestResponse
@@ -49,7 +41,7 @@ namespace TrueLayer.Sdk.Tests
             _httpMessageHandler
                 .Expect(HttpMethod.Get, "http://localhost/get-json")
                 .WithHeaders("Authorization", "Bearer access-token")
-                .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, _jsonSerializer.Serialize(_stub));
+                .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, JsonSerializer.Serialize(_stub, SerializerOptions.Default));
 
             TestResponse? response = await _apiClient.GetAsync<TestResponse>(
                 new Uri("http://localhost/get-json"),
@@ -62,16 +54,16 @@ namespace TrueLayer.Sdk.Tests
         [Fact]
         public async Task Posts_http_content_and_returns_deserialized_json()
         {
-            string requestJson = _jsonSerializer.Serialize(new
+            string requestJson = JsonSerializer.Serialize(new
             {
                 data = "http-content"
-            });
+            }, SerializerOptions.Default);
 
             _httpMessageHandler
                 .Expect(HttpMethod.Post, "http://localhost/post-http-content")
                 .WithHeaders("Authorization", "Bearer access-token")
                 .WithContent(requestJson)
-                .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, _jsonSerializer.Serialize(_stub));
+                .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, JsonSerializer.Serialize(_stub, SerializerOptions.Default));
 
             TestResponse? response = await _apiClient.PostAsync<TestResponse>(
                 new Uri("http://localhost/post-http-content"),
@@ -90,13 +82,13 @@ namespace TrueLayer.Sdk.Tests
                 data = "object"
             };
 
-            var json = _jsonSerializer.Serialize(obj);
+            var json = JsonSerializer.Serialize(obj, SerializerOptions.Default);
 
             _httpMessageHandler
                 .Expect(HttpMethod.Post, "http://localhost/post-object")
                 .WithHeaders("Authorization", "Bearer access-token")
                 .WithContent(json)
-                .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, _jsonSerializer.Serialize(_stub));
+                .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, JsonSerializer.Serialize(_stub, SerializerOptions.Default));
 
             TestResponse? response = await _apiClient.PostAsync<TestResponse>(
                 new Uri("http://localhost/post-object"),
