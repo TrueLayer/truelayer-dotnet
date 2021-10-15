@@ -5,8 +5,13 @@ using System.Threading.Tasks;
 
 namespace TrueLayer.Payments.Model
 {
-    public class CreatePaymentResponse
+    public record CreatePaymentResponse
     {
-        
+
+        public record AuthorizationRequired(string Id, long AmountInMinor, string Currency, DateTime CreatedAt, string Status, string ResourceToken)
+            : CreatePaymentResponse
+        {
+
+        }
     }
 }
