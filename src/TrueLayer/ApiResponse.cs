@@ -4,8 +4,15 @@ namespace TrueLayer
 {
     public class ApiResponse<TData>
     {
-        public ApiResponse(HttpStatusCode statusCode, string? traceId)
+        internal ApiResponse(HttpStatusCode statusCode, string? traceId)
         {
+            StatusCode = statusCode;
+            TraceId = traceId;
+        }
+
+        internal ApiResponse(TData data, HttpStatusCode statusCode, string? traceId)
+        {
+            Data = data.NotNull(nameof(data));
             StatusCode = statusCode;
             TraceId = traceId;
         }

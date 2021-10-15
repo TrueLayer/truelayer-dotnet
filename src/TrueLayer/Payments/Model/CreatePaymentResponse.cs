@@ -7,9 +7,7 @@ namespace TrueLayer.Payments.Model
 {
     public record CreatePaymentResponse
     {
-
-        public record AuthorizationRequired(string Id, long AmountInMinor, string Currency, DateTime CreatedAt, string Status, string ResourceToken)
-            : CreatePaymentResponse
+        public record AuthorizationRequired(string Id, long AmountInMinor, string Currency, DateTime CreatedAt, string Status, string ResourceToken) : CreatePaymentResponse
         {
 
         }
