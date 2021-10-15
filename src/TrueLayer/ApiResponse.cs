@@ -34,6 +34,6 @@ namespace TrueLayer
 
         public static implicit operator TData?(ApiResponse<TData> response) => response.Data;
 
-        public bool Success => (int)StatusCode is (>= 200 and <= 299);
+        public bool IsSuccessful => (int)StatusCode is (>= 200 and <= 299);
     }
 }

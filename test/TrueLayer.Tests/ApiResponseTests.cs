@@ -16,7 +16,7 @@ namespace TrueLayer.Tests
         public void Is_successful_when_status_code_indicates_success(HttpStatusCode statusCode, bool expected)
         {
             var response = new ApiResponse<Stub>(statusCode, "trace-id");
-            response.Success.ShouldBe(expected);
+            response.IsSuccessful.ShouldBe(expected);
         }
 
         class Stub

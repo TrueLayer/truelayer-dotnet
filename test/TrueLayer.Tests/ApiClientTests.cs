@@ -123,7 +123,7 @@ namespace TrueLayer.Sdk.Tests
                 });
 
             ApiResponse<TestResponse> response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/error"));
-            response.Success.ShouldBeFalse();
+            response.IsSuccessful.ShouldBeFalse();
             response.StatusCode.ShouldBe(statusCode);
             response.TraceId.ShouldBe("trace-id");
             response.Data.ShouldBeNull();
@@ -159,7 +159,7 @@ namespace TrueLayer.Sdk.Tests
                 });
 
             ApiResponse<TestResponse> response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/bad-request-error-details"));
-            response.Success.ShouldBeFalse();
+            response.IsSuccessful.ShouldBeFalse();
             response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
             response.TraceId.ShouldBe("trace-id");
             response.Data.ShouldBeNull();
