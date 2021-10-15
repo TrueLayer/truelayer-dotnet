@@ -8,6 +8,7 @@ using Shouldly;
 using RichardSzalay.MockHttp;
 using System.Net.Mime;
 using TrueLayer.Serialization;
+using System.Text;
 
 namespace TrueLayer.Sdk.Tests
 {
@@ -129,65 +130,46 @@ namespace TrueLayer.Sdk.Tests
         }
 
 
-        // [Theory]
-        // [InlineData(HttpStatusCode.BadRequest)]
-        // [InlineData(HttpStatusCode.UnprocessableEntity)]
-        // public async Task Given_bad_request_with_body_throws_validation_exception_with_error_details(HttpStatusCode httpStatusCode)
-        // {
-        //     var error = new ErrorResponse
-        //     {
-        //         Error = "error",
-        //         ErrorDescription = "An error occurred",
-        //         ErrorDetails = new ErrorDetails
-        //         {
-        //             Parameters = new()
-        //             {
-        //                 { "param", new[] { "invalid_param" } }
-        //             }
-        //         }
-        //     };
+        [Fact]
+        public async Task Given_request_fails_returns_problem_details()
+        {
+            string json = @"
+                {
+                    ""type"": ""https://docs.truelayer.com/errors#invalid_parameters"",
+                    ""title"": ""Validation Error"",
+                    ""detail"": ""Invalid Parameters"",
+                    ""status"": 400,
+                    ""trace_id"": ""trace-id"",
+                    ""errors"": {
+                        ""summary"": [
+                            ""summary_required""
+                        ]
+                    }
+                }
+            ";
 
-        //     _httpMessageHandler
-        //         .Expect(HttpMethod.Get, "http://localhost/bad-request-error-details")
-        //         .Respond(() =>
-        //         {
-        //             var response = new HttpResponseMessage(httpStatusCode);
-        //             response.Content = new StringContent(_jsonSerializer.Serialize(error));
-        //             response.Headers.TryAddWithoutValidation(CustomHeaders.RequestId, "request-id");
-        //             return Task.FromResult(response);
-        //         });
+            _httpMessageHandler
+                .Expect(HttpMethod.Get, "http://localhost/bad-request-error-details")
+                .Respond(() =>
+                {
+                    var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+                    response.Content = new StringContent(json, Encoding.UTF8, "application/problem+json");
+                    response.Headers.TryAddWithoutValidation(CustomHeaders.TraceId, "trace-id");
+                    return Task.FromResult(response);
+                });
 
-        //     var exception = await Assert.ThrowsAsync<TrueLayerValidationException>(
-        //         () => _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/bad-request-error-details"))
-        //     );
-
-        //     exception.RequestId.ShouldBe("request-id");
-        //     AssertSame(exception.Error, error);
-        // }
-
-        // [Theory]
-        // [InlineData(HttpStatusCode.PreconditionFailed)]
-        // [InlineData(HttpStatusCode.UnsupportedMediaType)]
-        // [InlineData(HttpStatusCode.InternalServerError)]
-        // [InlineData(HttpStatusCode.BadGateway)]
-        // public async Task Given_other_non_successful_status_throws_api_exception(HttpStatusCode httpStatusCode)
-        // {
-        //     _httpMessageHandler
-        //         .Expect(HttpMethod.Get, "http://localhost/non-successful")
-        //         .Respond(() =>
-        //         {
-        //             var response = new HttpResponseMessage(httpStatusCode);
-        //             response.Headers.TryAddWithoutValidation(CustomHeaders.RequestId, "request-id");
-        //             return Task.FromResult(response);
-        //         });
-
-        //     var exception = await Assert.ThrowsAsync<TrueLayerApiException>(
-        //         () => _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/non-successful"))
-        //     );
-
-        //     exception.RequestId.ShouldBe("request-id");
-
-        // }
+            ApiResponse<TestResponse> response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/bad-request-error-details"));
+            response.Success.ShouldBeFalse();
+            response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+            response.TraceId.ShouldBe("trace-id");
+            response.Data.ShouldBeNull();
+            response.Problem.ShouldNotBeNull();
+            response.Problem.Type.ShouldBe("https://docs.truelayer.com/errors#invalid_parameters");
+            response.Problem.Title.ShouldBe("Validation Error");
+            response.Problem.Detail.ShouldBe("Invalid Parameters");
+            response.Problem.Errors.ShouldNotBeNull();
+            response.Problem.Errors["summary"].ShouldContain("summary_required");
+        }
 
         private static void AssertSame(TestResponse? response, TestResponse expected)
         {
@@ -196,28 +178,6 @@ namespace TrueLayer.Sdk.Tests
             response.LastName.ShouldBe(expected.LastName);
             response.Age.ShouldBe(expected.Age);
         }
-
-        // private static void AssertSame(ErrorResponse error, ErrorResponse expected)
-        // {
-        //     error.Error.ShouldBe(expected.Error);
-        //     error.ErrorDescription.ShouldBe(expected.ErrorDescription);
-
-        //     if (expected.ErrorDetails is not null)
-        //     {
-        //         error.ErrorDetails.ShouldNotBeNull();
-
-        //         if (expected.ErrorDetails.Parameters is not null)
-        //         {
-        //             error.ErrorDetails.ShouldNotBeNull();
-
-        //             foreach (var param in expected.ErrorDetails.Parameters)
-        //             {
-        //                 error.ErrorDetails.Parameters[param.Key].ShouldBe(param.Value);
-        //             }
-        //         }
-        //     }
-
-        // }
 
         public void Dispose()
         {

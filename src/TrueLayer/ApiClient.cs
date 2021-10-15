@@ -91,9 +91,12 @@ namespace TrueLayer
                 return new ApiResponse<TData>(data, httpResponse.StatusCode, traceId);
             }
 
-            // Failed    
+            if (httpResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
+            {
+                var problemDetails = await DeserializeJsonAsync<ProblemDetails>(httpResponse, traceId, cancellationToken);
+                return new ApiResponse<TData>(problemDetails, httpResponse.StatusCode, traceId);
+            }
             
-            // TODO handle application/problem+json
             return new ApiResponse<TData>(httpResponse.StatusCode, traceId);
         }
 

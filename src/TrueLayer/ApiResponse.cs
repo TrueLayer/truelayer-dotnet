@@ -10,6 +10,13 @@ namespace TrueLayer
             TraceId = traceId;
         }
 
+        internal ApiResponse(ProblemDetails problemDetails, HttpStatusCode statusCode, string? traceId)
+        {
+            StatusCode = statusCode;
+            TraceId = traceId;
+            Problem = problemDetails.NotNull(nameof(problemDetails));
+        }
+
         internal ApiResponse(TData data, HttpStatusCode statusCode, string? traceId)
         {
             Data = data.NotNull(nameof(data));
@@ -22,6 +29,8 @@ namespace TrueLayer
 
         // TODO NotNullWhen 
         public TData? Data { get; }
+
+        public ProblemDetails? Problem { get; }
 
         public static implicit operator TData?(ApiResponse<TData> response) => response.Data;
 
