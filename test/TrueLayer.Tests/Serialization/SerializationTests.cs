@@ -52,6 +52,21 @@ namespace TrueLayer.Tests.Serialization
                 .Doors.ShouldBe(3);
         }
 
+        [Fact]
+        public void Can_deserialize_resource_collection()
+        {
+            string json = @"{ 
+               ""items"": [{
+                   ""__Type"": ""car"",
+                   ""Doors"": 3
+               }]
+            }";
+
+            var cars = JsonSerializer.Deserialize<ResourceCollection<Car>>(json, SerializerOptions.Default);
+            cars.ShouldNotBeNull();
+            cars.Items.ShouldNotBeEmpty();
+        }
+
         class Sut
         {
             public Vehicle? Vehicle { get; set; }
