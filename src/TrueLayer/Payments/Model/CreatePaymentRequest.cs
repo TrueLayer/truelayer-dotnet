@@ -41,7 +41,7 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Gets the beneficiary details
         /// </summary>
-        [JsonConverter(typeof(DiscriminatedJsonConverter))]
+        [JsonConverter(typeof(PolymorphicWriterConverter))]
         public IBeneficiary Beneficiary { get; }
     }
 }

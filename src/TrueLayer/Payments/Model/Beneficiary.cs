@@ -78,7 +78,7 @@ namespace TrueLayer.Payments.Model
         /// Gets the unique scheme identifier for the external account
         /// </summary>
         /// <value></value>
-        [JsonConverter(typeof(DiscriminatedJsonConverter))]
+        [JsonConverter(typeof(PolymorphicWriterConverter))]
         public ISchemeIdentifier SchemeIdentifier { get; }
     }
 }

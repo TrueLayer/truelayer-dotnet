@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Shouldly;
@@ -41,6 +39,13 @@ namespace TrueLayer.AcceptanceTests
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
             response.Data.ShouldNotBeNull();
             response.Data.Status.ShouldBe("authorization_required");
+            var authRequired = response.Data.ShouldBeOfType<CreatePaymentResponse.AuthorizationRequired>();
+
+            authRequired.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
+            authRequired.Currency.ShouldBe(paymentRequest.Currency);
+            authRequired.Id.ShouldNotBeNullOrWhiteSpace();
+            authRequired.ResourceToken.ShouldNotBeNullOrWhiteSpace();
+            authRequired.CreatedAt.ShouldNotBe(default);
         }
     }
 }

@@ -127,7 +127,7 @@ namespace TrueLayer
                     signature = RequestSigning.SignJson(json, signingKey);
                 }
 
-                httpContent = new StringContent(Serialize(request), Encoding.UTF8, MediaTypeNames.Application.Json);
+                httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
             }
 
             return SendRequestAsync(httpMethod, uri, accessToken, httpContent, signature, cancellationToken);

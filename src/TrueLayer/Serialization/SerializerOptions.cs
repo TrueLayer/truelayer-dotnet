@@ -7,7 +7,8 @@ namespace TrueLayer.Serialization
         public static readonly JsonSerializerOptions Default = new JsonSerializerOptions
         {
             IgnoreNullValues = true,
-            PropertyNamingPolicy = JsonSnakeCaseNamingPolicy.Instance
+            PropertyNamingPolicy = JsonSnakeCaseNamingPolicy.Instance,
+            Converters = { new DiscriminatedUnionConverterFactory() }
         };
     }
 }

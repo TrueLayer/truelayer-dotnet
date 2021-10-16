@@ -21,20 +21,20 @@ namespace TrueLayer.Tests.Serialization
         {
             IVehicle car = new Car { Doors = 3 };
             string json = JsonSerializer.Serialize(car, new JsonSerializerOptions {
-                Converters = { new DiscriminatedJsonConverter() }
+                Converters = { new PolymorphicWriterConverter() }
             });
 
-            json.ShouldNotContain(nameof(Car.Doors));
+            json.ShouldContain(nameof(Car.Doors));
         }
 
-        public interface IVehicle
+        public interface IVehicle : IDiscriminated
         {
             string Type { get; }
         }
 
         public class Car : IVehicle
         {
-            public string Type => "cat";
+            public string Type => "car";
             public int Doors { get; set; }
         }
     }
