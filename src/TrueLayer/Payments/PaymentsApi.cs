@@ -44,6 +44,7 @@ namespace TrueLayer.Payments
             return await _apiClient.PostAsync<CreatePaymentResponse>(
                 new Uri(_baseUri, "payments"),
                 paymentRequest,
+                idempotencyKey,
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken

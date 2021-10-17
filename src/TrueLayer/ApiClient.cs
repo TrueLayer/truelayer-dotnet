@@ -36,6 +36,7 @@ namespace TrueLayer
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Get,
                 uri: uri,
+                idempotencyKey: null,
                 accessToken: accessToken,
                 httpContent: null,
                 signature: null,
@@ -53,6 +54,7 @@ namespace TrueLayer
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Post,
                 uri: uri,
+                idempotencyKey: null,
                 accessToken: accessToken,
                 httpContent: httpContent,
                 signature: null,
@@ -63,13 +65,14 @@ namespace TrueLayer
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<TData>> PostAsync<TData>(Uri uri, object? request = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<TData>> PostAsync<TData>(Uri uri, object? request = null, string? idempotencyKey = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
             using var httpResponse = await SendJsonRequestAsync(
                 httpMethod: HttpMethod.Post,
                 uri: uri,
+                idempotencyKey: idempotencyKey,
                 accessToken: accessToken,
                 request: request,
                 signingKey: signingKey,
@@ -112,8 +115,14 @@ namespace TrueLayer
                 ?? throw new JsonException($"Failed to deserialize to type {typeof(TData).Name}");
         }
 
-        private Task<HttpResponseMessage> SendJsonRequestAsync(HttpMethod httpMethod, Uri uri, string? accessToken,
-            object? request, SigningKey? signingKey, CancellationToken cancellationToken)
+        private Task<HttpResponseMessage> SendJsonRequestAsync(
+            HttpMethod httpMethod,
+            Uri uri,
+            string? idempotencyKey,
+            string? accessToken,
+            object? request,
+            SigningKey? signingKey,
+            CancellationToken cancellationToken)
         {
             HttpContent? httpContent = null;
             string? signature = null;
@@ -124,17 +133,29 @@ namespace TrueLayer
 
                 if (signingKey != null)
                 {
-                    signature = RequestSigning.SignJson(json, signingKey);
+                    signature = RequestSignature.Create(
+                        signingKey,
+                        httpMethod,
+                        uri,
+                        json,
+                        idempotencyKey
+                    );
                 }
 
                 httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
             }
 
-            return SendRequestAsync(httpMethod, uri, accessToken, httpContent, signature, cancellationToken);
+            return SendRequestAsync(httpMethod, uri, idempotencyKey, accessToken, httpContent, signature, cancellationToken);
         }
 
-        private Task<HttpResponseMessage> SendRequestAsync(HttpMethod httpMethod, Uri uri, string? accessToken,
-            HttpContent? httpContent, string? signature, CancellationToken cancellationToken)
+        private Task<HttpResponseMessage> SendRequestAsync(
+            HttpMethod httpMethod,
+            Uri uri,
+            string? idempotencyKey,
+            string? accessToken,
+            HttpContent? httpContent,
+            string? signature,
+            CancellationToken cancellationToken)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -150,7 +171,12 @@ namespace TrueLayer
 
             if (!string.IsNullOrWhiteSpace(signature))
             {
-                httpRequest.Headers.Add("X-Tl-Signature", signature);
+                httpRequest.Headers.Add(CustomHeaders.Signature, signature);
+            }
+
+            if (!string.IsNullOrWhiteSpace(idempotencyKey))
+            {
+                httpRequest.Headers.Add(CustomHeaders.IdempotencyKey, idempotencyKey);
             }
 
             return _httpClient.SendAsync(httpRequest, cancellationToken);
