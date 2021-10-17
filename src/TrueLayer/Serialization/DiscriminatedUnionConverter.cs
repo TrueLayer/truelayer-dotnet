@@ -31,7 +31,8 @@ namespace TrueLayer.Serialization
 
             if (_descriptor.TypeMap.TryGetValue(discriminator.GetString()!, out var concreteType))
             {
-                return (T?)JsonSerializer.Deserialize(ref readerClone, concreteType, options);
+                dynamic? obj = JsonSerializer.Deserialize(ref readerClone, concreteType, options);
+                return (T?)obj;
             }
 
             throw new JsonException($"Unknown discriminator {discriminator}");

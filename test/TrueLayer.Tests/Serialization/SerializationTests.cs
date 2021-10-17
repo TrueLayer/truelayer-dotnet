@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OneOf;
 using Shouldly;
 using TrueLayer.Serialization;
 using Xunit;
@@ -32,13 +33,6 @@ namespace TrueLayer.Tests.Serialization
                } 
             }";
 
-            // var options = new JsonSerializerOptions
-            // {
-            //     Converters = { new UnionTypeConverter<Vehicle>(new Dictionary<string, Type> {
-            //         { "car", typeof(Car)}
-            //     }) }
-            // };
-
             var options = new JsonSerializerOptions
             {
                 Converters = { new DiscriminatedUnionConverterFactory() }
@@ -67,23 +61,63 @@ namespace TrueLayer.Tests.Serialization
             cars.Items.ShouldNotBeEmpty();
         }
 
+        [Fact]
+        public void Can_deserialize_oneof()
+        {
+            // TODO test nested discriminators
+            
+            string json = @"{ 
+                ""__Type"": ""bike"",
+                ""Gears"": 10
+            }";
+
+            object? obj = new Bike();
+            Vehicle vehicle = (Vehicle)(obj);
+            _ = vehicle.Match(car => 1, bike => 2);
+
+            var options = new JsonSerializerOptions
+            {
+                Converters = { new DiscriminatedUnionConverterFactory() }
+            };
+
+            var sut = JsonSerializer.Deserialize<Vehicle>(json, options);
+            sut.ShouldNotBeNull();
+            sut.IsT1.ShouldBeTrue();
+            // sut.Vehicle.ShouldNotBeNull();
+            // sut.Vehicle.Type.ShouldBe("car");
+            // sut.Vehicle.ShouldBeOfType<Car>()
+            //     .Doors.ShouldBe(3);
+        }        
+
         class Sut
         {
             public Vehicle? Vehicle { get; set; }
         }
 
         [JsonKnownType(typeof(Car), "car")]
+        [JsonKnownType(typeof(Bike), "bike")]
         [JsonDiscriminator("__Type")]
-        public abstract class Vehicle
+        class Vehicle : OneOfBase<Car, Bike>
         {
+            protected Vehicle(OneOf<Car, Bike> _) : base(_)
+            {
+            }
+
             [JsonPropertyName("__Type")]
             public string Type { get; set; } = null!;
-            public bool IsCar() => this is Car;
+
+            public static implicit operator Vehicle(Car car) => new Vehicle(car);
+            public static explicit operator Vehicle(Bike bike) => new Vehicle(bike);
         }
 
-        class Car : Vehicle
+        class Car
         {
             public int Doors { get; set; }
+        }
+
+        class Bike
+        {
+            public int Gears { get; set; }
         }
 
         record TestRecord(string RequiredField, string? OptionalField);
