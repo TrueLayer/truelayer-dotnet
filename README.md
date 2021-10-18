@@ -38,7 +38,6 @@ public void ConfigureServices(IServiceCollection services)
     services.AddTrueLayer(Configuration);
 
     // Or if using APIs that require request signing e.g. payments
-
     services.AddTrueLayer(configuration, options =>
     {
         if (options.Payments?.SigningKey != null)
@@ -62,7 +61,7 @@ class MyService
         _client = client;
     }
 
-    public async Task MakePayment()
+    public async Task<ActionResult> MakePayment()
     {
         var paymentRequest = new CreatePaymentRequest(
             100,
@@ -78,16 +77,19 @@ class MyService
             )
         );
 
-        var response = await _fixture.Client.Payments.CreatePayment(
+        var response = await _client.Payments.CreatePayment(
             paymentRequest, 
             idempotencyKey: Guid.NewGuid().ToString()
         );
 
-        var resourceToken = response.Data.Match(
-            authRequired => (authRequired.Id, authRequired.ResourceToken)
+        string hostedPaymentPageUrl = await response.Data.Match(
+            authRequired => await _client.CreateHostedPaymentPageLink(
+                authRequired.Id, authRequired.ResourceToken, new Uri("https://redirect.yourdomain.com")
+            )
         );
 
-        // Pass the resource token and id to the Web or Mobile SDK / Hosted Payment Page
+        // Redirect to the TrueLayer Hosted Payment Page
+        return Redirect(hostedPaymentPageUrl);
     }
 }
 ```

@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Payments.Model;
@@ -8,6 +9,8 @@ namespace TrueLayer.Payments
     public interface IPaymentsApi
     {
         Task<ApiResponse<Union<AuthorizationRequired>>> CreatePayment(
-            CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default);        
+            CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default);
+
+        ValueTask<string> CreateHostedPaymentPageLink(string paymentId, string resourceToken, Uri returnUri);
     }
 }
