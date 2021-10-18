@@ -1,7 +1,7 @@
 // Install .NET Core Global tools.
-#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=4.8.5"
+#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=4.8.12"
 #tool "dotnet:?package=coveralls.net&version=3.0.0"
-#tool "dotnet:?package=dotnet-sonarscanner&version=5.0.4"
+#tool "dotnet:?package=dotnet-sonarscanner&version=5.3.1"
 #tool nuget:?package=docfx.console&version=2.56.6
 #tool nuget:?package=KuduSync.NET&version=1.5.3
 
@@ -24,7 +24,7 @@ var configuration = Argument("configuration", "Release");
 var artifactsPath = "./artifacts";
 var coveragePath = "./artifacts/coverage"; 
 var packFiles = "./src/**/*.csproj";
-var testFiles = "./test/**/*.csproj";
+var testFiles = "./test/**/*Tests.csproj";
 var packages = "./artifacts/*.nupkg";
 DirectoryPath sitePath = "./artifacts/docs";
 var docFxConfig = "./docs/docfx.json";
@@ -89,7 +89,7 @@ Task("SonarBegin")
 Task("Build")
     .Does(() => 
     {
-        DotNetCoreBuild("Sdk.sln", new DotNetCoreBuildSettings 
+        DotNetCoreBuild("TrueLayer.sln", new DotNetCoreBuildSettings 
         {
             Configuration = configuration
         });
