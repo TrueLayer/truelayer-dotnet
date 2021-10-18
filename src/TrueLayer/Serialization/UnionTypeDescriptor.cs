@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+using System.Reflection;
+using TrueLayer.Serialization;
 
 namespace TrueLayer
 {
-    public class UnionDescriptor
+    internal sealed class UnionTypeDescriptor
     {
-        private UnionDescriptor(Type unionType, Dictionary<string, (Type, Delegate)> typeFactories)
+        private UnionTypeDescriptor(Type unionType, Dictionary<string, (Type, Delegate)> typeFactories)
         {
             UnionType = unionType.NotNull(nameof(unionType));
             TypeFactories = typeFactories.NotNull(nameof(typeFactories));
@@ -22,7 +23,7 @@ namespace TrueLayer
         /// </summary>
         public Dictionary<string, (Type FieldType, Delegate Factory)> TypeFactories { get; }
 
-        public static bool TryCreate(Type unionType, [NotNullWhen(true)]out UnionDescriptor? factory)
+        public static bool TryCreate(Type unionType, [NotNullWhen(true)]out UnionTypeDescriptor? factory)
         {
             factory = default;
             
@@ -42,10 +43,13 @@ namespace TrueLayer
             foreach (Type fieldType in unionFields)
             {
                 Delegate valueFactory = CreateUnionValueFactory(factoryType, unionType, fieldType);
-                factories.Add(fieldType.Name, (fieldType, valueFactory)); // TODO support overriding the type using attribute
+            
+                // The discriminator name/id can be overridden with JsonDiscriminatorAttribute otherwise fallback to type name
+                var discriminatorAttribute = fieldType.GetCustomAttributes<JsonDiscriminatorAttribute>().FirstOrDefault();
+                factories.Add(discriminatorAttribute?.Discriminator ?? fieldType.Name, (fieldType, valueFactory));
             }
 
-            factory = new UnionDescriptor(unionType, factories);
+            factory = new UnionTypeDescriptor(unionType, factories);
             return true;
         }
 

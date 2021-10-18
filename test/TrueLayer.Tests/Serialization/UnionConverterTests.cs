@@ -49,6 +49,23 @@ namespace TrueLayer.Tests.Serialization
             wrapper.Union.AsT0.FooProp.ShouldBe("test");
         }
 
+        [Fact]
+        public void Can_override_discriminator()
+        {
+            string json = @"{
+                    ""type"": ""_other_""
+                }
+            ";
+
+            var options = new JsonSerializerOptions
+            {
+                Converters = { new UnionConverterFactory() }
+            };
+
+            var union = JsonSerializer.Deserialize<Union<Foo, Other>>(json, options);
+            union.Value.ShouldBeOfType<Other>();
+        }
+
         public class Foo
         {
             public string? FooProp { get; set; }
@@ -57,6 +74,12 @@ namespace TrueLayer.Tests.Serialization
         public class Bar
         {
             public int BarProp { get; set; }
+        }
+
+        [JsonDiscriminator("_other_")]
+        public class Other
+        {
+
         }
 
         public class Wrapper

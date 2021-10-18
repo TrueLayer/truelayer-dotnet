@@ -9,14 +9,14 @@ namespace TrueLayer.Tests
         [Fact]
         public void Returns_false_for_non_union_type()
         {
-            UnionDescriptor.TryCreate(typeof(string), out var descriptor).ShouldBeFalse();
+            UnionTypeDescriptor.TryCreate(typeof(string), out var descriptor).ShouldBeFalse();
         }
         
         [Fact]
         public void Creates_factory_for_valid_union_type()
         {
             var unionType = typeof(Union<string, int>);
-            UnionDescriptor.TryCreate(unionType, out var factory).ShouldBeTrue();
+            UnionTypeDescriptor.TryCreate(unionType, out var factory).ShouldBeTrue();
 
             factory.UnionType.ShouldBe(unionType);
             

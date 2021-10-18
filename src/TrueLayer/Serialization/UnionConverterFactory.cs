@@ -13,7 +13,7 @@ namespace TrueLayer.Serialization
 
         public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
-            if (UnionDescriptor.TryCreate(typeToConvert, out UnionDescriptor? descriptor))
+            if (UnionTypeDescriptor.TryCreate(typeToConvert, out UnionTypeDescriptor? descriptor))
             {
                 var converterType = typeof(UnionConverter<>).MakeGenericType(typeToConvert);
                 // TODO use expression to create the converter

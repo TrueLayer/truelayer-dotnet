@@ -4,22 +4,22 @@ using System.Text.Json.Serialization;
 
 namespace TrueLayer.Serialization
 {
-    internal class DiscriminatedUnionConverterFactory : JsonConverterFactory
+    internal class PolymorphicJsonConverterFactory : JsonConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {
             // TODO cache result to avoid reflecting on every type
-            return DiscriminatedUnionDescriptor.IsValidType(typeToConvert, out _);
+            return PolymorphicTypeDescriptor.IsValidType(typeToConvert, out _);
         }
 
         public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
-            if (!DiscriminatedUnionDescriptor.TryCreate(typeToConvert, out var descriptor))
+            if (!PolymorphicTypeDescriptor.TryCreate(typeToConvert, out var descriptor))
             {
                 throw new ArgumentException(); // shouldn't happen
             }
 
-            var converterType = typeof(DiscriminatedUnionConverter<>).MakeGenericType(typeToConvert);
+            var converterType = typeof(PolymorphicJsonConverter<>).MakeGenericType(typeToConvert);
             return Activator.CreateInstance(converterType, descriptor) as JsonConverter;
         }
     }

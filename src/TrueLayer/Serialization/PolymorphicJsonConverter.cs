@@ -4,11 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace TrueLayer.Serialization
 {
-    internal class DiscriminatedUnionConverter<T> : JsonConverter<T> where T : class
+    internal class PolymorphicJsonConverter<T> : JsonConverter<T> where T : class
     {
-        private readonly DiscriminatedUnionDescriptor _descriptor;
+        private readonly PolymorphicTypeDescriptor _descriptor;
 
-        public DiscriminatedUnionConverter(DiscriminatedUnionDescriptor descriptor)
+        public PolymorphicJsonConverter(PolymorphicTypeDescriptor descriptor)
         {
             _descriptor = descriptor.NotNull(nameof(descriptor));
         }

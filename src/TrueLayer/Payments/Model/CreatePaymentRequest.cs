@@ -1,7 +1,7 @@
 namespace TrueLayer.Payments.Model
 {
-    using System.Text.Json.Serialization;
-    using TrueLayer.Serialization;
+    using PaymentMethodUnion = Union<BankTransferPaymentMethod>;
+    using BeneficiaryUnion = Union<MerchantAccountBeneficiary, ExternalAccountBeneficiary>;
 
     /// <summary>
     /// Represents a request for payment
@@ -15,12 +15,16 @@ namespace TrueLayer.Payments.Model
         /// <param name="currency">The three-letter ISO currency code</param>
         /// <param name="paymentMethod">The method of payment</param>
         /// <param name="beneficiary">The payment beneficiary details</param>
-        public CreatePaymentRequest(long amountInMinor, string currency, IPaymentMethod paymentMethod, IBeneficiary beneficiary)
+        public CreatePaymentRequest(
+            long amountInMinor,
+            string currency,
+            PaymentMethodUnion paymentMethod,
+            BeneficiaryUnion beneficiary)
         {
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
             Currency = currency.NotNullOrWhiteSpace(nameof(currency));
             PaymentMethod = paymentMethod.NotNull(nameof(paymentMethod));
-            Beneficiary = beneficiary.NotNull(nameof(beneficiary));
+            Beneficiary = beneficiary;
         }
 
         /// <summary>
@@ -36,12 +40,11 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Gets the method of payment 
         /// </summary>
-        public IPaymentMethod PaymentMethod { get; }
+        public PaymentMethodUnion PaymentMethod { get; }
 
         /// <summary>
         /// Gets the beneficiary details
         /// </summary>
-        [JsonConverter(typeof(PolymorphicWriterConverter))]
-        public IBeneficiary Beneficiary { get; }
+        public BeneficiaryUnion Beneficiary { get; }
     }
 }

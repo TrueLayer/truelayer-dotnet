@@ -6,10 +6,10 @@ namespace TrueLayer.Serialization
 {
     internal class UnionConverter<T> : JsonConverter<T> where T : IUnion
     {
-        private readonly UnionDescriptor _factory;
+        private readonly UnionTypeDescriptor _factory;
         private readonly string _discriminatorFieldName;
 
-        public UnionConverter(UnionDescriptor factory, string discriminatorFieldName)
+        public UnionConverter(UnionTypeDescriptor factory, string discriminatorFieldName)
         {
             _factory = factory.NotNull(nameof(factory));
             _discriminatorFieldName = discriminatorFieldName.NotNullOrWhiteSpace(nameof(discriminatorFieldName));
@@ -26,7 +26,8 @@ namespace TrueLayer.Serialization
 
             var doc = JsonDocument.ParseValue(ref reader);
 
-            if (!doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator))
+            if (!doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator) 
+                && !doc.RootElement.TryGetProperty("status", out discriminator)) // Hack until payment response uses a `type` field
             {
                 throw new JsonException();
             }
@@ -53,7 +54,7 @@ namespace TrueLayer.Serialization
 
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
-            JsonSerializer.Serialize(writer, value.Value, value.GetType(), options);
+            JsonSerializer.Serialize(writer, value.Value, value.Value.GetType(), options);
         }
     }
 }

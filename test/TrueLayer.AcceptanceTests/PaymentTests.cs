@@ -15,7 +15,7 @@ namespace TrueLayer.AcceptanceTests
         {
             _fixture = fixture;
         }
-        
+
         [Fact]
         public async Task Can_create_payment()
         {
@@ -26,26 +26,31 @@ namespace TrueLayer.AcceptanceTests
                 {
                     ProviderIds = new[] { "mock-payments-gb-redirect" }
                 }),
-                Beneficiary.ToExternalAccount(
+                new ExternalAccountBeneficiary(
                     "TrueLayer",
                     "truelayer-dotnet",
-                    SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
+                    new SortCodeAccountNumberSchemeIdentifier("567890", "12345678")
                 )
             );
 
-            ApiResponse<CreatePaymentResponse> response = await _fixture.Client.Payments.CreatePayment(
+            var response = await _fixture.Client.Payments.CreatePayment(
                 paymentRequest, Guid.NewGuid().ToString());
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
-            response.Data.ShouldNotBeNull();
-            response.Data.Status.ShouldBe("authorization_required");
-            var authRequired = response.Data.ShouldBeOfType<CreatePaymentResponse.AuthorizationRequired>();
+            response.Data.Value.ShouldBeOfType<CreatePaymentResponse.AuthorizationRequired>();
 
-            authRequired.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
-            authRequired.Currency.ShouldBe(paymentRequest.Currency);
-            authRequired.Id.ShouldNotBeNullOrWhiteSpace();
-            authRequired.ResourceToken.ShouldNotBeNullOrWhiteSpace();
-            authRequired.CreatedAt.ShouldNotBe(default);
+            response.Data.Switch(
+                authRequired =>
+                {
+                    authRequired.Status.ShouldBe("authorization_required");
+
+                    authRequired.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
+                    authRequired.Currency.ShouldBe(paymentRequest.Currency);
+                    authRequired.Id.ShouldNotBeNullOrWhiteSpace();
+                    authRequired.ResourceToken.ShouldNotBeNullOrWhiteSpace();
+                    authRequired.CreatedAt.ShouldNotBe(default);
+                }
+            );
         }
     }
 }

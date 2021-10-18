@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace TrueLayer
 {
@@ -8,6 +7,54 @@ namespace TrueLayer
         object Value { get; }
     }
 
+    public struct Union<T0> : IUnion
+    {
+        private T0? _value0;
+        private int _index;
+
+        public Union(T0 t0)
+        {
+            _value0 = t0.NotNull(nameof(t0));
+            _index = 0;
+        }
+
+        public object Value => _index switch
+        {
+            0 => _value0!,
+            _ => throw new InvalidOperationException()
+        };
+
+        public bool IsT0 => _index == 0;
+
+        public T0 AsT0 => _index == 0 
+                ? _value0!
+                : throw new InvalidOperationException($"Cannot return as T0 as result is T{_index}");
+
+        public void Switch(Action<T0> f0)
+        {
+            if (_index == 0 && f0 != null)
+            {
+                f0(_value0!);
+                return;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        public TResult Match<TResult>(Func<T0, TResult> f0)
+        {
+            if (_index == 0 && f0 != null)
+            {
+                return f0(_value0!);
+            }
+
+            throw new InvalidOperationException();
+        }
+
+
+        public static implicit operator Union<T0>(T0 t0) => new (t0);
+    }
+    
     public struct Union<T0, T1> : IUnion
     {
         private T0? _value0;

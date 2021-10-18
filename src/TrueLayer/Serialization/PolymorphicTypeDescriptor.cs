@@ -6,12 +6,12 @@ using System.Reflection;
 
 namespace TrueLayer.Serialization
 {
-    internal sealed class DiscriminatedUnionDescriptor
+    internal sealed class PolymorphicTypeDescriptor
     {
         // Needs to have discriminator field name to override with [JsonDiscriminator]
         //public static bool TryCreate(Type type);
 
-        private DiscriminatedUnionDescriptor(Type baseType, Dictionary<string, Type> typeMap, string? discriminator)
+        private PolymorphicTypeDescriptor(Type baseType, Dictionary<string, Type> typeMap, string? discriminator)
         {
             BaseType = baseType;
             TypeMap = typeMap;
@@ -34,7 +34,7 @@ namespace TrueLayer.Serialization
             return attributes.Any();
         }
 
-        public static bool TryCreate(Type baseType, [NotNullWhen(true)] out DiscriminatedUnionDescriptor? descriptor)
+        public static bool TryCreate(Type baseType, [NotNullWhen(true)] out PolymorphicTypeDescriptor? descriptor)
         {
             descriptor = default;
 
@@ -55,7 +55,7 @@ namespace TrueLayer.Serialization
 
             string? discriminator = baseType.GetCustomAttribute<JsonDiscriminatorAttribute>()?.Discriminator;
 
-            descriptor = new DiscriminatedUnionDescriptor(baseType, typeMap, discriminator);
+            descriptor = new PolymorphicTypeDescriptor(baseType, typeMap, discriminator);
 
             return true;
         }

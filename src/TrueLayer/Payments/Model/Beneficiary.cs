@@ -1,29 +1,11 @@
 namespace TrueLayer.Payments.Model
 {
-    using System.Text.Json.Serialization;
-    using TrueLayer.Serialization;
-
-    public interface IBeneficiary : IDiscriminated
-    {
-        string Type { get; }
-    }
-
-    public static class Beneficiary
-    {
-        public static MerchantAccountBeneficiary ToMerchantAccount(string id, string? name)
-            => new MerchantAccountBeneficiary(id)
-            {
-                Name = name
-            };
-
-        public static ExternalAccountBeneficiary ToExternalAccount(string name, string reference, ISchemeIdentifier schemeIdentifier)
-            => new ExternalAccountBeneficiary(name, reference, schemeIdentifier);
-    }
+    using SchemeIdentifierUnion = Union<SortCodeAccountNumberSchemeIdentifier>;
 
     /// <summary>
     /// Represents a TrueLayer beneficiary merchant account
     /// </summary>
-    public sealed class MerchantAccountBeneficiary : IBeneficiary
+    public sealed class MerchantAccountBeneficiary : IDiscriminated
     {
         /// <summary>
         /// Creates a new <see cref="MerchantAccountBeneficiary"/>
@@ -52,13 +34,13 @@ namespace TrueLayer.Payments.Model
     /// <summary>
     /// Represents an external beneficiary account
     /// </summary>
-    public sealed class ExternalAccountBeneficiary : IBeneficiary
+    public sealed class ExternalAccountBeneficiary : IDiscriminated
     {
-        internal ExternalAccountBeneficiary(string name, string reference, ISchemeIdentifier schemeIdentifier)
+        public ExternalAccountBeneficiary(string name, string reference, SchemeIdentifierUnion schemeIdentifier)
         {
             Name = name.NotNullOrWhiteSpace(nameof(name));
             Reference = reference.NotNullOrWhiteSpace(nameof(reference));
-            SchemeIdentifier = schemeIdentifier.NotNull(nameof(schemeIdentifier));
+            SchemeIdentifier = schemeIdentifier;
         }
 
         public string Type => "external";
@@ -78,7 +60,6 @@ namespace TrueLayer.Payments.Model
         /// Gets the unique scheme identifier for the external account
         /// </summary>
         /// <value></value>
-        [JsonConverter(typeof(PolymorphicWriterConverter))]
-        public ISchemeIdentifier SchemeIdentifier { get; }
+        public SchemeIdentifierUnion SchemeIdentifier { get; }
     }
 }
