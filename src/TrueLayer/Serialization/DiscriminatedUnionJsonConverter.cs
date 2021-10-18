@@ -22,11 +22,13 @@ namespace TrueLayer.Serialization
                 throw new JsonException();
             }
 
+#if !NET6_0_OR_GREATER
             Utf8JsonReader readerClone = reader;
+#endif
 
             var doc = JsonDocument.ParseValue(ref reader);
 
-            if (!doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator) 
+            if (!doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator)
                 && !doc.RootElement.TryGetProperty("status", out discriminator)) // Hack until payment response uses a `type` field
             {
                 throw new JsonException();
@@ -34,7 +36,11 @@ namespace TrueLayer.Serialization
 
             if (_factory.TypeFactories.TryGetValue(discriminator.GetString()!, out var typeFactory))
             {
+#if NET6_0_OR_GREATER
+                object? deserializedObject = doc.RootElement.Deserialize(typeFactory.FieldType, options);
+#else
                 object? deserializedObject = JsonSerializer.Deserialize(ref readerClone, typeFactory.FieldType, options);
+#endif
 
                 if (deserializedObject is null)
                 {
