@@ -24,9 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (options is null) throw new ArgumentNullException(nameof(options));
 
-            IHttpClientBuilder httpClientBuilder = services.AddHttpClient<IApiClient, ApiClient>()
-                .AddHttpMessageHandler(() => new UserAgentHandler());
-            
+            IHttpClientBuilder httpClientBuilder = services.AddHttpClient<IApiClient, ApiClient>();            
             configureBuilder?.Invoke(httpClientBuilder);
 
             services.AddTransient<ITrueLayerClient, TrueLayerClient>();

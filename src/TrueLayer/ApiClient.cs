@@ -16,6 +16,9 @@ namespace TrueLayer
     /// </summary>
     internal class ApiClient : IApiClient
     {
+        private static readonly ProductInfoHeaderValue UserAgentHeader
+            = new ProductInfoHeaderValue("truelayer-dotnet", ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>());
+        
         private readonly HttpClient _httpClient;
 
         /// <summary>
@@ -178,6 +181,8 @@ namespace TrueLayer
             {
                 httpRequest.Headers.Add(CustomHeaders.IdempotencyKey, idempotencyKey);
             }
+
+            httpRequest.Headers.UserAgent.Add(UserAgentHeader);
 
             return _httpClient.SendAsync(httpRequest, cancellationToken);
         }
