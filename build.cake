@@ -89,7 +89,7 @@ Task("SonarBegin")
 Task("Build")
     .Does(() => 
     {
-        DotNetCoreBuild("Sdk.sln", new DotNetCoreBuildSettings 
+        DotNetCoreBuild("TrueLayer.sln", new DotNetCoreBuildSettings 
         {
             Configuration = configuration
         });
