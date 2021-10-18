@@ -39,8 +39,8 @@ namespace TrueLayer.AcceptanceTests
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
             response.Data.Value.ShouldBeOfType<CreatePaymentResponse.AuthorizationRequired>();
 
-            response.Data.Switch(
-                authRequired =>
+            string hppUri = await response.Data.Match(
+                async authRequired =>
                 {
                     authRequired.Status.ShouldBe("authorization_required");
 
@@ -49,8 +49,14 @@ namespace TrueLayer.AcceptanceTests
                     authRequired.Id.ShouldNotBeNullOrWhiteSpace();
                     authRequired.ResourceToken.ShouldNotBeNullOrWhiteSpace();
                     authRequired.CreatedAt.ShouldNotBe(default);
+
+                    return await _fixture.Client.Payments.CreateHostedPaymentPageLink(
+                        authRequired.Id, authRequired.ResourceToken, new Uri("https://redirect.mydomain.com")
+                    );
                 }
             );
+
+            hppUri.ShouldNotBeNullOrWhiteSpace();
         }
     }
 }

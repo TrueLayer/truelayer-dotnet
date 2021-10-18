@@ -17,12 +17,14 @@ namespace TrueLayer.Payments
         private readonly TrueLayerOptions _options;
         private readonly Uri _baseUri;
         private readonly IAuthApi _auth;
+        private readonly HppLinkBuilder _hppLinkBuilder;
 
         public PaymentsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
         {
             _apiClient = apiClient.NotNull(nameof(apiClient));
             _options = options.NotNull(nameof(options)); 
             _auth = auth.NotNull(nameof(auth));
+            _hppLinkBuilder = new HppLinkBuilder(options.Payments?.HppUri, options.UseSandbox ?? true);
 
             options.Validate();
 
@@ -51,5 +53,8 @@ namespace TrueLayer.Payments
                 cancellationToken
             );
         }
+
+        public ValueTask<string> CreateHostedPaymentPageLink(string paymentId, string resourceToken, Uri returnUri)
+            => ValueTask.FromResult(_hppLinkBuilder.Build(paymentId, resourceToken, returnUri));
     }
 }

@@ -5,6 +5,7 @@ namespace TrueLayer.Payments
     public class PaymentsOptions : ApiOptions
     {
         public SigningKey? SigningKey { get; set; }
+        public Uri? HppUri { get; set; }
 
         public override void Validate()
         {
