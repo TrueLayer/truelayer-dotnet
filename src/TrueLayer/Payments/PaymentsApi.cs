@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Auth;
 using TrueLayer.Payments.Model;
-using static TrueLayer.Payments.Model.CreatePaymentResponse;
+using static TrueLayer.Payments.Model.GetPaymentResponse;
 
 namespace TrueLayer.Payments
 {
+    using GetPaymentUnion = OneOf<AuthorizationRequired>;
+    
     internal class PaymentsApi : IPaymentsApi
     {
         internal const string ProdUrl = "https://api.truelayer.com/payments/";
@@ -33,7 +35,7 @@ namespace TrueLayer.Payments
                        new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
         
-        public async Task<ApiResponse<OneOf<AuthorizationRequired>>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<OneOf<CreatePaymentResponse.AuthorizationRequired>>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
         {
             paymentRequest.NotNull(nameof(paymentRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
@@ -42,15 +44,34 @@ namespace TrueLayer.Payments
 
             if (!authResponse.IsSuccessful)
             {
-                return new ApiResponse<OneOf<AuthorizationRequired>>(authResponse.StatusCode, authResponse.TraceId);
+                return new (authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.PostAsync<OneOf<AuthorizationRequired>>(
+            return await _apiClient.PostAsync<OneOf<CreatePaymentResponse.AuthorizationRequired>>(
                 new Uri(_baseUri, "payments"),
                 paymentRequest,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
+                cancellationToken
+            );
+        }
+
+
+        public async Task<ApiResponse<GetPaymentUnion>> GetPayment(string id, CancellationToken cancellationToken = default)
+        {
+            id.NotNullOrWhiteSpace(nameof(id));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new (authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.GetAsync<GetPaymentUnion>(
+                new Uri(_baseUri, $"payments/{id}"),
+                authResponse.Data!.AccessToken,
                 cancellationToken
             );
         }
