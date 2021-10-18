@@ -46,7 +46,7 @@ namespace TrueLayer.Serialization
                     return factory.Invoke(deserializedObject);
                 }
 
-                throw new ArgumentException($"Unable to execute union type factory for type {typeFactory.FieldType.FullName}");
+                throw new JsonException($"Unable to execute union type factory for type {typeFactory.FieldType.FullName}");
             }
 
             throw new JsonException($"Unknown discriminator {discriminator}");
