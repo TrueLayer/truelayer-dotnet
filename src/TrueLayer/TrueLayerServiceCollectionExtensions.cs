@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using TrueLayer;
-using TrueLayer.Serialization;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

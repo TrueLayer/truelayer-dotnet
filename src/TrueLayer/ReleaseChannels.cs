@@ -1,6 +1,6 @@
 namespace TrueLayer
 {
-    public class ReleaseChannels
+    public static class ReleaseChannels
     {
         public const string PrivateBeta = "private_beta";
         public const string PublicBeta = "public_beta";

@@ -1,6 +1,6 @@
 namespace TrueLayer
 {
-    public class CustomerSegments
+    public static class CustomerSegments
     {
         public const string Retail = "retail";
         public const string Business = "business";
