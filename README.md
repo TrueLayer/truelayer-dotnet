@@ -18,7 +18,12 @@ Add your `ClientId` and `ClientSecret` to `appsettings.json`. You can obtain the
   "TrueLayer": {
     "ClientId": "your id",
     "ClientSecret": "your secret",
-    "UseSandbox": true
+    "UseSandbox": true,
+    "Payments": {
+      "SigningKey": {
+        "KeyId": "85eeb2da-702c-4f4b-bf9a-e98af5fd47c3"
+      }
+    }
   }
 }
 ```
@@ -31,6 +36,17 @@ public IConfiguration Configuration { get; }
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddTrueLayer(Configuration);
+
+    // Or if using APIs that require request signing e.g. payments
+
+    services.AddTrueLayer(configuration, options =>
+    {
+        if (options.Payments?.SigningKey != null)
+        {
+            // For demo purposes only. Private keys should always be stored securely
+            options.Payments.SigningKey.Certificate = File.ReadAllText("ec512-private-key.pem");
+        }
+    });
 }
 ```
 
