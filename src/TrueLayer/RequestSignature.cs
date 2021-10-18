@@ -62,7 +62,7 @@ namespace TrueLayer
             key.ImportECPrivateKey(decodedPem, out _);
 #endif
 
-            return JWT.Encode(jsonBody.ToString(), key, JwsAlgorithm.ES512, headers, options: Options);
+            return JWT.Encode(sb.ToString(), key, JwsAlgorithm.ES512, headers, options: Options);
         }
 
         /// <summary>
