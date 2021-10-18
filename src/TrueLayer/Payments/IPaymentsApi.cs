@@ -11,6 +11,6 @@ namespace TrueLayer.Payments
         Task<ApiResponse<Union<AuthorizationRequired>>> CreatePayment(
             CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default);
 
-        ValueTask<string> CreateHostedPaymentPageLink(string paymentId, string resourceToken, Uri returnUri);
+        string CreateHostedPaymentPageLink(string paymentId, string resourceToken, Uri returnUri);
     }
 }

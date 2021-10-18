@@ -82,8 +82,8 @@ class MyService
             idempotencyKey: Guid.NewGuid().ToString()
         );
 
-        string hostedPaymentPageUrl = await response.Data.Match(
-            async authRequired => await _client.CreateHostedPaymentPageLink(
+        string hostedPaymentPageUrl = response.Data.Match(
+            authRequired => _client.CreateHostedPaymentPageLink(
                 authRequired.Id, authRequired.ResourceToken, new Uri("https://redirect.yourdomain.com")
             )
         );

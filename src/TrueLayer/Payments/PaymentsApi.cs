@@ -54,7 +54,7 @@ namespace TrueLayer.Payments
             );
         }
 
-        public ValueTask<string> CreateHostedPaymentPageLink(string paymentId, string resourceToken, Uri returnUri)
-            => ValueTask.FromResult(_hppLinkBuilder.Build(paymentId, resourceToken, returnUri));
+        public string CreateHostedPaymentPageLink(string paymentId, string resourceToken, Uri returnUri)
+            => _hppLinkBuilder.Build(paymentId, resourceToken, returnUri);
     }
 }
