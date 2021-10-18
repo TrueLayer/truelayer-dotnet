@@ -55,7 +55,7 @@ namespace TrueLayer
 
         private static Delegate CreateUnionValueFactory(Type factoryType, Type unionType, Type fieldType)
         {
-            var constructor = unionType.GetConstructor(new[] { fieldType });
+            var constructor = unionType.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { fieldType }, null);
 
             if (constructor is null)
                 throw new ArgumentException($"Union Type {unionType.FullName} missing constructor with parameter of type ${fieldType}", nameof(constructor));

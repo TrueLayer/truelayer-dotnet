@@ -8,7 +8,7 @@ namespace TrueLayer
     /// <summary>
     /// Defines the operations used for communicating with TrueLayer.com APIs.
     /// </summary>
-    public interface IApiClient
+    internal interface IApiClient
     {
         /// <summary>
         /// Executes a GET request to the specified <paramref name="uri"/>. 
