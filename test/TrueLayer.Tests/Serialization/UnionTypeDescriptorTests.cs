@@ -2,7 +2,7 @@ using System;
 using Shouldly;
 using Xunit;
 
-namespace TrueLayer.Tests
+namespace TrueLayer.Tests.Serialization
 {
     public class UnionDescriptorTests
     {
