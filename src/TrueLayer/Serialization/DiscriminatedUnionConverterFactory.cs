@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace TrueLayer.Serialization
 {
-    internal class UnionConverterFactory : JsonConverterFactory
+    internal class DiscriminatedUnionConverterFactory : JsonConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {
@@ -15,7 +15,7 @@ namespace TrueLayer.Serialization
         {
             if (UnionTypeDescriptor.TryCreate(typeToConvert, out UnionTypeDescriptor? descriptor))
             {
-                var converterType = typeof(UnionConverter<>).MakeGenericType(typeToConvert);
+                var converterType = typeof(DiscriminatedUnionJsonConverter<>).MakeGenericType(typeToConvert);
                 // TODO use expression to create the converter
                 return Activator.CreateInstance(converterType, descriptor, /* discriminator field */ "type") as JsonConverter;
             }

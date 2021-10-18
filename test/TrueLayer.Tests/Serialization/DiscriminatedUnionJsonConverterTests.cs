@@ -5,7 +5,7 @@ using Xunit;
 
 namespace TrueLayer.Tests.Serialization
 {
-    public class UnionConverterTests
+    public class DiscriminatedUnionJsonConverterTests
     {
         [Fact]
         public void Can_read()
@@ -18,7 +18,7 @@ namespace TrueLayer.Tests.Serialization
 
             var options = new JsonSerializerOptions
             {
-                Converters = { new UnionConverterFactory() }
+                Converters = { new DiscriminatedUnionConverterFactory() }
             };
 
             var union = JsonSerializer.Deserialize<Union<Foo, Bar>>(json, options);
@@ -40,7 +40,7 @@ namespace TrueLayer.Tests.Serialization
 
             var options = new JsonSerializerOptions
             {
-                Converters = { new UnionConverterFactory() }
+                Converters = { new DiscriminatedUnionConverterFactory() }
             };
 
             var wrapper = JsonSerializer.Deserialize<Wrapper>(json, options)
@@ -59,7 +59,7 @@ namespace TrueLayer.Tests.Serialization
 
             var options = new JsonSerializerOptions
             {
-                Converters = { new UnionConverterFactory() }
+                Converters = { new DiscriminatedUnionConverterFactory() }
             };
 
             var union = JsonSerializer.Deserialize<Union<Foo, Other>>(json, options);

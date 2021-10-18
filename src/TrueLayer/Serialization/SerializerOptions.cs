@@ -8,7 +8,7 @@ namespace TrueLayer.Serialization
         {
             IgnoreNullValues = true,
             PropertyNamingPolicy = JsonSnakeCaseNamingPolicy.Instance,
-            Converters = { new UnionConverterFactory() }
+            Converters = { new DiscriminatedUnionConverterFactory() }
         };
     }
 }

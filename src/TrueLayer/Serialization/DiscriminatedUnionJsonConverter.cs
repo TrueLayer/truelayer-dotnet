@@ -4,12 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace TrueLayer.Serialization
 {
-    internal class UnionConverter<T> : JsonConverter<T> where T : IUnion
+    internal class DiscriminatedUnionJsonConverter<T> : JsonConverter<T> where T : IUnion
     {
         private readonly UnionTypeDescriptor _factory;
         private readonly string _discriminatorFieldName;
 
-        public UnionConverter(UnionTypeDescriptor factory, string discriminatorFieldName)
+        public DiscriminatedUnionJsonConverter(UnionTypeDescriptor factory, string discriminatorFieldName)
         {
             _factory = factory.NotNull(nameof(factory));
             _discriminatorFieldName = discriminatorFieldName.NotNullOrWhiteSpace(nameof(discriminatorFieldName));
