@@ -18,7 +18,7 @@ namespace TrueLayer
     {
         private static readonly ProductInfoHeaderValue UserAgentHeader
             = new ProductInfoHeaderValue("truelayer-dotnet", ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>());
-        
+
         private readonly HttpClient _httpClient;
 
         /// <summary>
@@ -96,7 +96,8 @@ namespace TrueLayer
                 return new ApiResponse<TData>(data, httpResponse.StatusCode, traceId);
             }
 
-            if (httpResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
+            // In .NET Standard 2.1 HttpResponse.Content can be null
+            if (httpResponse.Content?.Headers.ContentType?.MediaType == "application/problem+json")
             {
                 var problemDetails = await DeserializeJsonAsync<ProblemDetails>(httpResponse, traceId, cancellationToken);
                 return new ApiResponse<TData>(problemDetails, httpResponse.StatusCode, traceId);
@@ -107,7 +108,11 @@ namespace TrueLayer
 
         private async Task<TData> DeserializeJsonAsync<TData>(HttpResponseMessage httpResponse, string? traceId, CancellationToken cancellationToken)
         {
+#if (NET5_0 || NET5_0_OR_GREATER)
             string? json = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
+#else
+            string? json = await httpResponse.Content.ReadAsStringAsync();
+#endif
 
             if (string.IsNullOrWhiteSpace(json))
             {
