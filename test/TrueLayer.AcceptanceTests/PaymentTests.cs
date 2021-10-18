@@ -34,7 +34,7 @@ namespace TrueLayer.AcceptanceTests
             );
 
             var response = await _fixture.Client.Payments.CreatePayment(
-                paymentRequest, Guid.NewGuid().ToString());
+                paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
             response.Data.Value.ShouldBeOfType<CreatePaymentResponse.AuthorizationRequired>();
