@@ -27,7 +27,7 @@ namespace TrueLayer.Serialization
             attributes = default;
 
             // TODO can we relax this restriction and just check for sealed types?
-            if (!baseType.IsClass || !(baseType.IsAbstract || baseType.IsInterface || typeof(OneOf.IOneOf).IsAssignableFrom(baseType)))
+            if (!baseType.IsClass || !(baseType.IsAbstract || baseType.IsInterface))
                 return false;
 
             attributes = baseType.GetCustomAttributes<JsonKnownTypeAttribute>(false);
@@ -45,10 +45,10 @@ namespace TrueLayer.Serialization
 
             foreach (var attr in attributes)
             {
-                // if (!baseType.IsAssignableFrom(attr.SubType))
-                // {
-                //     throw new ArgumentException($"Sub-type {attr.SubType.FullName} does not derive from {baseType.FullName}");
-                // }
+                if (!baseType.IsAssignableFrom(attr.SubType))
+                {
+                    throw new ArgumentException($"Sub-type {attr.SubType.FullName} does not derive from {baseType.FullName}");
+                }
 
                 typeMap.Add(attr.Identifier, attr.SubType);
             }

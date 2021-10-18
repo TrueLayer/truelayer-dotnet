@@ -10,10 +10,10 @@ namespace TrueLayer.Serialization
             SubType = subType.NotNull(nameof(subType));
             Identifier = identifier.NotNullOrWhiteSpace(nameof(identifier));
 
-            // if (!SubType.IsClass || SubType.IsInterface || SubType.IsAbstract)
-            // {
-            //     throw new ArgumentException("SubType must be a valid class", nameof(subType));
-            // }
+            if (!SubType.IsClass || SubType.IsInterface || SubType.IsAbstract)
+            {
+                throw new ArgumentException("SubType must be a valid class", nameof(subType));
+            }
         }
 
         public Type SubType { get; }

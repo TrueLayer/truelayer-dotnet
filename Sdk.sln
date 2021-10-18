@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrueLayer.Tests", "test\Tru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrueLayer.AcceptanceTests", "test\TrueLayer.AcceptanceTests\TrueLayer.AcceptanceTests.csproj", "{FFAA4AAE-79EC-4290-8C01-755C3CA42973}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrueLayer.Benchmarks", "test\TrueLayer.Benchmarks\TrueLayer.Benchmarks.csproj", "{7BDAA830-ABAC-4BAF-B4DD-F9ABD3250929}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{FFAA4AAE-79EC-4290-8C01-755C3CA42973}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFAA4AAE-79EC-4290-8C01-755C3CA42973}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFAA4AAE-79EC-4290-8C01-755C3CA42973}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BDAA830-ABAC-4BAF-B4DD-F9ABD3250929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BDAA830-ABAC-4BAF-B4DD-F9ABD3250929}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BDAA830-ABAC-4BAF-B4DD-F9ABD3250929}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BDAA830-ABAC-4BAF-B4DD-F9ABD3250929}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3CAD6ACA-344B-4FC3-965E-8C116759B50A} = {A28C8509-D982-426E-A9DC-83A169621955}
@@ -64,5 +70,6 @@ Global
 		{BC796CD1-698E-42C1-A057-4699E434109D} = {A28C8509-D982-426E-A9DC-83A169621955}
 		{A724A59C-2A34-4715-8ECB-B55F2993597A} = {F7D3A645-D715-4EE6-A2B2-1D557A60B9D2}
 		{FFAA4AAE-79EC-4290-8C01-755C3CA42973} = {F7D3A645-D715-4EE6-A2B2-1D557A60B9D2}
+		{7BDAA830-ABAC-4BAF-B4DD-F9ABD3250929} = {F7D3A645-D715-4EE6-A2B2-1D557A60B9D2}
 	EndGlobalSection
 EndGlobal
