@@ -83,7 +83,7 @@ class MyService
         );
 
         string hostedPaymentPageUrl = await response.Data.Match(
-            authRequired => await _client.CreateHostedPaymentPageLink(
+            async authRequired => await _client.CreateHostedPaymentPageLink(
                 authRequired.Id, authRequired.ResourceToken, new Uri("https://redirect.yourdomain.com")
             )
         );
