@@ -17,7 +17,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Shouldly" Version="4.0.3"/>
-    <PackageReference Include="RichardSzalay.MockHttp" Version="6.0.0" />
+    <PackageReference Include="RichardSzalay.MockHttp" Version="6.0.0"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\TrueLayer\TrueLayer.csproj"/>

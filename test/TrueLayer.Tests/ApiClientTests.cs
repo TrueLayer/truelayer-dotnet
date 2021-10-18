@@ -93,7 +93,7 @@ namespace TrueLayer.Sdk.Tests
             TestResponse? response = await _apiClient.PostAsync<TestResponse>(
                 new Uri("http://localhost/post-object"),
                 obj,
-                "access-token"
+                accessToken: "access-token"
             );
 
             AssertSame(response, _stub);

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
 using TrueLayer.Payments.Model;
+using static TrueLayer.Payments.Model.CreatePaymentResponse;
 
 namespace TrueLayer.Payments
 {
@@ -29,7 +30,7 @@ namespace TrueLayer.Payments
                        new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
         
-        public async Task<ApiResponse<CreatePaymentResponse>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<Union<AuthorizationRequired>>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
         {
             paymentRequest.NotNull(nameof(paymentRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
@@ -38,10 +39,10 @@ namespace TrueLayer.Payments
 
             if (!authResponse.IsSuccessful)
             {
-                return new ApiResponse<CreatePaymentResponse>(authResponse.StatusCode, authResponse.TraceId);
+                return new ApiResponse<Union<AuthorizationRequired>>(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.PostAsync<CreatePaymentResponse>(
+            return await _apiClient.PostAsync<Union<AuthorizationRequired>>(
                 new Uri(_baseUri, "payments"),
                 paymentRequest,
                 idempotencyKey,

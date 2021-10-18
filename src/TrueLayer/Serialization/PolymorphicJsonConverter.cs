@@ -4,11 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace TrueLayer.Serialization
 {
-    internal class DiscriminatedUnionConverter<T> : JsonConverter<T> where T : class
+    internal class PolymorphicJsonConverter<T> : JsonConverter<T> where T : class
     {
-        private readonly DiscriminatedUnionDescriptor _descriptor;
+        private readonly PolymorphicTypeDescriptor _descriptor;
 
-        public DiscriminatedUnionConverter(DiscriminatedUnionDescriptor descriptor)
+        public PolymorphicJsonConverter(PolymorphicTypeDescriptor descriptor)
         {
             _descriptor = descriptor.NotNull(nameof(descriptor));
         }
@@ -31,7 +31,8 @@ namespace TrueLayer.Serialization
 
             if (_descriptor.TypeMap.TryGetValue(discriminator.GetString()!, out var concreteType))
             {
-                return (T?)JsonSerializer.Deserialize(ref readerClone, concreteType, options);
+                dynamic? obj = JsonSerializer.Deserialize(ref readerClone, concreteType, options);
+                return (T?)obj;
             }
 
             throw new JsonException($"Unknown discriminator {discriminator}");
