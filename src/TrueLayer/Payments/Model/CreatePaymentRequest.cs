@@ -1,7 +1,10 @@
+using static TrueLayer.Payments.Model.Beneficiary;
+using static TrueLayer.Payments.Model.PaymentMethod;
+
 namespace TrueLayer.Payments.Model
 {
-    using PaymentMethodUnion = Union<BankTransferPaymentMethod>;
-    using BeneficiaryUnion = Union<MerchantAccountBeneficiary, ExternalAccountBeneficiary>;
+    using BeneficiaryUnion = Union<MerchantAccount, ExternalAccount>;
+    using PaymentMethodUnion = Union<BankTransfer>;
 
     /// <summary>
     /// Represents a request for payment

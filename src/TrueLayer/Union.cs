@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace TrueLayer
 {
@@ -51,7 +52,7 @@ namespace TrueLayer
             throw new InvalidOperationException();
         }
 
-
+        [DebuggerStepThrough]
         public static implicit operator Union<T0>(T0 t0) => new (t0);
     }
     

@@ -66,14 +66,14 @@ class MyService
         var paymentRequest = new CreatePaymentRequest(
             100,
             Currencies.GBP,
-            PaymentMethod.BankTransfer(providerFilter: new ProviderFilter
+            new PaymentMethod.BankTransfer
             {
-                ProviderIds = new[] { "mock-payments-gb-redirect" }
-            }),
-            new ExternalAccountBeneficiary(
+                StatementReference = "Your ref"
+            },
+            new Beneficiary.ExternalAccount(
                 "TrueLayer",
                 "truelayer-dotnet",
-                new SortCodeAccountNumberSchemeIdentifier("567890", "12345678")
+                new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
             )
         );
 
