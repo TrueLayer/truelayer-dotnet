@@ -57,7 +57,7 @@ namespace TrueLayer.AcceptanceTests
 
             response.IsSuccessful.ShouldBeTrue();
 
-            var getPaymentResponse 
+            var getPaymentResponse
                 = await _fixture.Client.Payments.GetPayment(response.Data.AsT0.Id);
 
             getPaymentResponse.IsSuccessful.ShouldBeTrue();
@@ -67,7 +67,7 @@ namespace TrueLayer.AcceptanceTests
             payment.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
             payment.Currency.ShouldBe(paymentRequest.Currency);
             payment.Id.ShouldNotBeNullOrWhiteSpace();
-            payment.CreatedAt.ShouldNotBe(default);       
+            payment.CreatedAt.ShouldNotBe(default);
             payment.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
             payment.PaymentMethod.AsT0.ShouldNotBeNull();
         }

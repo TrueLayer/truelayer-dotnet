@@ -8,11 +8,11 @@ namespace TrueLayer.Payments.Model
         /// Used to request payments via bank transfer
         /// </summary>
         [JsonDiscriminator("bank_transfer")]
-        public class BankTransfer : IDiscriminated
+        public record BankTransfer : IDiscriminated
         {
             public string Type => "bank_transfer";
-            public string? StatementReference { get; set; }
-            public ProviderFilter? ProviderFilter { get; set; }
+            public string? StatementReference { get; init; }
+            public ProviderFilter? ProviderFilter { get; init; }
         }
     }
 }
