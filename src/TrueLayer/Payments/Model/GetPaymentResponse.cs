@@ -6,28 +6,36 @@ namespace TrueLayer.Payments.Model
     public static class GetPaymentResponse
     {
         // TODO beneficiary/payment method types
-        
+        public record PaymentDetails
+        {
+            public string Id { get; init; } = null!;
+            public long AmountInMinor { get; init; }
+            public string Currency { get; init; } = null!;
+            public string Status { get; init; } = null!;
+            public DateTime CreatedAt { get; init; }
+        }
+
         [JsonDiscriminator("authorization_required")]
-        public record AuthorizationRequired(string Id, long AmountInMinor, string Currency, string Status, DateTime CreatedAt);
+        public record AuthorizationRequired : PaymentDetails;
 
         [JsonDiscriminator("authorizing")]
-        public record Authorizing(string Id, long AmountInMinor, string Currency, string Status, DateTime CreatedAt);
+        public record Authorizing : PaymentDetails;
 
         [JsonDiscriminator("authorized")]
-        public record Authorized(string Id, long AmountInMinor, string Currency, string Status, DateTime CreatedAt, DateTime AuthorizedAt);
+        public record Authorized(DateTime AuthorizedAt) : PaymentDetails;
 
         [JsonDiscriminator("authorization_failed")]
-        public record AuthorizationFailed(string Id, long AmountInMinor, string Currency, string Status, DateTime CreatedAt, DateTime FailedAt, string FailureReason);
+        public record AuthorizationFailed(DateTime FailedAt, string FailureReason) : PaymentDetails;
 
         // TODO source_of_funds
         [JsonDiscriminator("successful")]
-        public record Successful(string Id, long AmountInMinor, string Currency, string Status, DateTime CreatedAt, DateTime AuthorizedAt, DateTime SucceededAt);
+        public record Successful(DateTime AuthorizedAt, DateTime SucceededAt) : PaymentDetails;
 
         // TODO source_of_funds
         [JsonDiscriminator("settled")]
-        public record Settled(string Id, long AmountInMinor, string Currency, string Status, DateTime CreatedAt, DateTime AuthorizedAt, DateTime SucceededAt, DateTime SettledAt);
+        public record Settled(DateTime AuthorizedAt, DateTime SucceededAt, DateTime SettledAt) : PaymentDetails;
 
         [JsonDiscriminator("failed")]
-        public record Failed(string Id, long AmountInMinor, string Currency, string Status, DateTime CreatedAt, DateTime AuthorizedAt, DateTime FailedAt, string FailureReason);
+        public record Failed(DateTime AuthorizedAt, DateTime FailedAt, string FailureReason) : PaymentDetails;
     }
 }
