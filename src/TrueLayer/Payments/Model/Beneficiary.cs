@@ -1,8 +1,9 @@
+using OneOf;
 using static TrueLayer.Payments.Model.SchemeIdentifier;
 
 namespace TrueLayer.Payments.Model
 {
-    using SchemeIdentifierUnion = Union<SortCodeAccountNumber>;
+    using SchemeIdentifierUnion = OneOf<SortCodeAccountNumber>;
 
     public static class Beneficiary
     {

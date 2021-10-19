@@ -1,17 +1,18 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OneOf;
 
 namespace TrueLayer.Serialization
 {
-    internal class DiscriminatedUnionJsonConverter<T> : JsonConverter<T> where T : IUnion
+    internal class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
     {
-        private readonly UnionTypeDescriptor _factory;
+        private readonly OneOfTypeDescriptor _descriptor;
         private readonly string _discriminatorFieldName;
 
-        public DiscriminatedUnionJsonConverter(UnionTypeDescriptor factory, string discriminatorFieldName)
+        public OneOfJsonConverter(OneOfTypeDescriptor descriptor, string discriminatorFieldName)
         {
-            _factory = factory.NotNull(nameof(factory));
+            _descriptor = descriptor.NotNull(nameof(descriptor));
             _discriminatorFieldName = discriminatorFieldName.NotNullOrWhiteSpace(nameof(discriminatorFieldName));
         }
 
@@ -32,7 +33,7 @@ namespace TrueLayer.Serialization
                 throw new JsonException();
             }
 
-            if (_factory.TypeFactories.TryGetValue(discriminator.GetString()!, out var typeFactory))
+            if (_descriptor.TypeFactories.TryGetValue(discriminator.GetString()!, out var typeFactory))
             {
                 object? deserializedObject = JsonSerializer.Deserialize(ref readerClone, typeFactory.FieldType, options);
 
@@ -46,7 +47,7 @@ namespace TrueLayer.Serialization
                     return factory.Invoke(deserializedObject);
                 }
 
-                throw new JsonException($"Unable to execute union type factory for type {typeFactory.FieldType.FullName}");
+                throw new JsonException($"Unable to execute OneOf factory for type {typeFactory.FieldType.FullName}");
             }
 
             throw new JsonException($"Unknown discriminator {discriminator}");

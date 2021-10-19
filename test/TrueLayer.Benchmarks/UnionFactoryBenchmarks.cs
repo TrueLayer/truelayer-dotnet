@@ -1,18 +1,19 @@
 using System;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
+using OneOf;
 
 namespace TrueLayer.Benchmarks
 {
     [MemoryDiagnoser]
     public class UnionFactoryBenchmarks
     {
-        private static Func<int, Union<string, int>> TypedFactory = CreateTypedFactory<int, Union<string, int>>();
+        private static Func<int, OneOf<string, int>> TypedFactory = CreateTypedFactory<int, OneOf<string, int>>();
         private static Delegate DelegateFactory;
 
         static UnionFactoryBenchmarks()
         {
-            if (UnionTypeDescriptor.TryCreate(typeof(Union<string, int>), out var descriptor))
+            if (OneOfTypeDescriptor.TryCreate(typeof(OneOf<string, int>), out var descriptor))
             {
                 DelegateFactory = descriptor.TypeFactories[nameof(Int32)].Factory;
             }
@@ -24,22 +25,22 @@ namespace TrueLayer.Benchmarks
 
 
         [Benchmark(Baseline = true)]
-        public Union<string, int> DirectConstructor() => new Union<string, int>(10);
+        public OneOf<string, int> DirectConstructor() => OneOf<string, int>.FromT1(10);
 
         //[Benchmark]
-        public Union<string, int> Reflection()
+        public OneOf<string, int> Reflection()
         {
-            return (Union<string, int>)Activator.CreateInstance(typeof(Union<string, int>), 10)!;
+            return (OneOf<string, int>)Activator.CreateInstance(typeof(OneOf<string, int>), 10)!;
         }
 
         [Benchmark]
-        public Union<string, int> TypedExpression() => TypedFactory.Invoke(10);
+        public OneOf<string, int> TypedExpression() => TypedFactory.Invoke(10);
 
         [Benchmark]
-        public Union<string, int> DynamicInvokeExpression() => (Union<string, int>)DelegateFactory.DynamicInvoke(10)!;
+        public OneOf<string, int> DynamicInvokeExpression() => (OneOf<string, int>)DelegateFactory.DynamicInvoke(10)!;
 
         [Benchmark()]
-        public Union<string, int> Current() => ((Func<object, Union<string, int>>)DelegateFactory).Invoke(10);
+        public OneOf<string, int> Current() => ((Func<object, OneOf<string, int>>)DelegateFactory).Invoke(10);
 
 
         public static Func<TArg, T> CreateTypedFactory<TArg, T>()

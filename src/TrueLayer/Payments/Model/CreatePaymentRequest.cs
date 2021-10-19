@@ -1,10 +1,11 @@
+using OneOf;
 using static TrueLayer.Payments.Model.Beneficiary;
 using static TrueLayer.Payments.Model.PaymentMethod;
 
 namespace TrueLayer.Payments.Model
 {
-    using BeneficiaryUnion = Union<MerchantAccount, ExternalAccount>;
-    using PaymentMethodUnion = Union<BankTransfer>;
+    using BeneficiaryUnion = OneOf<MerchantAccount, ExternalAccount>;
+    using PaymentMethodUnion = OneOf<BankTransfer>;
 
     /// <summary>
     /// Represents a request for payment

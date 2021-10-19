@@ -1,11 +1,12 @@
 using System.Text.Json;
+using OneOf;
 using Shouldly;
 using TrueLayer.Serialization;
 using Xunit;
 
 namespace TrueLayer.Tests.Serialization
 {
-    public class DiscriminatedUnionJsonConverterTests
+    public class OneOfJsonConverterTests
     {
         [Fact]
         public void Can_read()
@@ -18,20 +19,20 @@ namespace TrueLayer.Tests.Serialization
 
             var options = new JsonSerializerOptions
             {
-                Converters = { new DiscriminatedUnionConverterFactory() }
+                Converters = { new OneOfJsonConverterFactory() }
             };
 
-            var union = JsonSerializer.Deserialize<Union<Foo, Bar>>(json, options);
-            union.AsT1.BarProp.ShouldBe(10);
-            union.Value.ShouldBeOfType<Bar>();
+            var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, options);
+            oneOf.AsT1.BarProp.ShouldBe(10);
+            oneOf.Value.ShouldBeOfType<Bar>();
         }
 
         [Fact]
-        public void Can_read_nested_unions()
+        public void Can_read_nested()
         {
             string json = @"{
                 ""Name"": ""Nested"",
-                ""Union"": {
+                ""OneOf"": {
                         ""type"": ""Foo"",
                         ""FooProp"": ""test""
                     }
@@ -40,13 +41,13 @@ namespace TrueLayer.Tests.Serialization
 
             var options = new JsonSerializerOptions
             {
-                Converters = { new DiscriminatedUnionConverterFactory() }
+                Converters = { new OneOfJsonConverterFactory() }
             };
 
             var wrapper = JsonSerializer.Deserialize<Wrapper>(json, options)
                 .ShouldNotBeNull();
             wrapper.Name.ShouldBe("Nested");
-            wrapper.Union.AsT0.FooProp.ShouldBe("test");
+            wrapper.OneOf.AsT0.FooProp.ShouldBe("test");
         }
 
         [Fact]
@@ -59,11 +60,11 @@ namespace TrueLayer.Tests.Serialization
 
             var options = new JsonSerializerOptions
             {
-                Converters = { new DiscriminatedUnionConverterFactory() }
+                Converters = { new OneOfJsonConverterFactory() }
             };
 
-            var union = JsonSerializer.Deserialize<Union<Foo, Other>>(json, options);
-            union.Value.ShouldBeOfType<Other>();
+            var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Other>>(json, options);
+            oneOf.Value.ShouldBeOfType<Other>();
         }
 
         public class Foo
@@ -85,7 +86,7 @@ namespace TrueLayer.Tests.Serialization
         public class Wrapper
         {
             public string? Name { get; set; }
-            public Union<Foo, Bar> Union { get; set; }
+            public OneOf<Foo, Bar> OneOf { get; set; }
         }
     }
 }
