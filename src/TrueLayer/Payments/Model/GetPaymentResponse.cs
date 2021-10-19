@@ -8,6 +8,7 @@ namespace TrueLayer.Payments.Model
 {
     using BeneficiaryUnion = OneOf<MerchantAccount, ExternalAccount>;
     using PaymentMethodUnion = OneOf<BankTransfer>;
+    using SourceOfFundsUnion = OneOf<SourceOfFunds.ExternalAccount>;
 
     public static class GetPaymentResponse
     {
@@ -35,13 +36,11 @@ namespace TrueLayer.Payments.Model
         [JsonDiscriminator("authorization_failed")]
         public record AuthorizationFailed(DateTime FailedAt, string FailureReason) : PaymentDetails;
 
-        // TODO source_of_funds
         [JsonDiscriminator("successful")]
-        public record Successful(DateTime AuthorizedAt, DateTime SucceededAt) : PaymentDetails;
+        public record Successful(DateTime AuthorizedAt, DateTime SucceededAt, SourceOfFundsUnion SourceOfFunds) : PaymentDetails;
 
-        // TODO source_of_funds
         [JsonDiscriminator("settled")]
-        public record Settled(DateTime AuthorizedAt, DateTime SucceededAt, DateTime SettledAt) : PaymentDetails;
+        public record Settled(DateTime AuthorizedAt, DateTime SucceededAt, DateTime SettledAt, SourceOfFundsUnion SourceOfFunds) : PaymentDetails;
 
         [JsonDiscriminator("failed")]
         public record Failed(DateTime AuthorizedAt, DateTime FailedAt, string FailureReason) : PaymentDetails;
