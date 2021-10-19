@@ -21,7 +21,6 @@ namespace TrueLayer
             Data = data.NotNull(nameof(data));
         }
 
-        //[MemberNotNullWhen(true, nameof(ApiResponse.IsSuccessful))]
         public TData? Data { get; }
 
         public static implicit operator TData?(ApiResponse<TData> response) => response.Data;

@@ -1,4 +1,5 @@
 using OneOf;
+using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.SchemeIdentifier;
 
 namespace TrueLayer.Payments.Model
@@ -10,14 +11,15 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Represents a TrueLayer beneficiary merchant account
         /// </summary>
-        public sealed class MerchantAccount : IDiscriminated
+        [JsonDiscriminator("merchant_account")]
+        public sealed record MerchantAccount : IDiscriminated
         {
             /// <summary>
             /// Creates a new <see cref="MerchantAccount"/>
             /// </summary>
             /// <param name="id">Your TrueLayer merchant account identifier</param>
             /// <returns></returns>
-            internal MerchantAccount(string id)
+            public MerchantAccount(string id)
             {
                 Id = id.NotNullOrWhiteSpace(nameof(id));
             }
@@ -33,13 +35,14 @@ namespace TrueLayer.Payments.Model
             /// The name of the beneficiary. 
             /// If unspecified, the API will use the account owner name associated to the selected merchant account.
             /// </summary>
-            public string? Name { get; set; }
+            public string? Name { get; init; }
         }
 
         /// <summary>
         /// Represents an external beneficiary account
         /// </summary>
-        public sealed class ExternalAccount : IDiscriminated
+        [JsonDiscriminator("external")]
+        public sealed record ExternalAccount : IDiscriminated
         {
             public ExternalAccount(string name, string reference, SchemeIdentifierUnion schemeIdentifier)
             {

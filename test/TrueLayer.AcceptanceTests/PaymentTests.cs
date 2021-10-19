@@ -19,22 +19,7 @@ namespace TrueLayer.AcceptanceTests
         [Fact]
         public async Task Can_create_payment()
         {
-            var paymentRequest = new CreatePaymentRequest(
-                100,
-                Currencies.GBP,
-                new PaymentMethod.BankTransfer
-                {
-                    ProviderFilter = new ProviderFilter
-                    {
-                        ProviderIds = new[] { "mock-payments-gb-redirect" }
-                    }
-                },
-                new Beneficiary.ExternalAccount(
-                    "TrueLayer",
-                    "truelayer-dotnet",
-                    new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
-                )
-            );
+            CreatePaymentRequest paymentRequest = CreatePaymentRequest();
 
             var response = await _fixture.Client.Payments.CreatePayment(
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
@@ -61,5 +46,48 @@ namespace TrueLayer.AcceptanceTests
 
             hppUri.ShouldNotBeNullOrWhiteSpace();
         }
+
+        [Fact]
+        public async Task Can_get_authorization_required_payment()
+        {
+            CreatePaymentRequest paymentRequest = CreatePaymentRequest();
+
+            var response = await _fixture.Client.Payments.CreatePayment(
+                paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+            response.IsSuccessful.ShouldBeTrue();
+
+            var getPaymentResponse
+                = await _fixture.Client.Payments.GetPayment(response.Data.AsT0.Id);
+
+            getPaymentResponse.IsSuccessful.ShouldBeTrue();
+
+            getPaymentResponse.Data.TryPickT0(out var payment, out _).ShouldBeTrue();
+            payment.Status.ShouldBe("authorization_required");
+            payment.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
+            payment.Currency.ShouldBe(paymentRequest.Currency);
+            payment.Id.ShouldNotBeNullOrWhiteSpace();
+            payment.CreatedAt.ShouldNotBe(default);
+            payment.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
+            payment.PaymentMethod.AsT0.ShouldNotBeNull();
+        }
+
+        private static CreatePaymentRequest CreatePaymentRequest()
+            => new CreatePaymentRequest(
+                100,
+                Currencies.GBP,
+                new PaymentMethod.BankTransfer
+                {
+                    ProviderFilter = new ProviderFilter
+                    {
+                        ProviderIds = new[] { "mock-payments-gb-redirect" }
+                    }
+                },
+                new Beneficiary.ExternalAccount(
+                    "TrueLayer",
+                    "truelayer-dotnet",
+                    new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
+                )
+            );
     }
 }
