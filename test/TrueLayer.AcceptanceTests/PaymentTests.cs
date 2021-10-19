@@ -62,7 +62,7 @@ namespace TrueLayer.AcceptanceTests
 
             getPaymentResponse.IsSuccessful.ShouldBeTrue();
 
-            var payment = getPaymentResponse.Data.AsT0.ShouldNotBeNull();
+            getPaymentResponse.Data.TryPickT0(out var payment, out _).ShouldBeTrue();
             payment.Status.ShouldBe("authorization_required");
             payment.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
             payment.Currency.ShouldBe(paymentRequest.Currency);

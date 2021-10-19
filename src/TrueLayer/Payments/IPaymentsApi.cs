@@ -7,7 +7,16 @@ using static TrueLayer.Payments.Model.GetPaymentResponse;
 
 namespace TrueLayer.Payments
 {
-    using GetPaymentUnion = OneOf<AuthorizationRequired>;
+    // TODO Global Usings?
+    using GetPaymentUnion = OneOf<
+        AuthorizationRequired,
+        Authorizing,
+        Authorized,
+        AuthorizationFailed,
+        Successful,
+        Settled,
+        Failed
+    >;
     
     public interface IPaymentsApi
     {
