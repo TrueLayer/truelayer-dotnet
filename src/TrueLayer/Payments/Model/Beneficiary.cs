@@ -1,4 +1,5 @@
 using OneOf;
+using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.SchemeIdentifier;
 
 namespace TrueLayer.Payments.Model
@@ -10,6 +11,7 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Represents a TrueLayer beneficiary merchant account
         /// </summary>
+        [JsonDiscriminator("merchant_account")]
         public sealed class MerchantAccount : IDiscriminated
         {
             /// <summary>
@@ -39,6 +41,7 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Represents an external beneficiary account
         /// </summary>
+        [JsonDiscriminator("external")]
         public sealed class ExternalAccount : IDiscriminated
         {
             public ExternalAccount(string name, string reference, SchemeIdentifierUnion schemeIdentifier)

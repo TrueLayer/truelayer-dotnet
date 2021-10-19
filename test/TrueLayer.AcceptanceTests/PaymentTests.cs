@@ -67,7 +67,8 @@ namespace TrueLayer.AcceptanceTests
             payment.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
             payment.Currency.ShouldBe(paymentRequest.Currency);
             payment.Id.ShouldNotBeNullOrWhiteSpace();
-            payment.CreatedAt.ShouldNotBe(default);           
+            payment.CreatedAt.ShouldNotBe(default);       
+            payment.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
         }
 
         private static CreatePaymentRequest CreatePaymentRequest()

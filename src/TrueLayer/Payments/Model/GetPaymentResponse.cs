@@ -1,8 +1,14 @@
 using System;
+using OneOf;
 using TrueLayer.Serialization;
+using static TrueLayer.Payments.Model.Beneficiary;
+using static TrueLayer.Payments.Model.PaymentMethod;
 
 namespace TrueLayer.Payments.Model
 {
+    using BeneficiaryUnion = OneOf<MerchantAccount, ExternalAccount>;
+    using PaymentMethodUnion = OneOf<BankTransfer>;
+
     public static class GetPaymentResponse
     {
         // TODO beneficiary/payment method types
@@ -13,6 +19,7 @@ namespace TrueLayer.Payments.Model
             public string Currency { get; init; } = null!;
             public string Status { get; init; } = null!;
             public DateTime CreatedAt { get; init; }
+            public BeneficiaryUnion Beneficiary { get; init; }
         }
 
         [JsonDiscriminator("authorization_required")]

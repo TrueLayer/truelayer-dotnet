@@ -1,7 +1,10 @@
+using TrueLayer.Serialization;
+
 namespace TrueLayer.Payments.Model
 {
     public static class SchemeIdentifier
     {
+        [JsonDiscriminator("sort_code_account_number")]
         public record SortCodeAccountNumber : IDiscriminated
         {
             public SortCodeAccountNumber(string sortCode, string accountNumber)
