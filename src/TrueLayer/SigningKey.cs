@@ -10,7 +10,7 @@ namespace TrueLayer
     /// </summary>
     public class SigningKey
     {
-        private Lazy<ECDsa> _key;
+        private readonly Lazy<ECDsa> _key;
 
         public SigningKey()
         {
@@ -18,7 +18,7 @@ namespace TrueLayer
         }
         
         /// <summary>
-        /// Gets the ES512 PEM certificate contents
+        /// Sets the ES512 PEM certificate contents
         /// </summary>
         public string Certificate { internal get; set; } = null!;
 
