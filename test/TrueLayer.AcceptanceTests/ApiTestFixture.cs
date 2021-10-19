@@ -14,7 +14,7 @@ namespace TrueLayer.AcceptanceTests
 
             ServiceProvider = new ServiceCollection()
                 .AddTrueLayer(configuration, options =>
-                {
+                {   
                     if (options.Payments?.SigningKey != null)
                     {
                         options.Payments.SigningKey.Certificate = File.ReadAllText("ec512-private-key.pem");

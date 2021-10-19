@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text;
 using Jose;
 
@@ -27,7 +25,7 @@ namespace TrueLayer
 
             var headers = new Dictionary<string, object>
             {
-                { "alg", "ES512" },
+                // alg is already set when provided to JWT.Encode
                 { "kid", signingKey.KeyId },
                 { "tl_version", "2" }
             };
@@ -52,39 +50,7 @@ namespace TrueLayer
                 sb.Append(jsonBody);
             }
 
-            using var key = ECDsa.Create();
-
-#if (NET5_0 || NET5_0_OR_GREATER)
-            // Ref https://www.scottbrady91.com/C-Sharp/PEM-Loading-in-dotnet-core-and-dotnet
-            key.ImportFromPem(signingKey.Certificate);
-#else
-            byte[] decodedPem = ReadPemContents(signingKey.Certificate);
-            key.ImportECPrivateKey(decodedPem, out _);
-#endif
-
-            return JWT.Encode(sb.ToString(), key, JwsAlgorithm.ES512, headers, options: Options);
-        }
-
-        /// <summary>
-        /// Reads and decodes the contents of the PEM certificate, removing the header/trailer
-        /// Required before .NET 5.0
-        /// </summary>
-        /// <param name="certificate"></param>
-        /// <returns></returns>
-        private static byte[] ReadPemContents(string certificate)
-        {
-            var sb = new StringBuilder();
-            using (var reader = new StringReader(certificate))
-            {
-                string? line = null;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (!line.StartsWith("--"))
-                        sb.Append(line);
-                }
-            }
-
-            return Convert.FromBase64String(sb.ToString());
+            return JWT.Encode(sb.ToString(), signingKey.Value, JwsAlgorithm.ES512, headers, options: Options);
         }
     }
 }
