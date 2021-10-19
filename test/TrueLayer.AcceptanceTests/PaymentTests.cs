@@ -69,6 +69,7 @@ namespace TrueLayer.AcceptanceTests
             payment.Id.ShouldNotBeNullOrWhiteSpace();
             payment.CreatedAt.ShouldNotBe(default);       
             payment.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
+            payment.PaymentMethod.AsT0.ShouldNotBeNull();
         }
 
         private static CreatePaymentRequest CreatePaymentRequest()

@@ -1,3 +1,5 @@
+using TrueLayer.Serialization;
+
 namespace TrueLayer.Payments.Model
 {
     public static class PaymentMethod
@@ -5,6 +7,7 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Used to request payments via bank transfer
         /// </summary>
+        [JsonDiscriminator("bank_transfer")]
         public class BankTransfer : IDiscriminated
         {
             public string Type => "bank_transfer";

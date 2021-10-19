@@ -20,6 +20,7 @@ namespace TrueLayer.Payments.Model
             public string Status { get; init; } = null!;
             public DateTime CreatedAt { get; init; }
             public BeneficiaryUnion Beneficiary { get; init; }
+            public PaymentMethodUnion PaymentMethod { get; init; }
         }
 
         [JsonDiscriminator("authorization_required")]
