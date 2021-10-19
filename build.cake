@@ -107,7 +107,8 @@ Task("Test")
                 NoBuild = true,
                 Configuration = configuration,
                 Loggers = { $"trx;LogFileName={projectName}.TestResults.xml" },
-                ResultsDirectory = artifactsPath
+                ResultsDirectory = artifactsPath,
+                Framework = "net5.0" // Until CI supports multiple versions of .NET
             };
             
             // https://github.com/Romanx/Cake.Coverlet
