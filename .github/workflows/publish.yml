@@ -4,6 +4,16 @@ on:
   push:
     branches: [main]
     tags: ['*']
+  workflow_dispatch:
+    inputs:
+      verbosity:
+        description: 'Cake Build Verbosity'     
+        required: true
+        default: 'Normal'
+      target:
+        description: 'Cake Build Target'     
+        required: true
+        default: 'Publish'
 
 jobs:
   publish:
@@ -41,4 +51,5 @@ jobs:
           TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
-          target: Publish
+          target: ${{ github.event.inputs.target }}
+          verbosity: ${{ github.event.inputs.verbosity }}

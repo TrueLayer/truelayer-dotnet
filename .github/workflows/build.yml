@@ -3,6 +3,12 @@ name: Build
 on:
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      verbosity:
+        description: "Cake Build Verbosity"
+        required: true
+        default: "Normal"
 
 jobs:
   build:
@@ -36,10 +42,9 @@ jobs:
           TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
           target: CI
+          verbosity: ${{ github.event.inputs.verbosity }}
       - name: Upload pre-release packages
         uses: actions/upload-artifact@v2
         with:
           name: packages
           path: artifacts/*.nupkg
-
-
