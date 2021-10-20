@@ -241,7 +241,7 @@ Task("ServeDocs")
 
 Task("PublishDocs")
     .IsDependentOn("BuildDocs")
-    .WithCriteria(!string.IsNullOrEmpty(gitHubPagesToken) && currentBranch.FriendlyName == "main")
+    .WithCriteria(!string.IsNullOrEmpty(gitHubPagesToken))// && currentBranch.FriendlyName == "main")
     .Does(() => 
     {
         // Get the current commit
