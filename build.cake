@@ -43,7 +43,7 @@ uint coverageThreshold = 50;
 Setup(context =>
 {
    BuildContext.Initialize(Context);
-   Information($"Building Json with configuration {configuration} on branch {currentBranch.FriendlyName}");
+   Information($"Building TrueLayer.NET with configuration {configuration} on branch {currentBranch.FriendlyName}");
 });
 
 Teardown(ctx =>
@@ -89,7 +89,7 @@ Task("SonarBegin")
 Task("Build")
     .Does(() => 
     {
-        DotNetCoreBuild("Json.sln", new DotNetCoreBuildSettings 
+        DotNetCoreBuild("TrueLayer.sln", new DotNetCoreBuildSettings 
         {
             Configuration = configuration
         });
