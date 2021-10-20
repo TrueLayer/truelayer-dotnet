@@ -249,7 +249,7 @@ Task("PublishDocs")
         var publishFolder = $"./artifacts/docs-publish-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}";
         Information("Publishing Folder: {0}", publishFolder);
         Information("Getting publish branch...");
-        GitClone("https://github.com/truelayer/truelayer-dotnet.git", publishFolder, new GitCloneSettings { BranchName = "gh-pages" });
+        GitClone("https://github.com/TrueLayer/truelayer-dotnet.git", publishFolder, new GitCloneSettings { BranchName = "gh-pages" });
 
         Information("Sync output files...");
         
