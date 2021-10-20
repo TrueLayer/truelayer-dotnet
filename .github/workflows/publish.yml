@@ -6,7 +6,7 @@ on:
     tags: ['*']
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_PAGES_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUGET_PRE_API_KEY: ${{ secrets.GITHUB_TOKEN }}
-          NUGET_PRE_API_URL: https://nuget.pkg.github.com/truelayer/index.json
+          NUGET_PRE_API_URL: https://nuget.pkg.github.com/TrueLayer/index.json
           TrueLayer__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
           TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
