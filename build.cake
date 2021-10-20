@@ -288,15 +288,15 @@ Task("Default")
     .IsDependentOn("Test")
     .IsDependentOn("Pack")
     .IsDependentOn("GenerateReports")
-    .IsDependentOn("BuildDocs")
-    .IsDependentOn("PublishDocs");
-
+    .IsDependentOn("BuildDocs");
 
 Task("CI")
-    .IsDependentOn("SonarBegin")
+    //.IsDependentOn("SonarBegin")
     .IsDependentOn("Default")
-    .IsDependentOn("UploadCoverage")
-    .IsDependentOn("SonarEnd");
+    //.IsDependentOn("UploadCoverage")
+    //.IsDependentOn("SonarEnd")
+    .IsDependentOn("PublishDocs");
+
 
 Task("Publish")
     .IsDependentOn("CI")
