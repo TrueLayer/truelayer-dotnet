@@ -41,8 +41,17 @@ From within Visual Studio:
 4. Click on the *Browse* tab and search for "TrueLayer".
 5. Click on the `TrueLayer` package, select the appropriate version in the
    right-tab and click *Install*.
-    
-  
+
+### Pre-release Packages
+
+Pre-release packages can be downloaded from [GitHub Packages](https://github.com/truelayer?tab=packages&repo_name=truelayer-dotnet).
+
+```
+dotnet add package TrueLayer --prerelease --source https://nuget.pkg.github.com/truelayer/index.json
+```
+
+[More information](https://docs.github.com/en/packages/guides/configuring-dotnet-cli-for-use-with-github-packages) on using GitHub packages with .NET.
+
 ## Documentation
 
 For a comprehensive list of examples, check out the [API documentation](https://docs.truelayer.com).
@@ -53,7 +62,7 @@ For a comprehensive list of examples, check out the [API documentation](https://
 
 First [sign up](https://console.truelayer.com/) for a developer account. Follow the instructions to set up a new application and obtain your Client ID and Secret.
 
-Generate a Signing Key Pair used to sign API requests.
+Next, generate a signing key pair used to sign API requests.
 
 To generate a private key, run:
 
@@ -67,9 +76,9 @@ To obtain the public key, run:
 docker run --rm -v ${PWD}:/out -w /out -it alpine/openssl ec -in ec512-private-key.pem -pubout -out ec512-public-key.pem
 ```
 
-Navigate to the Payments settings and upload your public key. Obtain the Key Id.
+Navigate to the Payments settings section of the TrueLayer console and upload your public key. Obtain the Key Id.
 
-### Initialize TrueLayer.NET
+### Configure Settings
 
 Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other supported [configuration provider](https://docs.microsoft.com/en-us/dotnet/core/extensions/configuration).
 
@@ -89,7 +98,9 @@ Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other
 }
 ```
 
-Register TrueLayer.NET `Startup.cs` or `Program.cs` (.NET 6.0):
+### Initialize TrueLayer.NET
+
+Register the TrueLayer client in `Startup.cs` or `Program.cs` (.NET 6.0):
 
 ```c#
 public IConfiguration Configuration { get; }
@@ -112,7 +123,7 @@ public void ConfigureServices(IServiceCollection services)
 Inject `ITrueLayerClient` into your classes:
 
 ```c#
-class MyService
+public class MyService
 {
     private readonly ITrueLayerClient _client;
 
@@ -137,7 +148,7 @@ class MyService
             )
         );
 
-        var response = await _client.Payments.CreatePayment(
+        var apiResponse = await _client.Payments.CreatePayment(
             paymentRequest, 
             idempotencyKey: Guid.NewGuid().ToString()
         );
@@ -146,9 +157,11 @@ class MyService
 
         // or, redirect to the TrueLayer Hosted Payment Page
 
-        string hostedPaymentPageUrl = response.Data.Match(
+        string hostedPaymentPageUrl = apiResponse.Data.Match(
             authRequired => _client.CreateHostedPaymentPageLink(
-                authRequired.Id, authRequired.ResourceToken, new Uri("https://redirect.yourdomain.com")
+                authRequired.Id, 
+                authRequired.ResourceToken, 
+                new Uri("https://redirect.yourdomain.com")
             )
         );
 
@@ -159,16 +172,7 @@ class MyService
 
 All API operations return an `ApiResponse<TData>` where `TData` contains the result of the API call. Get more details on [TrueLayer's API documentation](https://docs.truelayer.com/).
 
-
-### Pre-release Packages
-
-Pre-release packages can be downloaded from [GitHub Packages](https://github.com/truelayer?tab=packages&repo_name=truelayer-dotnet).
-
-```
-dotnet add package TrueLayer --prerelease --source https://nuget.pkg.github.com/truelayer/index.json
-```
-
-[More information](https://docs.github.com/en/packages/guides/configuring-dotnet-cli-for-use-with-github-packages) on using GitHub packages with .NET.
+For more examples see the [API documentation](https://docs.truelayer.com). Advanced customization options and documentation for contributors can be found in the [Wiki](https://github.com/TrueLayer/truelayer-sdk-net/wiki).
 
 ## Building locally 
 
