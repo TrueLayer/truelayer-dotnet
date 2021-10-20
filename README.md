@@ -153,10 +153,18 @@ public class MyService
             idempotencyKey: Guid.NewGuid().ToString()
         );
 
+        if (!apiResponse.IsSuccessful)
+        {
+            return HandleFailure(
+                apiResponse.StatusCode,
+                // Includes details of any errors
+                apiResponse.Problem
+            )
+        }
+
         // Pass the ResourceToken to the TrueLayer Web or Mobile SDK
 
         // or, redirect to the TrueLayer Hosted Payment Page
-
         string hostedPaymentPageUrl = apiResponse.Data.Match(
             authRequired => _client.CreateHostedPaymentPageLink(
                 authRequired.Id, 
@@ -170,11 +178,9 @@ public class MyService
 }
 ```
 
-All API operations return an `ApiResponse<TData>` where `TData` contains the result of the API call. Get more details on [TrueLayer's API documentation](https://docs.truelayer.com/).
-
 For more examples see the [API documentation](https://docs.truelayer.com). Advanced customization options and documentation for contributors can be found in the [Wiki](https://github.com/TrueLayer/truelayer-sdk-net/wiki).
 
-## Building locally 
+## Building locally
 
 This project uses [Cake](https://cakebuild.net/) to build, test and publish packages. 
 
