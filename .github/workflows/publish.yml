@@ -36,6 +36,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_PAGES_ACCESS_TOKEN: ${{ secrets.GH_PAGES_ACCESS_TOKEN }}
           NUGET_PRE_API_KEY: ${{ secrets.GITHUB_TOKEN }}
-          NUGET_PRE_API_URL: https://nuget.pkg.github.com/benfoster/index.json
+          NUGET_PRE_API_URL: https://nuget.pkg.github.com/truelayer/index.json
+          TrueLayer__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
+          TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
+          TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
           target: Publish

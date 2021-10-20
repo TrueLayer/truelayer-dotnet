@@ -31,6 +31,9 @@ jobs:
           COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TrueLayer__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
+          TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
+          TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
           target: CI
       - name: Upload pre-release packages
