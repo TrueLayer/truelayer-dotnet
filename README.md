@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/:license-mit-blue.svg)](https://truelayer.mit-license.org/)
 
 ![Build](https://github.com/truelayer/truelayer-dotnet/workflows/Build/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/truelayer/truelayer-dotnet/badge.svg?branch=main)](https://coveralls.io/github/truelayer/truelayer-dotnet?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/TrueLayer/truelayer-dotnet/badge.svg?t=KxNahQ)](https://coveralls.io/github/TrueLayer/truelayer-dotnet)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=truelayer_truelayer-dotnet&metric=alert_status)](https://sonarcloud.io/dashboard?id=truelayer_truelayer-dotnet)
 
 
