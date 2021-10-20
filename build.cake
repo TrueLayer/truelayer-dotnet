@@ -24,7 +24,7 @@ var configuration = Argument("configuration", "Release");
 var artifactsPath = "./artifacts";
 var coveragePath = "./artifacts/coverage"; 
 var packFiles = "./src/**/*.csproj";
-var testFiles = "./test/**/*Tests.csproj";
+var testFiles = "./test/**/*.csproj";
 var packages = "./artifacts/*.nupkg";
 DirectoryPath sitePath = "./artifacts/docs";
 var docFxConfig = "./docs/docfx.json";
@@ -43,7 +43,7 @@ uint coverageThreshold = 50;
 Setup(context =>
 {
    BuildContext.Initialize(Context);
-   Information($"Building TrueLayer SDK with configuration {configuration} on branch {currentBranch.FriendlyName}");
+   Information($"Building TrueLayer.NET with configuration {configuration} on branch {currentBranch.FriendlyName}");
 });
 
 Teardown(ctx =>
@@ -76,10 +76,10 @@ Task("SonarBegin")
     {
         SonarBegin(new SonarBeginSettings 
         {
-            Key = "truelayer_truelayer-sdk-net",
+            Key = "TrueLayer_truelayer-dotnet",
             Organization = "truelayer",
             Url = "https://sonarcloud.io",
-            Exclusions = "test/**,examples/**",
+            Exclusions = "test/**",
             OpenCoverReportsPath = $"{coveragePath}/*.xml",
             Login = sonarToken,
             VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
@@ -107,8 +107,7 @@ Task("Test")
                 NoBuild = true,
                 Configuration = configuration,
                 Loggers = { $"trx;LogFileName={projectName}.TestResults.xml" },
-                ResultsDirectory = artifactsPath,
-                Framework = "net5.0" // Until CI supports multiple versions of .NET
+                ResultsDirectory = artifactsPath
             };
             
             // https://github.com/Romanx/Cake.Coverlet
@@ -117,7 +116,7 @@ Task("Test")
                 CollectCoverage = true,
                 CoverletOutputFormat = CoverletOutputFormat.opencover,
                 CoverletOutputDirectory = coveragePath,
-                CoverletOutputName = $"{projectName}.opencover.xml",
+                CoverletOutputName = $"{projectName}.opencover.xml"
                 //Threshold = coverageThreshold
             };
             
@@ -152,23 +151,32 @@ Task("GenerateReports")
     });
 
 Task("UploadCoverage")
-    .WithCriteria(!string.IsNullOrEmpty(coverallsToken) && EnvironmentVariable<bool>("CIRCLECI", false))
+    .WithCriteria(!string.IsNullOrEmpty(coverallsToken) && BuildSystem.IsRunningOnGitHubActions)
     .Does(() => 
     {
+        var workflow = BuildSystem.GitHubActions.Environment.Workflow;
+
+        Dictionary<string, object> @event = default;
+        if (workflow.EventName == "pull_request")
+        {
+            string eventJson = System.IO.File.ReadAllText(workflow.EventPath); 
+            @event = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(eventJson);
+        }
+
         var args = new ProcessArgumentBuilder()
                     .Append($"--repoToken {coverallsToken}")
                     .Append("--lcov")
                     .Append("--useRelativePaths")
                     .Append("-i ./artifacts/lcov.info")
-                    .Append($"--commitId {EnvironmentVariable("CIRCLE_SHA1")}") 
-                    .Append($"--commitBranch {EnvironmentVariable("CIRCLE_BRANCH")}")
-                    .Append($"--serviceNumber {EnvironmentVariable("CIRCLE_BUILD_NUM")}")
-                    .Append($"--jobId {EnvironmentVariable("CIRCLE_JOB")}");
+                    .Append($"--commitId {workflow.Sha}") 
+                    .Append($"--commitBranch {workflow.Ref}")
+                    .Append($"--serviceNumber {workflow.RunNumber}")
+                    .Append($"--jobId {workflow.RunId}");
+                    //.Append("--dryrun");
 
-        string pullRequestUrl = EnvironmentVariable("CIRCLE_PULL_REQUEST");
-        if (!string.IsNullOrWhiteSpace(pullRequestUrl))
+        if (BuildSystem.IsPullRequest)
         {
-            args.Append($"--pullRequest {pullRequestUrl.Substring(pullRequestUrl.LastIndexOf('/'))}");
+            args.Append($"--pullRequest {@event["number"].ToString()}");
         }
 
         var settings = new ProcessSettings { Arguments = args };
@@ -241,7 +249,7 @@ Task("PublishDocs")
         var publishFolder = $"./artifacts/docs-publish-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}";
         Information("Publishing Folder: {0}", publishFolder);
         Information("Getting publish branch...");
-        GitClone("https://github.com/truelayer/truelayer-sdk-net.git", publishFolder, new GitCloneSettings { BranchName = "gh-pages" });
+        GitClone("https://github.com/truelayer/truelayer-dotnet.git", publishFolder, new GitCloneSettings { BranchName = "gh-pages" });
 
         Information("Sync output files...");
         
@@ -249,13 +257,21 @@ Task("PublishDocs")
             ArgumentCustomization = args => args.Append("--ignore").AppendQuoted(".git;CNAME")
         });
 
+        // var code = StartProcess("git",
+        //         new ProcessSettings
+        //         {
+        //             Arguments = new ProcessArgumentBuilder()
+        //                 .Append("status"),
+        //             WorkingDirectory = publishFolder
+        //         });
+
         if (GitHasUncommitedChanges(publishFolder))
         {
             GitAddAll(publishFolder);
             Information("Stage all changes...");
 
             // Only considers modified files - https://github.com/cake-contrib/Cake_Git/issues/77
-            if (BuildContext.ForcePublishDocs || GitHasStagedChanges(publishFolder))
+            if (GitHasStagedChanges(publishFolder))
             {
                 Information("Commit all changes...");
                 GitCommit(
@@ -279,14 +295,14 @@ Task("Default")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Pack")
-    .IsDependentOn("GenerateReports");
+    .IsDependentOn("GenerateReports")
+    .IsDependentOn("BuildDocs");
 
 Task("CI")
-    //.IsDependentOn("SonarBegin")
+    .IsDependentOn("SonarBegin")
     .IsDependentOn("Default")
-    //.IsDependentOn("BuildDocs")
-    .IsDependentOn("UploadCoverage");
-    //.IsDependentOn("SonarEnd");
+    .IsDependentOn("UploadCoverage")
+    .IsDependentOn("SonarEnd");
 
 Task("Publish")
     .IsDependentOn("CI")
@@ -301,7 +317,6 @@ public static class BuildContext
     public static bool IsTag { get; private set; }
     public static string NugetApiUrl { get; private set; }
     public static string NugetApiKey { get; private set; }
-    public static bool ForcePublishDocs { get; private set; }
 
     public static bool ShouldPublishToNuget
         => !string.IsNullOrWhiteSpace(BuildContext.NugetApiUrl) && !string.IsNullOrWhiteSpace(BuildContext.NugetApiKey);
@@ -329,8 +344,6 @@ public static class BuildContext
             NugetApiUrl = context.EnvironmentVariable("NUGET_PRE_API_URL");
             NugetApiKey = context.EnvironmentVariable("NUGET_PRE_API_KEY");
         }
-
-        ForcePublishDocs = context.Argument<bool>("force-docs", false);
     }
 
     public static void PrintParameters(ICakeContext context)
