@@ -263,7 +263,7 @@ Task("PublishDocs")
             Information("Stage all changes...");
 
             // Only considers modified files - https://github.com/cake-contrib/Cake_Git/issues/77
-            if (GitHasStagedChanges(publishFolder))
+            if (BuildContext.ForcePushDocs || GitHasStagedChanges(publishFolder))
             {
                 Information("Commit all changes...");
                 GitCommit(
@@ -309,6 +309,7 @@ public static class BuildContext
     public static bool IsTag { get; private set; }
     public static string NugetApiUrl { get; private set; }
     public static string NugetApiKey { get; private set; }
+    public static bool ForcePushDocs { get; private set; }
 
     public static bool ShouldPublishToNuget
         => !string.IsNullOrWhiteSpace(BuildContext.NugetApiUrl) && !string.IsNullOrWhiteSpace(BuildContext.NugetApiKey);
@@ -336,6 +337,8 @@ public static class BuildContext
             NugetApiUrl = context.EnvironmentVariable("NUGET_PRE_API_URL");
             NugetApiKey = context.EnvironmentVariable("NUGET_PRE_API_KEY");
         }
+
+        ForcePushDocs = context.Argument<bool>("force-docs", false);
     }
 
     public static void PrintParameters(ICakeContext context)
