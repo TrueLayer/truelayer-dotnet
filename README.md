@@ -1,16 +1,77 @@
-# TrueLayer .NET
+# TrueLayer.NET
 
-The **TrueLayer .NET library** enables .NET developers to easily work with [TrueLayer APIs](https://docs.truelayer.com/).
+[![NuGet](https://img.shields.io/nuget/v/TrueLayer.svg)](https://www.nuget.org/packages/TrueLayer) 
+[![NuGet](https://img.shields.io/nuget/dt/TrueLayer.svg)](https://www.nuget.org/packages/TrueLayer)
+[![License](https://img.shields.io/:license-mit-blue.svg)](https://truelayer.mit-license.org/)
 
-## Quickstart
+![Build](https://github.com/truelayer/truelayer-dotnet/workflows/Build/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/truelayer/truelayer-dotnet/badge.svg?branch=main)](https://coveralls.io/github/truelayer/truelayer-dotnet?branch=main)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=truelayer_truelayer-dotnet&metric=alert_status)](https://sonarcloud.io/dashboard?id=truelayer_truelayer-dotnet)
 
-Install the TrueLayer NuGet package:
 
-```
+The official [TrueLayer](https://truelayer.com) .NET library provides convenient access to TrueLayer APIs from applications built with .NET. 
+
+The library currently supports .NET Standard 2.1, .NET 5.0 and .NET 6.0.
+
+## Installation
+
+Using the [.NET Core command-line interface (CLI) tools](https://docs.microsoft.com/en-us/dotnet/core/tools/):
+
+```sh
 dotnet add package TrueLayer
 ```
 
-Add your `ClientId` and `ClientSecret` to `appsettings.json`. You can obtain them by signing up at [TrueLayer's console](https://console.truelayer.com/?auto=signup).
+Using the [NuGet Command Line Interface (CLI)](https://docs.microsoft.com/en-us/nuget/tools/nuget-exe-cli-reference)
+
+```sh
+nuget install TrueLayer
+```
+
+Using the [Package Manager Console](https://docs.microsoft.com/en-us/nuget/tools/package-manager-console):
+
+```powershell
+Install-Package TrueLayer
+```
+
+From within Visual Studio:
+
+1. Open the Solution Explorer.
+2. Right-click on a project within your solution.
+3. Click on *Manage NuGet Packages...*
+4. Click on the *Browse* tab and search for "TrueLayer".
+5. Click on the `TrueLayer` package, select the appropriate version in the
+   right-tab and click *Install*.
+    
+  
+## Documentation
+
+For a comprehensive list of examples, check out the [API documentation](https://docs.truelayer.com).
+
+## Usage
+
+### Prerequisites
+
+First [sign up](https://console.truelayer.com/) for a developer account. Follow the instructions to set up a new application and obtain your Client ID and Secret.
+
+Generate a Signing Key Pair used to sign API requests.
+
+To generate a private key, run:
+
+```sh
+docker run --rm -v ${PWD}:/out -w /out -it alpine/openssl ecparam -genkey -name secp521r1 -noout -out ec512-private-key.pem
+```
+
+To obtain the public key, run:
+
+```sh
+docker run --rm -v ${PWD}:/out -w /out -it alpine/openssl ec -in ec512-private-key.pem -pubout -out ec512-public-key.pem
+```
+
+Navigate to the Payments settings and upload your public key. Obtain the Key Id.
+
+### Initialize TrueLayer.NET
+
+Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other supported [configuration provider](https://docs.microsoft.com/en-us/dotnet/core/extensions/configuration).
 
 
 ```json
@@ -28,33 +89,32 @@ Add your `ClientId` and `ClientSecret` to `appsettings.json`. You can obtain the
 }
 ```
 
-Register the TrueLayer client in `Startup.cs`:
+Register TrueLayer.NET `Startup.cs` or `Program.cs` (.NET 6.0):
 
 ```c#
 public IConfiguration Configuration { get; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddTrueLayer(Configuration);
-
-    // Or if using APIs that require request signing e.g. payments
     services.AddTrueLayer(configuration, options =>
     {
         if (options.Payments?.SigningKey != null)
         {
-            // For demo purposes only. Private keys should always be stored securely
+            // For demo purposes only. Private key should be stored securely
             options.Payments.SigningKey.Certificate = File.ReadAllText("ec512-private-key.pem");
         }
     });
 }
 ```
 
+### Make a payment
+
 Inject `ITrueLayerClient` into your classes:
 
 ```c#
 class MyService
 {
-    private readonly ITrueLayerClient _client_;
+    private readonly ITrueLayerClient _client;
 
     public MyService(ITrueLayerClient client)
     {
@@ -82,13 +142,16 @@ class MyService
             idempotencyKey: Guid.NewGuid().ToString()
         );
 
+        // Pass the ResourceToken to the TrueLayer Web or Mobile SDK
+
+        // or, redirect to the TrueLayer Hosted Payment Page
+
         string hostedPaymentPageUrl = response.Data.Match(
             authRequired => _client.CreateHostedPaymentPageLink(
                 authRequired.Id, authRequired.ResourceToken, new Uri("https://redirect.yourdomain.com")
             )
         );
 
-        // Redirect to the TrueLayer Hosted Payment Page
         return Redirect(hostedPaymentPageUrl);
     }
 }
@@ -115,16 +178,25 @@ Run `build.sh` (Mac/Linux) or `build.ps1` (Windows) To build and test the projec
 
 This will output NuGet packages and coverage reports in the `artifacts` directory.
 
-## Contributing
+## Library Documentation
 
-To contribute to TrueLayer for .NET, fork the repository and raise a PR. If your change is substantial please [open an issue](https://github.com/benfoster/o9d-json/issues) first to discuss your objective.
-
-## Docs
-
-The JSON documentation is built using [DocFx](https://dotnet.github.io/docfx/). To build and serve the docs locally run:
+The library documentation is built using [DocFx](https://dotnet.github.io/docfx/). To build and serve the docs locally run:
 
 ```
 ./build.sh --target ServeDocs
 ```
 
 This will serve the docs on http://localhost:8080.
+
+## Contributing
+
+Contributions are always welcome!
+
+See [contributing](contributing.md) for ways to get started.
+
+Please adhere to this project's [code of conduct](CODE_OF_CONDUCT.md).
+
+  
+## License
+
+[MIT](LICENSE)
