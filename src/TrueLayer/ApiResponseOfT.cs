@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace TrueLayer
@@ -22,6 +23,11 @@ namespace TrueLayer
         }
 
         public TData? Data { get; }
+
+#if NET5_0 || NET5_0_OR_GREATER
+        [MemberNotNullWhen(true, nameof(Data))]
+#endif
+        public override bool IsSuccessful => base.IsSuccessful;
 
         public static implicit operator TData?(ApiResponse<TData> response) => response.Data;
     }

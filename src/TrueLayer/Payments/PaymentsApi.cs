@@ -37,9 +37,9 @@ namespace TrueLayer.Payments
             _auth = auth.NotNull(nameof(auth));
             _hppLinkBuilder = new HppLinkBuilder(options.Payments?.HppUri, options.UseSandbox ?? true);
 
-            options.Validate();
+            options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            _baseUri = options.Payments?.Uri ??
+            _baseUri = options.Payments.Uri ??
                        new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
         

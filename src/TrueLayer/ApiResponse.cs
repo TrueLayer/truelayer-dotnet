@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace TrueLayer
@@ -22,6 +23,6 @@ namespace TrueLayer
 
         public ProblemDetails? Problem { get; }
 
-        public bool IsSuccessful => (int)StatusCode is (>= 200 and <= 299);
+        public virtual bool IsSuccessful => (int)StatusCode is (>= 200 and <= 299);
     }
 }
