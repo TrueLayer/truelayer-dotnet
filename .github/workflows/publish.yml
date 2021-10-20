@@ -16,7 +16,7 @@ on:
         default: 'Publish'
       force-docs:
         description: 'Whether to force push the docs to GitHub Pages'     
-        required: false
+        required: true
         default: 'false'
 jobs:
   publish:
