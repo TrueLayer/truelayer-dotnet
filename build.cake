@@ -76,7 +76,7 @@ Task("SonarBegin")
     {
         SonarBegin(new SonarBeginSettings 
         {
-            Key = "truelayer_truelayer-dotnet",
+            Key = "TrueLayer_truelayer-dotnet",
             Organization = "truelayer",
             Url = "https://sonarcloud.io",
             Exclusions = "test/**",
