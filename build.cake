@@ -257,14 +257,6 @@ Task("PublishDocs")
             ArgumentCustomization = args => args.Append("--ignore").AppendQuoted(".git;CNAME")
         });
 
-        // var code = StartProcess("git",
-        //         new ProcessSettings
-        //         {
-        //             Arguments = new ProcessArgumentBuilder()
-        //                 .Append("status"),
-        //             WorkingDirectory = publishFolder
-        //         });
-
         if (GitHasUncommitedChanges(publishFolder))
         {
             GitAddAll(publishFolder);

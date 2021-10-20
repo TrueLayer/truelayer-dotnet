@@ -48,7 +48,7 @@ From within Visual Studio:
 Pre-release packages can be downloaded from [GitHub Packages](https://github.com/truelayer?tab=packages&repo_name=truelayer-dotnet).
 
 ```
-dotnet add package TrueLayer --prerelease --source https://nuget.pkg.github.com/truelayer/index.json
+dotnet add package TrueLayer --prerelease --source https://nuget.pkg.github.com/TrueLayer/index.json
 ```
 
 [More information](https://docs.github.com/en/packages/guides/configuring-dotnet-cli-for-use-with-github-packages) on using GitHub packages with .NET.

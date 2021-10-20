@@ -41,7 +41,7 @@
     ],
     "overwrite": "specs/*.md",
     "globalMetadata": {
-      "_appTitle": "TrueLayer SDK Documentation",
+      "_appTitle": "TrueLayer.NET Documentation",
       "_enableSearch": true,
       "_appLogoPath": "img/logo.svg"
     },
