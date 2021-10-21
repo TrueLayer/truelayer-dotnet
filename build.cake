@@ -31,6 +31,7 @@ var docFxConfig = "./docs/docfx.json";
 
 var coverallsToken = EnvironmentVariable("COVERALLS_TOKEN");
 var sonarToken = EnvironmentVariable("SONAR_TOKEN");
+var gitHubUser = EnvironmentVariable("GITHUB_USER");
 var gitHubPagesToken = EnvironmentVariable("GH_PAGES_ACCESS_TOKEN");
 GitBranch currentBranch = GitBranchCurrent("./");
 
@@ -251,7 +252,7 @@ Task("PublishDocs")
         Information("Getting publish branch...");
         GitClone("https://github.com/TrueLayer/truelayer-dotnet.git", 
             publishFolder,
-            "benfoster",
+            gitHubUser,
             gitHubPagesToken,
             new GitCloneSettings { BranchName = "gh-pages" }
         );
@@ -280,7 +281,7 @@ Task("PublishDocs")
 
                 Information("Pushing all changes...");
                 
-                GitPush(publishFolder, "benfoster", gitHubPagesToken, "gh-pages");
+                GitPush(publishFolder, gitHubUser, gitHubPagesToken, "gh-pages");
             }
         }
     });

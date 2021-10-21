@@ -39,7 +39,7 @@ jobs:
           NUGET_API_URL: https://api.nuget.org/v3/index.json
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_PAGES_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAGES_ACCESS_TOKEN: ${{ secrets.GH_PAGES_ACCESS_TOKEN }}
           NUGET_PRE_API_KEY: ${{ secrets.GITHUB_TOKEN }}
           NUGET_PRE_API_URL: https://nuget.pkg.github.com/TrueLayer/index.json
           TrueLayer__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
