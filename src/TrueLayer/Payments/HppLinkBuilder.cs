@@ -21,7 +21,7 @@ namespace TrueLayer.Payments
             resourceToken.NotNullOrWhiteSpace(nameof(resourceToken));
             returnUri.NotNull(nameof(returnUri));
             
-            var fragment = $"id={paymentId}&token={resourceToken}&return_uri={returnUri.AbsoluteUri}";
+            var fragment = $"payment_id={paymentId}&resource_token={resourceToken}&return_uri={returnUri.AbsoluteUri}";
 
             var builder = new UriBuilder(_baseUri);
             builder.Fragment = fragment;
