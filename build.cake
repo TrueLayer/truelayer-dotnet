@@ -251,8 +251,8 @@ Task("PublishDocs")
         Information("Getting publish branch...");
         GitClone("https://github.com/TrueLayer/truelayer-dotnet.git", 
             publishFolder,
+            "benfoster",
             gitHubPagesToken,
-            "x-oauth-basic",
             new GitCloneSettings { BranchName = "gh-pages" }
         );
 
