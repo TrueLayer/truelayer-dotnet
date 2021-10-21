@@ -2,7 +2,7 @@ using System;
 
 namespace TrueLayer.Payments
 {
-    internal class HppLinkBuilder
+    internal sealed class HppLinkBuilder
     {
         internal const string SandboxUrl = "https://checkout.truelayer-sandbox.com/";
         internal const string ProdUrl = "https://checkout.truelayer.com/";

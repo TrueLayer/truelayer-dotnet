@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace TrueLayer.Serialization
 {
-    internal class JsonSnakeCaseNamingPolicy : JsonNamingPolicy
+    internal sealed class JsonSnakeCaseNamingPolicy : JsonNamingPolicy
     {
         public static JsonSnakeCaseNamingPolicy Instance { get; } = new();
 
