@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace TrueLayer.Serialization
 {
-    internal sealed class SerializerOptions
+    internal static class SerializerOptions
     {
         public static readonly JsonSerializerOptions Default = new JsonSerializerOptions
         {
