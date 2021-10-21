@@ -31,8 +31,8 @@ var docFxConfig = "./docs/docfx.json";
 
 var coverallsToken = EnvironmentVariable("COVERALLS_TOKEN");
 var sonarToken = EnvironmentVariable("SONAR_TOKEN");
-var gitHubUser = EnvironmentVariable("GITHUB_ACTOR");
-var gitHubPagesToken = EnvironmentVariable("GH_PAGES_ACCESS_TOKEN");
+var gitHubUser = EnvironmentVariable("GITHUB_USER");
+var gitHubPagesToken = EnvironmentVariable("GITHUB_TOKEN");
 GitBranch currentBranch = GitBranchCurrent("./");
 
 uint coverageThreshold = 50;
@@ -297,12 +297,10 @@ Task("Default")
     .IsDependentOn("BuildDocs");
 
 Task("CI")
-    //.IsDependentOn("SonarBegin")
+    .IsDependentOn("SonarBegin")
     .IsDependentOn("Default")
-    //.IsDependentOn("UploadCoverage")
-    //.IsDependentOn("SonarEnd")
-    .IsDependentOn("PublishDocs");
-
+    .IsDependentOn("UploadCoverage")
+    .IsDependentOn("SonarEnd");
 
 Task("Publish")
     .IsDependentOn("CI")
