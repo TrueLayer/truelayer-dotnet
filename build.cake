@@ -280,7 +280,7 @@ Task("PublishDocs")
 
                 Information("Pushing all changes...");
                 
-                GitPush(publishFolder, gitHubPagesToken, "x-oauth-basic", "gh-pages");
+                GitPush(publishFolder, "benfoster", gitHubPagesToken, "gh-pages");
             }
         }
     });
