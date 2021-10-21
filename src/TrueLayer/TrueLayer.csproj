@@ -2,9 +2,9 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
     <RootNamespace>TrueLayer</RootNamespace>
-    <AssemblyName>TrueLayer</AssemblyName>
-    <PackageId>TrueLayer</PackageId>
-    <Description>.NET library for the TrueLayer API</Description>
+    <AssemblyName>TrueLayer.Client</AssemblyName>
+    <PackageId>TrueLayer.Client</PackageId>
+    <Description>.NET client for the TrueLayer API</Description>
     <PackageIcon>icon.png</PackageIcon>
     <LangVersion>latest</LangVersion>
     <Authors>TrueLayer</Authors>
