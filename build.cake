@@ -31,7 +31,7 @@ var docFxConfig = "./docs/docfx.json";
 
 var coverallsToken = EnvironmentVariable("COVERALLS_TOKEN");
 var sonarToken = EnvironmentVariable("SONAR_TOKEN");
-var gitHubUser = EnvironmentVariable("GITHUB_USER");
+var gitHubUser = EnvironmentVariable("GITHUB_ACTOR");
 var gitHubPagesToken = EnvironmentVariable("GITHUB_TOKEN");
 GitBranch currentBranch = GitBranchCurrent("./");
 
