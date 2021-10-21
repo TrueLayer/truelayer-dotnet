@@ -1,7 +1,7 @@
 # TrueLayer.NET
 
-[![NuGet](https://img.shields.io/nuget/v/TrueLayer.svg)](https://www.nuget.org/packages/TrueLayer) 
-[![NuGet](https://img.shields.io/nuget/dt/TrueLayer.svg)](https://www.nuget.org/packages/TrueLayer)
+[![NuGet](https://img.shields.io/nuget/v/TrueLayer.Client.svg)](https://www.nuget.org/packages/TrueLayer.Client) 
+[![NuGet](https://img.shields.io/nuget/dt/TrueLayer.Client.svg)](https://www.nuget.org/packages/TrueLayer.Client)
 [![License](https://img.shields.io/:license-mit-blue.svg)](https://truelayer.mit-license.org/)
 
 ![Build](https://github.com/TrueLayer/truelayer-dotnet/workflows/Build/badge.svg)
@@ -10,7 +10,7 @@
 
 
 
-The official [TrueLayer](https://truelayer.com) .NET library provides convenient access to TrueLayer APIs from applications built with .NET. 
+The official [TrueLayer](https://truelayer.com) .NET client provides convenient access to TrueLayer APIs from applications built with .NET. 
 
 The library currently supports .NET Standard 2.1, .NET 5.0 and .NET 6.0.
 
@@ -19,19 +19,19 @@ The library currently supports .NET Standard 2.1, .NET 5.0 and .NET 6.0.
 Using the [.NET Core command-line interface (CLI) tools](https://docs.microsoft.com/en-us/dotnet/core/tools/):
 
 ```sh
-dotnet add package TrueLayer
+dotnet add package TrueLayer.Client
 ```
 
 Using the [NuGet Command Line Interface (CLI)](https://docs.microsoft.com/en-us/nuget/tools/nuget-exe-cli-reference)
 
 ```sh
-nuget install TrueLayer
+nuget install TrueLayer.Client
 ```
 
 Using the [Package Manager Console](https://docs.microsoft.com/en-us/nuget/tools/package-manager-console):
 
 ```powershell
-Install-Package TrueLayer
+Install-Package TrueLayer.Client
 ```
 
 From within Visual Studio:
@@ -191,7 +191,7 @@ This will output NuGet packages and coverage reports in the `artifacts` director
 
 ## Library Documentation
 
-The library documentation is built using [DocFx](https://dotnet.github.io/docfx/). To build and serve the docs locally run:
+The library API documentation is built using [DocFx](https://dotnet.github.io/docfx/). To build and serve the docs locally run:
 
 ```
 ./build.sh --target ServeDocs
