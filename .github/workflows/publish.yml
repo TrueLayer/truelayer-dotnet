@@ -14,6 +14,10 @@ on:
         description: 'Cake Build Target'     
         required: true
         default: 'Publish'
+      force-docs:
+        description: 'Whether to force push the docs to GitHub Pages'     
+        required: true
+        default: 'false'
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -43,11 +47,14 @@ jobs:
           NUGET_API_URL: https://api.nuget.org/v3/index.json
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAGES_ACCESS_TOKEN: ${{ secrets.GH_PAGES_ACCESS_TOKEN }}
           NUGET_PRE_API_KEY: ${{ secrets.GITHUB_TOKEN }}
           NUGET_PRE_API_URL: https://nuget.pkg.github.com/TrueLayer/index.json
           TrueLayer__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
           TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
-          target: ${{ github.event.inputs.target }}
-          verbosity: ${{ github.event.inputs.verbosity }}
+          target: ${{ github.event.inputs.target || 'Publish' }}
+          verbosity: ${{ github.event.inputs.verbosity || 'Normal' }}
+          arguments: |
+            force-docs: ${{ github.event.inputs.force-docs || 'false' }}
