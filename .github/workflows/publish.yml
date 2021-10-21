@@ -14,10 +14,6 @@ on:
         description: 'Cake Build Target'     
         required: true
         default: 'Publish'
-      force-docs:
-        description: 'Whether to force push the docs to GitHub Pages'     
-        required: true
-        default: 'false'
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -55,5 +51,3 @@ jobs:
         with:
           target: ${{ github.event.inputs.target }}
           verbosity: ${{ github.event.inputs.verbosity }}
-          arguments: |
-            force-docs: ${{ github.event.inputs.force-docs }}
