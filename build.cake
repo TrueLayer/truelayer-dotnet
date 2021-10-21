@@ -31,7 +31,8 @@ var docFxConfig = "./docs/docfx.json";
 
 var coverallsToken = EnvironmentVariable("COVERALLS_TOKEN");
 var sonarToken = EnvironmentVariable("SONAR_TOKEN");
-var gitHubPagesToken = EnvironmentVariable("GH_PAGES_ACCESS_TOKEN");
+var gitHubUser = EnvironmentVariable("GITHUB_ACTOR");
+var gitHubPagesToken = EnvironmentVariable("GITHUB_TOKEN");
 GitBranch currentBranch = GitBranchCurrent("./");
 
 uint coverageThreshold = 50;
@@ -241,7 +242,7 @@ Task("ServeDocs")
 
 Task("PublishDocs")
     .IsDependentOn("BuildDocs")
-    .WithCriteria(!string.IsNullOrEmpty(gitHubPagesToken) && currentBranch.FriendlyName == "main")
+    .WithCriteria(!string.IsNullOrEmpty(gitHubPagesToken))// && currentBranch.FriendlyName == "main")
     .Does(() => 
     {
         // Get the current commit
@@ -249,7 +250,12 @@ Task("PublishDocs")
         var publishFolder = $"./artifacts/docs-publish-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}";
         Information("Publishing Folder: {0}", publishFolder);
         Information("Getting publish branch...");
-        GitClone("https://github.com/TrueLayer/truelayer-dotnet.git", publishFolder, new GitCloneSettings { BranchName = "gh-pages" });
+        GitClone("https://github.com/TrueLayer/truelayer-dotnet.git", 
+            publishFolder,
+            gitHubUser,
+            gitHubPagesToken,
+            new GitCloneSettings { BranchName = "gh-pages" }
+        );
 
         Information("Sync output files...");
         
@@ -263,7 +269,7 @@ Task("PublishDocs")
             Information("Stage all changes...");
 
             // Only considers modified files - https://github.com/cake-contrib/Cake_Git/issues/77
-            if (BuildContext.ForcePushDocs || GitHasStagedChanges(publishFolder))
+            if (true || GitHasStagedChanges(publishFolder))
             {
                 Information("Commit all changes...");
                 GitCommit(
@@ -275,7 +281,7 @@ Task("PublishDocs")
 
                 Information("Pushing all changes...");
                 
-                GitPush(publishFolder, gitHubPagesToken, "x-oauth-basic", "gh-pages");
+                GitPush(publishFolder, gitHubUser, gitHubPagesToken, "gh-pages");
             }
         }
     });
