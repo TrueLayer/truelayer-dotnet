@@ -68,9 +68,31 @@ namespace MvcExample.Controllers
         }
 
         [HttpGet]
-        public IActionResult Complete()
+        public async Task<IActionResult> Complete(string paymentId)
         {
-            return View();
+            if (string.IsNullOrWhiteSpace(paymentId))
+                return RedirectToAction("Index");
+
+            var apiResponse = await _truelayer.Payments.GetPayment(paymentId);
+
+            IActionResult Failed(string status)
+            {
+                ViewData["Status"] = status;
+                return View("Failed");
+            }
+
+            if (!apiResponse.IsSuccessful)
+                return Failed(apiResponse.StatusCode.ToString());
+
+            return apiResponse.Data.Match(
+                authRequired => Failed(authRequired.Status),
+                authorizing => Failed(authorizing.Status), // TODO pending
+                authorized => Failed(authorized.Status),
+                authFailed => Failed(authFailed.Status),
+                success => View("Success"),
+                settled => View("Success"),
+                failed => Failed(failed.Status)
+            );
         }
 
         public IActionResult Privacy()
