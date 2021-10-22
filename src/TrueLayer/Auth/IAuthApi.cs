@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace TrueLayer.Auth
 {
+    /// <summary>
+    /// Provides access to the TrueLayer Authorization API
+    /// </summary>
     public interface IAuthApi
     {
         /// <summary>
@@ -10,7 +13,7 @@ namespace TrueLayer.Auth
         /// </summary>
         /// <param name="authTokenRequest">The authorization token request</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
-        /// <returns></returns>
+        /// <returns>An API response that includes the authorization token if successful, otherwise problem details</returns>
         Task<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default);
     }
 }
