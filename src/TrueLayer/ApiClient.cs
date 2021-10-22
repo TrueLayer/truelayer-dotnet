@@ -147,7 +147,7 @@ namespace TrueLayer
 
             if (request is { })
             {
-                string json = Serialize(request);
+                string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
 
                 if (signingKey != null)
                 {
@@ -201,8 +201,5 @@ namespace TrueLayer
 
             return _httpClient.SendAsync(httpRequest, cancellationToken);
         }
-
-        public static string Serialize(object value)
-            => JsonSerializer.Serialize(value, value.GetType(), SerializerOptions.Default);
     }
 }
