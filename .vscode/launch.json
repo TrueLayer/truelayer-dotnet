@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/samples/TrueLayerSdk.SampleApp/bin/Debug/net5.0/TrueLayerSdk.SampleApp.dll",
+            "program": "${workspaceFolder}/examples/MvcExample/bin/Debug/net5.0/MvcExample.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/samples/TrueLayerSdk.SampleApp",
+            "cwd": "${workspaceFolder}/examples/MvcExample",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {
