@@ -80,7 +80,7 @@ Task("SonarBegin")
             Key = "TrueLayer_truelayer-dotnet",
             Organization = "truelayer",
             Url = "https://sonarcloud.io",
-            Exclusions = "test/**",
+            Exclusions = "test/**,examples/**",
             OpenCoverReportsPath = $"{coveragePath}/*.xml",
             Login = sonarToken,
             VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
@@ -269,7 +269,7 @@ Task("PublishDocs")
             Information("Stage all changes...");
 
             // Only considers modified files - https://github.com/cake-contrib/Cake_Git/issues/77
-            if (true || GitHasStagedChanges(publishFolder))
+            if (GitHasStagedChanges(publishFolder))
             {
                 Information("Commit all changes...");
                 GitCommit(
