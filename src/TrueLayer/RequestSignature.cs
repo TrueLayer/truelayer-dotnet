@@ -11,7 +11,7 @@ namespace TrueLayer
         private static JwtOptions Options = new JwtOptions { DetachPayload = true };
         
         /// <summary>
-        /// Create a Json Web Signature (JWS) using the provided ES512 signing certificate
+        /// Create a Json Web Signature (JWS) using the provided ES512 signing key
         /// </summary>
         /// <param name="signingKey">The Elliptic Curve signing key</param>
         /// <param name="httpMethod">The HTTP method of the request</param>

@@ -26,9 +26,9 @@ namespace TrueLayer.Payments
                 throw new ArgumentNullException(nameof(SigningKey.KeyId), "The signing key identifier is required");
             }
 
-            if (string.IsNullOrWhiteSpace(SigningKey?.Certificate))
+            if (string.IsNullOrWhiteSpace(SigningKey?.PrivateKey))
             {
-                throw new ArgumentNullException(nameof(SigningKey.Certificate), "The signing certificate is required");
+                throw new ArgumentNullException(nameof(SigningKey.PrivateKey), "The signing key is required");
             }
         }
     }

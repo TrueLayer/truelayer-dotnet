@@ -24,9 +24,9 @@ Alternatively create an `appsettings.local.json` file in the root of the tests w
 
 ## Testing Payments
 
-To test payments you will also need to provide a signing certificate. For convenience, a public/private key pair is provided in this directory (`ec512-private-key.pem` and `ec512-public-key.pem`) which should only be used for testing in Sandbox.
+To test payments you will also need to provide a signing key. For convenience, a public/private key pair is provided in this directory (`ec512-private-key.pem` and `ec512-public-key.pem`) which should only be used for testing in Sandbox.
 
-Upload the public certificate to the [TrueLayer Console](https://console.truelayer.com/) and then update your configuration with the generated key identifier:
+Upload the public key to the [TrueLayer Console](https://console.truelayer.com/) and then update your configuration with the generated key identifier:
 
 ```json
 {

@@ -13,7 +13,7 @@ namespace TrueLayer.Benchmarks
     [MemoryDiagnoser]
     public class RequestSignatureBenchmarks
     {
-        private static string Certificate = @"-----BEGIN EC PRIVATE KEY-----
+        private static string PrivateKey = @"-----BEGIN EC PRIVATE KEY-----
 MIHcAgEBBEIALJ2sKM+8mVDfTIlk50rqB5lkxaLBt+OECvhXq3nEaB+V0nqljZ9c
 5aHRN3qqxMzNLvxFQ+4twifa4ezkMK2/j5WgBwYFK4EEACOhgYkDgYYABADmhZbj
 i8bgJRfMTdtzy+5VbS5ScMaKC1LQfhII+PTzGzOr+Ts7Qv8My5cmYU5qarGK3tWF
@@ -22,7 +22,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
 -----END EC PRIVATE KEY-----";
 
         private static string Json = JsonSerializer.Serialize(CreatePaymentRequest(), SerializerOptions.Default);
-        private static SigningKey SigningKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), Certificate = Certificate };
+        private static SigningKey SigningKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = PrivateKey };
 
         [Benchmark]
         public string Create()
