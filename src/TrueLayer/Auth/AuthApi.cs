@@ -24,6 +24,7 @@ namespace TrueLayer.Auth
                       new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 
+        /// <inheritdoc />
         public Task<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default)
         {
             authTokenRequest.NotNull(nameof(authTokenRequest));
