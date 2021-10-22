@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MvcExample.Models;
 using TrueLayer;
 using TrueLayer.Payments.Model;
+using static TrueLayer.Payments.Model.GetPaymentResponse;
 
 namespace MvcExample.Controllers
 {
@@ -62,6 +63,7 @@ namespace MvcExample.Controllers
             string redirectLink = apiResponse.Data.Match(
                 authRequired => _truelayer.Payments.CreateHostedPaymentPageLink(
                     authRequired.Id, authRequired.ResourceToken, new Uri(Url.ActionLink("Complete")))
+                    //authRequired.Id, authRequired.ResourceToken, new Uri(Url.ActionLink("Complete", "Home", new { paymentId = authRequired.Id })))
             );
 
             return Redirect(redirectLink);
@@ -71,7 +73,8 @@ namespace MvcExample.Controllers
         public async Task<IActionResult> Complete(string paymentId)
         {
             if (string.IsNullOrWhiteSpace(paymentId))
-                return RedirectToAction("Index");
+                return View();
+                //return RedirectToAction("Index");
 
             var apiResponse = await _truelayer.Payments.GetPayment(paymentId);
 
@@ -81,16 +84,22 @@ namespace MvcExample.Controllers
                 return View("Failed");
             }
 
+            IActionResult Success(PaymentDetails payment)
+            {
+                ViewData["Status"] = payment.Status;
+                return View("Success");
+            }
+
             if (!apiResponse.IsSuccessful)
                 return Failed(apiResponse.StatusCode.ToString());
 
             return apiResponse.Data.Match(
                 authRequired => Failed(authRequired.Status),
                 authorizing => Failed(authorizing.Status), // TODO pending
-                authorized => Failed(authorized.Status),
+                authorized => Success(authorized),
                 authFailed => Failed(authFailed.Status),
-                success => View("Success"),
-                settled => View("Success"),
+                success => Success(success),
+                settled => Success(settled),
                 failed => Failed(failed.Status)
             );
         }
