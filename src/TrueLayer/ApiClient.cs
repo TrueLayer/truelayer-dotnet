@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text.Json;
+#if NET5_0 || NET5_0_OR_GREATER
+using System.Net.Http.Json;
+#endif
 
 namespace TrueLayer
 {
@@ -108,19 +111,26 @@ namespace TrueLayer
 
         private async Task<TData> DeserializeJsonAsync<TData>(HttpResponseMessage httpResponse, string? traceId, CancellationToken cancellationToken)
         {
-#if (NET5_0 || NET5_0_OR_GREATER)
-            string? json = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-#else
-            string? json = await httpResponse.Content.ReadAsStringAsync();
-#endif
+            TData? data = default;
 
-            if (string.IsNullOrWhiteSpace(json))
+            if (httpResponse.Content != null)
             {
-                throw new TrueLayerApiException(httpResponse.StatusCode, traceId, additionalInformation: "The response body cannot be null");
+                try
+                {
+#if NET5_0 || NET5_0_OR_GREATER
+                    data = await httpResponse.Content.ReadFromJsonAsync<TData>(SerializerOptions.Default, cancellationToken);
+#else
+                    using var contentStream = await httpResponse.Content.ReadAsStreamAsync();
+                    data = await JsonSerializer.DeserializeAsync<TData>(contentStream, SerializerOptions.Default, cancellationToken);
+#endif
+                }
+                catch (NotSupportedException)
+                {
+                    throw new TrueLayerApiException(httpResponse.StatusCode, traceId, additionalInformation: "Invalid JSON");
+                }
             }
 
-            return JsonSerializer.Deserialize<TData>(json, SerializerOptions.Default)
-                ?? throw new JsonException($"Failed to deserialize to type {typeof(TData).Name}");
+            return data ?? throw new JsonException($"Failed to deserialize to type {typeof(TData).Name}");
         }
 
         private Task<HttpResponseMessage> SendJsonRequestAsync(
