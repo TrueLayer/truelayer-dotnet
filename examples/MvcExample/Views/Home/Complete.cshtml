@@ -2,8 +2,6 @@
   var fragment = window.location.href;
   var paymentId = fragment.substring(fragment.indexOf('=') + 1);
 
-  console.log(fragment, paymentId);
-
   if (paymentId) {
     window.location.href = '/Home/Complete?paymentId=' + paymentId;
   } else {
