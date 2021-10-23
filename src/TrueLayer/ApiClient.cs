@@ -124,7 +124,7 @@ namespace TrueLayer
                     data = await JsonSerializer.DeserializeAsync<TData>(contentStream, SerializerOptions.Default, cancellationToken);
 #endif
                 }
-                catch (NotSupportedException)
+                catch (NotSupportedException) // Unsupported media type or invalid JSON
                 {
                     throw new TrueLayerApiException(httpResponse.StatusCode, traceId, additionalInformation: "Invalid JSON");
                 }
@@ -210,7 +210,10 @@ namespace TrueLayer
 
             httpRequest.Headers.UserAgent.Add(UserAgentHeader);
 
-            // https://www.stevejgordon.co.uk/using-httpcompletionoption-responseheadersread-to-improve-httpclient-performance-dotnet
+            // HttpCompletionOption.ResponseHeadersRead reduces allocations by by avoiding the pre-buffering of the response content
+            // and allows us to access the content stream faster. 
+            // Doing so requires that always dispose of HttpResponseMessage to free up the connection
+            // Ref: https://www.stevejgordon.co.uk/using-httpcompletionoption-responseheadersread-to-improve-httpclient-performance-dotnet
             return _httpClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         }
     }
