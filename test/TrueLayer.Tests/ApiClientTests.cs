@@ -176,7 +176,7 @@ namespace TrueLayer.Sdk.Tests
         }
 
         [Fact]
-        public async Task Creates_request_signature_when_signing_key_provided()
+        public async Task Generates_request_signature_when_signing_key_provided()
         {
             var obj = new
             {
@@ -194,7 +194,6 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), Certificate = privateKey };
 
             var requestUri = new Uri("http://localhost/signing");
-            string json = JsonSerializer.Serialize(obj, SerializerOptions.Default);
             var idempotencyKey = Guid.NewGuid().ToString();
 
             _httpMessageHandler
@@ -208,7 +207,30 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 obj,
                 idempotencyKey: idempotencyKey,
                 signingKey: signingKey);
-        } 
+        }
+
+        [Fact]
+        public async Task Omits_signature_when_no_signing_key_provided()
+        {
+            var obj = new
+            {
+                key = "value"
+            };
+
+            var requestUri = new Uri("http://localhost/no-signing");
+            var idempotencyKey = Guid.NewGuid().ToString();
+
+            _httpMessageHandler
+                .Expect(HttpMethod.Post, "http://localhost/no-signing")
+                .With(r => !r.Headers.Contains(CustomHeaders.Signature))
+                .WithHeaders(CustomHeaders.IdempotencyKey, idempotencyKey)
+                .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, "{}");
+
+            var response = await _apiClient.PostAsync<TestResponse>(
+                requestUri,
+                obj,
+                idempotencyKey: idempotencyKey);
+        }
 
         public record UserAgentResponse(string Value);
 
