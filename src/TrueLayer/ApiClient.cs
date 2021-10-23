@@ -49,7 +49,7 @@ namespace TrueLayer
                 cancellationToken: cancellationToken
             );
 
-            return await CreateResponseAsync<TData>(httpResponse, cancellationToken) ?? throw new ArgumentNullException();
+            return await CreateResponseAsync<TData>(httpResponse, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -67,7 +67,7 @@ namespace TrueLayer
                 cancellationToken: cancellationToken
             );
 
-            return await CreateResponseAsync<TData>(httpResponse, cancellationToken) ?? throw new ArgumentNullException();
+            return await CreateResponseAsync<TData>(httpResponse, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -85,7 +85,7 @@ namespace TrueLayer
                 cancellationToken: cancellationToken
             );
 
-            return await CreateResponseAsync<TData>(httpResponse, cancellationToken) ?? throw new ArgumentNullException();
+            return await CreateResponseAsync<TData>(httpResponse, cancellationToken);
         }
 
         private async Task<ApiResponse<TData>> CreateResponseAsync<TData>(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
@@ -147,10 +147,11 @@ namespace TrueLayer
 
             if (request is { })
             {
-                string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
-
                 if (signingKey != null)
                 {
+                    // Only serialize to string if signing is required, 
+                    string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
+                    
                     signature = RequestSignature.Create(
                         signingKey,
                         httpMethod,
@@ -158,9 +159,19 @@ namespace TrueLayer
                         json,
                         idempotencyKey
                     );
-                }
 
-                httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+                    httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+                }
+                else // Otherwise we can serialize directly to stream for .NET 5.0 onwards
+                {
+#if (NET5_0 || NET5_0_OR_GREATER)
+                    httpContent = JsonContent.Create(request, request.GetType(), options: SerializerOptions.Default);
+#else
+                    // for older versions of .NET we'll have to fall back to using StringContent
+                    string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
+                    httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+#endif
+                }
             }
 
             return SendRequestAsync(httpMethod, uri, idempotencyKey, accessToken, httpContent, signature, cancellationToken);
@@ -199,7 +210,8 @@ namespace TrueLayer
 
             httpRequest.Headers.UserAgent.Add(UserAgentHeader);
 
-            return _httpClient.SendAsync(httpRequest, cancellationToken);
+            // https://www.stevejgordon.co.uk/using-httpcompletionoption-responseheadersread-to-improve-httpclient-performance-dotnet
+            return _httpClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         }
     }
 }

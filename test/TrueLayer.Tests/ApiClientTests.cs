@@ -175,6 +175,41 @@ namespace TrueLayer.Sdk.Tests
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
 
+        [Fact]
+        public async Task Creates_request_signature_when_signing_key_provided()
+        {
+            var obj = new
+            {
+                key = "value"
+            };
+
+            var privateKey = @"-----BEGIN EC PRIVATE KEY-----
+MIHcAgEBBEIALJ2sKM+8mVDfTIlk50rqB5lkxaLBt+OECvhXq3nEaB+V0nqljZ9c
+5aHRN3qqxMzNLvxFQ+4twifa4ezkMK2/j5WgBwYFK4EEACOhgYkDgYYABADmhZbj
+i8bgJRfMTdtzy+5VbS5ScMaKC1LQfhII+PTzGzOr+Ts7Qv8My5cmYU5qarGK3tWF
+c3VMlcFZw7Y0iLjxAQFPvHqJ9vn3xWp+d3JREU1vQJ9daXswwbcoer88o1oVFmFf
+WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
+-----END EC PRIVATE KEY-----";
+
+            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), Certificate = privateKey };
+
+            var requestUri = new Uri("http://localhost/signing");
+            string json = JsonSerializer.Serialize(obj, SerializerOptions.Default);
+            var idempotencyKey = Guid.NewGuid().ToString();
+
+            _httpMessageHandler
+                .Expect(HttpMethod.Post, "http://localhost/signing")
+                .With(r => r.Headers.Contains(CustomHeaders.Signature))
+                .WithHeaders(CustomHeaders.IdempotencyKey, idempotencyKey)
+                .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, "{}");
+
+            var response = await _apiClient.PostAsync<TestResponse>(
+                requestUri,
+                obj,
+                idempotencyKey: idempotencyKey,
+                signingKey: signingKey);
+        } 
+
         public record UserAgentResponse(string Value);
 
         private static void AssertSame(TestResponse? response, TestResponse expected)
