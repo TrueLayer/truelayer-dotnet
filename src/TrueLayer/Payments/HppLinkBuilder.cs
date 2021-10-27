@@ -24,6 +24,7 @@ namespace TrueLayer.Payments
             var fragment = $"payment_id={paymentId}&resource_token={resourceToken}&return_uri={returnUri.AbsoluteUri}";
 
             var builder = new UriBuilder(_baseUri);
+            builder.Path = "payments";
             builder.Fragment = fragment;
                 
             return builder.Uri.AbsoluteUri;
