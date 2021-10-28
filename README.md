@@ -61,7 +61,7 @@ For a comprehensive list of examples, check out the [API documentation](https://
 
 ### Prerequisites
 
-First [sign up](https://console.truelayer.com/) for a developer account. Follow the instructions to set up a new application and obtain your Client ID and Secret.
+First [sign up](https://console.truelayer.com/) for a developer account. Follow the instructions to set up a new application and obtain your Client ID and Secret. Once the application has been created you must add your application redirected URIs in order to test your integration end-to-end. 
 
 Next, generate a signing key pair used to sign API requests.
 
