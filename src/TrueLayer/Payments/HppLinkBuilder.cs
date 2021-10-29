@@ -2,7 +2,7 @@ using System;
 
 namespace TrueLayer.Payments
 {
-    internal class HppLinkBuilder
+    internal sealed class HppLinkBuilder
     {
         internal const string SandboxUrl = "https://checkout.truelayer-sandbox.com/";
         internal const string ProdUrl = "https://checkout.truelayer.com/";
@@ -24,6 +24,7 @@ namespace TrueLayer.Payments
             var fragment = $"payment_id={paymentId}&resource_token={resourceToken}&return_uri={returnUri.AbsoluteUri}";
 
             var builder = new UriBuilder(_baseUri);
+            builder.Path = "payments";
             builder.Fragment = fragment;
                 
             return builder.Uri.AbsoluteUri;

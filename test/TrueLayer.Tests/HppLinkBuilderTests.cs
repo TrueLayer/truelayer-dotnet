@@ -14,7 +14,7 @@ namespace TrueLayer.Tests
             var builder = new HppLinkBuilder(baseUri);
 
             var link = builder.Build("payment-id", "resource-token", new Uri("https://localhost.com"));
-            link.ShouldBe("https://checkout.truelayer-sandbox.com/#payment_id=payment-id&resource_token=resource-token&return_uri=https://localhost.com/");
+            link.ShouldBe("https://checkout.truelayer-sandbox.com/payments#payment_id=payment-id&resource_token=resource-token&return_uri=https://localhost.com/");
         }
     }
 }

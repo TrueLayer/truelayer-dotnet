@@ -5,7 +5,7 @@ using OneOf;
 
 namespace TrueLayer.Serialization
 {
-    internal class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
+    internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
     {
         private readonly OneOfTypeDescriptor _descriptor;
         private readonly string _discriminatorFieldName;

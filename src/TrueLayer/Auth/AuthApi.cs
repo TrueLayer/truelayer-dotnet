@@ -25,7 +25,7 @@ namespace TrueLayer.Auth
         }
 
         /// <inheritdoc />
-        public Task<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default)
+        public async ValueTask<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default)
         {
             authTokenRequest.NotNull(nameof(authTokenRequest));
 
@@ -41,7 +41,7 @@ namespace TrueLayer.Auth
                 values.Add(new("scope", authTokenRequest.Scope));
             }
 
-            return _apiClient.PostAsync<GetAuthTokenResponse>(
+            return await _apiClient.PostAsync<GetAuthTokenResponse>(
                 new Uri(_baseUri, "connect/token"), new FormUrlEncodedContent(values), null, cancellationToken);
         }
     }

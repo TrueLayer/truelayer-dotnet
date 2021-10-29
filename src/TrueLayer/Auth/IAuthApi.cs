@@ -14,6 +14,6 @@ namespace TrueLayer.Auth
         /// <param name="authTokenRequest">The authorization token request</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes the authorization token if successful, otherwise problem details</returns>
-        Task<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default);
+        ValueTask<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default);
     }
 }
