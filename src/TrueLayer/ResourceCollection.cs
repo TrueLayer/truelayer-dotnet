@@ -8,7 +8,7 @@ namespace TrueLayer
     /// <param name="Items"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    internal record ResourceCollection<T>(IEnumerable<T> Items)
+    public record ResourceCollection<T>(IEnumerable<T> Items)
     {
 
     }

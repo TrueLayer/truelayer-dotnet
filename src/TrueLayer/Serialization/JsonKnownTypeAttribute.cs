@@ -3,7 +3,7 @@ using System;
 namespace TrueLayer.Serialization
 {
     [AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
-    internal class JsonKnownTypeAttribute : Attribute
+    internal sealed class JsonKnownTypeAttribute : Attribute
     {
         public JsonKnownTypeAttribute(Type subType, string identifier)
         {
