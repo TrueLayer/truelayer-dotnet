@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace TrueLayer.Serialization
 {
-    internal class PolymorphicJsonConverterFactory : JsonConverterFactory
+    internal sealed class PolymorphicJsonConverterFactory : JsonConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {

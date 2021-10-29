@@ -5,7 +5,7 @@ using OneOf;
 
 namespace TrueLayer.Serialization
 {
-    internal class OneOfJsonConverterFactory : JsonConverterFactory
+    internal sealed class OneOfJsonConverterFactory : JsonConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {
