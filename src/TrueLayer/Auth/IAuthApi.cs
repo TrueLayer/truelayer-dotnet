@@ -5,6 +5,6 @@ namespace TrueLayer.Auth
 {
     public interface IAuthApi
     {
-        Task<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default);
+        ValueTask<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default);
     }
 }
