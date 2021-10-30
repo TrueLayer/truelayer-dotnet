@@ -2,12 +2,22 @@ using System;
 
 namespace TrueLayer.Payments
 {
+    /// <summary>
+    /// Options for the TrueLayer Payments API
+    /// </summary>
     public class PaymentsOptions : ApiOptions
     {
+        /// <summary>
+        /// Gets or sets the public key used to sign outgoing payment requests
+        /// </summary>
         public SigningKey? SigningKey { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the Hosted Payment Page URI. Defaults to Sandbox or Live depending on the value of <see cref="TrueLayerOptions.UseSandbox"/>
+        /// </summary>
         public Uri? HppUri { get; set; }
 
-        public override void Validate()
+        internal override void Validate()
         {
             base.Validate();
 
@@ -16,9 +26,9 @@ namespace TrueLayer.Payments
                 throw new ArgumentNullException(nameof(SigningKey.KeyId), "The signing key identifier is required");
             }
 
-            if (string.IsNullOrWhiteSpace(SigningKey?.Certificate))
+            if (string.IsNullOrWhiteSpace(SigningKey?.PrivateKey))
             {
-                throw new ArgumentNullException(nameof(SigningKey.Certificate), "The signing certificate is required");
+                throw new ArgumentNullException(nameof(SigningKey.PrivateKey), "The signing key is required");
             }
         }
     }

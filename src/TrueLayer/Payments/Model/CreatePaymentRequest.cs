@@ -15,8 +15,8 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Creates a new <see cref="CreatePaymentRequest"/>
         /// </summary>
-        /// <param name="amountInMinor">The payment amount in the minor currency unit</param>
-        /// <param name="currency">The three-letter ISO currency code</param>
+        /// <param name="amountInMinor">The payment amount in the minor currency unit e.g. cents</param>
+        /// <param name="currency">The three-letter ISO alpha currency code</param>
         /// <param name="paymentMethod">The method of payment</param>
         /// <param name="beneficiary">The payment beneficiary details</param>
         public CreatePaymentRequest(
@@ -39,6 +39,7 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Gets the three-letter ISO currency code
         /// </summary>
+        /// <example>EUR</example>
         public string Currency { get; }
 
         /// <summary>

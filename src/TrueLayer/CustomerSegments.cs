@@ -1,5 +1,8 @@
 namespace TrueLayer
 {
+    /// <summary>
+    /// Represents the customer segments for a provider
+    /// </summary>
     public static class CustomerSegments
     {
         public const string Retail = "retail";
