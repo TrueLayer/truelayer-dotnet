@@ -14,13 +14,13 @@ namespace TrueLayer
 
         public SigningKey()
         {
-            _key = new Lazy<ECDsa>(() => CreateECDsaKey(Certificate));
+            _key = new Lazy<ECDsa>(() => CreateECDsaKey(PrivateKey));
         }
         
         /// <summary>
-        /// Sets the ES512 PEM certificate contents
+        /// Sets the private key. Should not be shared with anyone outside of your organisation.
         /// </summary>
-        public string Certificate { internal get; set; } = null!;
+        public string PrivateKey { internal get; set; } = null!;
 
         /// <summary>
         /// Gets the TrueLayer Key identifier available from the Console
@@ -29,17 +29,17 @@ namespace TrueLayer
 
         internal ECDsa Value => _key.Value;
 
-        private static ECDsa CreateECDsaKey(string certificate)
+        private static ECDsa CreateECDsaKey(string privateKey)
         {           
-            certificate.NotNullOrWhiteSpace(nameof(certificate));
+            privateKey.NotNullOrWhiteSpace(nameof(privateKey));
             
             var key = ECDsa.Create();
 
 #if (NET5_0 || NET5_0_OR_GREATER)
             // Ref https://www.scottbrady91.com/C-Sharp/PEM-Loading-in-dotnet-core-and-dotnet
-            key.ImportFromPem(certificate);
+            key.ImportFromPem(privateKey);
 #else
-            byte[] decodedPem = ReadPemContents(certificate);
+            byte[] decodedPem = ReadPemContents(privateKey);
             key.ImportECPrivateKey(decodedPem, out _);
 #endif
 
@@ -47,15 +47,15 @@ namespace TrueLayer
         }
 
         /// <summary>
-        /// Reads and decodes the contents of the PEM certificate, removing the header/trailer
+        /// Reads and decodes the contents of the PEM private key, removing the header/trailer
         /// Required before .NET 5.0
         /// </summary>
-        /// <param name="certificate"></param>
+        /// <param name="privateKey"></param>
         /// <returns></returns>
-        private static byte[] ReadPemContents(string certificate)
+        private static byte[] ReadPemContents(string privateKey)
         {
             var sb = new StringBuilder();
-            using (var reader = new StringReader(certificate))
+            using (var reader = new StringReader(privateKey))
             {
                 string? line = null;
                 while ((line = reader.ReadLine()) != null)

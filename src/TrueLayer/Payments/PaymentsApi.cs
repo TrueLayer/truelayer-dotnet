@@ -17,13 +17,13 @@ namespace TrueLayer.Payments
         Settled,
         Failed
     >;
-    
+
     internal class PaymentsApi : IPaymentsApi
     {
         internal const string ProdUrl = "https://api.truelayer.com/";
         internal const string SandboxUrl = "https://api.truelayer-sandbox.com/";
         internal static string[] RequiredScopes = new[] { "payments" };
-        
+
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
         private readonly Uri _baseUri;
@@ -33,7 +33,7 @@ namespace TrueLayer.Payments
         public PaymentsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
         {
             _apiClient = apiClient.NotNull(nameof(apiClient));
-            _options = options.NotNull(nameof(options)); 
+            _options = options.NotNull(nameof(options));
             _auth = auth.NotNull(nameof(auth));
             _hppLinkBuilder = new HppLinkBuilder(options.Payments?.HppUri, options.UseSandbox ?? true);
 
@@ -42,7 +42,8 @@ namespace TrueLayer.Payments
             _baseUri = options.Payments.Uri ??
                        new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
-        
+
+        /// <inheritdoc />
         public async Task<ApiResponse<OneOf<CreatePaymentResponse.AuthorizationRequired>>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
         {
             paymentRequest.NotNull(nameof(paymentRequest));
@@ -52,7 +53,7 @@ namespace TrueLayer.Payments
 
             if (!authResponse.IsSuccessful)
             {
-                return new (authResponse.StatusCode, authResponse.TraceId);
+                return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
             return await _apiClient.PostAsync<OneOf<CreatePaymentResponse.AuthorizationRequired>>(
@@ -66,6 +67,7 @@ namespace TrueLayer.Payments
         }
 
 
+        /// <inheritdoc />
         public async Task<ApiResponse<GetPaymentUnion>> GetPayment(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
@@ -74,7 +76,7 @@ namespace TrueLayer.Payments
 
             if (!authResponse.IsSuccessful)
             {
-                return new (authResponse.StatusCode, authResponse.TraceId);
+                return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
             return await _apiClient.GetAsync<GetPaymentUnion>(
@@ -84,6 +86,7 @@ namespace TrueLayer.Payments
             );
         }
 
+        /// <inheritdoc />
         public string CreateHostedPaymentPageLink(string paymentId, string resourceToken, Uri returnUri)
             => _hppLinkBuilder.Build(paymentId, resourceToken, returnUri);
     }

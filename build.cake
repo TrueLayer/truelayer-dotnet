@@ -269,7 +269,7 @@ Task("PublishDocs")
             Information("Stage all changes...");
 
             // Only considers modified files - https://github.com/cake-contrib/Cake_Git/issues/77
-            if (GitHasStagedChanges(publishFolder))
+            if (BuildContext.ForcePushDocs || GitHasStagedChanges(publishFolder))
             {
                 Information("Commit all changes...");
                 GitCommit(

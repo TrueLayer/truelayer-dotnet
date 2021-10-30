@@ -31,7 +31,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             var uri = new Uri("http://api.truelayer.com/payments/");
 
             string signature = RequestSignature.Create(
-                new() { Certificate = privateKey, KeyId = Guid.NewGuid().ToString() },
+                new() { PrivateKey = privateKey, KeyId = Guid.NewGuid().ToString() },
                 HttpMethod.Post,
                 uri,
                 json,
