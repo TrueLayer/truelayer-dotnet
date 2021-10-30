@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -56,6 +57,12 @@ namespace MvcExample.Controllers
             if (!apiResponse.IsSuccessful)
             {
                 _logger.LogError("Create TrueLayer payment failed with status code {StatusCode}", apiResponse.StatusCode);
+
+                foreach (var error in apiResponse.Problem?.Errors)
+                {
+                    ModelState.AddModelError("", $"{error.Key}: {error.Value?.FirstOrDefault()}");
+                }
+
                 ModelState.AddModelError("", "Payment failed");
                 return View("Index");
             }
@@ -63,7 +70,7 @@ namespace MvcExample.Controllers
             string redirectLink = apiResponse.Data.Match(
                 authRequired => _truelayer.Payments.CreateHostedPaymentPageLink(
                     authRequired.Id, authRequired.ResourceToken, new Uri(Url.ActionLink("Complete")))
-                    //authRequired.Id, authRequired.ResourceToken, new Uri(Url.ActionLink("Complete", "Home", new { paymentId = authRequired.Id })))
+            //authRequired.Id, authRequired.ResourceToken, new Uri(Url.ActionLink("Complete", "Home", new { paymentId = authRequired.Id })))
             );
 
             return Redirect(redirectLink);
@@ -74,7 +81,7 @@ namespace MvcExample.Controllers
         {
             if (string.IsNullOrWhiteSpace(paymentId))
                 return View();
-                //return RedirectToAction("Index");
+            //return RedirectToAction("Index");
 
             var apiResponse = await _truelayer.Payments.GetPayment(paymentId);
 
@@ -90,12 +97,18 @@ namespace MvcExample.Controllers
                 return View("Success");
             }
 
+            IActionResult Pending(PaymentDetails payment)
+            {
+                ViewData["Status"] = payment.Status;
+                return View("Success");
+            }
+
             if (!apiResponse.IsSuccessful)
                 return Failed(apiResponse.StatusCode.ToString());
 
             return apiResponse.Data.Match(
                 authRequired => Failed(authRequired.Status),
-                authorizing => Failed(authorizing.Status), // TODO pending
+                authorizing => Pending(authorizing),
                 authorized => Success(authorized),
                 authFailed => Failed(authFailed.Status),
                 success => Success(success),
