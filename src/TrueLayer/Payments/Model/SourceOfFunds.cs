@@ -15,7 +15,7 @@ namespace TrueLayer.Payments.Model
         [JsonDiscriminator(ExternalAccount.Discriminator)]
         public sealed record ExternalAccount(SchemeIdentifiersUnion[] SchemeIdentifiers)
         {
-            public const string Discriminator = "external";
+            public const string Discriminator = "external_account";
             public string Type => Discriminator;
         }
     }
