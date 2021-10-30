@@ -80,7 +80,7 @@ namespace TrueLayer.Payments
             }
 
             return await _apiClient.GetAsync<GetPaymentUnion>(
-                new Uri(_baseUri, $"{id}"),
+                new Uri(_baseUri, id),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
