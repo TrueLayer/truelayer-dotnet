@@ -119,6 +119,8 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
+Alternatively you can create a class that implements `IConfigureOptions<TrueLayerOptions>` if you have more complex configuration requirements. 
+
 ### Make a payment
 
 Inject `ITrueLayerClient` into your classes:
