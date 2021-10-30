@@ -57,7 +57,7 @@ namespace TrueLayer.Payments
             }
 
             return await _apiClient.PostAsync<OneOf<CreatePaymentResponse.AuthorizationRequired>>(
-                new Uri(_baseUri, "payments"),
+                _baseUri,
                 paymentRequest,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
@@ -80,7 +80,7 @@ namespace TrueLayer.Payments
             }
 
             return await _apiClient.GetAsync<GetPaymentUnion>(
-                new Uri(_baseUri, $"payments/{id}"),
+                new Uri(_baseUri, $"{id}"),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
