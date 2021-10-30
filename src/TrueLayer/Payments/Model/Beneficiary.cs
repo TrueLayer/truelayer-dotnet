@@ -41,7 +41,7 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Represents an external beneficiary account
         /// </summary>
-        [JsonDiscriminator("external_account")]
+        [JsonDiscriminator("external")]
         public sealed record ExternalAccount : IDiscriminated
         {
             public ExternalAccount(string name, string reference, SchemeIdentifierUnion schemeIdentifier)
@@ -51,7 +51,7 @@ namespace TrueLayer.Payments.Model
                 SchemeIdentifier = schemeIdentifier;
             }
 
-            public string Type => "external_account";
+            public string Type => "external";
 
             /// <summary>
             /// Gets the name of the external account holder
