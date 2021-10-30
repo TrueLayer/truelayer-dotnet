@@ -90,7 +90,7 @@ public void ConfigureServices(IServiceCollection services)
         if (options.Payments?.SigningKey != null)
         {
             // For demo purposes only. Private key should be stored securely
-            options.Payments.SigningKey.Certificate = File.ReadAllText("ec512-private-key.pem");
+            options.Payments.SigningKey.PrivateKey = File.ReadAllText("ec512-private-key.pem");
         }
     });
 }

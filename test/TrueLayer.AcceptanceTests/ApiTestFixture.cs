@@ -39,7 +39,7 @@ namespace TrueLayer.AcceptanceTests
         {
             if (options.Payments?.SigningKey != null)
             {
-                options.Payments.SigningKey.Certificate = File.ReadAllText("ec512-private-key.pem");
+                options.Payments.SigningKey.PrivateKey = File.ReadAllText("ec512-private-key.pem");
             }
         }
     }
