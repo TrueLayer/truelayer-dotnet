@@ -21,14 +21,19 @@ namespace TrueLayer.Payments
         {
             base.Validate();
 
+            if (SigningKey is null)
+            {
+                throw new ArgumentNullException(nameof(SigningKey));
+            }
+
             if (string.IsNullOrWhiteSpace(SigningKey?.KeyId))
             {
-                throw new ArgumentNullException(nameof(SigningKey.KeyId), "The signing key identifier is required");
+                throw new ArgumentException("The signing key identifier is required", nameof(SigningKey.KeyId));
             }
 
             if (string.IsNullOrWhiteSpace(SigningKey?.PrivateKey))
             {
-                throw new ArgumentNullException(nameof(SigningKey.PrivateKey), "The signing key is required");
+                throw new ArgumentException("The signing key is required", nameof(SigningKey.PrivateKey));
             }
         }
     }
