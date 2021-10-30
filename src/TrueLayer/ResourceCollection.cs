@@ -3,13 +3,9 @@ using System.Collections.Generic;
 namespace TrueLayer
 {
     /// <summary>
-    /// Container for resource collection wrapped in an `items` array
+    /// Represents a collection resource
     /// </summary>
-    /// <param name="Items"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    internal record ResourceCollection<T>(IEnumerable<T> Items)
-    {
-
-    }
+    /// <param name="Items">The collection items</param>
+    /// <typeparam name="T">The type of resource</typeparam>
+    public record ResourceCollection<T>(IEnumerable<T> Items);
 }

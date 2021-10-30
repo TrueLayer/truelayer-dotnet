@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace TrueLayer.Serialization
 {
-    internal class PolymorphicJsonConverter<T> : JsonConverter<T> where T : class
+    internal sealed class PolymorphicJsonConverter<T> : JsonConverter<T> where T : class
     {
         private readonly PolymorphicTypeDescriptor _descriptor;
 

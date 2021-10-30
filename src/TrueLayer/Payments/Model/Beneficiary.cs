@@ -17,13 +17,15 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Creates a new <see cref="MerchantAccount"/>
             /// </summary>
-            /// <param name="id">Your TrueLayer merchant account identifier</param>
-            /// <returns></returns>
+            /// <param name="id">The TrueLayer merchant account identifier</param>
             public MerchantAccount(string id)
             {
                 Id = id.NotNullOrWhiteSpace(nameof(id));
             }
 
+            /// <summary>
+            /// Gets the type of beneficiary
+            /// </summary>
             public string Type => "merchant_account";
 
             /// <summary>
@@ -41,7 +43,7 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Represents an external beneficiary account
         /// </summary>
-        [JsonDiscriminator("external")]
+        [JsonDiscriminator("external_account")]
         public sealed record ExternalAccount : IDiscriminated
         {
             public ExternalAccount(string name, string reference, SchemeIdentifierUnion schemeIdentifier)
@@ -51,7 +53,10 @@ namespace TrueLayer.Payments.Model
                 SchemeIdentifier = schemeIdentifier;
             }
 
-            public string Type => "external";
+            /// <summary>
+            /// Gets the type of beneficiary
+            /// </summary>
+            public string Type => "external_account";
 
             /// <summary>
             /// Gets the name of the external account holder
@@ -61,13 +66,11 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets the reference for the external bank account holder 
             /// </summary>
-            /// <value></value>
             public string Reference { get; }
 
             /// <summary>
             /// Gets the unique scheme identifier for the external account
             /// </summary>
-            /// <value></value>
             public SchemeIdentifierUnion SchemeIdentifier { get; }
         }
     }
