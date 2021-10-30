@@ -191,7 +191,7 @@ c3VMlcFZw7Y0iLjxAQFPvHqJ9vn3xWp+d3JREU1vQJ9daXswwbcoer88o1oVFmFf
 WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
 -----END EC PRIVATE KEY-----";
 
-            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), Certificate = privateKey };
+            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = privateKey };
 
             var requestUri = new Uri("http://localhost/signing");
             var idempotencyKey = Guid.NewGuid().ToString();
