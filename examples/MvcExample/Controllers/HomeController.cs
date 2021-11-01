@@ -58,9 +58,12 @@ namespace MvcExample.Controllers
             {
                 _logger.LogError("Create TrueLayer payment failed with status code {StatusCode}", apiResponse.StatusCode);
 
-                foreach (var error in apiResponse.Problem?.Errors)
+                if (apiResponse.Problem?.Errors != null)
                 {
-                    ModelState.AddModelError("", $"{error.Key}: {error.Value?.FirstOrDefault()}");
+                    foreach (var error in apiResponse.Problem.Errors)
+                    {
+                        ModelState.AddModelError("", $"{error.Key}: {error.Value?.FirstOrDefault()}");
+                    }
                 }
 
                 ModelState.AddModelError("", "Payment failed");
