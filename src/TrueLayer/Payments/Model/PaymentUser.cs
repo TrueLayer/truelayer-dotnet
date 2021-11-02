@@ -1,5 +1,7 @@
 namespace TrueLayer.Payments.Model
 {
+    using System;
+
     /// <summary>
     /// Payment user types
     /// </summary>
@@ -19,6 +21,12 @@ namespace TrueLayer.Payments.Model
             public NewUser(string name, string? email = null, string? phone = null)
             {
                 Name = name.NotNullOrWhiteSpace(nameof(name));                
+                
+                if (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(phone))
+                {
+                    throw new ArgumentException("User email or phone must be provided");
+                }
+                
                 Email = email;
                 Phone = phone;
             }
