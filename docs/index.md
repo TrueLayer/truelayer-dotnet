@@ -113,17 +113,18 @@ public class MyService
     public async Task<ActionResult> MakePayment()
     {
         var paymentRequest = new CreatePaymentRequest(
-            100,
-            Currencies.GBP,
-            new PaymentMethod.BankTransfer
+            amountInMinor: 100,
+            currency: Currencies.GBP,
+            paymentMethod: new PaymentMethod.BankTransfer
             {
                 StatementReference = "Your ref"
             },
-            new Beneficiary.ExternalAccount(
+            beneficiary: new Beneficiary.ExternalAccount(
                 "TrueLayer",
                 "truelayer-dotnet",
                 new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
-            )
+            ),
+            user: new PaymentUser.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "0123456789")
         );
 
         var apiResponse = await _client.Payments.CreatePayment(
