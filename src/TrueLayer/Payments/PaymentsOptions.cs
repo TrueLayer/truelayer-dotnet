@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace TrueLayer.Payments
 {
@@ -20,15 +21,20 @@ namespace TrueLayer.Payments
         internal override void Validate()
         {
             base.Validate();
+            
+            if (SigningKey is null)
+            {
+                throw new ValidationException("The signing key is required");
+            }
 
             if (string.IsNullOrWhiteSpace(SigningKey?.KeyId))
             {
-                throw new ArgumentNullException(nameof(SigningKey.KeyId), "The signing key identifier is required");
+                throw new ValidationException("The signing key identifier is required");
             }
 
             if (string.IsNullOrWhiteSpace(SigningKey?.PrivateKey))
             {
-                throw new ArgumentNullException(nameof(SigningKey.PrivateKey), "The signing key is required");
+                throw new ValidationException("The signing key is required");
             }
         }
     }
