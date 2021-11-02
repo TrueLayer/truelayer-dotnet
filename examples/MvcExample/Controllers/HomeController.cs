@@ -46,7 +46,8 @@ namespace MvcExample.Controllers
                     "TrueLayer",
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
-                )
+                ),
+                new PaymentUser.NewUser(donateModel.Name, donateModel.Email)
             );
 
             var apiResponse = await _truelayer.Payments.CreatePayment(
@@ -113,7 +114,6 @@ namespace MvcExample.Controllers
                 authRequired => Failed(authRequired.Status),
                 authorizing => Pending(authorizing),
                 authorized => Success(authorized),
-                authFailed => Failed(authFailed.Status),
                 success => Success(success),
                 settled => Success(settled),
                 failed => Failed(failed.Status)

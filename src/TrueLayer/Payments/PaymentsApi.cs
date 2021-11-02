@@ -19,8 +19,8 @@ namespace TrueLayer.Payments
 
     internal class PaymentsApi : IPaymentsApi
     {
-        internal const string ProdUrl = "https://api.truelayer.com/";
-        internal const string SandboxUrl = "https://api.truelayer-sandbox.com/";
+        internal const string ProdUrl = "https://api.truelayer.com/payments/";
+        internal const string SandboxUrl = "https://api.truelayer-sandbox.com/payments/";
         internal static string[] RequiredScopes = new[] { "payments" };
 
         private readonly IApiClient _apiClient;

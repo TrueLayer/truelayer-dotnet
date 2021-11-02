@@ -1,11 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MvcExample.Models
 {
-    using System.ComponentModel.DataAnnotations;
-
     public class DonateModel
     {
         [Required(ErrorMessage = "The amount is required")]
         [Range(1, double.MaxValue, ErrorMessage = "You must donate at least 1 GBP")]
         public double AmountInMajor { get; set; }
+
+        [Required(ErrorMessage = "Your name is required")]
+        public string Name { get; set; }
+
+        [Required(ErrorMessage = "Your email is required")]
+        [EmailAddress(ErrorMessage = "A valid email address is required")]
+        public string Email { get; set; }
     }
 }
