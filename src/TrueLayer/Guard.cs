@@ -32,6 +32,31 @@ namespace TrueLayer
         }
 
         /// <summary>
+        /// Values that the provided <paramref name="value"/> is not empty, or whitespace but can be null
+        /// </summary>
+        /// <param name="value">The value to validate</param>
+        /// <param name="name">The name of the argument</param>
+        /// <returns>The value of <paramref name="value"/> if it is empty or whitespace</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the value is empty or whitespace
+        /// </exception>
+        /// <example>
+        /// <code>
+        /// _name = name.NotEmptyOrWhiteSpace(nameof(name));
+        /// </code>
+        /// </example>
+        [DebuggerStepThrough]
+        public static string? NotEmptyOrWhiteSpace(this string? value, string name)
+        {
+            if (value is not null && string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("Value must be provided", name);
+            }
+
+            return value;
+        }
+
+        /// <summary>
         /// Validates that the provided <paramref name="value"/> is not null
         /// </summary>
         /// <param name="value">The value to validate</param>

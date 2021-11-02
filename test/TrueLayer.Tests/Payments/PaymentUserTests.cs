@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TrueLayer.Payments.Model;
 using Xunit;
 
@@ -24,6 +21,22 @@ namespace TrueLayer.Tests.Payments
         public void Can_create_new_user_with_email_or_phone(string? email, string? phone)
         {
             _ = new PaymentUser.NewUser("name", email: email, phone: phone);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void New_user_throws_if_email_empty_or_whitespace(string? email)
+        {
+            Assert.Throws<ArgumentException>("email", () => new PaymentUser.NewUser("name", email: email, phone: "01234567890"));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void New_user_throws_if_phone_empty_or_whitespace(string? phone)
+        {
+            Assert.Throws<ArgumentException>("phone", () => new PaymentUser.NewUser("name", email: "a@b.com", phone: phone));
         }
     }
 }

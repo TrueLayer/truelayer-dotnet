@@ -27,8 +27,8 @@ namespace TrueLayer.Payments.Model
                     throw new ArgumentException("User email or phone must be provided");
                 }
                 
-                Email = email;
-                Phone = phone;
+                Email = email.NotEmptyOrWhiteSpace(nameof(email));
+                Phone = phone.NotEmptyOrWhiteSpace(nameof(phone));
             }
 
             /// <summary>
