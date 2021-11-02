@@ -1,11 +1,13 @@
 using OneOf;
 using static TrueLayer.Payments.Model.Beneficiary;
 using static TrueLayer.Payments.Model.PaymentMethod;
+using static TrueLayer.Payments.Model.PaymentUser;
 
 namespace TrueLayer.Payments.Model
 {
     using BeneficiaryUnion = OneOf<MerchantAccount, ExternalAccount>;
     using PaymentMethodUnion = OneOf<BankTransfer>;
+    using UserUnion = OneOf<NewUser, ExistingUser>;
 
     /// <summary>
     /// Represents a request for payment
@@ -19,16 +21,19 @@ namespace TrueLayer.Payments.Model
         /// <param name="currency">The three-letter ISO alpha currency code</param>
         /// <param name="paymentMethod">The method of payment</param>
         /// <param name="beneficiary">The payment beneficiary details</param>
+        /// <param name="user">The end user details</param>
         public CreatePaymentRequest(
             long amountInMinor,
             string currency,
             PaymentMethodUnion paymentMethod,
-            BeneficiaryUnion beneficiary)
+            BeneficiaryUnion beneficiary,
+            UserUnion user)
         {
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
             Currency = currency.NotNullOrWhiteSpace(nameof(currency));
-            PaymentMethod = paymentMethod.NotNull(nameof(paymentMethod));
+            PaymentMethod = paymentMethod;
             Beneficiary = beneficiary;
+            User = user;
         }
 
         /// <summary>
@@ -51,5 +56,10 @@ namespace TrueLayer.Payments.Model
         /// Gets the beneficiary details
         /// </summary>
         public BeneficiaryUnion Beneficiary { get; }
+
+        /// <summary>
+        /// Gets the end user details
+        /// </summary>
+        public UserUnion User { get; }
     }
 }
