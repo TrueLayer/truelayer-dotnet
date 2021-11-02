@@ -1,5 +1,6 @@
 using System;
 using TrueLayer.Serialization;
+using TrueLayer.Users.Model;
 
 namespace TrueLayer.Payments.Model
 {
@@ -17,8 +18,8 @@ namespace TrueLayer.Payments.Model
         /// <param name="Status">The status of the payment</param>
         /// <param name="CreatedAt">The data and time the payment was created</param>
         /// <param name="ResourceToken">The resource token used to complete the payment via a front-end channel</param>
-        /// <returns></returns>
+        /// <param name="User">The end user details</param>
         [JsonDiscriminator("authorization_required")]
-        public record AuthorizationRequired(string Id, long AmountInMinor, string Currency, string Status, DateTime CreatedAt, string ResourceToken);
+        public record AuthorizationRequired(string Id, long AmountInMinor, string Currency, string Status, DateTime CreatedAt, string ResourceToken, User User);
     }
 }
