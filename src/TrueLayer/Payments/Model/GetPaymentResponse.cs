@@ -1,6 +1,7 @@
 using System;
 using OneOf;
 using TrueLayer.Serialization;
+using TrueLayer.Users.Model;
 using static TrueLayer.Payments.Model.Beneficiary;
 using static TrueLayer.Payments.Model.PaymentMethod;
 
@@ -25,38 +26,43 @@ namespace TrueLayer.Payments.Model
             /// Gets the unique identifier of the payment
             /// </summary>
             public string Id { get; init; } = null!;
-            
+
             /// <summary>
             /// Gets the Amount in the minor currency unit e.g. cents
             /// </summary>
             public long AmountInMinor { get; init; }
-            
+
             /// <summary>
             /// Gets the three-letter ISO3 alpha currency code
             /// </summary>
             /// <example>EUR</example>
             public string Currency { get; init; } = null!;
-            
+
             /// <summary>
             /// Gets the status of the payment
             /// </summary>
             public string Status { get; init; } = null!;
-            
+
             /// <summary>
             /// Gets the data and time the payment was created
             /// </summary>
             /// <value></value>
             public DateTime CreatedAt { get; init; }
-            
+
             /// <summary>
             /// Gets the beneficiary details
             /// </summary>
             public BeneficiaryUnion Beneficiary { get; init; }
-            
+
             /// <summary>
             /// Gets the payment method details
             /// </summary>
             public PaymentMethodUnion PaymentMethod { get; init; }
+
+            /// <summary>
+            /// Gets the end user details
+            /// </summary>
+            public User User { get; init; } = null!;
         }
 
         /// <summary>
