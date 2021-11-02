@@ -76,7 +76,7 @@ namespace TrueLayer.Payments.Model
         /// </summary>
         /// <returns></returns>
         [JsonDiscriminator("authorized")]
-        public record Authorized() : PaymentDetails;
+        public record Authorized : PaymentDetails;
 
         /// <summary>
         /// Represents a payment that has succeeded
