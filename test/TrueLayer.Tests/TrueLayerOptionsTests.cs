@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using Xunit;
 
 namespace TrueLayer.Tests
@@ -17,7 +18,7 @@ namespace TrueLayer.Tests
                 ClientSecret = "secret"
             };
 
-            Assert.Throws<ArgumentException>("ClientId", () => options.Validate());
+            Assert.Throws<ValidationException>(() => options.Validate());
         }
 
         [Theory]
@@ -32,7 +33,7 @@ namespace TrueLayer.Tests
                 ClientSecret = value
             };
 
-            Assert.Throws<ArgumentException>("ClientSecret", () => options.Validate());
+            Assert.Throws<ValidationException>(() => options.Validate());
         }
 
         [Fact]

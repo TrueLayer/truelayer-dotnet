@@ -1,7 +1,8 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace TrueLayer
 {
-    using System;
-
     /// <summary>
     /// Represents default options for an API resource
     /// </summary>
@@ -15,7 +16,7 @@ namespace TrueLayer
         internal virtual void Validate()
         {
             if (Uri is null || !Uri.IsAbsoluteUri)
-                throw new ArgumentException("Must be a valid and absolute uri.", nameof(Uri));
+                throw new ValidationException("Uri must be a valid and absolute uri");
         }
     }
 }

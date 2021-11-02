@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using Xunit;
 
 namespace TrueLayer.Tests
@@ -12,7 +13,7 @@ namespace TrueLayer.Tests
         public void Invalid_if_not_absolute_uri(string value)
         {
             Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out var uri);
-            Assert.Throws<ArgumentException>("Uri", () => new ApiOptions { Uri = uri }.Validate());
+            Assert.Throws<ValidationException>(() => new ApiOptions { Uri = uri }.Validate());
         }
 
         [Fact]

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using TrueLayer.Payments;
 using Xunit;
 
@@ -11,20 +12,20 @@ namespace TrueLayer.Tests.Payments
         [Fact]
         public void Invalid_if_no_signing_key()
         {
-            Assert.Throws<ArgumentNullException>("SigningKey", () => new PaymentsOptions { Uri = TestUri }.Validate());
+            Assert.Throws<ValidationException>(() => new PaymentsOptions { Uri = TestUri }.Validate());
         }
 
         [Fact]
         public void Invalid_if_no_signing_key_id()
         {
-            Assert.Throws<ArgumentException>("KeyId", () =>
+            Assert.Throws<ValidationException>(() =>
                 new PaymentsOptions { Uri = TestUri, SigningKey = new SigningKey { PrivateKey = "xxx" } }.Validate());
         }
 
         [Fact]
         public void Invalid_if_no_private_key()
         {
-            Assert.Throws<ArgumentException>("PrivateKey", () =>
+            Assert.Throws<ValidationException>(() =>
                 new PaymentsOptions { Uri = TestUri, SigningKey = new SigningKey { KeyId = "xxx" } }.Validate());
         }
 
