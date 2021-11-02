@@ -50,7 +50,7 @@ namespace TrueLayer
         {
             if (value is not null && string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException("Value must be provided", name);
+                throw new ArgumentException("Value cannot be empty or whitespace", name);
             }
 
             return value;
