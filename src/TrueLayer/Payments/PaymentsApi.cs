@@ -12,8 +12,7 @@ namespace TrueLayer.Payments
         AuthorizationRequired,
         Authorizing,
         Authorized,
-        AuthorizationFailed,
-        Successful,
+        Succeeded,
         Settled,
         Failed
     >;
