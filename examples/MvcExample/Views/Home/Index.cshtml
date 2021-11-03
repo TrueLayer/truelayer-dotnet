@@ -1,0 +1,38 @@
+﻿@model DonateModel
+@{
+  ViewData["Title"] = "Home Page";
+}
+
+<h1 class="display-4 mb-4 text-center">Make a donation</h1>
+
+<div class="row justify-content-center">
+  <form class="needs-validation col-sm-10" asp-action="Donate" asp-controller="Home" method="post" novalidate>
+    @Html.ValidationSummary(true)
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label asp-for="Name"></label>
+        <input type="text" class="form-control form-control-lg" asp-for="Name">
+        <span asp-validation-for="Name"></span>
+      </div>
+      <div class="form-group col-md-6">
+        <label asp-for="Email"></label>
+        <input type="text" class="form-control form-control-lg" asp-for="Email">
+        <span asp-validation-for="Email"></span>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="input-group mb-3 col-md-12">
+        <div class="input-group-prepend">
+          <span class="input-group-text">GBP</span>
+        </div>
+        <input type="text" class="form-control form-control-lg" asp-for="AmountInMajor" />
+        <div class="input-group-append">
+          <button type="submit" class="btn btn-primary btn-lg">Donate!</button>
+        </div>
+      </div>
+      <span asp-validation-for="AmountInMajor"></span>
+    </div>
+
+  </form>
+
+</div>

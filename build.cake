@@ -80,7 +80,7 @@ Task("SonarBegin")
             Key = "TrueLayer_truelayer-dotnet",
             Organization = "truelayer",
             Url = "https://sonarcloud.io",
-            Exclusions = "test/**",
+            Exclusions = "test/**,examples/**",
             OpenCoverReportsPath = $"{coveragePath}/*.xml",
             Login = sonarToken,
             VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
