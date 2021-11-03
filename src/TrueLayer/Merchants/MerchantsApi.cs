@@ -8,7 +8,7 @@ namespace TrueLayer.Merchants
 {
     internal class MerchantsApi : IMerchantsApi
     {
-        private const string Url = "https://test-pay-api.t7r.dev/merchant_accounts/";
+        private const string Url = "https://test-pay-api.t7r.dev/merchant_accounts";
         private readonly IApiClient _apiClient;
         private readonly Uri _baseUri;
         private readonly IAuthApi _auth;
@@ -23,7 +23,8 @@ namespace TrueLayer.Merchants
         
         public async Task<ApiResponse<ListMerchantsResponse>> ListMerchants(CancellationToken cancellationToken = default)
         {
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            // 'payments' scope should be supported soon
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("paydirect"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
