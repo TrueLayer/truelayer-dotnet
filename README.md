@@ -170,7 +170,7 @@ public class MyService
 
         // or, redirect to the TrueLayer Hosted Payment Page
         string hostedPaymentPageUrl = apiResponse.Data.Match(
-            authRequired => _client.CreateHostedPaymentPageLink(
+            authRequired => _client.Payments.CreateHostedPaymentPageLink(
                 authRequired.Id, 
                 authRequired.ResourceToken, 
                 new Uri("https://redirect.yourdomain.com")
