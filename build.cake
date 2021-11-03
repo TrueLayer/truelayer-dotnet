@@ -1,7 +1,7 @@
 // Install .NET Core Global tools.
 #tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=4.8.12"
 #tool "dotnet:?package=coveralls.net&version=3.0.0"
-#tool "dotnet:?package=dotnet-sonarscanner&version=5.3.1"
+#tool "dotnet:?package=dotnet-sonarscanner&version=5.3.2"
 #tool nuget:?package=docfx.console&version=2.56.6
 #tool nuget:?package=KuduSync.NET&version=1.5.3
 
