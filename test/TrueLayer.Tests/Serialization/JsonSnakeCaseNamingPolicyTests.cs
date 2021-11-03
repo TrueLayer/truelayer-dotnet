@@ -35,7 +35,7 @@ namespace TrueLayer.Tests.Serialization
             Person? person = JsonSerializer.Deserialize<Person>(json, SerializerOptions);
             Assert.NotNull(person);
             Assert.Equal("Name!", person!.Name);
-            Assert.Equal(DateTime.Parse("2000-11-20T23:55:44Z"), person.BirthDate);
+            Assert.Equal(DateTime.Parse("2000-11-20T23:55:44Z").ToUniversalTime(), person.BirthDate);
             Assert.Equal(new[] { "food", "sport" }, person.Likes);
         }
 

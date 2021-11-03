@@ -19,6 +19,8 @@ namespace TrueLayer.Tests.Serialization
             var oneOfType = typeof(OneOf<string, int>);
             OneOfTypeDescriptor.TryCreate(oneOfType, out var factory).ShouldBeTrue();
 
+            if (factory is null) throw new Exception($"{nameof(factory)} is null");
+            
             factory.OneOfType.ShouldBe(oneOfType);
             
             factory.TypeFactories.TryGetValue(nameof(String), out var stringOneOfFactory)
