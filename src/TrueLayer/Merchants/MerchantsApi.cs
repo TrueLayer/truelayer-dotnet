@@ -26,7 +26,7 @@ namespace TrueLayer.Merchants
                 : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl).AbsoluteUri;
         }
         
-        public async Task<ApiResponse<ListMerchantsResponse>> ListMerchants(CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<ResourceCollection<MerchantAccount>>> ListMerchants(CancellationToken cancellationToken = default)
         {
             // 'payments' scope should be supported soon
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("paydirect"), cancellationToken);
@@ -36,7 +36,7 @@ namespace TrueLayer.Merchants
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
             
-            return await _apiClient.GetAsync<ListMerchantsResponse>(
+            return await _apiClient.GetAsync<ResourceCollection<MerchantAccount>>(
                 new Uri(_baseUri.TrimEnd('/')),
                 authResponse.Data!.AccessToken,
                 cancellationToken

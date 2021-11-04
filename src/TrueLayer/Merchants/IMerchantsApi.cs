@@ -14,7 +14,7 @@ namespace TrueLayer.Merchants
         /// </summary>
         /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
         /// <returns>An API response that includes a list of merchant accounts if successful, otherwise problem details.</returns>
-        Task<ApiResponse<ListMerchantsResponse>> ListMerchants(CancellationToken cancellationToken = default);
+        Task<ApiResponse<ResourceCollection<MerchantAccount>>> ListMerchants(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get the details of a single merchant account.
