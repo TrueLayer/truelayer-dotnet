@@ -21,14 +21,9 @@ namespace TrueLayer.Merchants
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            if (options.Payments.Uri is not null)
-            {
-                _baseUri = options.Payments.Uri.AbsoluteUri.Replace("/payments", "/merchant_accounts");
-            }
-            else
-            {
-                _baseUri = options.UseSandbox ?? true ? SandboxUrl : ProdUrl;
-            }
+            _baseUri = options.Payments.Uri is not null 
+                ? new Uri(options.Payments.Uri, "merchant_accounts").AbsoluteUri
+                : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl).AbsoluteUri;
         }
         
         public async Task<ApiResponse<ListMerchantsResponse>> ListMerchants(CancellationToken cancellationToken = default)

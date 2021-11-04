@@ -37,7 +37,7 @@ namespace TrueLayer.AcceptanceTests
         public async Task Can_get_specific_merchant_account()
         {
             // Arrange
-            var canceller = new CancellationTokenSource(150000).Token;
+            var canceller = new CancellationTokenSource(5000).Token;
             
             var listMerchants = await _fixture.Client.Merchants.ListMerchants(canceller);
             listMerchants.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
