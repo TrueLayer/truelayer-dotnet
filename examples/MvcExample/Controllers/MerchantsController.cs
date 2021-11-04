@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TrueLayer;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MvcExample.Controllers
@@ -21,21 +20,25 @@ namespace MvcExample.Controllers
         {
             var apiResponse = await _truelayer.Merchants.ListMerchants();
 
-            if (!apiResponse.IsSuccessful)
+            if (apiResponse.IsSuccessful)
             {
-                if (apiResponse.Problem?.Errors != null)
-                {
-                    foreach (var error in apiResponse.Problem.Errors)
-                    {
-                        ModelState.AddModelError("", $"{error.Key}: {error.Value?.FirstOrDefault()}");
-                    }
-                }
-                
-                ModelState.AddModelError("", "Failed to gather merchants list");
-                return View();
+                return View(apiResponse.Data?.Items);
             }
-            
-            return View(apiResponse.Data?.Items);
+
+            _logger.LogError("Get merchant accounts failed with status code {StatusCode}", apiResponse.StatusCode);
+
+            if (apiResponse.Problem != null)
+            {
+                var problem = apiResponse.Problem;
+                ModelState.AddModelError("", $"{problem.Title}, {problem.Detail}");
+            }
+            else
+            {
+                ModelState.AddModelError("", "Failed to gather merchants list");
+            }
+
+            return View();
+
         }
     }
 }
