@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace MvcExample.Controllers
 {
-    public class MerchantsController : Controller
+    public class MerchantAccountsController : Controller
     {
         private readonly ITrueLayerClient _truelayer;
-        private readonly ILogger<MerchantsController> _logger;
+        private readonly ILogger<MerchantAccountsController> _logger;
 
-        public MerchantsController(ITrueLayerClient truelayer, ILogger<MerchantsController> logger)
+        public MerchantAccountsController(ITrueLayerClient truelayer, ILogger<MerchantAccountsController> logger)
         {
             _truelayer = truelayer;
             _logger = logger;
@@ -18,7 +18,7 @@ namespace MvcExample.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var apiResponse = await _truelayer.Merchants.ListMerchants();
+            var apiResponse = await _truelayer.MerchantAccounts.ListMerchantAccounts();
 
             if (apiResponse.IsSuccessful)
             {
@@ -42,7 +42,7 @@ namespace MvcExample.Controllers
 
         public async Task<IActionResult> Details(string id)
         {
-            var apiResponse = await _truelayer.Merchants.GetMerchant(id);
+            var apiResponse = await _truelayer.MerchantAccounts.GetMerchantAccount(id);
 
             if (apiResponse.IsSuccessful)
             {

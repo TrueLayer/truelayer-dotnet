@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using TrueLayer.Merchants.Model;
+using TrueLayer.MerchantAccounts.Model;
 using Shouldly;
 using Xunit;
 using System.Threading;
@@ -25,7 +25,7 @@ namespace TrueLayer.AcceptanceTests
             var canceller = new CancellationTokenSource(5000).Token;
             
             // Act
-            var response = await _fixture.Client.Merchants.ListMerchants(canceller);
+            var response = await _fixture.Client.MerchantAccounts.ListMerchantAccounts(canceller);
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {response.TraceId}");
@@ -39,14 +39,14 @@ namespace TrueLayer.AcceptanceTests
             // Arrange
             var canceller = new CancellationTokenSource(5000).Token;
             
-            var listMerchants = await _fixture.Client.Merchants.ListMerchants(canceller);
+            var listMerchants = await _fixture.Client.MerchantAccounts.ListMerchantAccounts(canceller);
             listMerchants.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
             listMerchants.Data.ShouldNotBeNull();
             listMerchants.Data.Items.ShouldNotBeEmpty();
             var merchantId = listMerchants.Data.Items.First().Id;
             
             // Act
-            var merchantResponse = await _fixture.Client.Merchants.GetMerchant(merchantId, canceller);
+            var merchantResponse = await _fixture.Client.MerchantAccounts.GetMerchantAccount(merchantId, canceller);
 
             // Assert
             merchantResponse.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");

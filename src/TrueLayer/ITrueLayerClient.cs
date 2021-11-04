@@ -1,6 +1,6 @@
 using TrueLayer.Auth;
 using TrueLayer.Payments;
-using TrueLayer.Merchants;
+using TrueLayer.MerchantAccounts;
 
 namespace TrueLayer
 {
@@ -20,8 +20,8 @@ namespace TrueLayer
         IPaymentsApi Payments { get; }
 
         /// <summary>
-        /// Gets the Merchants API resource
+        /// Gets the Merchant Accounts API resource
         /// </summary>
-        IMerchantsApi Merchants { get; }
+        IMerchantAccountsApi MerchantAccounts { get; }
     }
 }

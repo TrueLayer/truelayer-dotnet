@@ -2,7 +2,7 @@ using OneOf;
 using SchemeIdentifier = TrueLayer.Payments.Model.SchemeIdentifier;
 using System.Collections.Generic;
 
-namespace TrueLayer.Merchants.Model
+namespace TrueLayer.MerchantAccounts.Model
 {
     using SchemeIdentifiersUnion = OneOf<
         SchemeIdentifier.SortCodeAccountNumber,
