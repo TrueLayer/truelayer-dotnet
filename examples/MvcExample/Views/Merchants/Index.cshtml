@@ -10,7 +10,7 @@
   <ul class="list-group">
     @foreach (var merchant in Model)
     {
-      <li class="list-group-item">@merchant.account_holder_name - @merchant.currency</li>
+      <li class="list-group-item">@merchant.id - @merchant.account_holder_name - @merchant.currency</li>
     }
   </ul>
 }
