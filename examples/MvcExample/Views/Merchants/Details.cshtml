@@ -1,0 +1,42 @@
+﻿@model TrueLayer.Merchants.Model.MerchantAccount
+@{
+  ViewData["Title"] = "Merchants Page";
+}
+
+<h1 class="display-4 mb-4 text-center">Merchant Account Details</h1>
+
+@if (Model != null)
+{
+  <table class="table">
+    <tbody>
+    <tr>
+      <th scope="row">Id</th>
+      <td>@Model.Id</td>
+    </tr>
+    <tr>
+      <th scope="row">Holder Name</th>
+      <td>@Model.AccountHolderName</td>
+    </tr>
+    <tr>
+      <th scope="row">Currency</th>
+      <td>@Model.Currency</td>
+    </tr>
+    <tr>
+      <th scope="row">Current Balance</th>
+      <td>@Model.CurrentBalanceInMinor</td>
+    </tr>
+    <tr>
+      <th scope="row">Available Balance</th>
+      <td>@Model.AvailableBalanceInMinor</td>
+    </tr>
+    <tr>
+      <th scope="row"></th>
+      <td></td>
+    </tr>
+    </tbody>
+  </table>
+}
+else
+{
+  <p>NO DETAILS</p>
+}

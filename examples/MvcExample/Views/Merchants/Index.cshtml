@@ -10,7 +10,12 @@
   <ul class="list-group">
     @foreach (var merchant in Model)
     {
-      <li class="list-group-item">@merchant.Id - @merchant.AccountHolderName - @merchant.Currency</li>
+      <li class="list-group-item">
+        @merchant.AccountHolderName - @merchant.Currency - 
+        <td class="form-inline">
+          <a asp-controller="Merchants" asp-action="Details" asp-route-id="@merchant.Id" class="btn btn-outline-secondary btn-sm list-inline-item" role="button">GO</a>
+        </td>
+      </li>
     }
   </ul>
 }
