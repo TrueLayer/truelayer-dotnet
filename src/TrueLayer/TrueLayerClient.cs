@@ -19,7 +19,7 @@ namespace TrueLayer
 
             Auth = new AuthApi(apiClient, options.Value);
             _payments = new(() => new PaymentsApi(apiClient, Auth, options.Value));
-            _merchants = new(() => new MerchantsApi(apiClient, Auth));
+            _merchants = new(() => new MerchantsApi(apiClient, Auth, options.Value));
         }
 
         public IAuthApi Auth { get; }

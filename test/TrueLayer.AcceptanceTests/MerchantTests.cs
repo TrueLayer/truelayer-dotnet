@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using TrueLayer.Merchants.Model;
 using Shouldly;
 using Xunit;
+using System.Threading;
 
 namespace TrueLayer.AcceptanceTests
 {
+
     public class MerchantTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
@@ -19,8 +21,11 @@ namespace TrueLayer.AcceptanceTests
         [Fact]
         public async Task Can_get_merchant_accounts()
         {
+            // Arrange
+            var canceller = new CancellationTokenSource(5000).Token;
+            
             // Act
-            var response = await _fixture.Client.Merchants.ListMerchants();
+            var response = await _fixture.Client.Merchants.ListMerchants(canceller);
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {response.TraceId}");
