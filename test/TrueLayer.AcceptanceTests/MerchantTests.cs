@@ -30,7 +30,7 @@ namespace TrueLayer.AcceptanceTests
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {response.TraceId}");
             response.Data.ShouldNotBeNull();
-            response.Data.items.ShouldBeOfType<List<MerchantAccount>>();
+            response.Data.Items.ShouldBeOfType<List<MerchantAccount>>();
         }
         
         [Fact]
@@ -42,8 +42,8 @@ namespace TrueLayer.AcceptanceTests
             var listMerchants = await _fixture.Client.Merchants.ListMerchants(canceller);
             listMerchants.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
             listMerchants.Data.ShouldNotBeNull();
-            listMerchants.Data.items.ShouldNotBeEmpty();
-            var merchantId = listMerchants.Data.items.First().id;
+            listMerchants.Data.Items.ShouldNotBeEmpty();
+            var merchantId = listMerchants.Data.Items.First().Id;
             
             // Act
             var merchantResponse = await _fixture.Client.Merchants.GetMerchant(merchantId, canceller);
@@ -51,9 +51,9 @@ namespace TrueLayer.AcceptanceTests
             // Assert
             merchantResponse.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
             merchantResponse.Data.ShouldNotBeNull();
-            merchantResponse.Data.id.ShouldBe(merchantId);
-            merchantResponse.Data.account_holder_name.ShouldNotBeNullOrWhiteSpace();
-            merchantResponse.Data.currency.ShouldNotBeNullOrWhiteSpace();
+            merchantResponse.Data.Id.ShouldBe(merchantId);
+            merchantResponse.Data.AccountHolderName.ShouldNotBeNullOrWhiteSpace();
+            merchantResponse.Data.Currency.ShouldNotBeNullOrWhiteSpace();
         }
     }
 }

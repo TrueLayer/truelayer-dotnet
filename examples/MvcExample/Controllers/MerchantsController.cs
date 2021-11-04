@@ -35,7 +35,7 @@ namespace MvcExample.Controllers
                 return View();
             }
             
-            return View(apiResponse.Data?.items);
+            return View(apiResponse.Data?.Items);
         }
     }
 }
