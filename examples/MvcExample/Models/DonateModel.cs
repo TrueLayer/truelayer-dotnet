@@ -6,7 +6,7 @@ namespace MvcExample.Models
     {
         [Required(ErrorMessage = "The amount is required")]
         [Range(1, double.MaxValue, ErrorMessage = "You must donate at least 1 GBP")]
-        public double AmountInMajor { get; set; }
+        public decimal AmountInMajor { get; set; }
 
         [Required(ErrorMessage = "Your name is required")]
         public string Name { get; set; }
