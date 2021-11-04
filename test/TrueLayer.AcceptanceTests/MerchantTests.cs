@@ -5,10 +5,10 @@ using TrueLayer.Merchants.Model;
 using Shouldly;
 using Xunit;
 using System.Threading;
+using System.Linq;
 
 namespace TrueLayer.AcceptanceTests
 {
-
     public class MerchantTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
@@ -31,6 +31,29 @@ namespace TrueLayer.AcceptanceTests
             response.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {response.TraceId}");
             response.Data.ShouldNotBeNull();
             response.Data.items.ShouldBeOfType<List<MerchantAccount>>();
+        }
+        
+        [Fact]
+        public async Task Can_get_specific_merchant_account()
+        {
+            // Arrange
+            var canceller = new CancellationTokenSource(150000).Token;
+            
+            var listMerchants = await _fixture.Client.Merchants.ListMerchants(canceller);
+            listMerchants.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
+            listMerchants.Data.ShouldNotBeNull();
+            listMerchants.Data.items.ShouldNotBeEmpty();
+            var merchantId = listMerchants.Data.items.First().id;
+            
+            // Act
+            var merchantResponse = await _fixture.Client.Merchants.GetMerchant(merchantId, canceller);
+
+            // Assert
+            merchantResponse.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
+            merchantResponse.Data.ShouldNotBeNull();
+            merchantResponse.Data.id.ShouldBe(merchantId);
+            merchantResponse.Data.account_holder_name.ShouldNotBeNullOrWhiteSpace();
+            merchantResponse.Data.currency.ShouldNotBeNullOrWhiteSpace();
         }
     }
 }

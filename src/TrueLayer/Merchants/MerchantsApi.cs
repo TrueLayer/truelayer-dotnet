@@ -11,7 +11,7 @@ namespace TrueLayer.Merchants
         private const string ProdUrl = "https://api.truelayer.com/merchant_accounts";
         private const string SandboxUrl = "https://api.truelayer-sandbox.com/merchant_accounts";
         private readonly IApiClient _apiClient;
-        private readonly Uri _baseUri;
+        private readonly string _baseUri;
         private readonly IAuthApi _auth;
         
         public MerchantsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
@@ -23,13 +23,11 @@ namespace TrueLayer.Merchants
 
             if (options.Payments.Uri is not null)
             {
-                var url = options.Payments.Uri.AbsoluteUri.Replace("/payments", "/merchant_accounts").TrimEnd('/');
-                var merchantUri = new Uri(url);
-                _baseUri = merchantUri;
+                _baseUri = options.Payments.Uri.AbsoluteUri.Replace("/payments", "/merchant_accounts");
             }
             else
             {
-                _baseUri = new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
+                _baseUri = options.UseSandbox ?? true ? SandboxUrl : ProdUrl;
             }
         }
         
@@ -44,7 +42,27 @@ namespace TrueLayer.Merchants
             }
             
             return await _apiClient.GetAsync<ListMerchantsResponse>(
-                _baseUri,
+                new Uri(_baseUri.TrimEnd('/')),
+                authResponse.Data!.AccessToken,
+                cancellationToken
+            );
+        }
+        
+        public async Task<ApiResponse<MerchantAccount>> GetMerchant(string merchantId, CancellationToken cancellationToken = default)
+        {
+            merchantId.NotNullOrWhiteSpace(nameof(merchantId));
+            
+            // 'payments' scope should be supported soon
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("paydirect"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            var getUri = new Uri(_baseUri.EndsWith('/') ? _baseUri + merchantId : _baseUri + "/" + merchantId);
+            return await _apiClient.GetAsync<MerchantAccount>(
+                getUri,
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
