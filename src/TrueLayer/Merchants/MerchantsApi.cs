@@ -11,7 +11,7 @@ namespace TrueLayer.Merchants
         private const string ProdUrl = "https://api.truelayer.com/merchant_accounts";
         private const string SandboxUrl = "https://api.truelayer-sandbox.com/merchant_accounts";
         private readonly IApiClient _apiClient;
-        private readonly string _baseUri;
+        private readonly Uri _baseUri;
         private readonly IAuthApi _auth;
         
         public MerchantsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
@@ -22,8 +22,8 @@ namespace TrueLayer.Merchants
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
             _baseUri = options.Payments.Uri is not null 
-                ? new Uri(options.Payments.Uri, "merchant_accounts").AbsoluteUri
-                : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl).AbsoluteUri;
+                ? new Uri(options.Payments.Uri, "merchant_accounts")
+                : new Uri(options.UseSandbox ?? true ? SandboxUrl : ProdUrl);
         }
         
         public async Task<ApiResponse<ResourceCollection<MerchantAccount>>> ListMerchants(CancellationToken cancellationToken = default)
@@ -37,7 +37,7 @@ namespace TrueLayer.Merchants
             }
             
             return await _apiClient.GetAsync<ResourceCollection<MerchantAccount>>(
-                new Uri(_baseUri.TrimEnd('/')),
+                _baseUri,
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
@@ -55,7 +55,7 @@ namespace TrueLayer.Merchants
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            var getUri = new Uri(_baseUri.EndsWith('/') ? _baseUri + merchantId : _baseUri + "/" + merchantId);
+            var getUri = new Uri(_baseUri.AbsoluteUri.EndsWith('/') ? _baseUri + merchantId : _baseUri + "/" + merchantId);
             return await _apiClient.GetAsync<MerchantAccount>(
                 getUri,
                 authResponse.Data!.AccessToken,
