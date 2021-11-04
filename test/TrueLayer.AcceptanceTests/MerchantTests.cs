@@ -23,7 +23,7 @@ namespace TrueLayer.AcceptanceTests
             var response = await _fixture.Client.Merchants.ListMerchants();
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {response.TraceId}");
             response.Data.ShouldNotBeNull();
             response.Data.items.ShouldBeOfType<List<MerchantAccount>>();
         }
