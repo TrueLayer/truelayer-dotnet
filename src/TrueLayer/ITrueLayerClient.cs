@@ -18,7 +18,10 @@ namespace TrueLayer
         /// Gets the Payments API resource
         /// </summary>
         IPaymentsApi Payments { get; }
-        
+
+        /// <summary>
+        /// Gets the Merchants API resource
+        /// </summary>
         IMerchantsApi Merchants { get; }
     }
 }
