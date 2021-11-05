@@ -16,11 +16,8 @@ namespace TrueLayer
         /// <returns>The converted value</returns>
         public static decimal ToMajorCurrencyUnit(this long minorValue, int currencyExponent = 2)
         {
-            if (minorValue < 0)
-                throw new ArgumentException("Minor value cannot be negative", nameof(minorValue));
-
             if (currencyExponent < 0)
-                throw new ArgumentException("Currency exponent value cannot be negative", nameof(currencyExponent));
+                throw new ArgumentOutOfRangeException(nameof(currencyExponent), "Currency exponent value cannot be negative");
 
             if (minorValue == 0)
                 return 0;
@@ -37,11 +34,8 @@ namespace TrueLayer
         /// <returns>The converted value</returns>
         public static long ToMinorCurrencyUnit(this decimal majorValue, int currencyExponent)
         {
-            if (majorValue < 0)
-                throw new ArgumentException("Minor value cannot be negative", nameof(majorValue));
-
             if (currencyExponent < 0)
-                throw new ArgumentException("Currency exponent value cannot be negative", nameof(currencyExponent));
+                throw new ArgumentOutOfRangeException(nameof(currencyExponent), "Currency exponent value cannot be negative");
 
             if (majorValue == 0)
                 return 0;
