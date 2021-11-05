@@ -19,9 +19,9 @@ namespace TrueLayer.MerchantAccounts
         /// <summary>
         /// Get the details of a single merchant account.
         /// </summary>
-        /// <param name="merchantAccountId">The merchant account identifier.</param>
+        /// <param name="id">The merchant account identifier.</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
         /// <returns>An API response that includes the merchant account details if successful, otherwise problem details.</returns>
-        Task<ApiResponse<MerchantAccount>> GetMerchantAccount(string merchantAccountId, CancellationToken cancellationToken = default);
+        Task<ApiResponse<MerchantAccount>> GetMerchantAccount(string id, CancellationToken cancellationToken = default);
     }
 }
