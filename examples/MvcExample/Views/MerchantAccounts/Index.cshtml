@@ -1,0 +1,25 @@
+﻿@model IEnumerable<TrueLayer.MerchantAccounts.Model.MerchantAccount>
+@{
+  ViewData["Title"] = "Merchant accounts Page";
+}
+
+<h1 class="display-4 mb-4 text-center">Merchant Accounts</h1>
+
+@if (Model != null && Model.Any())
+{
+  <ul class="list-group">
+    @foreach (var merchant in Model)
+    {
+      <li class="list-group-item">
+        @merchant.AccountHolderName - @merchant.Currency - 
+        <td class="form-inline">
+          <a asp-controller="MerchantAccounts" asp-action="Details" asp-route-id="@merchant.Id" class="btn btn-outline-secondary btn-sm list-inline-item" role="button">GO</a>
+        </td>
+      </li>
+    }
+  </ul>
+}
+else
+{
+  <p>NO MERCHANTS</p>
+}
