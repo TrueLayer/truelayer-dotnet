@@ -10,7 +10,7 @@ namespace TrueLayer.MerchantAccounts
     public interface IMerchantAccountsApi
     {
         /// <summary>
-        /// List all your TrueLayer's merchant accounts. There might be more than one account per currency.
+        /// List all your TrueLayer merchant accounts. There might be more than one account per currency.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
         /// <returns>An API response that includes a list of merchant accounts if successful, otherwise problem details.</returns>
