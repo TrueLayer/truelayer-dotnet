@@ -26,6 +26,7 @@ namespace TrueLayer.MerchantAccounts
                 : new Uri(options.UseSandbox ?? true ? SandboxUrl : ProdUrl);
         }
         
+        /// <inheritdoc />
         public async Task<ApiResponse<ResourceCollection<MerchantAccount>>> ListMerchantAccounts(CancellationToken cancellationToken = default)
         {
             // 'payments' scope should be supported soon
@@ -43,6 +44,7 @@ namespace TrueLayer.MerchantAccounts
             );
         }
         
+        /// <inheritdoc />
         public async Task<ApiResponse<MerchantAccount>> GetMerchantAccount(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
