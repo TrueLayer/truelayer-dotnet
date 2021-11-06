@@ -138,7 +138,7 @@ public class MyService
     public async Task<ActionResult> MakePayment()
     {
         var paymentRequest = new CreatePaymentRequest(
-            amountInMinor: 100,
+            amountInMinor: amount.ToMinorCurrencyUnit(2),
             currency: Currencies.GBP,
             paymentMethod: new PaymentMethod.BankTransfer
             {
