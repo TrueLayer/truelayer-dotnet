@@ -36,7 +36,7 @@ namespace MvcExample.Controllers
             }
 
             var paymentRequest = new CreatePaymentRequest(
-                (long)Math.Round(donateModel.AmountInMajor * 100, 0),
+                donateModel.AmountInMajor.ToMinorCurrencyUnit(2),
                 Currencies.GBP,
                 new PaymentMethod.BankTransfer
                 {
