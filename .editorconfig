@@ -8,8 +8,9 @@ indent_style = space
 indent_size = 4
 end_of_line = lf
 charset = utf-8
-trim_trailing_whitespace = false
-insert_final_newline = false
+trim_trailing_whitespace = true
+insert_final_newline = true
+tab_width = 4
 
 [*.js]
 indent_size = 2
@@ -28,17 +29,6 @@ indent_size = 2
 
 # C# files
 [*.cs]
-
-#### Core EditorConfig Options ####
-
-# Indentation and spacing
-indent_size = 4
-indent_style = space
-tab_width = 4
-
-# New line preferences
-end_of_line = crlf
-insert_final_newline = false
 
 #### .NET Coding Conventions ####
 
@@ -136,9 +126,6 @@ csharp_style_prefer_range_operator = true:suggestion
 csharp_style_throw_expression = true:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
-
-# 'using' directive preferences
-csharp_using_directive_placement = inside_namespace:silent
 
 #### C# Formatting Rules ####
 

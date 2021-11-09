@@ -13,7 +13,7 @@ namespace TrueLayer.MerchantAccounts
         private readonly IApiClient _apiClient;
         private readonly Uri _baseUri;
         private readonly IAuthApi _auth;
-        
+
         public MerchantAccountsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
         {
             _apiClient = apiClient.NotNull(nameof(apiClient));
@@ -21,11 +21,11 @@ namespace TrueLayer.MerchantAccounts
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            _baseUri = options.Payments.Uri is not null 
+            _baseUri = options.Payments.Uri is not null
                 ? new Uri(options.Payments.Uri, "merchant_accounts")
                 : new Uri(options.UseSandbox ?? true ? SandboxUrl : ProdUrl);
         }
-        
+
         /// <inheritdoc />
         public async Task<ApiResponse<ResourceCollection<MerchantAccount>>> ListMerchantAccounts(CancellationToken cancellationToken = default)
         {
@@ -36,19 +36,19 @@ namespace TrueLayer.MerchantAccounts
             {
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
-            
+
             return await _apiClient.GetAsync<ResourceCollection<MerchantAccount>>(
                 _baseUri,
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
         }
-        
+
         /// <inheritdoc />
         public async Task<ApiResponse<MerchantAccount>> GetMerchantAccount(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
-            
+
             // 'payments' scope should be supported soon
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("paydirect"), cancellationToken);
 
