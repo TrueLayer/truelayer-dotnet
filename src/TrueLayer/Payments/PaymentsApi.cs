@@ -12,7 +12,7 @@ namespace TrueLayer.Payments
         AuthorizationRequired,
         Authorizing,
         Authorized,
-        Succeeded,
+        Executed,
         Settled,
         Failed
     >;
@@ -38,8 +38,8 @@ namespace TrueLayer.Payments
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            _baseUri = options.Payments.Uri is not null 
-                ? new Uri(options.Payments.Uri, "payments/") 
+            _baseUri = options.Payments.Uri is not null
+                ? new Uri(options.Payments.Uri, "payments/")
                 : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 
