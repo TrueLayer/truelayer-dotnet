@@ -1,11 +1,9 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using OneOf;
 using Shouldly;
 using TrueLayer.Payments.Model;
 using Xunit;
-using static TrueLayer.Payments.Model.PaymentUser;
 
 namespace TrueLayer.AcceptanceTests
 {
@@ -79,7 +77,7 @@ namespace TrueLayer.AcceptanceTests
             payment.PaymentMethod.AsT0.ShouldNotBeNull();
             payment.User.ShouldNotBeNull();
             payment.User.Id.ShouldBe(response.Data.AsT0.User.Id);
-            
+
             // TODO Currently hardcoded in v3. Remove once implementation is complete
             //payment.User.Name.ShouldBe(paymentRequest.User.AsT0.Name);
             //payment.User.Email.ShouldBe(paymentRequest.User.AsT0.Email);
@@ -102,7 +100,7 @@ namespace TrueLayer.AcceptanceTests
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                new PaymentUser.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "0123456789")
+                new PaymentUser.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+44 7911 123456")
             );
     }
 }
