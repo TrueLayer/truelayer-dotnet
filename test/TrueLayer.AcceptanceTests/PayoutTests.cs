@@ -24,7 +24,7 @@ namespace TrueLayer.AcceptanceTests
             var response = await _fixture.Client.Payouts.CreatePayout(
                 payoutRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-            response.StatusCode.ShouldBe(HttpStatusCode.Created);
+            response.StatusCode.ShouldBe(HttpStatusCode.Accepted);
             response.Data.ShouldNotBeNull();
             response.Data.Id.ShouldNotBeNullOrWhiteSpace();
         }
