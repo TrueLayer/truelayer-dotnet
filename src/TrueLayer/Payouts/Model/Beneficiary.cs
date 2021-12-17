@@ -1,10 +1,10 @@
 using OneOf;
 using TrueLayer.Serialization;
-using static TrueLayer.Payments.Model.SchemeIdentifier;
+using static TrueLayer.Payouts.Model.SchemeIdentifier;
 
 namespace TrueLayer.Payouts.Model
 {
-    using SchemeIdentifierUnion = OneOf<SortCodeAccountNumber>;
+    using SchemeIdentifierUnion = OneOf<Iban>;
 
     public static class Beneficiary
     {
