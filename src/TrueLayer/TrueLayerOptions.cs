@@ -1,6 +1,6 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using TrueLayer.Payments;
+using TrueLayer.Payouts;
 
 namespace TrueLayer
 {
@@ -21,12 +21,13 @@ namespace TrueLayer
         public string? ClientSecret { get; init; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to connect to the TrueLayer Sandbox. 
+        /// Gets or sets a value indicating whether to connect to the TrueLayer Sandbox.
         /// </summary>
         public bool? UseSandbox { get; init; }
 
         public ApiOptions? Auth { get; set; }
         public PaymentsOptions? Payments { get; set; }
+        public PayoutsOptions? Payouts { get; set; }
 
         public void Validate()
         {
@@ -35,7 +36,7 @@ namespace TrueLayer
                 throw new ValidationException("Your client id is required");
             }
 
-            if (string.IsNullOrWhiteSpace(ClientSecret)) 
+            if (string.IsNullOrWhiteSpace(ClientSecret))
             {
                 throw new ValidationException("Your API secret key is required");
             }
