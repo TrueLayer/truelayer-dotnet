@@ -1,7 +1,7 @@
 // Install .NET Core Global tools.
-#tool nuget:?package=dotnet-reportgenerator-globaltool&version=5.0.0
-#tool nuget:?package=coveralls.net&version=3.0.0
-#tool nuget:?package=dotnet-sonarscanner&version=5.4.0"
+#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.0.0"
+#tool "dotnet:?package=coveralls.net&version=3.0.0"
+#tool "dotnet:?package=dotnet-sonarscanner&version=5.4.0"
 #tool nuget:?package=docfx.console&version=2.58.9
 #tool nuget:?package=KuduSync.NET&version=1.5.3
 
@@ -105,8 +105,8 @@ Task("Test")
             var projectName = project.GetFilenameWithoutExtension();
 
             // Exclude TrueLayer.AcceptanceTests from the tests because it needs a specific config file to run
-            if (string.Equals(projectName.ToString(), "TrueLayer.AcceptanceTests", StringComparison.OrdinalIgnoreCase)) 
-            { 
+            if (string.Equals(projectName.ToString(), "TrueLayer.AcceptanceTests", StringComparison.OrdinalIgnoreCase))
+            {
                 continue;
             }
 
