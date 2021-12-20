@@ -160,7 +160,7 @@ Task("UploadCoverage")
         Dictionary<string, object> @event = default;
         if (workflow.EventName == "pull_request")
         {
-            string eventJson = System.IO.File.ReadAllText(workflow.EventPath.ToString();
+            string eventJson = System.IO.File.ReadAllText(workflow.EventPath.ToString());
             @event = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(eventJson);
         }
 
