@@ -14,6 +14,7 @@
 
  #r "System.Text.Json"
  #r "System.IO"
+ #r "System"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -104,7 +105,7 @@ Task("Test")
             var projectName = project.GetFilenameWithoutExtension();
 
             // Exclude TrueLayer.AcceptanceTests from the tests because it needs a specific config file to run
-            if (projectName.Contains("TrueLayer.AcceptanceTests")) 
+            if (string.Equals(projectName, "TrueLayer.AcceptanceTests", StringComparison.OrdinalIgnoreCase)) 
             { 
                 continue;
             }
