@@ -1,0 +1,38 @@
+﻿@model PayoutModel
+@{
+  ViewData["Title"] = "Make a payout";
+}
+
+<h1 class="display-4 mb-4 text-center">Make a payout</h1>
+
+<div class="row justify-content-center">
+  <form class="needs-validation col-sm-10" asp-action="CreatePayout" asp-controller="Payout" method="post" novalidate>
+    @Html.ValidationSummary(true)
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label asp-for="MerchantAccountId">Merchant Account Id</label>
+        <input type="text" class="form-control form-control-lg" asp-for="MerchantAccountId">
+        <span asp-validation-for="MerchantAccountId"></span>
+      </div>
+      <div class="form-group col-md-6">
+        <label asp-for="Iban"></label>
+        <input type="text" class="form-control form-control-lg" asp-for="Iban">
+        <span asp-validation-for="Iban"></span>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="input-group mb-3 col-md-12">
+        <div class="input-group-prepend">
+          <span class="input-group-text">GBP</span>
+        </div>
+        <input type="text" class="form-control form-control-lg" asp-for="AmountInMajor" />
+        <div class="input-group-append">
+          <button type="submit" class="btn btn-primary btn-lg">Pay!</button>
+        </div>
+      </div>
+      <span asp-validation-for="AmountInMajor"></span>
+    </div>
+
+  </form>
+
+</div>
