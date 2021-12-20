@@ -66,8 +66,8 @@ namespace TrueLayer.Payouts.Model
         /// </summary>
         /// <param name="SucceededAt">The date and time the payout succeeded</param>
         /// <returns></returns>
-        [JsonDiscriminator("succeeded")]
-        public record Succeeded(DateTime SucceededAt) : PayoutDetails;
+        [JsonDiscriminator("successful")]
+        public record Successful(DateTime SucceededAt) : PayoutDetails;
 
         /// <summary>
         /// Represents an authorized payout that failed to complete. This is a terminate state.

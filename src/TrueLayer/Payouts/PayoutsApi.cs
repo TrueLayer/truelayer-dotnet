@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Auth;
+using TrueLayer.Extensions;
 using TrueLayer.Payouts.Model;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
 
@@ -11,7 +12,7 @@ namespace TrueLayer.Payouts
     using GetPayoutUnion = OneOf<
         Pending,
         Authorized,
-        Succeeded,
+        Successful,
         Failed
     >;
 
@@ -73,7 +74,7 @@ namespace TrueLayer.Payouts
             }
 
             return await _apiClient.GetAsync<GetPayoutUnion>(
-                new Uri(_baseUri, id),
+                _baseUri.Append(id),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
