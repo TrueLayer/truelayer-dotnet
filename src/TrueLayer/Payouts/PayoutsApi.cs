@@ -1,11 +1,20 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using OneOf;
 using TrueLayer.Auth;
 using TrueLayer.Payouts.Model;
+using static TrueLayer.Payouts.Model.GetPayoutsResponse;
 
 namespace TrueLayer.Payouts
 {
+    using GetPayoutUnion = OneOf<
+        Pending,
+        Authorized,
+        Succeeded,
+        Failed
+    >;
+
     internal class PayoutsApi : IPayoutsApi
     {
         private const string ProdUrl = "https://api.truelayer.com/payouts";
@@ -48,6 +57,24 @@ namespace TrueLayer.Payouts
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
                 _options.Payouts!.SigningKey,
+                cancellationToken
+            );
+        }
+
+        public async Task<ApiResponse<GetPayoutUnion>> GetPayout(string id, CancellationToken cancellationToken = default)
+        {
+            id.NotNullOrWhiteSpace(nameof(id));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("paydirect"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.GetAsync<GetPayoutUnion>(
+                new Uri(_baseUri, id),
+                authResponse.Data!.AccessToken,
                 cancellationToken
             );
         }
