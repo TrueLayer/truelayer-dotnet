@@ -16,8 +16,8 @@ namespace TrueLayer.Users.Model
     /// <param name="Id">The unique identifier of the user.</param>
     /// <param name="ExternalAccounts">Details of the external accounts of the user.</param>
     /// <param name="Name">The user's name.</param>
-    /// <param name="Email">The user's email address. Either an email address or <param ref="phone"/> must be provided.</param>
-    /// <param name="Phone">The user's phone number. Either a phone number or <param ref="email"/> must be provided.</param>
+    /// <param name="Email">The user's email address. Either an email address or <param ref="Phone"/> must be provided.</param>
+    /// <param name="Phone">The user's phone number. Either a phone number or <param ref="Email"/> must be provided.</param>
     public record GetUserResponse(string Id, string Name, UserExternalAccount[] ExternalAccounts , string? Email = null, string? Phone = null);
 
     /// <summary>

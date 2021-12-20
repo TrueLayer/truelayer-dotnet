@@ -11,7 +11,7 @@ namespace TrueLayer.Users
         /// </summary>
         /// <param name="id">The user identifier.</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
-        /// <returns>An API response that includes details of an user.</returns>
+        /// <returns>An API response that includes details of a user.</returns>
         Task<ApiResponse<GetUserResponse>> GetUser(string id, CancellationToken cancellationToken = default);
     }
 }
