@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Shouldly;
 using TrueLayer.Payouts.Model;
 using Xunit;
+using static TrueLayer.Payouts.Model.GetPayoutsResponse;
 
 namespace TrueLayer.AcceptanceTests
 {
@@ -29,15 +30,40 @@ namespace TrueLayer.AcceptanceTests
             response.Data.Id.ShouldNotBeNullOrWhiteSpace();
         }
 
+        [Fact]
+        public async Task Can_get_payout()
+        {
+            CreatePayoutRequest payoutRequest = CreatePayoutRequest();
+
+            var response = await _fixture.Client.Payouts.CreatePayout(
+                payoutRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+            response.StatusCode.ShouldBe(HttpStatusCode.Accepted);
+            response.Data.ShouldNotBeNull();
+            response.Data.Id.ShouldNotBeNullOrWhiteSpace();
+
+            var getPayoutResponse = await _fixture.Client.Payouts.GetPayout(response.Data.Id);
+
+            getPayoutResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+            getPayoutResponse.Data.Value.ShouldNotBeNull();
+            PayoutDetails? details = getPayoutResponse.Data.Value as PayoutDetails;
+
+            details.ShouldNotBeNull();
+            details.Id.ShouldBe(response.Data.Id);
+            details.Currency.ShouldBe(payoutRequest.Currency);
+            details.Status.ShouldBeOneOf("pending", "authorized", "successful", "failed");
+            details.CreatedAt.ShouldNotBeOneOf(DateTime.MinValue, DateTime.MaxValue);
+        }
+
         private static CreatePayoutRequest CreatePayoutRequest()
             => new CreatePayoutRequest(
-                "<CHANGE_ME_WITH_VALID_MERCHANT_ID_FROM_YOUR_ACCOUNT>",
+                "27e05025-407a-4b81-be84-1cea52a5125e",
                 100,
                 Currencies.GBP,
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
                     "truelayer-dotnet",
-                    new SchemeIdentifier.Iban("<CHANGE_ME_WITH_VALID_IBAN_FROM_YOUR_ACCOUNT>")
+                    new SchemeIdentifier.Iban("GB98CLRB04066200005308")
                 )
             );
     }
