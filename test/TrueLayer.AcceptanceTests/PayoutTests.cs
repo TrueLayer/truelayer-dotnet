@@ -31,13 +31,13 @@ namespace TrueLayer.AcceptanceTests
 
         private static CreatePayoutRequest CreatePayoutRequest()
             => new CreatePayoutRequest(
-                Guid.NewGuid().ToString(),
+                "<CHANGE_ME_WITH_VALID_MERCHANT_ID_FROM_YOUR_ACCOUNT>",
                 100,
                 Currencies.GBP,
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
                     "truelayer-dotnet",
-                    new SchemeIdentifier.Iban("IBAN1234567890")
+                    new SchemeIdentifier.Iban("<CHANGE_ME_WITH_VALID_IBAN_FROM_YOUR_ACCOUNT>")
                 )
             );
     }

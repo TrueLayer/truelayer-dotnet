@@ -8,8 +8,8 @@ namespace TrueLayer.Payouts
 {
     internal class PayoutsApi : IPayoutsApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/payouts/";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/payouts/";
+        private const string ProdUrl = "https://api.truelayer.com/payouts";
+        private const string SandboxUrl = "https://api.truelayer-sandbox.com/payouts";
 
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
@@ -25,7 +25,7 @@ namespace TrueLayer.Payouts
             options.Payouts.NotNull(nameof(options.Payouts))!.Validate();
 
             _baseUri = options.Payouts.Uri is not null
-                ? new Uri(options.Payouts.Uri, "payouts/")
+                ? new Uri(options.Payouts.Uri, "payouts")
                 : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 
