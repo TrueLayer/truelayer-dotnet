@@ -5,7 +5,7 @@
 #tool nuget:?package=docfx.console&version=2.56.6
 #tool nuget:?package=KuduSync.NET&version=1.5.3
 
-// Install addins 
+// Install addins
 #addin nuget:?package=Cake.Coverlet&version=2.5.1
 #addin nuget:?package=Cake.Sonar&version=1.1.25
 #addin nuget:?package=Cake.DocFx&version=0.13.1
@@ -22,7 +22,7 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var artifactsPath = "./artifacts";
-var coveragePath = "./artifacts/coverage"; 
+var coveragePath = "./artifacts/coverage";
 var packFiles = "./src/**/*.csproj";
 var testFiles = "./test/**/*.csproj";
 var packages = "./artifacts/*.nupkg";
@@ -51,13 +51,13 @@ Teardown(ctx =>
 {
    if (DirectoryExists(coveragePath))
    {
-        DeleteDirectory(coveragePath, new DeleteDirectorySettings 
+        DeleteDirectory(coveragePath, new DeleteDirectorySettings
         {
             Recursive = true,
             Force = true
         });
    }
-   
+
    Information("Finished running build");
 });
 
@@ -66,16 +66,16 @@ Teardown(ctx =>
 ///////////////////////////////////////////////////////////////////////////////
 
 Task("Clean")
-    .Does(() => 
+    .Does(() =>
     {
         CleanDirectories(artifactsPath);
     });
 
 Task("SonarBegin")
     .WithCriteria(!string.IsNullOrEmpty(sonarToken))
-    .Does(() => 
+    .Does(() =>
     {
-        SonarBegin(new SonarBeginSettings 
+        SonarBegin(new SonarBeginSettings
         {
             Key = "TrueLayer_truelayer-dotnet",
             Organization = "truelayer",
@@ -88,31 +88,31 @@ Task("SonarBegin")
     });
 
 Task("Build")
-    .Does(() => 
+    .Does(() =>
     {
-        DotNetCoreBuild("TrueLayer.sln", new DotNetCoreBuildSettings 
+        DotNetCoreBuild("TrueLayer.sln", new DotNetCoreBuildSettings
         {
             Configuration = configuration
         });
     });
 
 Task("Test")
-   .Does(() => 
+   .Does(() =>
    {
         foreach (var project in GetFiles(testFiles))
         {
             var projectName = project.GetFilenameWithoutExtension();
-            
-            var testSettings = new DotNetCoreTestSettings 
+
+            var testSettings = new DotNetCoreTestSettings
             {
                 NoBuild = true,
                 Configuration = configuration,
                 Loggers = { $"trx;LogFileName={projectName}.TestResults.xml" },
                 ResultsDirectory = artifactsPath
             };
-            
+
             // https://github.com/Romanx/Cake.Coverlet
-            var coverletSettings = new CoverletSettings 
+            var coverletSettings = new CoverletSettings
             {
                 CollectCoverage = true,
                 CoverletOutputFormat = CoverletOutputFormat.opencover,
@@ -120,14 +120,14 @@ Task("Test")
                 CoverletOutputName = $"{projectName}.opencover.xml"
                 //Threshold = coverageThreshold
             };
-            
+
             DotNetCoreTest(project.ToString(), testSettings, coverletSettings);
         }
    });
 
 
 Task("Pack")
-    .Does(() => 
+    .Does(() =>
     {
         var settings = new DotNetCorePackSettings
         {
@@ -143,7 +143,7 @@ Task("Pack")
     });
 
 Task("GenerateReports")
-    .Does(() => 
+    .Does(() =>
     {
         ReportGenerator(GetFiles($"{coveragePath}/*.xml"), artifactsPath, new ReportGeneratorSettings
         {
@@ -153,14 +153,14 @@ Task("GenerateReports")
 
 Task("UploadCoverage")
     .WithCriteria(!string.IsNullOrEmpty(coverallsToken) && BuildSystem.IsRunningOnGitHubActions)
-    .Does(() => 
+    .Does(() =>
     {
         var workflow = BuildSystem.GitHubActions.Environment.Workflow;
 
         Dictionary<string, object> @event = default;
         if (workflow.EventName == "pull_request")
         {
-            string eventJson = System.IO.File.ReadAllText(workflow.EventPath); 
+            string eventJson = System.IO.File.ReadAllText(workflow.EventPath.ToString();
             @event = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(eventJson);
         }
 
@@ -169,7 +169,7 @@ Task("UploadCoverage")
                     .Append("--lcov")
                     .Append("--useRelativePaths")
                     .Append("-i ./artifacts/lcov.info")
-                    .Append($"--commitId {workflow.Sha}") 
+                    .Append($"--commitId {workflow.Sha}")
                     .Append($"--commitBranch {workflow.Ref}")
                     .Append($"--serviceNumber {workflow.RunNumber}")
                     .Append($"--jobId {workflow.RunId}");
@@ -182,7 +182,7 @@ Task("UploadCoverage")
 
         var settings = new ProcessSettings { Arguments = args };
 
-        // We have to start the process manually since the cake addin forces us to provide 
+        // We have to start the process manually since the cake addin forces us to provide
         // a format enum which currently doesn't include lcov
         if (StartProcess(
             Context.Tools.Resolve("csmacnz.Coveralls")
@@ -197,7 +197,7 @@ Task("UploadCoverage")
 
 Task("PublishPackages")
     .WithCriteria(() => BuildContext.ShouldPublishToNuget)
-    .Does(() => 
+    .Does(() =>
     {
         foreach(var package in GetFiles(packages))
         {
@@ -211,7 +211,7 @@ Task("PublishPackages")
 
 Task("SonarEnd")
     .WithCriteria(!string.IsNullOrEmpty(sonarToken))
-    .Does(() => 
+    .Does(() =>
     {
         SonarEnd(new SonarEndSettings
         {
@@ -220,18 +220,18 @@ Task("SonarEnd")
     });
 
 Task("BuildDocs")
-    .Does(() => 
+    .Does(() =>
     {
         Information("Extracting API Metadata");
         DocFxMetadata(docFxConfig);
-        
+
         Information("Building Docs");
         DocFxBuild(docFxConfig);
     });
 
 Task("ServeDocs")
     .IsDependentOn("BuildDocs")
-    .Does(() => 
+    .Does(() =>
     {
         using (var process = DocFxServeStart(sitePath))
         {
@@ -243,14 +243,14 @@ Task("ServeDocs")
 Task("PublishDocs")
     .IsDependentOn("BuildDocs")
     .WithCriteria(!string.IsNullOrEmpty(gitHubPagesToken))// && currentBranch.FriendlyName == "main")
-    .Does(() => 
+    .Does(() =>
     {
         // Get the current commit
         var sourceCommit = currentBranch.Tip;
         var publishFolder = $"./artifacts/docs-publish-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}";
         Information("Publishing Folder: {0}", publishFolder);
         Information("Getting publish branch...");
-        GitClone("https://github.com/TrueLayer/truelayer-dotnet.git", 
+        GitClone("https://github.com/TrueLayer/truelayer-dotnet.git",
             publishFolder,
             gitHubUser,
             gitHubPagesToken,
@@ -258,7 +258,7 @@ Task("PublishDocs")
         );
 
         Information("Sync output files...");
-        
+
         Kudu.Sync(sitePath, publishFolder, new KuduSyncSettings {
             ArgumentCustomization = args => args.Append("--ignore").AppendQuoted(".git;CNAME")
         });
@@ -280,7 +280,7 @@ Task("PublishDocs")
                 );
 
                 Information("Pushing all changes...");
-                
+
                 GitPush(publishFolder, gitHubUser, gitHubPagesToken, "gh-pages");
             }
         }
@@ -319,7 +319,7 @@ public static class BuildContext
 
     public static bool ShouldPublishToNuget
         => !string.IsNullOrWhiteSpace(BuildContext.NugetApiUrl) && !string.IsNullOrWhiteSpace(BuildContext.NugetApiKey);
-        
+
     public static void Initialize(ICakeContext context)
     {
         if (context.BuildSystem().IsRunningOnGitHubActions)
