@@ -6,11 +6,11 @@
 #tool nuget:?package=KuduSync.NET&version=1.5.3
 
 // Install addins
-#addin nuget:?package=Cake.Coverlet&version=2.5.1
-#addin nuget:?package=Cake.Sonar&version=1.1.25
-#addin nuget:?package=Cake.DocFx&version=0.13.1
-#addin nuget:?package=Cake.Git&version=1.0.0
-#addin nuget:?package=Cake.Kudu&version=1.0.0
+#addin nuget:?package=Cake.Coverlet&version=2.5.4
+#addin nuget:?package=Cake.Sonar&version=1.1.29
+#addin nuget:?package=Cake.DocFx&version=1.0.0
+#addin nuget:?package=Cake.Git&version=2.0.0
+#addin nuget:?package=Cake.Kudu&version=2.0.0
 
  #r "System.Text.Json"
  #r "System.IO"
