@@ -2,7 +2,7 @@
 
 The Acceptance Tests run against the TrueLayer Sandbox to validate the SDK against our APIs.
 
-For the tests to run you need to set your Client ID and Secret. 
+For the tests to run you need to set your Client ID and Secret.
 
 This can be done either using environment variables:
 
@@ -22,9 +22,9 @@ Alternatively create an `appsettings.local.json` file in the root of the tests w
 }
 ```
 
-## Testing Payments
+## Testing Payments and Payouts
 
-To test payments you will also need to provide a signing key. For convenience, a public/private key pair is provided in this directory (`ec512-private-key.pem` and `ec512-public-key.pem`) which should only be used for testing in Sandbox.
+To test payments and payouts you will also need to provide a signing key. For convenience, a public/private key pair is provided in this directory (`ec512-private-key.pem` and `ec512-public-key.pem`) which should only be used for testing in Sandbox.
 
 Upload the public key to the [TrueLayer Console](https://console.truelayer.com/) and then update your configuration with the generated key identifier:
 
@@ -35,6 +35,11 @@ Upload the public key to the [TrueLayer Console](https://console.truelayer.com/)
     "ClientId": "client_id",
     "ClientSecret": "client_secret",
     "Payments": {
+      "SigningKey": {
+        "KeyId": "key_id"
+      }
+    },
+    "Payouts": {
       "SigningKey": {
         "KeyId": "key_id"
       }

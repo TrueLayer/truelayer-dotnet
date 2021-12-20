@@ -1,6 +1,6 @@
 # TrueLayer.NET
 
-[![NuGet](https://img.shields.io/nuget/v/TrueLayer.Client.svg)](https://www.nuget.org/packages/TrueLayer.Client) 
+[![NuGet](https://img.shields.io/nuget/v/TrueLayer.Client.svg)](https://www.nuget.org/packages/TrueLayer.Client)
 [![NuGet](https://img.shields.io/nuget/dt/TrueLayer.Client.svg)](https://www.nuget.org/packages/TrueLayer.Client)
 [![License](https://img.shields.io/:license-mit-blue.svg)](https://truelayer.mit-license.org/)
 
@@ -10,7 +10,7 @@
 
 
 
-The official [TrueLayer](https://truelayer.com) .NET client provides convenient access to TrueLayer APIs from applications built with .NET. 
+The official [TrueLayer](https://truelayer.com) .NET client provides convenient access to TrueLayer APIs from applications built with .NET.
 
 The library currently supports .NET Standard 2.1, .NET 5.0 and .NET 6.0.
 
@@ -61,7 +61,7 @@ For a comprehensive list of examples, check out the [API documentation](https://
 
 ### Prerequisites
 
-First [sign up](https://console.truelayer.com/) for a developer account. Follow the instructions to set up a new application and obtain your Client ID and Secret. Once the application has been created you must add your application redirected URIs in order to test your integration end-to-end. 
+First [sign up](https://console.truelayer.com/) for a developer account. Follow the instructions to set up a new application and obtain your Client ID and Secret. Once the application has been created you must add your application redirected URIs in order to test your integration end-to-end.
 
 Next, generate a signing key pair used to sign API requests.
 
@@ -94,6 +94,11 @@ Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other
       "SigningKey": {
         "KeyId": "85eeb2da-702c-4f4b-bf9a-e98af5fd47c3"
       }
+    },
+    "Payouts": {
+      "SigningKey": {
+        "KeyId": "85eeb2da-702c-4f4b-bf9a-e98af5fd47c3"
+      }
     }
   }
 }
@@ -119,7 +124,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-Alternatively you can create a class that implements `IConfigureOptions<TrueLayerOptions>` if you have more complex configuration requirements. 
+Alternatively you can create a class that implements `IConfigureOptions<TrueLayerOptions>` if you have more complex configuration requirements.
 
 ### Make a payment
 
@@ -153,7 +158,7 @@ public class MyService
         );
 
         var apiResponse = await _client.Payments.CreatePayment(
-            paymentRequest, 
+            paymentRequest,
             idempotencyKey: Guid.NewGuid().ToString()
         );
 
@@ -171,8 +176,8 @@ public class MyService
         // or, redirect to the TrueLayer Hosted Payment Page
         string hostedPaymentPageUrl = apiResponse.Data.Match(
             authRequired => _client.Payments.CreateHostedPaymentPageLink(
-                authRequired.Id, 
-                authRequired.ResourceToken, 
+                authRequired.Id,
+                authRequired.ResourceToken,
                 new Uri("https://redirect.yourdomain.com")
             )
         );
@@ -184,11 +189,60 @@ public class MyService
 
 For more examples see the [API documentation](https://docs.truelayer.com). Advanced customization options and documentation for contributors can be found in the [Wiki](https://github.com/TrueLayer/truelayer-sdk-net/wiki).
 
+### Make a payout
+
+Inject `ITrueLayerClient` into your classes:
+
+```c#
+public class MyService
+{
+    private readonly ITrueLayerClient _client;
+
+    public MyService(ITrueLayerClient client)
+    {
+        _client = client;
+    }
+
+    public async Task<ActionResult> MakePayment()
+    {
+        var payoutRequest = new CreatePayoutRequest(
+            merchantAccountId: "VALID_MERCHANT_ID",
+            amountInMinor: amount.ToMinorCurrencyUnit(2),
+            currency: Currencies.GBP,
+            beneficiary: new Beneficiary.ExternalAccount(
+                "TrueLayer",
+                "truelayer-dotnet",
+                new SchemeIdentifier.Iban("VALID_IBAN")
+            )
+        );
+
+        var apiResponse = await _client.Payments.CreatePayout(
+            payoutRequest,
+            idempotencyKey: Guid.NewGuid().ToString()
+        );
+
+        if (!apiResponse.IsSuccessful)
+        {
+            return HandleFailure(
+                apiResponse.StatusCode,
+                // Includes details of any errors
+                apiResponse.Problem
+            )
+        }
+
+
+        return Accepted(apiResponse.Data.Id);
+    }
+}
+```
+
+For more examples see the [API documentation](https://docs.truelayer.com). Advanced customization options and documentation for contributors can be found in the [Wiki](https://github.com/TrueLayer/truelayer-sdk-net/wiki).
+
 ## Building locally
 
-This project uses [Cake](https://cakebuild.net/) to build, test and publish packages. 
+This project uses [Cake](https://cakebuild.net/) to build, test and publish packages.
 
-Run `build.sh` (Mac/Linux) or `build.ps1` (Windows) To build and test the project. 
+Run `build.sh` (Mac/Linux) or `build.ps1` (Windows) To build and test the project.
 
 This will output NuGet packages and coverage reports in the `artifacts` directory.
 
@@ -210,7 +264,7 @@ See [contributing](contributing.md) for ways to get started.
 
 Please adhere to this project's [code of conduct](CODE_OF_CONDUCT.md).
 
-  
+
 ## License
 
 [MIT](LICENSE)
