@@ -1,11 +1,13 @@
+
 // Install .NET Core Global tools.
-#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=4.8.12"
-#tool "dotnet:?package=coveralls.net&version=3.0.0"
-#tool "dotnet:?package=dotnet-sonarscanner&version=5.3.1"
-#tool nuget:?package=docfx.console&version=2.56.6
+#tool nuget:?package=dotnet-reportgenerator-globaltool&version=5.0.0
+#tool nuget:?package=coveralls.net&version=3.0.0
+#tool nuget:?package=dotnet-sonarscanner&version=5.4.0"
+#tool nuget:?package=docfx.console&version=2.58.9
 #tool nuget:?package=KuduSync.NET&version=1.5.3
 
 // Install addins
+#addin nuget:?package=Cake.Core&version=2.0.0
 #addin nuget:?package=Cake.Coverlet&version=2.5.4
 #addin nuget:?package=Cake.Sonar&version=1.1.29
 #addin nuget:?package=Cake.DocFx&version=1.0.0
@@ -356,3 +358,6 @@ public static class BuildContext
         context.Information("ShouldPublishToNuget: {0}", ShouldPublishToNuget);
     }
 }
+
+
+
