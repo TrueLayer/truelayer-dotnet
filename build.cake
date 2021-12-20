@@ -4,7 +4,6 @@
 #tool nuget:?package=dotnet-sonarscanner&version=5.4.0"
 #tool nuget:?package=docfx.console&version=2.58.9
 #tool nuget:?package=KuduSync.NET&version=1.5.3
-#tool nuget:?package=Cake.Core&version=2.0.0
 
 // Install addins
 #addin nuget:?package=Cake.Coverlet&version=2.5.4
