@@ -100,7 +100,8 @@ namespace TrueLayer.AcceptanceTests
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                new PaymentUser.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+44 7911 123456")
+                
+                new PaymentUser.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")
             );
     }
 }
