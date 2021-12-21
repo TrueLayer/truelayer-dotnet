@@ -1,11 +1,9 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using OneOf;
 using Shouldly;
 using TrueLayer.Payments.Model;
 using Xunit;
-using static TrueLayer.Payments.Model.PaymentUser;
 
 namespace TrueLayer.AcceptanceTests
 {

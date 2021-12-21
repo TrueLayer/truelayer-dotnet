@@ -11,11 +11,11 @@ namespace TrueLayer.Payments
         AuthorizationRequired,
         Authorizing,
         Authorized,
-        Succeeded,
+        Executed,
         Settled,
         Failed
     >;
-    
+
     /// <summary>
     /// Provides access to the TrueLayer Payments API
     /// </summary>
@@ -26,7 +26,7 @@ namespace TrueLayer.Payments
         /// </summary>
         /// <param name="paymentRequest">The payment request details</param>
         /// <param name="idempotencyKey">
-        /// An idempotency key to allow safe retrying without the operation being performed multiple times. 
+        /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
