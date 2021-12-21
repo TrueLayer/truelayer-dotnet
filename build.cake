@@ -104,12 +104,6 @@ Task("Test")
         {
             var projectName = project.GetFilenameWithoutExtension();
 
-            // Exclude TrueLayer.AcceptanceTests from the tests because it needs a specific config file to run
-            if (string.Equals(projectName.ToString(), "TrueLayer.AcceptanceTests", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
             var testSettings = new DotNetCoreTestSettings
             {
                 NoBuild = true,
