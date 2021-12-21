@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Net;
 using System.Threading.Tasks;
 using Shouldly;
@@ -11,10 +12,31 @@ namespace TrueLayer.AcceptanceTests
     public class PayoutTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
+        private readonly string _merchantAccountId;
+        private readonly string _iban;
 
         public PayoutTests(ApiTestFixture fixture)
         {
+            const string merchantAccountIdEnvVarName = "TrueLayer__AcceptanceTests__MerchantAccountId";
+            const string ibanEnvVarName = "TrueLayer__AcceptanceTests__Iban";
+
             _fixture = fixture;
+            _merchantAccountId = Environment.GetEnvironmentVariable(merchantAccountIdEnvVarName)
+#if DEBUG
+                                 ?? "CHANGE ME WITH YOUR MERCHANT ID";
+#else
+                                 ?? throw new ConfigurationErrorsException($"NULL ${merchantAccountIdEnvVarName} environment variable");
+#endif
+            _iban = Environment.GetEnvironmentVariable(ibanEnvVarName)
+#if DEBUG
+                    ?? "CHANE ME WITH YOUR TEST IBAN";
+#else
+                    ?? throw new ConfigurationErrorsException($"NULL ${ibanEnvVarName} environment variable");
+#endif
+
+
+            Console.WriteLine(_merchantAccountId);
+            Console.WriteLine(_iban);
         }
 
         [Fact]
@@ -55,15 +77,15 @@ namespace TrueLayer.AcceptanceTests
             details.CreatedAt.ShouldNotBeOneOf(DateTime.MinValue, DateTime.MaxValue);
         }
 
-        private static CreatePayoutRequest CreatePayoutRequest()
+        private CreatePayoutRequest CreatePayoutRequest()
             => new CreatePayoutRequest(
-                "27e05025-407a-4b81-be84-1cea52a5125e",
+                _merchantAccountId,
                 100,
                 Currencies.GBP,
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
                     "truelayer-dotnet",
-                    new SchemeIdentifier.Iban("GB98CLRB04066200005308")
+                    new SchemeIdentifier.Iban(_iban)
                 )
             );
     }
