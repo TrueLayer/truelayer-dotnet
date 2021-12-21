@@ -44,6 +44,9 @@ jobs:
           TrueLayer__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
           TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
+          TrueLayer__Payouts__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYOUTS__SIGNINGKEY__KEYID }}
+          TrueLayer__AcceptanceTests__MerchantAccountId: ${{ secrets.TRUELAYER__ACCEPTANCETESTS__MERCHANTACCOUNTID }}
+          TrueLayer__AcceptanceTests__Iban: ${{ secrets.TRUELAYER__ACCEPTANCETESTS__IBAN }}
         with:
           target: CI
           verbosity: ${{ github.event.inputs.verbosity }}

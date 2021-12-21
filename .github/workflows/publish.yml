@@ -7,15 +7,15 @@ on:
   workflow_dispatch:
     inputs:
       verbosity:
-        description: 'Cake Build Verbosity'     
+        description: 'Cake Build Verbosity'
         required: true
         default: 'Normal'
       target:
-        description: 'Cake Build Target'     
+        description: 'Cake Build Target'
         required: true
         default: 'Publish'
       force-docs:
-        description: 'Whether to force push the docs to GitHub Pages'     
+        description: 'Whether to force push the docs to GitHub Pages'
         required: true
         default: 'false'
 jobs:
@@ -53,6 +53,9 @@ jobs:
           TrueLayer__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
           TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
+          TrueLayer__Payouts__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYOUTS__SIGNINGKEY__KEYID }}
+          TrueLayer__AcceptanceTests__MerchantAccountId: ${{ secrets.TRUELAYER__ACCEPTANCETESTS__MERCHANTACCOUNTID }}
+          TrueLayer__AcceptanceTests__Iban: ${{ secrets.TRUELAYER__ACCEPTANCETESTS__IBAN }}
         with:
           target: ${{ github.event.inputs.target || 'Publish' }}
           verbosity: ${{ github.event.inputs.verbosity || 'Normal' }}
