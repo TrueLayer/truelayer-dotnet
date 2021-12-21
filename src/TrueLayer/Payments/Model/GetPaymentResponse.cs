@@ -85,25 +85,25 @@ namespace TrueLayer.Payments.Model
         public record Authorized : PaymentDetails;
 
         /// <summary>
-        /// Represents a payment that has succeeded
+        /// Represents a payment that has been executed
         /// For open loop payments this state is terminate. For closed-loop payments, wait for Settled.
         /// </summary>
-        /// <param name="SucceededAt">The date and time the payment succeeded</param>
+        /// <param name="ExecutedAt">The date and time the payment executed</param>
         /// <param name="SourceOfFunds">Details of the source of funds for the payment</param>
         /// <returns></returns>
-        [JsonDiscriminator("succeeded")]
-        public record Succeeded(DateTime SucceededAt, SourceOfFundsUnion SourceOfFunds) : PaymentDetails;
+        [JsonDiscriminator("executed")]
+        public record Executed(DateTime ExecutedAt, SourceOfFundsUnion SourceOfFunds) : PaymentDetails;
 
         /// <summary>
         /// Represents a payment that has settled
         /// This is a terminate state for closed-loop payments.
         /// </summary>
-        /// <param name="SucceededAt">The date and time the payment succeeded</param>
+        /// <param name="ExecutedAt">The date and time the payment executed</param>
         /// <param name="SettledAt">The date and time the payment was settled</param>
         /// <param name="SourceOfFunds">Details of the source of funds for the payment</param>
         /// <returns></returns>
         [JsonDiscriminator("settled")]
-        public record Settled(DateTime SucceededAt, DateTime SettledAt, SourceOfFundsUnion SourceOfFunds) : PaymentDetails;
+        public record Settled(DateTime ExecutedAt, DateTime SettledAt, SourceOfFundsUnion SourceOfFunds) : PaymentDetails;
 
         /// <summary>
         /// Represents an authorized payment that failed to complete. This is a terminate state.
