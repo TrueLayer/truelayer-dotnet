@@ -77,11 +77,9 @@ namespace TrueLayer.AcceptanceTests
             payment.PaymentMethod.AsT0.ShouldNotBeNull();
             payment.User.ShouldNotBeNull();
             payment.User.Id.ShouldBe(response.Data.AsT0.User.Id);
-
-            // TODO Currently hardcoded in v3. Remove once implementation is complete
-            //payment.User.Name.ShouldBe(paymentRequest.User.AsT0.Name);
-            //payment.User.Email.ShouldBe(paymentRequest.User.AsT0.Email);
-            //payment.User.Phone.ShouldBe(paymentRequest.User.AsT0.Phone);
+            payment.User.Name.ShouldBe(paymentRequest.User.AsT0.Name);
+            payment.User.Email.ShouldBe(paymentRequest.User.AsT0.Email);
+            payment.User.Phone.ShouldBe(paymentRequest.User.AsT0.Phone);
         }
 
         private static CreatePaymentRequest CreatePaymentRequest()
