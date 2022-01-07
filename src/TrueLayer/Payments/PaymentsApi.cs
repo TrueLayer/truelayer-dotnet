@@ -87,7 +87,7 @@ namespace TrueLayer.Payments
         }
 
         /// <inheritdoc />
-        public string CreateHostedPaymentPageLink(string paymentId, string resourceToken, Uri returnUri)
-            => _hppLinkBuilder.Build(paymentId, resourceToken, returnUri);
+        public string CreateHostedPaymentPageLink(string paymentId, string paymentToken, Uri returnUri)
+            => _hppLinkBuilder.Build(paymentId, paymentToken, returnUri);
     }
 }

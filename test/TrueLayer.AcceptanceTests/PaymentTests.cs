@@ -30,21 +30,16 @@ namespace TrueLayer.AcceptanceTests
             string hppUri = response.Data.Match(
                 authRequired =>
                 {
-                    authRequired.Status.ShouldBe("authorization_required");
-
-                    authRequired.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
-                    authRequired.Currency.ShouldBe(paymentRequest.Currency);
                     authRequired.Id.ShouldNotBeNullOrWhiteSpace();
-                    authRequired.ResourceToken.ShouldNotBeNullOrWhiteSpace();
-                    authRequired.CreatedAt.ShouldNotBe(default);
+                    authRequired.PaymentToken.ShouldNotBeNullOrWhiteSpace();
                     authRequired.User.ShouldNotBeNull();
                     authRequired.User.Id.ShouldNotBeNullOrWhiteSpace();
-                    authRequired.User.Name.ShouldBe(paymentRequest.User.AsT0.Name);
-                    authRequired.User.Email.ShouldBe(paymentRequest.User.AsT0.Email);
-                    authRequired.User.Phone.ShouldBe(paymentRequest.User.AsT0.Phone);
+                    authRequired.User.Name.ShouldBeNull();
+                    authRequired.User.Email.ShouldBeNull();
+                    authRequired.User.Phone.ShouldBeNull();
 
                     return _fixture.Client.Payments.CreateHostedPaymentPageLink(
-                        authRequired.Id, authRequired.ResourceToken, new Uri("https://redirect.mydomain.com")
+                        authRequired.Id, authRequired.PaymentToken, new Uri("https://redirect.mydomain.com")
                     );
                 }
             );
@@ -98,7 +93,7 @@ namespace TrueLayer.AcceptanceTests
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                
+
                 new PaymentUser.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")
             );
     }

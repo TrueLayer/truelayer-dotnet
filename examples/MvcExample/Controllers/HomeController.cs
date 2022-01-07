@@ -73,8 +73,8 @@ namespace MvcExample.Controllers
 
             string redirectLink = apiResponse.Data.Match(
                 authRequired => _truelayer.Payments.CreateHostedPaymentPageLink(
-                    authRequired.Id, authRequired.ResourceToken, new Uri(Url.ActionLink("Complete")))
-            //authRequired.Id, authRequired.ResourceToken, new Uri(Url.ActionLink("Complete", "Home", new { paymentId = authRequired.Id })))
+                    authRequired.Id, authRequired.PaymentToken, new Uri(Url.ActionLink("Complete")))
+            //authRequired.Id, authRequired.PaymentToken, new Uri(Url.ActionLink("Complete", "Home", new { paymentId = authRequired.Id })))
             );
 
             return Redirect(redirectLink);

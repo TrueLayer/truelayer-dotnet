@@ -34,12 +34,8 @@ namespace TrueLayer.Benchmarks
         private static AuthorizationRequired CreatePaymentResponse()
             => new AuthorizationRequired(
                 "b0110edb-7964-4e22-b971-060d6445bb43",
-                100,
-                "GBP",
-                "authorization_required",
-                DateTime.UtcNow,
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiJtdmNleGFtcGxlLTVlM2EzMCIsImp0aSI6ImIwMTEwZWRiLTc5NjQtNGUyMi1iOTcxLTA2MGQ2NDQ1YmI0MyIsIm5iZiI6MTYzNDkyNDQ1NiwiZXhwIjoxNjM0OTI1MzU2LCJpc3MiOiJodHRwczovL2FwaS50N3IuZGV2IiwiYXVkIjoiaHR0cHM6Ly9hcGkudDdyLmRldiJ9.Zz7Eg9Aas6Q9uOlTji9xnre1Vzdemtrs40W6hKdgw6M",
-                new User(Guid.NewGuid().ToString(), "Test User", "a@b.com")
+                new User(Guid.NewGuid().ToString())
             );
     }
 }
