@@ -34,9 +34,6 @@ namespace TrueLayer.AcceptanceTests
                     authRequired.PaymentToken.ShouldNotBeNullOrWhiteSpace();
                     authRequired.User.ShouldNotBeNull();
                     authRequired.User.Id.ShouldNotBeNullOrWhiteSpace();
-                    authRequired.User.Name.ShouldBeNull();
-                    authRequired.User.Email.ShouldBeNull();
-                    authRequired.User.Phone.ShouldBeNull();
 
                     return _fixture.Client.Payments.CreateHostedPaymentPageLink(
                         authRequired.Id, authRequired.PaymentToken, new Uri("https://redirect.mydomain.com")
@@ -94,7 +91,7 @@ namespace TrueLayer.AcceptanceTests
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
 
-                new PaymentUser.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")
+                new PaymentUserRequest.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")
             );
     }
 }

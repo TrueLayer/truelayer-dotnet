@@ -16,6 +16,6 @@ namespace TrueLayer.Payments.Model
         /// <param name="PaymentToken">The token used to complete the payment via a front-end channel</param>
         /// <param name="User">The end user details</param>
         [JsonDiscriminator("authorization_required")]
-        public record AuthorizationRequired(string Id, string PaymentToken, User User);
+        public record AuthorizationRequired(string Id, string PaymentToken, PaymentUserResponse User);
     }
 }

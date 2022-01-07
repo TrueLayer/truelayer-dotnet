@@ -33,10 +33,10 @@ namespace TrueLayer.AcceptanceTests
 
             getUserResponse.Data.ShouldNotBeNull();
             var user = getUserResponse.Data!;
-            user.Email.ShouldBe(createPaymentUser.Email);
+            user.Email.ShouldBe(paymentRequest.User.AsT0.Email);
             user.Id.ShouldBe(createPaymentUser.Id);
-            user.Name.ShouldBe(createPaymentUser.Name);
-            user.Phone.ShouldBe(createPaymentUser.Phone);
+            user.Name.ShouldBe(paymentRequest.User.AsT0.Name);
+            user.Phone.ShouldBe(paymentRequest.User.AsT0.Phone);
         }
 
         private static CreatePaymentRequest CreatePaymentRequest()
@@ -55,7 +55,7 @@ namespace TrueLayer.AcceptanceTests
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                new PaymentUser.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+442079460087")
+                new PaymentUserRequest.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+442079460087")
             );
     }
 }

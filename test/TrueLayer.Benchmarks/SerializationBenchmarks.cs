@@ -4,8 +4,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
-using TrueLayer.Users.Model;
 using static TrueLayer.Payments.Model.CreatePaymentResponse;
 
 namespace TrueLayer.Benchmarks
@@ -35,7 +35,7 @@ namespace TrueLayer.Benchmarks
             => new AuthorizationRequired(
                 "b0110edb-7964-4e22-b971-060d6445bb43",
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiJtdmNleGFtcGxlLTVlM2EzMCIsImp0aSI6ImIwMTEwZWRiLTc5NjQtNGUyMi1iOTcxLTA2MGQ2NDQ1YmI0MyIsIm5iZiI6MTYzNDkyNDQ1NiwiZXhwIjoxNjM0OTI1MzU2LCJpc3MiOiJodHRwczovL2FwaS50N3IuZGV2IiwiYXVkIjoiaHR0cHM6Ly9hcGkudDdyLmRldiJ9.Zz7Eg9Aas6Q9uOlTji9xnre1Vzdemtrs40W6hKdgw6M",
-                new User(Guid.NewGuid().ToString())
+                new PaymentUserResponse(Guid.NewGuid().ToString())
             );
     }
 }
