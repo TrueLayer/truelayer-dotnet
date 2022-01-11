@@ -31,7 +31,7 @@ namespace TrueLayer.Payments
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the created payment if successful, otherwise problem details</returns>
-        Task<ApiResponse<OneOf<CreatePaymentResponse.AuthorizationRequired>>> CreatePayment(
+        Task<ApiResponse<CreatePaymentResponse>> CreatePayment(
             CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default);
 
         /// <summary>

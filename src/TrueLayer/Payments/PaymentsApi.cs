@@ -44,7 +44,7 @@ namespace TrueLayer.Payments
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<OneOf<CreatePaymentResponse.AuthorizationRequired>>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<CreatePaymentResponse>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
         {
             paymentRequest.NotNull(nameof(paymentRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
@@ -56,7 +56,7 @@ namespace TrueLayer.Payments
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.PostAsync<OneOf<CreatePaymentResponse.AuthorizationRequired>>(
+            return await _apiClient.PostAsync<CreatePaymentResponse>(
                 _baseUri,
                 paymentRequest,
                 idempotencyKey,

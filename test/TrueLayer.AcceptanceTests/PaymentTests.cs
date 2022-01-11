@@ -25,22 +25,16 @@ namespace TrueLayer.AcceptanceTests
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
-            response.Data.Value.ShouldBeOfType<CreatePaymentResponse.AuthorizationRequired>();
+            response.Data.ShouldBeOfType<CreatePaymentResponse>();
 
-            string hppUri = response.Data.Match(
-                authRequired =>
-                {
-                    authRequired.Id.ShouldNotBeNullOrWhiteSpace();
-                    authRequired.PaymentToken.ShouldNotBeNullOrWhiteSpace();
-                    authRequired.User.ShouldNotBeNull();
-                    authRequired.User.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.ShouldNotBeNull();
+            response.Data.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.PaymentToken.ShouldNotBeNullOrWhiteSpace();
+            response.Data.User.ShouldNotBeNull();
+            response.Data.User.Id.ShouldNotBeNullOrWhiteSpace();
 
-                    return _fixture.Client.Payments.CreateHostedPaymentPageLink(
-                        authRequired.Id, authRequired.PaymentToken, new Uri("https://redirect.mydomain.com")
-                    );
-                }
-            );
-
+            string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
+                response.Data!.Id, response.Data!.PaymentToken, new Uri("https://redirect.mydomain.com"));
             hppUri.ShouldNotBeNullOrWhiteSpace();
         }
 
@@ -55,7 +49,7 @@ namespace TrueLayer.AcceptanceTests
             response.IsSuccessful.ShouldBeTrue();
 
             var getPaymentResponse
-                = await _fixture.Client.Payments.GetPayment(response.Data.AsT0.Id);
+                = await _fixture.Client.Payments.GetPayment(response.Data!.Id);
 
             getPaymentResponse.IsSuccessful.ShouldBeTrue();
 
@@ -68,7 +62,7 @@ namespace TrueLayer.AcceptanceTests
             payment.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
             payment.PaymentMethod.AsT0.ShouldNotBeNull();
             payment.User.ShouldNotBeNull();
-            payment.User.Id.ShouldBe(response.Data.AsT0.User.Id);
+            payment.User.Id.ShouldBe(response.Data.User.Id);
             payment.User.Name.ShouldBe(paymentRequest.User.AsT0.Name);
             payment.User.Email.ShouldBe(paymentRequest.User.AsT0.Email);
             payment.User.Phone.ShouldBe(paymentRequest.User.AsT0.Phone);

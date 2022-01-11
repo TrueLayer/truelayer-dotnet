@@ -11,14 +11,10 @@ namespace TrueLayer.Users.Model
     >;
 
     /// <summary>
-    /// Represents an end user details.
+    /// Represents an end user's external accounts details.
     /// </summary>
-    /// <param name="Id">The unique identifier of the user.</param>
-    /// <param name="ExternalAccounts">Details of the external accounts of the user.</param>
-    /// <param name="Name">The user's name.</param>
-    /// <param name="Email">The user's email address. Either an email address or <param ref="Phone"/> must be provided.</param>
-    /// <param name="Phone">The user's phone number. Either a phone number or <param ref="Email"/> must be provided.</param>
-    public record GetUserResponse(string Id, string Name, UserExternalAccount[] ExternalAccounts , string? Email = null, string? Phone = null);
+    /// <param name="Items">Details of the external accounts of the user.</param>
+    public record GetUserExternalAccountsResponse(UserExternalAccount[] Items);
 
     /// <summary>
     /// Represents an external account.

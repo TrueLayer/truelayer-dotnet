@@ -149,9 +149,9 @@ namespace TrueLayer
             {
                 if (signingKey != null)
                 {
-                    // Only serialize to string if signing is required, 
+                    // Only serialize to string if signing is required,
                     string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
-                    
+
                     signature = RequestSignature.Create(
                         signingKey,
                         httpMethod,
@@ -211,7 +211,7 @@ namespace TrueLayer
             httpRequest.Headers.UserAgent.Add(UserAgentHeader);
 
             // HttpCompletionOption.ResponseHeadersRead reduces allocations by by avoiding the pre-buffering of the response content
-            // and allows us to access the content stream faster. 
+            // and allows us to access the content stream faster.
             // Doing so requires that always dispose of HttpResponseMessage to free up the connection
             // Ref: https://www.stevejgordon.co.uk/using-httpcompletionoption-responseheadersread-to-improve-httpclient-performance-dotnet
             return _httpClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);

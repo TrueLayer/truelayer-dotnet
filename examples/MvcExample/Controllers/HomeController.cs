@@ -71,11 +71,9 @@ namespace MvcExample.Controllers
                 return View("Index");
             }
 
-            string redirectLink = apiResponse.Data.Match(
-                authRequired => _truelayer.Payments.CreateHostedPaymentPageLink(
-                    authRequired.Id, authRequired.PaymentToken, new Uri(Url.ActionLink("Complete")))
-            //authRequired.Id, authRequired.PaymentToken, new Uri(Url.ActionLink("Complete", "Home", new { paymentId = authRequired.Id })))
-            );
+
+            string redirectLink = _truelayer.Payments.CreateHostedPaymentPageLink(
+                apiResponse.Data!.Id, apiResponse.Data!.PaymentToken, new Uri(Url.ActionLink("Complete")));
 
             return Redirect(redirectLink);
         }

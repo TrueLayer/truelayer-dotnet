@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Shouldly;
 using TrueLayer.Payments.Model;
+using TrueLayer.Users.Model;
 using Xunit;
 
 namespace TrueLayer.AcceptanceTests
@@ -16,7 +17,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Fact]
-        public async Task Can_get_user()
+        public async Task Can_get_user_external_accounts()
         {
             CreatePaymentRequest paymentRequest = CreatePaymentRequest();
 
@@ -24,19 +25,17 @@ namespace TrueLayer.AcceptanceTests
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
             response.IsSuccessful.ShouldBeTrue();
-            var createPaymentUser = response.Data.AsT0.User;
+            var createPaymentUser = response.Data!.User;
 
-            var getUserResponse
-                = await _fixture.Client.Users.GetUser(createPaymentUser.Id);
+            var getUserExternalAccountsResponse
+                = await _fixture.Client.Users.GetUserExternalAccounts(createPaymentUser.Id);
 
-            getUserResponse.IsSuccessful.ShouldBeTrue();
+            getUserExternalAccountsResponse.IsSuccessful.ShouldBeTrue();
+            getUserExternalAccountsResponse.Data.ShouldNotBeNull();
+            var externalAccounts = getUserExternalAccountsResponse.Data!;
+            externalAccounts.Items.ShouldBeOfType<UserExternalAccount[]>();
+            externalAccounts.Items.ShouldBeEmpty();
 
-            getUserResponse.Data.ShouldNotBeNull();
-            var user = getUserResponse.Data!;
-            user.Email.ShouldBe(paymentRequest.User.AsT0.Email);
-            user.Id.ShouldBe(createPaymentUser.Id);
-            user.Name.ShouldBe(paymentRequest.User.AsT0.Name);
-            user.Phone.ShouldBe(paymentRequest.User.AsT0.Phone);
         }
 
         private static CreatePaymentRequest CreatePaymentRequest()
