@@ -1,7 +1,7 @@
 using OneOf;
 using static TrueLayer.Payments.Model.Beneficiary;
 using static TrueLayer.Payments.Model.PaymentMethod;
-using static TrueLayer.Payments.Model.PaymentUser;
+using static TrueLayer.Payments.Model.PaymentUserRequest;
 
 namespace TrueLayer.Payments.Model
 {

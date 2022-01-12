@@ -50,7 +50,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                new PaymentUser.ExistingUser(Guid.NewGuid().ToString())
+                new PaymentUserRequest.ExistingUser(Guid.NewGuid().ToString())
             );
     }
 }

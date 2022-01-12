@@ -5,7 +5,7 @@ namespace TrueLayer.Payments.Model
     /// <summary>
     /// Payment user types
     /// </summary>
-    public static class PaymentUser
+    public static class PaymentUserRequest
     {
         /// <summary>
         /// Represents a new user
@@ -20,13 +20,13 @@ namespace TrueLayer.Payments.Model
             /// <param name="phone">The user's phone number. Either a phone number or <param ref="email"/> must be provided.</param>
             public NewUser(string name, string? email = null, string? phone = null)
             {
-                Name = name.NotNullOrWhiteSpace(nameof(name));                
-                
+                Name = name.NotNullOrWhiteSpace(nameof(name));
+
                 if (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(phone))
                 {
                     throw new ArgumentException("User email or phone must be provided");
                 }
-                
+
                 Email = email.NotEmptyOrWhiteSpace(nameof(email));
                 Phone = phone.NotEmptyOrWhiteSpace(nameof(phone));
             }
@@ -35,12 +35,12 @@ namespace TrueLayer.Payments.Model
             /// Gets the user's name
             /// </summary>
             public string Name { get; }
-            
+
             /// <summary>
             /// Gets the user's email address
             /// </summary>
             public string? Email { get; }
-            
+
             /// <summary>
             /// Gets the user's phone number
             /// </summary>
@@ -70,7 +70,7 @@ namespace TrueLayer.Payments.Model
             /// Gets the user identifier
             /// </summary>
             public string Id { get; }
-            
+
             /// <summary>
             /// Gets the user type
             /// </summary>

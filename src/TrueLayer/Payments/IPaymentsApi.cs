@@ -31,7 +31,7 @@ namespace TrueLayer.Payments
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the created payment if successful, otherwise problem details</returns>
-        Task<ApiResponse<OneOf<CreatePaymentResponse.AuthorizationRequired>>> CreatePayment(
+        Task<ApiResponse<CreatePaymentResponse>> CreatePayment(
             CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -46,12 +46,12 @@ namespace TrueLayer.Payments
         /// Generates a link to the TrueLayer hosted payment page
         /// </summary>
         /// <param name="paymentId">The payment identifier</param>
-        /// <param name="resourceToken">The payment resource token, returned from <see cref="CreatePayment"/></param>
+        /// <param name="paymentToken">The payment token, returned from <see cref="CreatePayment"/></param>
         /// <param name="returnUri">
         /// Your return URI to which the end user will be redirected after the payment is completed.
         /// Note this should be configured in the TrueLayer console under your application settings.
         /// </param>
         /// <returns>The HPP link you can redirect the end user to</returns>
-        string CreateHostedPaymentPageLink(string paymentId, string resourceToken, Uri returnUri);
+        string CreateHostedPaymentPageLink(string paymentId, string paymentToken, Uri returnUri);
     }
 }

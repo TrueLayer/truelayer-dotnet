@@ -28,7 +28,7 @@ namespace TrueLayer.Users
                 : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 
-        public async Task<ApiResponse<GetUserResponse>> GetUser(string id, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<GetUserExternalAccountsResponse>> GetUserExternalAccounts(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
 
@@ -39,8 +39,8 @@ namespace TrueLayer.Users
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.GetAsync<GetUserResponse>(
-                new Uri(_baseUri, id),
+            return await _apiClient.GetAsync<GetUserExternalAccountsResponse>(
+                new Uri(_baseUri, $"{id}/external-accounts"),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
