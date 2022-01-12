@@ -62,7 +62,7 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets the end user details
             /// </summary>
-            public User User { get; init; } = null!;
+            public PaymentUser User { get; init; } = null!;
         }
 
         /// <summary>

@@ -63,9 +63,9 @@ namespace TrueLayer.AcceptanceTests
             payment.PaymentMethod.AsT0.ShouldNotBeNull();
             payment.User.ShouldNotBeNull();
             payment.User.Id.ShouldBe(response.Data.User.Id);
-            payment.User.Name.ShouldBe(paymentRequest.User.AsT0.Name);
-            payment.User.Email.ShouldBe(paymentRequest.User.AsT0.Email);
-            payment.User.Phone.ShouldBe(paymentRequest.User.AsT0.Phone);
+            payment.User.Name.ShouldBe(paymentRequest.User!.Name);
+            payment.User.Email.ShouldBe(paymentRequest.User!.Email);
+            payment.User.Phone.ShouldBe(paymentRequest.User!.Phone);
         }
 
         private static CreatePaymentRequest CreatePaymentRequest()
@@ -85,7 +85,7 @@ namespace TrueLayer.AcceptanceTests
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
 
-                new PaymentUserRequest.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")
+                new PaymentUserRequest(null, "Jane Doe", "jane.doe@example.com", "+44 1234 567890")
             );
     }
 }
