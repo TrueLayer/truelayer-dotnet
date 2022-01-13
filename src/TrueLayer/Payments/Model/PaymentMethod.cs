@@ -17,12 +17,7 @@ namespace TrueLayer.Payments.Model
             /// Gets the payment method type
             /// </summary>
             public string Type => "bank_transfer";
-            
-            /// <summary>
-            /// Gets or sets the reference that will appear on the end-users statement
-            /// </summary>
-            public string? StatementReference { get; init; }
-            
+
             /// <summary>
             /// Gets or sets the filter used to determine the banks that should be displayed on the bank selection screen
             /// </summary>
