@@ -38,10 +38,7 @@ namespace MvcExample.Controllers
             var paymentRequest = new CreatePaymentRequest(
                 donateModel.AmountInMajor.ToMinorCurrencyUnit(2),
                 Currencies.GBP,
-                new PaymentMethod.BankTransfer
-                {
-                    StatementReference = "Your ref"
-                },
+                new PaymentMethod.BankTransfer(),
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
                     "truelayer-dotnet",
