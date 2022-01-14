@@ -4,8 +4,8 @@ namespace TrueLayer.Payments
 {
     internal sealed class HppLinkBuilder
     {
-        internal const string SandboxUrl = "https://checkout.truelayer-sandbox.com/";
-        internal const string ProdUrl = "https://checkout.truelayer.com/";
+        internal const string SandboxUrl = "https://payment.truelayer-sandbox.com/";
+        internal const string ProdUrl = "https://payment.truelayer.com/";
 
         private readonly Uri _baseUri;
 
