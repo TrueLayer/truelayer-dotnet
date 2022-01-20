@@ -4,7 +4,7 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model
 {
-    using ActionUnion = OneOf<SelectionAction>;
+    using ActionUnion = OneOf<UserSelection>;
 
     /// <summary>
     /// Payment Method types

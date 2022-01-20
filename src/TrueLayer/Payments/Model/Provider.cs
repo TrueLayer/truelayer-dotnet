@@ -8,13 +8,13 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Represents a selection action
         /// </summary>
-        public record SelectionAction : IDiscriminated
+        public record UserSelection : IDiscriminated
         {
             /// <summary>
-            /// Creates a new <see cref="SelectionAction"/> instance
+            /// Creates a new <see cref="UserSelection"/> instance
             /// </summary>
             /// <param name="providerFilter">Filter options for providers</param>
-            public SelectionAction(ProviderFilter providerFilter)
+            public UserSelection(ProviderFilter providerFilter)
             {
                 ProviderFilter = providerFilter;
             }
@@ -28,7 +28,7 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets the selection action type
             /// </summary>
-            public string Type => "selection_action";
+            public string Type => "user_selection";
         }
     }
 }

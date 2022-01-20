@@ -44,7 +44,7 @@ namespace TrueLayer.AcceptanceTests
                 Currencies.GBP,
                 new PaymentMethod.BankTransfer
                 {
-                    Provider = new Provider.SelectionAction(new ProviderFilter
+                    Provider = new Provider.UserSelection(new ProviderFilter
                     {
                         ProviderIds = new[] { "mock-payments-gb-redirect" }
                     }
