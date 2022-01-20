@@ -142,7 +142,9 @@ public class MyService
             currency: Currencies.GBP,
             paymentMethod: new PaymentMethod.BankTransfer
             {
-                StatementReference = "Your ref"
+                Provider = new Provider.UserSelection(new ProviderFilter {
+                    ProviderIds = new[] { "mock-payments-gb-redirect" }
+                })
             },
             beneficiary: new Beneficiary.ExternalAccount(
                 "TrueLayer",
