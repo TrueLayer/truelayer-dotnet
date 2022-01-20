@@ -1,34 +1,27 @@
+using TrueLayer.Serialization;
+
 namespace TrueLayer.Payments.Model
 {
     /// <summary>
-    /// Payment action types
+    /// Provider types
     /// </summary>
     public static class Provider
     {
         /// <summary>
-        /// Represents a selection action
+        /// Represents provider options for 'submit provider selection' action
         /// </summary>
+        [JsonDiscriminator("user_selection")]
         public record UserSelection : IDiscriminated
         {
             /// <summary>
-            /// Creates a new <see cref="UserSelection"/> instance
-            /// </summary>
-            /// <param name="providerFilter">Filter options for providers</param>
-            public UserSelection(ProviderFilter providerFilter)
-            {
-                ProviderFilter = providerFilter;
-            }
-
-            /// <summary>
-            /// Gets the provider filter
-            /// </summary>
-            public ProviderFilter ProviderFilter { get; }
-
-
-            /// <summary>
-            /// Gets the selection action type
+            /// Gets the provider type
             /// </summary>
             public string Type => "user_selection";
+
+            /// <summary>
+            /// Gets or sets the filter used to determine the banks that should be displayed on the bank selection screen
+            /// </summary>
+            public ProviderFilter? Filter { get; init; }
         }
     }
 }

@@ -44,11 +44,13 @@ namespace TrueLayer.AcceptanceTests
                 Currencies.GBP,
                 new PaymentMethod.BankTransfer
                 {
-                    Provider = new Provider.UserSelection(new ProviderFilter
+                    Provider = new Provider.UserSelection
                     {
-                        ProviderIds = new[] { "mock-payments-gb-redirect" }
+                        Filter = new ProviderFilter
+                        {
+                            ProviderIds = new[] { "mock-payments-gb-redirect" }
+                        }
                     }
-                    )
                 },
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",

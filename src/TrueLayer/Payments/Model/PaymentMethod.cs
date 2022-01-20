@@ -4,7 +4,7 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model
 {
-    using ActionUnion = OneOf<UserSelection>;
+    using ProviderUnion = OneOf<UserSelection>;
 
     /// <summary>
     /// Payment Method types
@@ -23,9 +23,9 @@ namespace TrueLayer.Payments.Model
             public string Type => "bank_transfer";
 
             /// <summary>
-            /// Gets or sets the filter used to determine the banks that should be displayed on the bank selection screen
+            /// Gets or sets the provider options
             /// </summary>
-            public ActionUnion? Provider { get; init; }
+            public ProviderUnion Provider { get; init; }
         }
     }
 }
