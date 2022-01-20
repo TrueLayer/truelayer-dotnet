@@ -40,10 +40,11 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 Currencies.GBP,
                 new PaymentMethod.BankTransfer
                 {
-                    ProviderFilter = new ProviderFilter
+                    Provider = new Provider.SelectionAction(new ProviderFilter
                     {
                         ProviderIds = new[] { "mock-payments-gb-redirect" }
                     }
+                    )
                 },
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
