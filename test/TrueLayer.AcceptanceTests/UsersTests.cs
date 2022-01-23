@@ -54,7 +54,7 @@ namespace TrueLayer.AcceptanceTests
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                new PaymentUserRequest(null, "Jane Doe", "jane.doe@example.com", "+442079460087")
+                PaymentUserRequest.New("Jane Doe", "jane.doe@example.com", "+442079460087")
             );
     }
 }
