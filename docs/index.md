@@ -124,7 +124,7 @@ public class MyService
                 "truelayer-dotnet",
                 new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
             ),
-            user: PaymentUserRequest.New("Jane Doe", "jane.doe@example.com", "0123456789")
+            user: new PaymentUserRequest("Jane Doe", "jane.doe@example.com", "0123456789")
         );
 
         var apiResponse = await _client.Payments.CreatePayment(

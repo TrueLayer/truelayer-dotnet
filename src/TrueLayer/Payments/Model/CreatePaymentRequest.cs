@@ -25,7 +25,7 @@ namespace TrueLayer.Payments.Model
             string currency,
             PaymentMethodUnion paymentMethod,
             BeneficiaryUnion beneficiary,
-            PaymentUserRequest user)
+            PaymentUserRequest? user)
         {
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
             Currency = currency.NotNullOrWhiteSpace(nameof(currency));

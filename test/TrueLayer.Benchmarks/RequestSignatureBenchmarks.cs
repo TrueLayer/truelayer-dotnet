@@ -50,7 +50,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                PaymentUserRequest.Existing(Guid.NewGuid().ToString(), "Jane Doe", "jane.doe@example.com", "+442079460087")
+                new PaymentUserRequest(Guid.NewGuid().ToString(), "Jane Doe", "jane.doe@example.com", "+442079460087")
             );
     }
 }

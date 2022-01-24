@@ -85,7 +85,7 @@ namespace TrueLayer.AcceptanceTests
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
 
-                PaymentUserRequest.New("Jane Doe", "jane.doe@example.com", "+44 1234 567890")
+                new PaymentUserRequest("Jane Doe", "jane.doe@example.com", "+44 1234 567890")
             );
     }
 }
