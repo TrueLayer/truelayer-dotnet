@@ -11,7 +11,7 @@ namespace TrueLayer.Payments.Model
         /// <param name="name">The user's name.</param>
         /// <param name="email">The user's email address.</param>
         /// <param name="phone">The user's phone number.</param>
-        public PaymentUserRequest(string? name, string? email, string? phone)
+        public PaymentUserRequest(string? name = null, string? email = null, string? phone = null)
         {
             Name = name.NotEmptyOrWhiteSpace(nameof(name));
             Email = email.NotEmptyOrWhiteSpace(nameof(email));
@@ -25,7 +25,7 @@ namespace TrueLayer.Payments.Model
         /// <param name="name">The user's name</param>
         /// <param name="email">The user's email address.</param>
         /// <param name="phone">The user's phone number.</param>
-        public PaymentUserRequest(string id, string? name, string? email, string? phone)
+        public PaymentUserRequest(string id, string? name = null, string? email = null, string? phone = null)
         {
             Id = id.NotNullOrWhiteSpace(nameof(id));
             Name = name.NotEmptyOrWhiteSpace(nameof(name));

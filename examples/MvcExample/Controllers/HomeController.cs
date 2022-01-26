@@ -44,7 +44,7 @@ namespace MvcExample.Controllers
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                new PaymentUserRequest(donateModel.Name, donateModel.Email, null)
+                new PaymentUserRequest(name: donateModel.Name, email: donateModel.Email)
             );
 
             var apiResponse = await _truelayer.Payments.CreatePayment(
