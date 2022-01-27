@@ -40,9 +40,9 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 Currencies.GBP,
                 new PaymentMethod.BankTransfer
                 {
-                    ProviderFilter = new ProviderFilter
+                    Provider = new Provider.UserSelection
                     {
-                        ProviderIds = new[] { "mock-payments-gb-redirect" }
+                        Filter = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } }
                     }
                 },
                 new Beneficiary.ExternalAccount(
@@ -50,7 +50,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                new PaymentUserRequest.ExistingUser(Guid.NewGuid().ToString())
+                new PaymentUserRequest(id: Guid.NewGuid().ToString())
             );
     }
 }

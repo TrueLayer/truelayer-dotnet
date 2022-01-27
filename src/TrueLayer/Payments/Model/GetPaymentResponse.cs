@@ -1,7 +1,6 @@
 using System;
 using OneOf;
 using TrueLayer.Serialization;
-using TrueLayer.Users.Model;
 using static TrueLayer.Payments.Model.Beneficiary;
 using static TrueLayer.Payments.Model.PaymentMethod;
 
@@ -62,7 +61,7 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets the end user details
             /// </summary>
-            public User User { get; init; } = null!;
+            public PaymentUser User { get; init; } = null!;
         }
 
         /// <summary>

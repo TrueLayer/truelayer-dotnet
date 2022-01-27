@@ -1,7 +1,3 @@
-using System;
-using TrueLayer.Serialization;
-using TrueLayer.Users.Model;
-
 namespace TrueLayer.Payments.Model
 {
     /// <summary>
