@@ -4,9 +4,9 @@ namespace TrueLayer.Payments
 {
     internal sealed class HppLinkBuilder
     {
-        internal const string SandboxUrl = "https://checkout.truelayer-sandbox.com/";
-        internal const string ProdUrl = "https://checkout.truelayer.com/";
-        
+        internal const string SandboxUrl = "https://payment.truelayer-sandbox.com/";
+        internal const string ProdUrl = "https://payment.truelayer.com/";
+
         private readonly Uri _baseUri;
 
         public HppLinkBuilder(Uri? baseUri = null, bool useSandbox = true)
@@ -15,19 +15,19 @@ namespace TrueLayer.Payments
                 new Uri((useSandbox) ? SandboxUrl : ProdUrl);
         }
 
-        public string Build(string paymentId, string resourceToken, Uri returnUri)
+        public string Build(string paymentId, string paymentToken, Uri returnUri)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            resourceToken.NotNullOrWhiteSpace(nameof(resourceToken));
+            paymentToken.NotNullOrWhiteSpace(nameof(paymentToken));
             returnUri.NotNull(nameof(returnUri));
-            
-            var fragment = $"payment_id={paymentId}&resource_token={resourceToken}&return_uri={returnUri.AbsoluteUri}";
+
+            var fragment = $"payment_id={paymentId}&payment_token={paymentToken}&return_uri={returnUri.AbsoluteUri}";
 
             var builder = new UriBuilder(_baseUri);
             builder.Path = "payments";
             builder.Fragment = fragment;
-                
+
             return builder.Uri.AbsoluteUri;
-        }        
+        }
     }
 }

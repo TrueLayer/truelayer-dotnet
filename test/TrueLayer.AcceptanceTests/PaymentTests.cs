@@ -25,30 +25,16 @@ namespace TrueLayer.AcceptanceTests
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
-            response.Data.Value.ShouldBeOfType<CreatePaymentResponse.AuthorizationRequired>();
+            response.Data.ShouldBeOfType<CreatePaymentResponse>();
 
-            string hppUri = response.Data.Match(
-                authRequired =>
-                {
-                    authRequired.Status.ShouldBe("authorization_required");
+            response.Data.ShouldNotBeNull();
+            response.Data.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.PaymentToken.ShouldNotBeNullOrWhiteSpace();
+            response.Data.User.ShouldNotBeNull();
+            response.Data.User.Id.ShouldNotBeNullOrWhiteSpace();
 
-                    authRequired.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
-                    authRequired.Currency.ShouldBe(paymentRequest.Currency);
-                    authRequired.Id.ShouldNotBeNullOrWhiteSpace();
-                    authRequired.ResourceToken.ShouldNotBeNullOrWhiteSpace();
-                    authRequired.CreatedAt.ShouldNotBe(default);
-                    authRequired.User.ShouldNotBeNull();
-                    authRequired.User.Id.ShouldNotBeNullOrWhiteSpace();
-                    authRequired.User.Name.ShouldBe(paymentRequest.User.AsT0.Name);
-                    authRequired.User.Email.ShouldBe(paymentRequest.User.AsT0.Email);
-                    authRequired.User.Phone.ShouldBe(paymentRequest.User.AsT0.Phone);
-
-                    return _fixture.Client.Payments.CreateHostedPaymentPageLink(
-                        authRequired.Id, authRequired.ResourceToken, new Uri("https://redirect.mydomain.com")
-                    );
-                }
-            );
-
+            string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
+                response.Data!.Id, response.Data!.PaymentToken, new Uri("https://redirect.mydomain.com"));
             hppUri.ShouldNotBeNullOrWhiteSpace();
         }
 
@@ -63,7 +49,7 @@ namespace TrueLayer.AcceptanceTests
             response.IsSuccessful.ShouldBeTrue();
 
             var getPaymentResponse
-                = await _fixture.Client.Payments.GetPayment(response.Data.AsT0.Id);
+                = await _fixture.Client.Payments.GetPayment(response.Data!.Id);
 
             getPaymentResponse.IsSuccessful.ShouldBeTrue();
 
@@ -76,7 +62,7 @@ namespace TrueLayer.AcceptanceTests
             payment.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
             payment.PaymentMethod.AsT0.ShouldNotBeNull();
             payment.User.ShouldNotBeNull();
-            payment.User.Id.ShouldBe(response.Data.AsT0.User.Id);
+            payment.User.Id.ShouldBe(response.Data.User.Id);
             payment.User.Name.ShouldBe(paymentRequest.User.AsT0.Name);
             payment.User.Email.ShouldBe(paymentRequest.User.AsT0.Email);
             payment.User.Phone.ShouldBe(paymentRequest.User.AsT0.Phone);
@@ -98,8 +84,8 @@ namespace TrueLayer.AcceptanceTests
                     "truelayer-dotnet",
                     new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
-                
-                new PaymentUser.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")
+
+                new PaymentUserRequest.NewUser("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")
             );
     }
 }
