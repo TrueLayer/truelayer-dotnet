@@ -4,7 +4,6 @@ using TrueLayer.Auth;
 using TrueLayer.Payments;
 using TrueLayer.MerchantAccounts;
 using TrueLayer.Payouts;
-using TrueLayer.Users;
 
 namespace TrueLayer
 {
@@ -14,7 +13,6 @@ namespace TrueLayer
         private readonly Lazy<IPaymentsApi> _payments;
         private readonly Lazy<IPayoutsApi> _payouts;
         private readonly Lazy<IMerchantAccountsApi> _merchants;
-        private readonly Lazy<IUsersApi> _users;
 
         public TrueLayerClient(IApiClient apiClient, IOptions<TrueLayerOptions> options)
         {
@@ -25,13 +23,11 @@ namespace TrueLayer
             _payments = new(() => new PaymentsApi(apiClient, Auth, options.Value));
             _payouts = new(() => new PayoutsApi(apiClient, Auth, options.Value));
             _merchants = new(() => new MerchantAccountsApi(apiClient, Auth, options.Value));
-            _users = new(() => new UsersApi(apiClient, Auth, options.Value));
         }
 
         public IAuthApi Auth { get; }
         public IPaymentsApi Payments => _payments.Value;
         public IPayoutsApi Payouts => _payouts.Value;
         public IMerchantAccountsApi MerchantAccounts => _merchants.Value;
-        public IUsersApi Users => _users.Value;
     }
 }

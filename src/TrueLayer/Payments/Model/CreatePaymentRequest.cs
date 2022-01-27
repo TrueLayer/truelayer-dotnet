@@ -1,13 +1,11 @@
 using OneOf;
 using static TrueLayer.Payments.Model.Beneficiary;
 using static TrueLayer.Payments.Model.PaymentMethod;
-using static TrueLayer.Payments.Model.PaymentUserRequest;
 
 namespace TrueLayer.Payments.Model
 {
     using BeneficiaryUnion = OneOf<MerchantAccount, ExternalAccount>;
     using PaymentMethodUnion = OneOf<BankTransfer>;
-    using UserUnion = OneOf<NewUser, ExistingUser>;
 
     /// <summary>
     /// Represents a request for payment
@@ -27,7 +25,7 @@ namespace TrueLayer.Payments.Model
             string currency,
             PaymentMethodUnion paymentMethod,
             BeneficiaryUnion beneficiary,
-            UserUnion user)
+            PaymentUserRequest? user)
         {
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
             Currency = currency.NotNullOrWhiteSpace(nameof(currency));
@@ -48,7 +46,7 @@ namespace TrueLayer.Payments.Model
         public string Currency { get; }
 
         /// <summary>
-        /// Gets the method of payment 
+        /// Gets the method of payment
         /// </summary>
         public PaymentMethodUnion PaymentMethod { get; }
 
@@ -60,6 +58,6 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Gets the end user details
         /// </summary>
-        public UserUnion User { get; }
+        public PaymentUserRequest? User { get; }
     }
 }
