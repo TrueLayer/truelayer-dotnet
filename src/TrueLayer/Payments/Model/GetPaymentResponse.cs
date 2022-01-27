@@ -1,7 +1,6 @@
 using System;
 using OneOf;
 using TrueLayer.Serialization;
-using TrueLayer.Users.Model;
 using static TrueLayer.Payments.Model.Beneficiary;
 using static TrueLayer.Payments.Model.PaymentMethod;
 
