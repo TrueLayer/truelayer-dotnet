@@ -66,7 +66,7 @@ namespace TrueLayer.MerchantAccounts
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<GetUserExternalAccountsResponse>> GetUserExternalAccounts(string merchantAccountId, string userId, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<GetUserPaymentSourcesResponse>> GetUserPaymentSources(string merchantAccountId, string userId, CancellationToken cancellationToken = default)
         {
             merchantAccountId.NotNullOrWhiteSpace(nameof(merchantAccountId));
             userId.NotNullOrWhiteSpace(nameof(userId));
@@ -78,7 +78,7 @@ namespace TrueLayer.MerchantAccounts
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.GetAsync<GetUserExternalAccountsResponse>(
+            return await _apiClient.GetAsync<GetUserPaymentSourcesResponse>(
                 new Uri(_baseUri, $"merchant-accounts/{merchantAccountId}/payment-sources?user_id={userId}"),
                 authResponse.Data!.AccessToken,
                 cancellationToken

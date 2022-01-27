@@ -59,7 +59,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Fact]
-        public async Task Can_get_user_external_accounts()
+        public async Task Can_get_user_payment_sources()
         {
             var listMerchants = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
             listMerchants.Data.ShouldNotBeNull();
@@ -76,12 +76,12 @@ namespace TrueLayer.AcceptanceTests
 
 
             var getUserExternalAccountsResponse
-                = await _fixture.Client.MerchantAccounts.GetUserExternalAccounts(merchantId, createPaymentUser.Id);
+                = await _fixture.Client.MerchantAccounts.GetUserPaymentSources(merchantId, createPaymentUser.Id);
 
             getUserExternalAccountsResponse.IsSuccessful.ShouldBeTrue();
             getUserExternalAccountsResponse.Data.ShouldNotBeNull();
             var externalAccounts = getUserExternalAccountsResponse.Data!;
-            externalAccounts.Items.ShouldBeOfType<UserExternalAccount[]>();
+            externalAccounts.Items.ShouldBeOfType<UserPaymentSource[]>();
             externalAccounts.Items.ShouldBeEmpty();
         }
 

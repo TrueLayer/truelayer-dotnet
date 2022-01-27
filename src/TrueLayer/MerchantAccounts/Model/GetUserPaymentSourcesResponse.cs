@@ -14,7 +14,7 @@ namespace TrueLayer.MerchantAccounts.Model
     /// Represents an end user's external accounts details.
     /// </summary>
     /// <param name="Items">Details of the external accounts of the user.</param>
-    public record GetUserExternalAccountsResponse(UserExternalAccount[] Items);
+    public record GetUserPaymentSourcesResponse(UserPaymentSource[] Items);
 
     /// <summary>
     /// Represents an external account.
@@ -22,5 +22,5 @@ namespace TrueLayer.MerchantAccounts.Model
     /// <param name="Id">TrueLayer unique identifier of the external account</param>
     /// <param name="Name">Account holder name</param>
     /// <param name="SchemeIdentifiers">The scheme identifiers for the external account</param>
-    public record UserExternalAccount(string Id, string Name, SchemeIdentifiersUnion[] SchemeIdentifiers);
+    public record UserPaymentSource(string Id, string Name, SchemeIdentifiersUnion[] SchemeIdentifiers);
 }
