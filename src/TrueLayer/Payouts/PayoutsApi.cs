@@ -34,9 +34,10 @@ namespace TrueLayer.Payouts
 
             options.Payouts.NotNull(nameof(options.Payouts))!.Validate();
 
+            string payoutsApiUrl = (options.UseSandbox ?? true) ? SandboxUrl : ProdUrl;
             _baseUri = options.Payouts.Uri is not null
                 ? new Uri(options.Payouts.Uri, "payouts")
-                : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
+                : new Uri(payoutsApiUrl);
         }
 
         /// <inheritdoc />
