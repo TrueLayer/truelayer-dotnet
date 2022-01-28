@@ -83,6 +83,11 @@ namespace TrueLayer.AcceptanceTests
             var externalAccounts = getUserExternalAccountsResponse.Data!;
             externalAccounts.Items.ShouldBeOfType<UserPaymentSource[]>();
             externalAccounts.Items.ShouldBeEmpty();
+
+            var account = externalAccounts.Items.First();
+            account.AccountIdentifiers.ShouldNotBeNull();
+            account.Id.ShouldNotBeNullOrWhiteSpace();
+            account.Name.ShouldNotBeNullOrWhiteSpace();
         }
 
         private static CreatePaymentRequest CreatePaymentRequest(string merchantId)
