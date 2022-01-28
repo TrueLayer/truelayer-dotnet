@@ -82,7 +82,7 @@ namespace TrueLayer.AcceptanceTests
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
                     "truelayer-dotnet",
-                    new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
+                    new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
 
                 new PaymentUserRequest("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")

@@ -3,11 +3,11 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model
 {
-    using SchemeIdentifiersUnion = OneOf<
-        SchemeIdentifier.SortCodeAccountNumber,
-        SchemeIdentifier.Bban,
-        SchemeIdentifier.Iban,
-        SchemeIdentifier.Nrb
+    using AccountIdentifiersUnion = OneOf<
+        AccountIdentifier.SortCodeAccountNumber,
+        AccountIdentifier.Bban,
+        AccountIdentifier.Iban,
+        AccountIdentifier.Nrb
     >;
 
     /// <summary>
@@ -18,9 +18,9 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Represents an external account source
         /// </summary>
-        /// <param name="SchemeIdentifiers">The scheme identifiers for the external account</param>
+        /// <param name="AccountIdentifiers">The identifiers for the external account</param>
         [JsonDiscriminator(ExternalAccount.Discriminator)]
-        public sealed record ExternalAccount(SchemeIdentifiersUnion[] SchemeIdentifiers)
+        public sealed record ExternalAccount(AccountIdentifiersUnion[] AccountIdentifiers)
         {
             public const string Discriminator = "external_account";
 
@@ -35,10 +35,10 @@ namespace TrueLayer.Payments.Model
             /// </summary>
             public string? ExternalAccountId { get; init; }
 
-            
+
             /// <summary>
             /// Gets the account holder name
-            /// This field is null if the chosen payment method/destination does not provide this information. 
+            /// This field is null if the chosen payment method/destination does not provide this information.
             /// If the payment beneficiary is of type <see cref="Beneficiary.MerchantAccount"/>, the account holder name is available once the payment is settled.
             /// </summary>
             public string? AccountHolderName { get; init; }

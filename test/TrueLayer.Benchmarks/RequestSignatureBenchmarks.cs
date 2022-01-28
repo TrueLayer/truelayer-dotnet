@@ -48,7 +48,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
                     "truelayer-dotnet",
-                    new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
+                    new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
                 new PaymentUserRequest(id: Guid.NewGuid().ToString())
             );

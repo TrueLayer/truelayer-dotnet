@@ -42,7 +42,7 @@ namespace MvcExample.Controllers
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
                     "truelayer-dotnet",
-                    new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
+                    new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
                 ),
                 new PaymentUserRequest(name: donateModel.Name, email: donateModel.Email)
             );

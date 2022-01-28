@@ -1,10 +1,10 @@
 using OneOf;
 using TrueLayer.Serialization;
-using static TrueLayer.Payments.Model.SchemeIdentifier;
+using static TrueLayer.Payments.Model.AccountIdentifier;
 
 namespace TrueLayer.Payments.Model
 {
-    using SchemeIdentifierUnion = OneOf<SortCodeAccountNumber>;
+    using AccountIdentifierUnion = OneOf<SortCodeAccountNumber>;
 
     public static class Beneficiary
     {
@@ -34,7 +34,7 @@ namespace TrueLayer.Payments.Model
             public string Id { get; }
 
             /// <summary>
-            /// The name of the beneficiary. 
+            /// The name of the beneficiary.
             /// If unspecified, the API will use the account owner name associated to the selected merchant account.
             /// </summary>
             public string? Name { get; init; }
@@ -46,11 +46,11 @@ namespace TrueLayer.Payments.Model
         [JsonDiscriminator("external_account")]
         public sealed record ExternalAccount : IDiscriminated
         {
-            public ExternalAccount(string name, string reference, SchemeIdentifierUnion schemeIdentifier)
+            public ExternalAccount(string name, string reference, AccountIdentifierUnion accountIdentifier)
             {
                 Name = name.NotNullOrWhiteSpace(nameof(name));
                 Reference = reference.NotNullOrWhiteSpace(nameof(reference));
-                SchemeIdentifier = schemeIdentifier;
+                AccountIdentifier = accountIdentifier;
             }
 
             /// <summary>
@@ -64,14 +64,14 @@ namespace TrueLayer.Payments.Model
             public string Name { get; }
 
             /// <summary>
-            /// Gets the reference for the external bank account holder 
+            /// Gets the reference for the external bank account holder
             /// </summary>
             public string Reference { get; }
 
             /// <summary>
-            /// Gets the unique scheme identifier for the external account
+            /// Gets the unique identifier for the external account
             /// </summary>
-            public SchemeIdentifierUnion SchemeIdentifier { get; }
+            public AccountIdentifierUnion AccountIdentifier { get; }
         }
     }
 }

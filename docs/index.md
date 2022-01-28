@@ -122,7 +122,7 @@ public class MyService
             beneficiary: new Beneficiary.ExternalAccount(
                 "TrueLayer",
                 "truelayer-dotnet",
-                new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
+                new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
             ),
             user: new PaymentUserRequest("Jane Doe", "jane.doe@example.com", "0123456789")
         );

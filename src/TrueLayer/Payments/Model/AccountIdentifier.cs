@@ -4,9 +4,9 @@ using TrueLayer.Serialization;
 namespace TrueLayer.Payments.Model
 {
     /// <summary>
-    /// Scheme Identifier types
+    /// Account Identifier types
     /// </summary>
-    public static class SchemeIdentifier
+    public static class AccountIdentifier
     {
         /// <summary>
         /// Defines a bank account identified by sort code and account number
@@ -32,12 +32,12 @@ namespace TrueLayer.Payments.Model
             /// Gets the scheme identifier type
             /// </summary>
             public string Type => Discriminator;
-            
+
             /// <summary>
             /// Gets the bank account sort code
             /// </summary>
             public string SortCode { get; }
-            
+
             /// <summary>
             /// Gets the bank account number
             /// </summary>
@@ -57,8 +57,8 @@ namespace TrueLayer.Payments.Model
             /// Creates a new <see cref="Nrb"/> instance
             /// </summary>
             /// <param name="value">
-            /// Valid Polish NRB (no spaces). 
-            /// Consists of 2 check digits, followed by an 8 digit bank branch number, and then by a 16 digit bank account number. 
+            /// Valid Polish NRB (no spaces).
+            /// Consists of 2 check digits, followed by an 8 digit bank branch number, and then by a 16 digit bank account number.
             /// Equivalent to a Polish IBAN with the country code removed.
             /// </param>
             public Nrb(string value)
@@ -90,8 +90,8 @@ namespace TrueLayer.Payments.Model
             /// Creates a new <see cref="Bban"/> instance
             /// </summary>
             /// <param name="value">
-            /// Valid Basic Bank Account Number (no spaces). 
-            /// Consists of up to 30 alphanumeric characters, with a fixed length per country. 
+            /// Valid Basic Bank Account Number (no spaces).
+            /// Consists of up to 30 alphanumeric characters, with a fixed length per country.
             /// Forms the latter part of the IBAN as described above.
             /// </param>
             public Bban(string value)
@@ -123,8 +123,8 @@ namespace TrueLayer.Payments.Model
             /// Creates a new <see cref="Iban"/> instance
             /// </summary>
             /// <param name="value">
-            /// Valid International Bank Account Number (no spaces). 
-            /// Consists of a 2 letter country code, followed by 2 check digits, 
+            /// Valid International Bank Account Number (no spaces).
+            /// Consists of a 2 letter country code, followed by 2 check digits,
             /// and then by up to 30 alphanumeric characters (also known as the BBAN).
             /// </param>
             public Iban(string value)

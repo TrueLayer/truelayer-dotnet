@@ -3,11 +3,11 @@ using TrueLayer.Payments.Model;
 
 namespace TrueLayer.MerchantAccounts.Model
 {
-    using SchemeIdentifiersUnion = OneOf<
-        SchemeIdentifier.SortCodeAccountNumber,
-        SchemeIdentifier.Bban,
-        SchemeIdentifier.Iban,
-        SchemeIdentifier.Nrb
+    using AccountIdentifiersUnion = OneOf<
+        AccountIdentifier.SortCodeAccountNumber,
+        AccountIdentifier.Bban,
+        AccountIdentifier.Iban,
+        AccountIdentifier.Nrb
     >;
 
     /// <summary>
@@ -21,6 +21,6 @@ namespace TrueLayer.MerchantAccounts.Model
     /// </summary>
     /// <param name="Id">TrueLayer unique identifier of the external account</param>
     /// <param name="Name">Account holder name</param>
-    /// <param name="SchemeIdentifiers">The scheme identifiers for the external account</param>
-    public record UserPaymentSource(string Id, string Name, SchemeIdentifiersUnion[] SchemeIdentifiers);
+    /// <param name="AccountIdentifiers">The identifiers for the external account</param>
+    public record UserPaymentSource(string Id, string Name, AccountIdentifiersUnion[] AccountIdentifiers);
 }
