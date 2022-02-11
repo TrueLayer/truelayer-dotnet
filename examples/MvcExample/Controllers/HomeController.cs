@@ -38,12 +38,12 @@ namespace MvcExample.Controllers
             var paymentRequest = new CreatePaymentRequest(
                 donateModel.AmountInMajor.ToMinorCurrencyUnit(2),
                 Currencies.GBP,
-                new PaymentMethod.BankTransfer(),
-                new Beneficiary.ExternalAccount(
-                    "TrueLayer",
-                    "truelayer-dotnet",
-                    new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
-                ),
+                new PaymentMethod.BankTransfer(
+                    new Provider.UserSelected(),
+                    new Beneficiary.ExternalAccount(
+                        "TrueLayer",
+                        "truelayer-dotnet",
+                        new AccountIdentifier.SortCodeAccountNumber("567890", "12345678"))),
                 new PaymentUserRequest(name: donateModel.Name, email: donateModel.Email)
             );
 
@@ -70,7 +70,7 @@ namespace MvcExample.Controllers
 
 
             string redirectLink = _truelayer.Payments.CreateHostedPaymentPageLink(
-                apiResponse.Data!.Id, apiResponse.Data!.PaymentToken, new Uri(Url.ActionLink("Complete")));
+                apiResponse.Data!.Id, apiResponse.Data!.ResourceToken, new Uri(Url.ActionLink("Complete")));
 
             return Redirect(redirectLink);
         }

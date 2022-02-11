@@ -59,8 +59,9 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Fact]
-        public async Task Can_get_user_payment_sources()
+        public async Task Can_get_payment_sources()
         {
+            // Arrange
             var listMerchants = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
             listMerchants.Data.ShouldNotBeNull();
             listMerchants.Data.Items.ShouldNotBeEmpty();
@@ -74,34 +75,27 @@ namespace TrueLayer.AcceptanceTests
             createPaymentResponse.IsSuccessful.ShouldBeTrue();
             var createPaymentUser = createPaymentResponse.Data!.User;
 
+            // Act
+            var getPaymentSourcesResponse
+                = await _fixture.Client.MerchantAccounts.GetPaymentSources(merchantId, createPaymentUser.Id);
 
-            var getUserExternalAccountsResponse
-                = await _fixture.Client.MerchantAccounts.GetUserPaymentSources(merchantId, createPaymentUser.Id);
-
-            getUserExternalAccountsResponse.IsSuccessful.ShouldBeTrue();
-            getUserExternalAccountsResponse.Data.ShouldNotBeNull();
-            var externalAccounts = getUserExternalAccountsResponse.Data!;
-            externalAccounts.Items.ShouldBeOfType<UserPaymentSource[]>();
-            externalAccounts.Items.ShouldBeEmpty();
-
-            var account = externalAccounts.Items.First();
-            account.AccountIdentifiers.ShouldNotBeNull();
-            account.Id.ShouldNotBeNullOrWhiteSpace();
-            account.Name.ShouldNotBeNullOrWhiteSpace();
+            // Assert
+            getPaymentSourcesResponse.IsSuccessful.ShouldBeTrue();
+            getPaymentSourcesResponse.Data.ShouldNotBeNull();
+            var responseBody = getPaymentSourcesResponse.Data!;
+            responseBody.Items.ShouldBeEmpty();
         }
 
         private static CreatePaymentRequest CreatePaymentRequest(string merchantId)
             => new CreatePaymentRequest(
                 100,
                 Currencies.GBP,
-                new PaymentMethod.BankTransfer
-                {
-                    Provider = new Provider.UserSelection
+                new PaymentMethod.BankTransfer(
+                    new Provider.UserSelected
                     {
                         Filter = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } }
-                    }
-                },
-                new Beneficiary.MerchantAccount(merchantId),
+                    },
+                    new Beneficiary.MerchantAccount(merchantId)),
                 new PaymentUserRequest("Jane Doe", email: "jane.doe@example.com", phone: "+442079460087")
             );
     }

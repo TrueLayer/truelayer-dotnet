@@ -38,17 +38,16 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             => new CreatePaymentRequest(
                 100,
                 Currencies.GBP,
-                new PaymentMethod.BankTransfer
-                {
-                    Provider = new Provider.UserSelection
+                new PaymentMethod.BankTransfer(
+                    new Provider.UserSelected
                     {
                         Filter = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } }
-                    }
-                },
-                new Beneficiary.ExternalAccount(
-                    "TrueLayer",
-                    "truelayer-dotnet",
-                    new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
+                    },
+                    new Beneficiary.ExternalAccount(
+                        "TrueLayer",
+                        "truelayer-dotnet",
+                        new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
+                    )
                 ),
                 new PaymentUserRequest(id: Guid.NewGuid().ToString())
             );

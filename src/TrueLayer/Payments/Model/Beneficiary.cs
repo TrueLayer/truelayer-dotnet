@@ -17,10 +17,10 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Creates a new <see cref="MerchantAccount"/>
             /// </summary>
-            /// <param name="id">The TrueLayer merchant account identifier</param>
-            public MerchantAccount(string id)
+            /// <param name="merchantAccountId">The TrueLayer merchant account identifier</param>
+            public MerchantAccount(string merchantAccountId)
             {
-                Id = id.NotNullOrWhiteSpace(nameof(id));
+                MerchantAccountId = merchantAccountId.NotNullOrWhiteSpace(nameof(merchantAccountId));
             }
 
             /// <summary>
@@ -31,13 +31,13 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets the TrueLayer merchant account identifier
             /// </summary>
-            public string Id { get; }
+            public string MerchantAccountId { get; }
 
             /// <summary>
             /// The name of the beneficiary.
             /// If unspecified, the API will use the account owner name associated to the selected merchant account.
             /// </summary>
-            public string? Name { get; init; }
+            public string? AccountHolderName { get; init; }
         }
 
         /// <summary>
@@ -46,9 +46,15 @@ namespace TrueLayer.Payments.Model
         [JsonDiscriminator("external_account")]
         public sealed record ExternalAccount : IDiscriminated
         {
-            public ExternalAccount(string name, string reference, AccountIdentifierUnion accountIdentifier)
+            /// <summary>
+            /// Creates a new <see cref="ExternalAccount"/>
+            /// </summary>
+            /// <param name="accountHolderName">The external account holder name</param>
+            /// <param name="reference">The reference for the external bank account holder</param>
+            /// <param name="accountIdentifier">The unique identifier for the external account</param>
+            public ExternalAccount(string accountHolderName, string reference, AccountIdentifierUnion accountIdentifier)
             {
-                Name = name.NotNullOrWhiteSpace(nameof(name));
+                AccountHolderName = accountHolderName.NotNullOrWhiteSpace(nameof(accountHolderName));
                 Reference = reference.NotNullOrWhiteSpace(nameof(reference));
                 AccountIdentifier = accountIdentifier;
             }
@@ -61,7 +67,7 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets the name of the external account holder
             /// </summary>
-            public string Name { get; }
+            public string AccountHolderName { get; }
 
             /// <summary>
             /// Gets the reference for the external bank account holder

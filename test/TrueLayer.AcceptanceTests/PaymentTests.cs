@@ -29,12 +29,12 @@ namespace TrueLayer.AcceptanceTests
 
             response.Data.ShouldNotBeNull();
             response.Data.Id.ShouldNotBeNullOrWhiteSpace();
-            response.Data.PaymentToken.ShouldNotBeNullOrWhiteSpace();
+            response.Data.ResourceToken.ShouldNotBeNullOrWhiteSpace();
             response.Data.User.ShouldNotBeNull();
             response.Data.User.Id.ShouldNotBeNullOrWhiteSpace();
 
             string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
-                response.Data!.Id, response.Data!.PaymentToken, new Uri("https://redirect.mydomain.com"));
+                response.Data!.Id, response.Data!.ResourceToken, new Uri("https://redirect.mydomain.com"));
             hppUri.ShouldNotBeNullOrWhiteSpace();
         }
 
@@ -59,8 +59,8 @@ namespace TrueLayer.AcceptanceTests
             payment.Currency.ShouldBe(paymentRequest.Currency);
             payment.Id.ShouldNotBeNullOrWhiteSpace();
             payment.CreatedAt.ShouldNotBe(default);
-            payment.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
             payment.PaymentMethod.AsT0.ShouldNotBeNull();
+            payment.PaymentMethod.AsT0.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
             payment.User.ShouldNotBeNull();
             payment.User.Id.ShouldBe(response.Data.User.Id);
             payment.User.Name.ShouldBe(paymentRequest.User!.Name);
@@ -72,19 +72,16 @@ namespace TrueLayer.AcceptanceTests
             => new CreatePaymentRequest(
                 100,
                 Currencies.GBP,
-                new PaymentMethod.BankTransfer
-                {
-                    Provider = new Provider.UserSelection
+                new PaymentMethod.BankTransfer(
+                    new Provider.UserSelected
                     {
                         Filter = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } }
-                    }
-                },
-                new Beneficiary.ExternalAccount(
-                    "TrueLayer",
-                    "truelayer-dotnet",
-                    new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
-                ),
-
+                    },
+                    new Beneficiary.ExternalAccount(
+                        "TrueLayer",
+                        "truelayer-dotnet",
+                        new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
+                    )),
                 new PaymentUserRequest("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")
             );
     }
