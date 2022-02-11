@@ -12,7 +12,7 @@ namespace TrueLayer.Serialization
             return typeof(IOneOf).IsAssignableFrom(typeToConvert);
         }
 
-        public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+        public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions _)
         {
             if (OneOfTypeDescriptor.TryCreate(typeToConvert, out OneOfTypeDescriptor? descriptor))
             {

@@ -31,6 +31,6 @@ namespace TrueLayer.MerchantAccounts
         /// <param name="userId">The user identifier.</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
         /// <returns>An API response that includes details of a user.</returns>
-        Task<ApiResponse<GetUserPaymentSourcesResponse>> GetUserPaymentSources(string merchantAccountId, string userId, CancellationToken cancellationToken = default);
+        Task<ApiResponse<GetPaymentSourcesResponse>> GetPaymentSources(string merchantAccountId, string userId, CancellationToken cancellationToken = default);
     }
 }

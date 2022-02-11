@@ -140,20 +140,19 @@ public class MyService
         var paymentRequest = new CreatePaymentRequest(
             amountInMinor: amount.ToMinorCurrencyUnit(2),
             currency: Currencies.GBP,
-            paymentMethod: new PaymentMethod.BankTransfer
-            {
-                Provider = new Provider.UserSelection
+            paymentMethod: new PaymentMethod.BankTransfer(
+                new Provider.UserSelected
                 {
                     Filter = new ProviderFilter
                     {
                         ProviderIds = new[] { "mock-payments-gb-redirect" }
                     }
-                }
-            },
-            beneficiary: new Beneficiary.ExternalAccount(
-                "TrueLayer",
-                "truelayer-dotnet",
-                new SchemeIdentifier.SortCodeAccountNumber("567890", "12345678")
+                },
+                new Beneficiary.ExternalAccount(
+                    "TrueLayer",
+                    "truelayer-dotnet",
+                    new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
+                )
             ),
             user: new PaymentUserRequest("Jane Doe", "jane.doe@example.com", "0123456789")
         );
@@ -172,12 +171,12 @@ public class MyService
             )
         }
 
-        // Pass the PaymentToken to the TrueLayer Web or Mobile SDK
+        // Pass the ResourceToken to the TrueLayer Web or Mobile SDK
 
         // or, redirect to the TrueLayer Hosted Payment Page
         string hostedPaymentPageUrl = _client.Payments.CreateHostedPaymentPageLink(
             apiResponse.Data!.Id,
-            apiResponse.Data!.PaymentToken,
+            apiResponse.Data!.ResourceToken,
             new Uri("https://redirect.yourdomain.com"));
 
         return Redirect(hostedPaymentPageUrl);

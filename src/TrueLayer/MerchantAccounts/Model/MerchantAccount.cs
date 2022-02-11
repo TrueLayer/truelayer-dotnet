@@ -1,21 +1,21 @@
 using OneOf;
-using SchemeIdentifier = TrueLayer.Payments.Model.SchemeIdentifier;
+using AccountIdentifier = TrueLayer.Payments.Model.AccountIdentifier;
 using System.Collections.Generic;
 
 namespace TrueLayer.MerchantAccounts.Model
 {
-    using SchemeIdentifiersUnion = OneOf<
-        SchemeIdentifier.SortCodeAccountNumber,
-        SchemeIdentifier.Bban,
-        SchemeIdentifier.Iban,
-        SchemeIdentifier.Nrb
+    using AccountIdentifiersUnion = OneOf<
+        AccountIdentifier.SortCodeAccountNumber,
+        AccountIdentifier.Bban,
+        AccountIdentifier.Iban,
+        AccountIdentifier.Nrb
     >;
 
     public record MerchantAccount(
-        string Id, 
-        string Currency, 
-        IEnumerable<SchemeIdentifiersUnion> SchemeIdentifiers,
-        long AvailableBalanceInMinor, 
-        long CurrentBalanceInMinor, 
+        string Id,
+        string Currency,
+        IEnumerable<AccountIdentifiersUnion> AccountIdentifiers,
+        long AvailableBalanceInMinor,
+        long CurrentBalanceInMinor,
         string AccountHolderName);
 }
