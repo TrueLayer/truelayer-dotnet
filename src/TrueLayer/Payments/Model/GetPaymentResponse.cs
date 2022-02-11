@@ -1,14 +1,11 @@
 using System;
 using OneOf;
 using TrueLayer.Serialization;
-using static TrueLayer.Payments.Model.Beneficiary;
 using static TrueLayer.Payments.Model.PaymentMethod;
 
 namespace TrueLayer.Payments.Model
 {
-    using BeneficiaryUnion = OneOf<MerchantAccount, ExternalAccount>;
     using PaymentMethodUnion = OneOf<BankTransfer>;
-    using SourceOfFundsUnion = OneOf<SourceOfFunds.ExternalAccount>;
 
     /// <summary>
     /// Get Payment Response Types
@@ -49,11 +46,6 @@ namespace TrueLayer.Payments.Model
             public DateTime CreatedAt { get; init; }
 
             /// <summary>
-            /// Gets the beneficiary details
-            /// </summary>
-            public BeneficiaryUnion Beneficiary { get; init; }
-
-            /// <summary>
             /// Gets the payment method details
             /// </summary>
             public PaymentMethodUnion PaymentMethod { get; init; }
@@ -88,10 +80,9 @@ namespace TrueLayer.Payments.Model
         /// For open loop payments this state is terminate. For closed-loop payments, wait for Settled.
         /// </summary>
         /// <param name="ExecutedAt">The date and time the payment executed</param>
-        /// <param name="SourceOfFunds">Details of the source of funds for the payment</param>
         /// <returns></returns>
         [JsonDiscriminator("executed")]
-        public record Executed(DateTime ExecutedAt, SourceOfFundsUnion SourceOfFunds) : PaymentDetails;
+        public record Executed(DateTime ExecutedAt) : PaymentDetails;
 
         /// <summary>
         /// Represents a payment that has settled
@@ -99,10 +90,10 @@ namespace TrueLayer.Payments.Model
         /// </summary>
         /// <param name="ExecutedAt">The date and time the payment executed</param>
         /// <param name="SettledAt">The date and time the payment was settled</param>
-        /// <param name="SourceOfFunds">Details of the source of funds for the payment</param>
+        /// <param name="PaymentSource">Details of the source of funds for the payment</param>
         /// <returns></returns>
         [JsonDiscriminator("settled")]
-        public record Settled(DateTime ExecutedAt, DateTime SettledAt, SourceOfFundsUnion SourceOfFunds) : PaymentDetails;
+        public record Settled(DateTime ExecutedAt, DateTime SettledAt, PaymentSource PaymentSource) : PaymentDetails;
 
         /// <summary>
         /// Represents an authorized payment that failed to complete. This is a terminate state.

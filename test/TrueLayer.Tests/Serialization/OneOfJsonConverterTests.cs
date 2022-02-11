@@ -8,8 +8,32 @@ namespace TrueLayer.Tests.Serialization
 {
     public class OneOfJsonConverterTests
     {
+        private readonly JsonSerializerOptions _options = new JsonSerializerOptions
+        {
+            Converters = { new OneOfJsonConverterFactory() }
+        };
+
         [Fact]
-        public void Can_read()
+        public void Throws_if_not_a_valid_json_object()
+        {
+            string json = "[]";
+            Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options));
+        }
+
+        [Fact]
+        public void Throws_if_discriminator_and_status_field_missing()
+        {
+            string json = @"{
+                    ""field1"": ""Bar"",
+                    ""field2"": 10
+                }
+            ";
+
+            Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options));
+        }
+
+        [Fact]
+        public void Can_read_from_type_discriminator()
         {
             string json = @"{
                     ""type"": ""Bar"",
@@ -17,12 +41,21 @@ namespace TrueLayer.Tests.Serialization
                 }
             ";
 
-            var options = new JsonSerializerOptions
-            {
-                Converters = { new OneOfJsonConverterFactory() }
-            };
+            var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
+            oneOf.AsT1.BarProp.ShouldBe(10);
+            oneOf.Value.ShouldBeOfType<Bar>();
+        }
 
-            var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, options);
+        [Fact]
+        public void Can_read_from_status_discriminator()
+        {
+            string json = @"{
+                    ""status"": ""Bar"",
+                    ""BarProp"": 10
+                }
+            ";
+
+            var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
             oneOf.AsT1.BarProp.ShouldBe(10);
             oneOf.Value.ShouldBeOfType<Bar>();
         }
@@ -39,12 +72,7 @@ namespace TrueLayer.Tests.Serialization
                 }
             ";
 
-            var options = new JsonSerializerOptions
-            {
-                Converters = { new OneOfJsonConverterFactory() }
-            };
-
-            var wrapper = JsonSerializer.Deserialize<Wrapper>(json, options)
+            var wrapper = JsonSerializer.Deserialize<Wrapper>(json, _options)
                 .ShouldNotBeNull();
             wrapper.Name.ShouldBe("Nested");
             wrapper.OneOf.AsT0.FooProp.ShouldBe("test");
@@ -58,13 +86,15 @@ namespace TrueLayer.Tests.Serialization
                 }
             ";
 
-            var options = new JsonSerializerOptions
-            {
-                Converters = { new OneOfJsonConverterFactory() }
-            };
-
-            var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Other>>(json, options);
+            var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Other>>(json, _options);
             oneOf.Value.ShouldBeOfType<Other>();
+        }
+
+        [Fact]
+        public void Can_write_one_of_type()
+        {
+            OneOf<Foo, Bar> obj = new Foo();
+            JsonSerializer.Serialize(obj, _options).ShouldNotBeNullOrWhiteSpace();
         }
 
         public class Foo
