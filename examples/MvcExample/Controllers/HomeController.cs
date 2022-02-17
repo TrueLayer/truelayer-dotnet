@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -70,17 +71,16 @@ namespace MvcExample.Controllers
 
 
             string redirectLink = _truelayer.Payments.CreateHostedPaymentPageLink(
-                apiResponse.Data!.Id, apiResponse.Data!.ResourceToken, new Uri(Url.ActionLink("Complete")));
+                apiResponse.Data!.Id, apiResponse.Data!.ResourceToken, new Uri("http://localhost:3000/callback"));
 
             return Redirect(redirectLink);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Complete(string paymentId)
+        public async Task<IActionResult> Complete([FromQuery(Name = "payment_id")]string paymentId)
         {
             if (string.IsNullOrWhiteSpace(paymentId))
-                return View();
-            //return RedirectToAction("Index");
+                return StatusCode((int)HttpStatusCode.BadRequest);
 
             var apiResponse = await _truelayer.Payments.GetPayment(paymentId);
 
