@@ -1,10 +1,10 @@
 using OneOf;
 using TrueLayer.Serialization;
-using static TrueLayer.Payouts.Model.SchemeIdentifier;
+using static TrueLayer.Payouts.Model.AccountIdentifier;
 
 namespace TrueLayer.Payouts.Model
 {
-    using SchemeIdentifierUnion = OneOf<Iban>;
+    using AccountIdentifierUnion = OneOf<Iban>;
 
     public static class Beneficiary
     {
@@ -46,11 +46,11 @@ namespace TrueLayer.Payouts.Model
         [JsonDiscriminator("external_account")]
         public sealed record ExternalAccount : IDiscriminated
         {
-            public ExternalAccount(string name, string reference, SchemeIdentifierUnion schemeIdentifier)
+            public ExternalAccount(string accountHolderName, string reference, AccountIdentifierUnion schemeIdentifier)
             {
-                Name = name.NotNullOrWhiteSpace(nameof(name));
+                AccountHolderName = accountHolderName.NotNullOrWhiteSpace(nameof(accountHolderName));
                 Reference = reference.NotNullOrWhiteSpace(nameof(reference));
-                SchemeIdentifier = schemeIdentifier;
+                AccountIdentifier = schemeIdentifier;
             }
 
             /// <summary>
@@ -61,7 +61,7 @@ namespace TrueLayer.Payouts.Model
             /// <summary>
             /// Gets the name of the external account holder
             /// </summary>
-            public string Name { get; }
+            public string AccountHolderName { get; }
 
             /// <summary>
             /// Gets the reference for the external bank account holder
@@ -71,7 +71,7 @@ namespace TrueLayer.Payouts.Model
             /// <summary>
             /// Gets the unique scheme identifier for the external account
             /// </summary>
-            public SchemeIdentifierUnion SchemeIdentifier { get; }
+            public AccountIdentifierUnion AccountIdentifier { get; }
         }
     }
 }

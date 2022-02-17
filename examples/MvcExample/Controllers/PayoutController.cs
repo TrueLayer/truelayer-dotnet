@@ -43,7 +43,7 @@ namespace MvcExample.Controllers
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
                     "truelayer-dotnet",
-                    new SchemeIdentifier.Iban(payoutModel.Iban)
+                    new AccountIdentifier.Iban(payoutModel.Iban)
                 )
             );
 

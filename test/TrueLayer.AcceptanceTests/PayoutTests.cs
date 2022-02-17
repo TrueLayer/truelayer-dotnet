@@ -1,42 +1,23 @@
 using System;
-using System.Configuration;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Shouldly;
+using TrueLayer.MerchantAccounts.Model;
 using TrueLayer.Payouts.Model;
 using Xunit;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
 
 namespace TrueLayer.AcceptanceTests
 {
-    public class PayoutTests : IClassFixture<ApiTestFixture>
+    public class PayoutTests : IClassFixture<ApiTestFixture>, IAsyncLifetime
     {
         private readonly ApiTestFixture _fixture;
-        private readonly string _merchantAccountId;
-        private readonly string _iban;
+        private MerchantAccount? _merchantAccount;
 
         public PayoutTests(ApiTestFixture fixture)
         {
-            const string merchantAccountIdEnvVarName = "TrueLayer__AcceptanceTests__MerchantAccountId";
-            const string ibanEnvVarName = "TrueLayer__AcceptanceTests__Iban";
-
-            _fixture = fixture;
-            _merchantAccountId = Environment.GetEnvironmentVariable(merchantAccountIdEnvVarName)
-#if DEBUG
-                                 ?? "CHANGE ME WITH YOUR MERCHANT ID";
-#else
-                                 ?? throw new ConfigurationErrorsException($"NULL ${merchantAccountIdEnvVarName} environment variable");
-#endif
-            _iban = Environment.GetEnvironmentVariable(ibanEnvVarName)
-#if DEBUG
-                    ?? "CHANE ME WITH YOUR TEST IBAN";
-#else
-                    ?? throw new ConfigurationErrorsException($"NULL ${ibanEnvVarName} environment variable");
-#endif
-
-
-            Console.WriteLine(_merchantAccountId);
-            Console.WriteLine(_iban);
+             _fixture = fixture;
         }
 
         [Fact]
@@ -77,15 +58,29 @@ namespace TrueLayer.AcceptanceTests
             details.CreatedAt.ShouldNotBeOneOf(DateTime.MinValue, DateTime.MaxValue);
         }
 
+        public Task DisposeAsync() => Task.CompletedTask;
+
+        public async Task InitializeAsync()
+        {
+            var accounts = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
+
+            if (!accounts.IsSuccessful || !accounts.Data.Items.Any())
+            {
+                throw new InvalidOperationException("You must have a merchant account in order to perform a payout");
+            }
+
+            _merchantAccount = accounts.Data.Items.First();
+        }
+
         private CreatePayoutRequest CreatePayoutRequest()
             => new CreatePayoutRequest(
-                _merchantAccountId,
+                _merchantAccount!.Id,
                 100,
                 Currencies.GBP,
                 new Beneficiary.ExternalAccount(
-                    "TrueLayer",
+                    "Ms. Lucky",
                     "truelayer-dotnet",
-                    new SchemeIdentifier.Iban(_iban)
+                    new AccountIdentifier.Iban("GB33BUKB20201555555555")
                 )
             );
     }

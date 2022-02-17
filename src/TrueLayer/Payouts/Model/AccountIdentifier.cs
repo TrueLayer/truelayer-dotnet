@@ -4,9 +4,9 @@ using TrueLayer.Serialization;
 namespace TrueLayer.Payouts.Model
 {
     /// <summary>
-    /// Scheme Identifier types
+    /// Account Identifier types
     /// </summary>
-    public static class SchemeIdentifier
+    public static class AccountIdentifier
     {
         /// <summary>
         /// Defines a bank account identified by an IBAN
