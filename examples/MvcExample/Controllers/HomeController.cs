@@ -71,7 +71,7 @@ namespace MvcExample.Controllers
 
 
             string redirectLink = _truelayer.Payments.CreateHostedPaymentPageLink(
-                apiResponse.Data!.Id, apiResponse.Data!.ResourceToken, new Uri("http://localhost:3000/callback"));
+                apiResponse.Data!.Id, apiResponse.Data!.ResourceToken, new Uri(Url.ActionLink("Complete")));
 
             return Redirect(redirectLink);
         }
