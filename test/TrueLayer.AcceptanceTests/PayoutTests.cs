@@ -69,7 +69,7 @@ namespace TrueLayer.AcceptanceTests
                 throw new InvalidOperationException("You must have a merchant account in order to perform a payout");
             }
 
-            _merchantAccount = accounts.Data.Items.First();
+            _merchantAccount = accounts.Data.Items.Single(x => x.Currency == "GBP");
         }
 
         private CreatePayoutRequest CreatePayoutRequest()
