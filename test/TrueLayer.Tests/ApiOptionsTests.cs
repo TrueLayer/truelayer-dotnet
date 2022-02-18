@@ -7,10 +7,10 @@ namespace TrueLayer.Tests
     public class ApiOptionsTests
     {
         [Theory]
-        [InlineData(default(string))]
+        [InlineData("")]
         [InlineData("payments")]
         [InlineData("/payments")]
-        public void Invalid_if_not_absolute_uri(string value)
+        public void Invalid_if_provided_url_is_not_absolute(string value)
         {
             Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out var uri);
             Assert.Throws<ValidationException>(() => new ApiOptions { Uri = uri }.Validate());
