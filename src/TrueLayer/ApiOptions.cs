@@ -15,7 +15,7 @@ namespace TrueLayer
 
         internal virtual void Validate()
         {
-            if (Uri is null || !Uri.IsAbsoluteUri)
+            if (Uri is not null && !Uri.IsAbsoluteUri)
                 throw new ValidationException("Uri must be a valid and absolute uri");
         }
     }
