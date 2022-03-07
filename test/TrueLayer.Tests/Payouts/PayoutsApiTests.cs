@@ -73,7 +73,7 @@ namespace TrueLayer.Tests.Payouts
             actual.TraceId.ShouldBe("trace-id");
         }
 
-        private CreatePayoutRequest CreatePayoutRequest()
+        private static CreatePayoutRequest CreatePayoutRequest()
             => new CreatePayoutRequest(
                 "merchant-account-id",
                 100,
