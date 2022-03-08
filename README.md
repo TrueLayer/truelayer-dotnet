@@ -94,6 +94,11 @@ Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other
       "SigningKey": {
         "KeyId": "85eeb2da-702c-4f4b-bf9a-e98af5fd47c3"
       }
+    },
+    "Payouts": {
+      "SigningKey": {
+        "KeyId": "85eeb2da-702c-4f4b-bf9a-e98af5fd47c3"
+      }
     }
   }
 }
@@ -180,6 +185,55 @@ public class MyService
             new Uri("https://redirect.yourdomain.com"));
 
         return Redirect(hostedPaymentPageUrl);
+    }
+}
+```
+
+For more examples see the [API documentation](https://docs.truelayer.com). Advanced customization options and documentation for contributors can be found in the [Wiki](https://github.com/TrueLayer/truelayer-sdk-net/wiki).
+
+### Make a payout
+
+Inject `ITrueLayerClient` into your classes:
+
+```c#
+public class MyService
+{
+    private readonly ITrueLayerClient _client;
+
+    public MyService(ITrueLayerClient client)
+    {
+        _client = client;
+    }
+
+    public async Task<ActionResult> MakePayment()
+    {
+        var payoutRequest = new CreatePayoutRequest(
+            merchantAccountId: "VALID_MERCHANT_ID",
+            amountInMinor: amount.ToMinorCurrencyUnit(2),
+            currency: Currencies.GBP,
+            beneficiary: new Beneficiary.ExternalAccount(
+                "TrueLayer",
+                "truelayer-dotnet",
+                new SchemeIdentifier.Iban("VALID_IBAN")
+            )
+        );
+
+        var apiResponse = await _client.Payments.CreatePayout(
+            payoutRequest,
+            idempotencyKey: Guid.NewGuid().ToString()
+        );
+
+        if (!apiResponse.IsSuccessful)
+        {
+            return HandleFailure(
+                apiResponse.StatusCode,
+                // Includes details of any errors
+                apiResponse.Problem
+            )
+        }
+
+
+        return Accepted(apiResponse.Data.Id);
     }
 }
 ```

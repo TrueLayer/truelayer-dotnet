@@ -1,0 +1,10 @@
+﻿<script>
+  var fragment = window.location.href;
+  var payoutId = fragment.substring(fragment.indexOf('=') + 1);
+
+  if (payoutId) {
+    window.location.href = '/Payout/Complete?payoutId=' + payoutId;
+  } else {
+    window.location.href = '/';
+  }
+</script>

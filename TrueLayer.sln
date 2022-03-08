@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
+#
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A28C8509-D982-426E-A9DC-83A169621955}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F7D3A645-D715-4EE6-A2B2-1D557A60B9D2}"
@@ -16,6 +16,20 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{F603DA66-7092-4E8A-9C50-7D103861BE30}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcExample", "examples\MvcExample\MvcExample.csproj", "{EC68E7F5-64F9-4768-95FC-3F4A8D9620D0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{BBC92D48-CF99-4E97-B4DC-3E345A296D81}"
+	ProjectSection(SolutionItems) = preProject
+		docs\index.md = docs\index.md
+		Directory.Build.props = Directory.Build.props
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{CD513AC9-E9A5-4941-A131-678BCE9DB2B0}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+		build.cake = build.cake
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,5 +64,6 @@ Global
 		{FFAA4AAE-79EC-4290-8C01-755C3CA42973} = {F7D3A645-D715-4EE6-A2B2-1D557A60B9D2}
 		{7BDAA830-ABAC-4BAF-B4DD-F9ABD3250929} = {F7D3A645-D715-4EE6-A2B2-1D557A60B9D2}
 		{EC68E7F5-64F9-4768-95FC-3F4A8D9620D0} = {F603DA66-7092-4E8A-9C50-7D103861BE30}
+		{CD513AC9-E9A5-4941-A131-678BCE9DB2B0} = {BBC92D48-CF99-4E97-B4DC-3E345A296D81}
 	EndGlobalSection
 EndGlobal

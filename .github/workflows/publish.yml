@@ -57,6 +57,7 @@ jobs:
           TrueLayer__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
           TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
+          TrueLayer__Payouts__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
           cake-version: 1.3.0
           target: ${{ github.event.inputs.target || 'Publish' }}
