@@ -94,11 +94,6 @@ Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other
       "SigningKey": {
         "KeyId": "85eeb2da-702c-4f4b-bf9a-e98af5fd47c3"
       }
-    },
-    "Payouts": {
-      "SigningKey": {
-        "KeyId": "85eeb2da-702c-4f4b-bf9a-e98af5fd47c3"
-      }
     }
   }
 }
@@ -205,7 +200,7 @@ public class MyService
         _client = client;
     }
 
-    public async Task<ActionResult> MakePayment()
+    public async Task<ActionResult> MakePayout()
     {
         var payoutRequest = new CreatePayoutRequest(
             merchantAccountId: "VALID_MERCHANT_ID",

@@ -32,11 +32,11 @@ namespace TrueLayer.Payouts
             _options = options.NotNull(nameof(options));
             _auth = auth.NotNull(nameof(auth));
 
-            options.Payouts.NotNull(nameof(options.Payouts))!.Validate();
+            options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
             string payoutsApiUrl = (options.UseSandbox ?? true) ? SandboxUrl : ProdUrl;
-            _baseUri = options.Payouts.Uri is not null
-                ? new Uri(options.Payouts.Uri, "payouts")
+            _baseUri = options.Payments.Uri is not null
+                ? new Uri(options.Payments.Uri, "payouts")
                 : new Uri(payoutsApiUrl);
         }
 
@@ -58,7 +58,7 @@ namespace TrueLayer.Payouts
                 payoutRequest,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
-                _options.Payouts!.SigningKey,
+                _options.Payments!.SigningKey,
                 cancellationToken
             );
         }

@@ -38,11 +38,6 @@ Upload the public key to the [TrueLayer Console](https://console.truelayer.com/)
       "SigningKey": {
         "KeyId": "key_id"
       }
-    },
-    "Payouts": {
-      "SigningKey": {
-        "KeyId": "key_id"
-      }
     }
   }
 }
@@ -51,5 +46,5 @@ Upload the public key to the [TrueLayer Console](https://console.truelayer.com/)
 Or using an Environment Variable:
 
 ```
-TrueLayer__PayDirect__SigningKey__KeyId=key_id dotnet test
+TrueLayer__Payments__SigningKey__KeyId=key_id dotnet test
 ```

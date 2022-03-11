@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Moq;
 using Shouldly;
 using TrueLayer.Auth;
+using TrueLayer.Payments;
 using TrueLayer.Payouts;
 using TrueLayer.Payouts.Model;
 using Xunit;
@@ -21,7 +22,7 @@ namespace TrueLayer.Tests.Payouts
         {
             _trueLayerOptions = new TrueLayerOptions()
             {
-                Payouts = new PayoutsOptions()
+                Payments = new PaymentsOptions()
                 {
                     SigningKey = new SigningKey()
                     {
