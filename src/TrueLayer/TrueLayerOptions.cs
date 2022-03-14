@@ -27,7 +27,6 @@ namespace TrueLayer
 
         public ApiOptions? Auth { get; set; }
         public PaymentsOptions? Payments { get; set; }
-        public PayoutsOptions? Payouts { get; set; }
 
         public void Validate()
         {

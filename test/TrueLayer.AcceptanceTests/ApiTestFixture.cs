@@ -42,11 +42,6 @@ namespace TrueLayer.AcceptanceTests
             {
                 options.Payments.SigningKey.PrivateKey = privateKey;
             }
-
-            if (options.Payouts?.SigningKey != null)
-            {
-                options.Payouts.SigningKey.PrivateKey = privateKey;
-            }
         }
     }
 }
