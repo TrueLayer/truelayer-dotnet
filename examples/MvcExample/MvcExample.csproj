@@ -3,13 +3,13 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <ProjectReference Include="..\..\src\TrueLayer\TrueLayer.csproj" />
     </ItemGroup>
 
     <ItemGroup Label="Output Files">
-        <Content Include="ec512-private-key.pem" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="ec512-private-key.pem" CopyToOutputDirectory="Always" />
     </ItemGroup>
 
 </Project>
