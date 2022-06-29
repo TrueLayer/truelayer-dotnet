@@ -1,12 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using OneOf;
 using Shouldly;
 using TrueLayer.Payments.Model;
 using Xunit;
 
 namespace TrueLayer.AcceptanceTests
 {
+    using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
+    using AccountIdentifierUnion = OneOf<AccountIdentifier.SortCodeAccountNumber, AccountIdentifier.Iban>;
+
     public class PaymentTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
@@ -16,11 +21,10 @@ namespace TrueLayer.AcceptanceTests
             _fixture = fixture;
         }
 
-        [Fact]
-        public async Task Can_create_payment()
+        [Theory]
+        [MemberData(nameof(CreateTestPaymentRequests))]
+        public async Task Can_create_payment(CreatePaymentRequest paymentRequest)
         {
-            CreatePaymentRequest paymentRequest = CreatePaymentRequest();
-
             var response = await _fixture.Client.Payments.CreatePayment(
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
@@ -38,11 +42,10 @@ namespace TrueLayer.AcceptanceTests
             hppUri.ShouldNotBeNullOrWhiteSpace();
         }
 
-        [Fact]
-        public async Task Can_get_authorization_required_payment()
+        [Theory]
+        [MemberData(nameof(CreateTestPaymentRequests))]
+        public async Task Can_get_authorization_required_payment(CreatePaymentRequest paymentRequest)
         {
-            CreatePaymentRequest paymentRequest = CreatePaymentRequest();
-
             var response = await _fixture.Client.Payments.CreatePayment(
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
@@ -68,21 +71,51 @@ namespace TrueLayer.AcceptanceTests
             payment.User.Phone.ShouldBe(paymentRequest.User!.Phone);
         }
 
-        private static CreatePaymentRequest CreatePaymentRequest()
+        private static CreatePaymentRequest CreateTestPaymentRequest(
+            ProviderUnion providerSelection,
+            AccountIdentifierUnion accountIdentifier,
+            string currency = Currencies.GBP)
             => new CreatePaymentRequest(
                 100,
-                Currencies.GBP,
+                currency,
                 new PaymentMethod.BankTransfer(
-                    new Provider.UserSelected
-                    {
-                        Filter = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } }
-                    },
+                    providerSelection,
                     new Beneficiary.ExternalAccount(
                         "TrueLayer",
                         "truelayer-dotnet",
-                        new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
+                        accountIdentifier
                     )),
                 new PaymentUserRequest("Jane Doe", email: "jane.doe@example.com", phone: "+44 1234 567890")
             );
+
+        private static IEnumerable<object[]> CreateTestPaymentRequests()
+        {
+            var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
+            yield return new object[]
+            {
+                CreateTestPaymentRequest(new Provider.UserSelected
+                    {
+                        Filter = new ProviderFilter {ProviderIds = new[] {"mock-payments-gb-redirect"}},
+                    },
+                    sortCodeAccountNumber),
+            };
+            yield return new object[]
+            {
+                CreateTestPaymentRequest(new Provider.Preselected(
+                    "mock-payments-gb-redirect",
+                    "faster_payments_service",
+                    new RemitterAccount("John Doe", new AccountIdentifier.SortCodeAccountNumber("123456", "12345678"))),
+                    sortCodeAccountNumber),
+            };
+            yield return new object[]
+            {
+                CreateTestPaymentRequest(new Provider.Preselected(
+                    "mock-payments-gb-redirect",
+                    "faster_payments_service",
+                    new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606"))),
+                    new AccountIdentifier.Iban("IT60X0542811101000000123456"),
+                    Currencies.EUR),
+            };
+        }
     }
 }
