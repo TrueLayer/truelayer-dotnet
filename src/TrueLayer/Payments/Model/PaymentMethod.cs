@@ -5,7 +5,7 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model
 {
-    using ProviderUnion = OneOf<UserSelected>;
+    using ProviderUnion = OneOf<UserSelected, Preselected>;
     using BeneficiaryUnion = OneOf<MerchantAccount, ExternalAccount>;
 
     /// <summary>
