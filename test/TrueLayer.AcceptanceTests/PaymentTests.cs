@@ -101,18 +101,33 @@ namespace TrueLayer.AcceptanceTests
             };
             yield return new object[]
             {
-                CreateTestPaymentRequest(new Provider.Preselected(
-                    "mock-payments-gb-redirect",
-                    "faster_payments_service",
-                    new RemitterAccount("John Doe", new AccountIdentifier.SortCodeAccountNumber("123456", "12345678"))),
+                CreateTestPaymentRequest(
+                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+                    {
+                        Remitter = new RemitterAccount("John Doe", new AccountIdentifier.SortCodeAccountNumber("123456", "12345678")),
+                    },
                     sortCodeAccountNumber),
             };
             yield return new object[]
             {
-                CreateTestPaymentRequest(new Provider.Preselected(
-                    "mock-payments-gb-redirect",
-                    "faster_payments_service",
-                    new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606"))),
+                CreateTestPaymentRequest(
+                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+                    {
+                        Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606")),
+                    },
+                    new AccountIdentifier.Iban("IT60X0542811101000000123456"),
+                    Currencies.EUR),
+            };
+            yield return new object[]
+            {
+                CreateTestPaymentRequest(
+                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service"),
+                    sortCodeAccountNumber),
+            };
+            yield return new object[]
+            {
+                CreateTestPaymentRequest(
+                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service"),
                     new AccountIdentifier.Iban("IT60X0542811101000000123456"),
                     Currencies.EUR),
             };

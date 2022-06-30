@@ -30,11 +30,10 @@ namespace TrueLayer.Payments.Model
         [JsonDiscriminator("preselected")]
         public record Preselected : IDiscriminated
         {
-            public Preselected(string providerId, string schemeId, RemitterAccount remitter)
+            public Preselected(string providerId, string schemeId)
             {
                 ProviderId = providerId.NotNull(nameof(providerId));
                 SchemeId = schemeId.NotNull(nameof(schemeId));
-                Remitter = remitter.NotNull(nameof(remitter));
             }
 
             /// <summary>
@@ -53,9 +52,9 @@ namespace TrueLayer.Payments.Model
             public string SchemeId { get; }
 
             /// <summary>
-            /// Gets the account details for the remitter
+            /// Gets or sets the account details for the remitter
             /// </summary>
-            public RemitterAccount Remitter { get; }
+            public RemitterAccount? Remitter { get; init; }
         }
     }
 }
