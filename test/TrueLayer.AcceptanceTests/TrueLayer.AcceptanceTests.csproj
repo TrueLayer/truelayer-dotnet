@@ -27,8 +27,7 @@
       <ProjectReference Include="..\..\src\TrueLayer\TrueLayer.csproj" />
     </ItemGroup>
     <ItemGroup Label="Output Files">
-      <None Update="appsettings.*" CopyToOutputDirectory="PreserveNewest" />
-      <None Update="*.pem" CopyToOutputDirectory="PreserveNewest" />
+      <None Update="appsettings.*" CopyToOutputDirectory="Always" />
+      <None Update="*.pem" CopyToOutputDirectory="Always" />
     </ItemGroup>
   </Project>
-  
