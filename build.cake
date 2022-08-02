@@ -300,7 +300,7 @@ Task("Default")
 Task("CI")
     .IsDependentOn("SonarBegin")
     .IsDependentOn("Default")
-    .IsDependentOn("UploadCoverage")
+    //.IsDependentOn("UploadCoverage")
     .IsDependentOn("SonarEnd");
 
 Task("Publish")
