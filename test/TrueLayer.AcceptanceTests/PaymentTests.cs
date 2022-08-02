@@ -111,7 +111,7 @@ namespace TrueLayer.AcceptanceTests
             yield return new object[]
             {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+                    new Provider.Preselected("mock-payments-fr-redirect", "sepa_credit_transfer_instant")
                     {
                         Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606")),
                     },
@@ -127,7 +127,7 @@ namespace TrueLayer.AcceptanceTests
             yield return new object[]
             {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service"),
+                    new Provider.Preselected("mock-payments-fr-redirect", "sepa_credit_transfer_instant"),
                     new AccountIdentifier.Iban("IT60X0542811101000000123456"),
                     Currencies.EUR),
             };
