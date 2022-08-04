@@ -54,11 +54,11 @@ namespace TrueLayer.Payouts.Model
         [JsonDiscriminator("external_account")]
         public sealed record ExternalAccount : IDiscriminated
         {
-            public ExternalAccount(string accountHolderName, string reference, AccountIdentifierUnion schemeIdentifier)
+            public ExternalAccount(string accountHolderName, string reference, AccountIdentifierUnion accountIdentifier)
             {
                 AccountHolderName = accountHolderName.NotNullOrWhiteSpace(nameof(accountHolderName));
                 Reference = reference.NotNullOrWhiteSpace(nameof(reference));
-                AccountIdentifier = schemeIdentifier;
+                AccountIdentifier = accountIdentifier;
             }
 
             /// <summary>
