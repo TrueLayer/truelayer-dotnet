@@ -15,29 +15,37 @@ namespace TrueLayer.Payouts.Model
         public sealed record PaymentSource : IDiscriminated
         {
             /// <summary>
-            /// Creates a new <see cref="PaymentSource"/>
+            /// Creates a new <see cref="PaymentSource"/>.
             /// </summary>
-            /// <param name="id">The TrueLayer merchant account identifier</param>
-            public PaymentSource(string id)
+            /// <param name="paymentSourceId">ID of the external account which has become a payment source.</param>
+            /// <param name="userId">ID of the owning user of the external account.</param>
+            /// <param name="reference">A reference for the payout.</param>
+            public PaymentSource(string paymentSourceId, string userId, string reference)
             {
-                Id = id.NotNullOrWhiteSpace(nameof(id));
+                PaymentSourceId = paymentSourceId.NotNullOrWhiteSpace(nameof(paymentSourceId));
+                UserId = userId.NotNullOrWhiteSpace(nameof(userId));
+                Reference = reference.NotNullOrWhiteSpace(nameof(reference));
             }
 
             /// <summary>
             /// Gets the type of beneficiary
             /// </summary>
-            public string Type => "merchant_account";
+            public string Type => "payment_source";
 
             /// <summary>
-            /// Gets the TrueLayer merchant account identifier
+            /// ID of the external account which has become a payment source.
             /// </summary>
-            public string Id { get; }
+            public string PaymentSourceId { get; }
 
             /// <summary>
-            /// The name of the beneficiary.
-            /// If unspecified, the API will use the account owner name associated to the selected merchant account.
+            /// ID of the owning user of the external account.
             /// </summary>
-            public string? Name { get; init; }
+            public string UserId { get; }
+
+            /// <summary>
+            /// A reference for the payout.
+            /// </summary>
+            public string Reference { get; }
         }
 
         /// <summary>
