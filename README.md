@@ -257,10 +257,7 @@ This will serve the docs on http://localhost:8080.
 
 Contributions are always welcome!
 
-See [contributing](contributing.md) for ways to get started.
-
 Please adhere to this project's [code of conduct](CODE_OF_CONDUCT.md).
-
 
 ## License
 
