@@ -111,6 +111,7 @@ namespace MvcExample.Controllers
                 authorizing => Pending(authorizing),
                 authorized => Success(authorized),
                 successful => Success(successful),
+                executed => Success(executed),
                 failed => Failed(failed.Status)
             );
         }
