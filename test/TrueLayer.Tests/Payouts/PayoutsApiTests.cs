@@ -18,15 +18,17 @@ namespace TrueLayer.Tests.Payouts
 {
     public class PayoutsApiTests
     {
-        private readonly TrueLayerOptions _trueLayerOptions;
+        private readonly Mock<IApiClient> _apiClientMock;
+        private readonly Mock<IAuthApi> _authApiMock;
+        private readonly PayoutsApi _sut;
 
         public PayoutsApiTests()
         {
-            _trueLayerOptions = new TrueLayerOptions()
+            TrueLayerOptions trueLayerOptions = new()
             {
-                Payments = new PaymentsOptions()
+                Payments = new PaymentsOptions
                 {
-                    SigningKey = new SigningKey()
+                    SigningKey = new SigningKey
                     {
                         KeyId = "key-id",
                         PrivateKey = "private-key",
@@ -34,6 +36,39 @@ namespace TrueLayer.Tests.Payouts
                     Uri = new Uri("http://test.payouts.test"),
                 },
             };
+
+            _apiClientMock = new Mock<IApiClient>();
+            _authApiMock = new Mock<IAuthApi>();
+            _sut = new PayoutsApi(_apiClientMock.Object, _authApiMock.Object, trueLayerOptions);
+        }
+
+        [Fact]
+        public async Task Generic_Successful_PayoutSource_Request()
+        {
+            // Arrange
+            var payoutResponseData = new CreatePayoutResponse("some-id");
+            _apiClientMock
+                .Setup(x => x.PostAsync<CreatePayoutResponse>(It.IsAny<Uri>(), It.IsAny<object?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<SigningKey?>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ApiResponse<CreatePayoutResponse>(payoutResponseData, HttpStatusCode.OK, "trace-id"));
+
+            var authData = new GetAuthTokenResponse("access-token", 1000, "Bearer", "");
+            _authApiMock
+                .Setup(x => x.GetAuthToken(It.IsAny<GetAuthTokenRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ApiResponse<GetAuthTokenResponse>(authData, HttpStatusCode.OK, "trace-id"));
+
+            var beneficiary = new Beneficiary.PaymentSource("payment-source-id", "user-id", "truelayer-dotnet");
+            var createPayoutRequest = new CreatePayoutRequest("merch-id", 100, "EUR", beneficiary);
+
+            // Act
+            var response = await _sut.CreatePayout(createPayoutRequest, "idempotency-key", CancellationToken.None);
+
+            // Assert
+            response.ShouldNotBeNull();
+            response.IsSuccessful.ShouldBeTrue();
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.TraceId.ShouldBe("trace-id");
+            response.Data.ShouldNotBeNull();
+            response.Data.Id.ShouldBe("some-id");
         }
 
         [Theory]
@@ -41,14 +76,11 @@ namespace TrueLayer.Tests.Payouts
         public async Task CreatePayout_Returns_Empty_Response_With_Http_Status_Code_On_Auth_Failure(CreatePayoutRequest createPayoutRequest)
         {
             // Arrange
-            var authApiMock = new Mock<IAuthApi>();
-            authApiMock.Setup(x => x.GetAuthToken(It.IsNotNull<GetAuthTokenRequest>(), It.IsAny<CancellationToken>()))
+            _authApiMock.Setup(x => x.GetAuthToken(It.IsNotNull<GetAuthTokenRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ApiResponse<GetAuthTokenResponse>(HttpStatusCode.BadRequest, "trace-id"));
 
-            var sut = new PayoutsApi(Mock.Of<IApiClient>(), authApiMock.Object, _trueLayerOptions);
-
             // Act
-            var actual = await sut.CreatePayout(createPayoutRequest, "indepotency-key", CancellationToken.None);
+            var actual = await _sut.CreatePayout(createPayoutRequest, "idempotency-key", CancellationToken.None);
 
             //Assert
             actual.ShouldNotBeNull();
@@ -61,14 +93,12 @@ namespace TrueLayer.Tests.Payouts
         public async Task GetPayout_Returns_Empty_Response_With_Http_Status_Code_On_Auth_Failure()
         {
             // Arrange
-            var authApiMock = new Mock<IAuthApi>();
-            authApiMock.Setup(x => x.GetAuthToken(It.IsNotNull<GetAuthTokenRequest>(), It.IsAny<CancellationToken>()))
+            _authApiMock
+                .Setup(x => x.GetAuthToken(It.IsNotNull<GetAuthTokenRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ApiResponse<GetAuthTokenResponse>(HttpStatusCode.BadRequest, "trace-id"));
 
-            var sut = new PayoutsApi(Mock.Of<IApiClient>(), authApiMock.Object, _trueLayerOptions);
-
             // Act
-            var actual = await sut.GetPayout("payout-id", CancellationToken.None);
+            var actual = await _sut.GetPayout("payout-id", CancellationToken.None);
 
             //Assert
             actual.ShouldNotBeNull();
