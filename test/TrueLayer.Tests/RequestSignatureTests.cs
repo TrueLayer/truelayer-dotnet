@@ -2,13 +2,14 @@ using System;
 using System.Net.Http;
 using System.Text.Json;
 using Shouldly;
+using TrueLayer.Signing;
 using Xunit;
 
 namespace TrueLayer.Tests
 {
     public class RequestSignatureTests
     {
-        // docker run --rm -it -v $(pwd):/export --entrypoint /bin/ash alpine/openssl  
+        // docker run --rm -it -v $(pwd):/export --entrypoint /bin/ash alpine/openssl
         // openssl ecparam -genkey -name secp521r1 -noout -out /export/ec512-private-key.pem
         // openssl ec -in /export/ec512-private-key.pem -pubout -out /export/ec512-public-key.pem
 
@@ -30,12 +31,14 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
 
             var uri = new Uri("http://api.truelayer.com/payments/");
 
-            string signature = RequestSignature.Create(
-                new() { PrivateKey = privateKey, KeyId = Guid.NewGuid().ToString() },
-                HttpMethod.Post,
-                uri,
-                json,
-                idempotencyKey: Guid.NewGuid().ToString());
+            var signingKey = new SigningKey { PrivateKey = privateKey, KeyId = Guid.NewGuid().ToString() };
+
+            var signature = Signer.SignWith(signingKey.KeyId, signingKey.Value)
+                .Method(HttpMethod.Post.Method)
+                .Path(uri.AbsolutePath.TrimEnd('/'))
+                .Body(json)
+                .Header(CustomHeaders.IdempotencyKey, Guid.NewGuid().ToString())
+                .Sign();
 
             signature.ShouldNotBeNullOrWhiteSpace();
         }
