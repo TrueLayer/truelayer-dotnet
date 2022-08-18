@@ -37,12 +37,15 @@ namespace MvcExample.Controllers
                 return View("Index");
             }
 
+            OneOf<Provider.UserSelected, Provider.Preselected> filter = donateModel.UserPreSelectedFilter
+                ? new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+                : new Provider.UserSelected();
+
             var paymentRequest = new CreatePaymentRequest(
                 donateModel.AmountInMajor.ToMinorCurrencyUnit(2),
                 Currencies.GBP,
                 new PaymentMethod.BankTransfer(
-                    new Provider.UserSelected(),
-                    //new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service"),
+                    filter,
                     new Beneficiary.ExternalAccount(
                         "TrueLayer",
                         "truelayer-dotnet",
@@ -85,34 +88,35 @@ namespace MvcExample.Controllers
 
             var apiResponse = await _truelayer.Payments.GetPayment(paymentId);
 
-            IActionResult Failed(string status, OneOf<Provider.UserSelected, Provider.Preselected>? providerSelection)
+            IActionResult Failed(string status, OneOf<PaymentMethod.BankTransfer> paymentMethod)
             {
                 ViewData["Status"] = status;
 
-                SetProviderAndSchemeId(providerSelection);
+                SetProviderAndSchemeId(paymentMethod);
                 return View("Failed");
             }
 
-            IActionResult Success(PaymentDetails payment, OneOf<Provider.UserSelected, Provider.Preselected> providerSelection)
+            IActionResult Success(PaymentDetails payment, OneOf<PaymentMethod.BankTransfer> paymentMethod)
             {
                 ViewData["Status"] = payment.Status;
-                SetProviderAndSchemeId(providerSelection);
+                SetProviderAndSchemeId(paymentMethod);
                 return View("Success");
             }
 
-            IActionResult Pending(PaymentDetails payment, OneOf<Provider.UserSelected, Provider.Preselected> providerSelection)
+            IActionResult Pending(PaymentDetails payment, OneOf<PaymentMethod.BankTransfer> paymentMethod)
             {
                 ViewData["Status"] = payment.Status;
-                SetProviderAndSchemeId(providerSelection);
+                SetProviderAndSchemeId(paymentMethod);
                 return View("Success");
             }
 
-            void SetProviderAndSchemeId(OneOf<Provider.UserSelected, Provider.Preselected>? providerSelection)
+            void SetProviderAndSchemeId(OneOf<PaymentMethod.BankTransfer> paymentMethod)
             {
-                (string providerId, string schemeId) = providerSelection?.Match(
-                    userSelected => (userSelected.ProviderId, userSelected.SchemeId),
-                    preselected => (preselected.ProviderId, preselected.SchemeId)
-                ) ?? ("unavailable", "unavailable");
+                (string providerId, string schemeId) = paymentMethod.Match(
+                    bankTransfer => bankTransfer.ProviderSelection.Match(
+                        userSelected => (userSelected.ProviderId, userSelected.SchemeId),
+                        preselected => (preselected.ProviderId, preselected.SchemeId)
+                    ));
 
                 ViewData["ProviderId"] = providerId;
                 ViewData["SchemeId"] = schemeId;
@@ -122,12 +126,12 @@ namespace MvcExample.Controllers
                 return Failed(apiResponse.StatusCode.ToString(), null!);
 
             return apiResponse.Data.Match(
-                authRequired => Failed(authRequired.Status, apiResponse.Data.AsT0.PaymentMethod.AsT0.ProviderSelection),
-                authorizing => Pending(authorizing, apiResponse.Data.AsT1.PaymentMethod.AsT0.ProviderSelection),
-                authorized => Success(authorized, apiResponse.Data.AsT2.PaymentMethod.AsT0.ProviderSelection),
-                success => Success(success, apiResponse.Data.AsT3.PaymentMethod.AsT0.ProviderSelection),
-                settled => Success(settled, apiResponse.Data.AsT4.PaymentMethod.AsT0.ProviderSelection),
-                failed => Failed(failed.Status, apiResponse.Data.AsT5.PaymentMethod.AsT0.ProviderSelection)
+                authRequired => Failed(authRequired.Status, authRequired.PaymentMethod),
+                authorizing => Pending(authorizing, authorizing.PaymentMethod),
+                authorized => Success(authorized, authorized.PaymentMethod),
+                success => Success(success, success.PaymentMethod),
+                settled => Success(settled, settled.PaymentMethod),
+                failed => Failed(failed.Status, failed.PaymentMethod)
             );
         }
 
