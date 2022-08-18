@@ -88,7 +88,7 @@ namespace MvcExample.Controllers
 
             var apiResponse = await _truelayer.Payments.GetPayment(paymentId);
 
-            IActionResult Failed(string status, OneOf<PaymentMethod.BankTransfer> paymentMethod)
+            IActionResult Failed(string status, OneOf<PaymentMethod.BankTransfer>? paymentMethod)
             {
                 ViewData["Status"] = status;
 
@@ -96,27 +96,20 @@ namespace MvcExample.Controllers
                 return View("Failed");
             }
 
-            IActionResult Success(PaymentDetails payment, OneOf<PaymentMethod.BankTransfer> paymentMethod)
+            IActionResult SuccessOrPending(PaymentDetails payment)
             {
                 ViewData["Status"] = payment.Status;
-                SetProviderAndSchemeId(paymentMethod);
+                SetProviderAndSchemeId(payment.PaymentMethod);
                 return View("Success");
             }
 
-            IActionResult Pending(PaymentDetails payment, OneOf<PaymentMethod.BankTransfer> paymentMethod)
+            void SetProviderAndSchemeId(OneOf<PaymentMethod.BankTransfer>? paymentMethod)
             {
-                ViewData["Status"] = payment.Status;
-                SetProviderAndSchemeId(paymentMethod);
-                return View("Success");
-            }
-
-            void SetProviderAndSchemeId(OneOf<PaymentMethod.BankTransfer> paymentMethod)
-            {
-                (string providerId, string schemeId) = paymentMethod.Match(
+                (string providerId, string schemeId) = paymentMethod?.Match(
                     bankTransfer => bankTransfer.ProviderSelection.Match(
                         userSelected => (userSelected.ProviderId, userSelected.SchemeId),
                         preselected => (preselected.ProviderId, preselected.SchemeId)
-                    ));
+                    )) ??  ("unavailable", "unavailable");
 
                 ViewData["ProviderId"] = providerId;
                 ViewData["SchemeId"] = schemeId;
@@ -127,10 +120,10 @@ namespace MvcExample.Controllers
 
             return apiResponse.Data.Match(
                 authRequired => Failed(authRequired.Status, authRequired.PaymentMethod),
-                authorizing => Pending(authorizing, authorizing.PaymentMethod),
-                authorized => Success(authorized, authorized.PaymentMethod),
-                success => Success(success, success.PaymentMethod),
-                settled => Success(settled, settled.PaymentMethod),
+                authorizing => SuccessOrPending(authorizing),
+                authorized => SuccessOrPending(authorized),
+                success => SuccessOrPending(success),
+                settled => SuccessOrPending(settled),
                 failed => Failed(failed.Status, failed.PaymentMethod)
             );
         }
