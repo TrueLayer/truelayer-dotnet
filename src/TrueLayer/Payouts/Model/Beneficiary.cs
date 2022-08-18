@@ -81,5 +81,30 @@ namespace TrueLayer.Payouts.Model
             /// </summary>
             public AccountIdentifierUnion AccountIdentifier { get; }
         }
+
+        /// <summary>
+        /// Represent's a client's preconfigured business account.
+        /// </summary>
+        public sealed record BusinessAccount : IDiscriminated
+        {
+            /// <summary>
+            /// Creates a new <see cref="BusinessAccount"/>.
+            /// </summary>
+            /// <param name="reference">A reference for the payout.</param>
+            public BusinessAccount(string reference)
+            {
+                Reference = reference.NotNullOrWhiteSpace(nameof(reference));
+            }
+
+            /// <summary>
+            /// Gets the type of beneficiary
+            /// </summary>
+            public string Type => "business_account";
+
+            /// <summary>
+            /// Gets a reference for the payout.
+            /// </summary>
+            public string Reference { get; }
+        }
     }
 }
