@@ -61,15 +61,6 @@ namespace TrueLayer.Payouts.Model
         public record Authorized : PayoutDetails;
 
         /// <summary>
-        /// Represents a payout that has succeeded
-        /// For open loop payouts this state is terminate. For closed-loop payouts, wait for Settled.
-        /// </summary>
-        /// <param name="SucceededAt">The date and time the payout succeeded</param>
-        /// <returns></returns>
-        [JsonDiscriminator("successful")]
-        public record Successful(DateTime SucceededAt) : PayoutDetails;
-
-        /// <summary>
         /// Represents a payout that has been executed.
         /// </summary>
         /// <param name="ExecutedAt">The date and time the payout got executed</param>
