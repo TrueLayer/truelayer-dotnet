@@ -63,6 +63,25 @@ namespace TrueLayer.AcceptanceTests
             payment.Id.ShouldNotBeNullOrWhiteSpace();
             payment.CreatedAt.ShouldNotBe(default);
             payment.PaymentMethod.AsT0.ShouldNotBeNull();
+
+            payment.PaymentMethod.Switch(
+                bankTransfer => bankTransfer.ProviderSelection.Switch(
+                    userSelected =>
+                    {
+                        Provider.UserSelected providerSelectionReq = paymentRequest.PaymentMethod.AsT0.ProviderSelection.AsT0;
+                        userSelected.Filter.ShouldBeEquivalentTo(providerSelectionReq.Filter);
+                        // Provider selection hasn't happened yet
+                        userSelected.ProviderId.ShouldBeNullOrEmpty();
+                        userSelected.SchemeId.ShouldBeNullOrEmpty();
+                    },
+                    preselected =>
+                    {
+                        Provider.Preselected providerSelectionReq = paymentRequest.PaymentMethod.AsT0.ProviderSelection.AsT1;
+                        preselected.ProviderId.ShouldBe(providerSelectionReq.ProviderId);
+                        preselected.SchemeId.ShouldBe(providerSelectionReq.SchemeId);
+                    })
+            );
+
             payment.PaymentMethod.AsT0.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
             payment.User.ShouldNotBeNull();
             payment.User.Id.ShouldBe(response.Data.User.Id);

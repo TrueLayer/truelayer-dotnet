@@ -22,6 +22,18 @@ namespace TrueLayer.Payments.Model
             /// Gets or sets the filter used to determine the banks that should be displayed on the bank selection screen
             /// </summary>
             public ProviderFilter? Filter { get; init; }
+
+            /// <summary>
+            /// Gets the provider Id the PSU will selected for this payment
+            /// The field is populated only when a <see cref="GetPaymentResponse"/> is returned
+            /// </summary>
+            public string? ProviderId { get; init; }
+
+            /// <summary>
+            /// Gets the id of the scheme associated to the selected provider that was used to make the payment over.
+            /// The field is populated only when a <see cref="GetPaymentResponse"/> is returned
+            /// </summary>
+            public string? SchemeId { get; init; }
         }
 
         /// <summary>

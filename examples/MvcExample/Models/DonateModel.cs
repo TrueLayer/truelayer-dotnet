@@ -14,5 +14,7 @@ namespace MvcExample.Models
         [Required(ErrorMessage = "Your email is required")]
         [EmailAddress(ErrorMessage = "A valid email address is required")]
         public string Email { get; set; }
+
+        public bool UserPreSelectedFilter { get; set; }
     }
 }

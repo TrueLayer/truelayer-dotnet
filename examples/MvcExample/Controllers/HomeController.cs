@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MvcExample.Models;
+using OneOf;
 using TrueLayer;
 using TrueLayer.Payments.Model;
 using static TrueLayer.Payments.Model.GetPaymentResponse;
@@ -36,11 +37,15 @@ namespace MvcExample.Controllers
                 return View("Index");
             }
 
+            OneOf<Provider.UserSelected, Provider.Preselected> filter = donateModel.UserPreSelectedFilter
+                ? new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+                : new Provider.UserSelected();
+
             var paymentRequest = new CreatePaymentRequest(
                 donateModel.AmountInMajor.ToMinorCurrencyUnit(2),
                 Currencies.GBP,
                 new PaymentMethod.BankTransfer(
-                    new Provider.UserSelected(),
+                    filter,
                     new Beneficiary.ExternalAccount(
                         "TrueLayer",
                         "truelayer-dotnet",
@@ -69,7 +74,6 @@ namespace MvcExample.Controllers
                 return View("Index");
             }
 
-
             string redirectLink = _truelayer.Payments.CreateHostedPaymentPageLink(
                 apiResponse.Data!.Id, apiResponse.Data!.ResourceToken, new Uri(Url.ActionLink("Complete")));
 
@@ -84,34 +88,43 @@ namespace MvcExample.Controllers
 
             var apiResponse = await _truelayer.Payments.GetPayment(paymentId);
 
-            IActionResult Failed(string status)
+            IActionResult Failed(string status, OneOf<PaymentMethod.BankTransfer>? paymentMethod)
             {
                 ViewData["Status"] = status;
+
+                SetProviderAndSchemeId(paymentMethod);
                 return View("Failed");
             }
 
-            IActionResult Success(PaymentDetails payment)
+            IActionResult SuccessOrPending(PaymentDetails payment)
             {
                 ViewData["Status"] = payment.Status;
+                SetProviderAndSchemeId(payment.PaymentMethod);
                 return View("Success");
             }
 
-            IActionResult Pending(PaymentDetails payment)
+            void SetProviderAndSchemeId(OneOf<PaymentMethod.BankTransfer>? paymentMethod)
             {
-                ViewData["Status"] = payment.Status;
-                return View("Success");
+                (string providerId, string schemeId) = paymentMethod?.Match(
+                    bankTransfer => bankTransfer.ProviderSelection.Match(
+                        userSelected => (userSelected.ProviderId, userSelected.SchemeId),
+                        preselected => (preselected.ProviderId, preselected.SchemeId)
+                    )) ??  ("unavailable", "unavailable");
+
+                ViewData["ProviderId"] = providerId;
+                ViewData["SchemeId"] = schemeId;
             }
 
             if (!apiResponse.IsSuccessful)
-                return Failed(apiResponse.StatusCode.ToString());
+                return Failed(apiResponse.StatusCode.ToString(), null!);
 
             return apiResponse.Data.Match(
-                authRequired => Failed(authRequired.Status),
-                authorizing => Pending(authorizing),
-                authorized => Success(authorized),
-                success => Success(success),
-                settled => Success(settled),
-                failed => Failed(failed.Status)
+                authRequired => Failed(authRequired.Status, authRequired.PaymentMethod),
+                authorizing => SuccessOrPending(authorizing),
+                authorized => SuccessOrPending(authorized),
+                success => SuccessOrPending(success),
+                settled => SuccessOrPending(settled),
+                failed => Failed(failed.Status, failed.PaymentMethod)
             );
         }
 
