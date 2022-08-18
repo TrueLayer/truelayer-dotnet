@@ -43,7 +43,7 @@ namespace TrueLayer.Payouts.Model
             public string UserId { get; }
 
             /// <summary>
-            /// A reference for the payout.
+            /// Gets a reference for the payout.
             /// </summary>
             public string Reference { get; }
         }
