@@ -33,7 +33,7 @@ namespace TrueLayer.Payouts.Model
             public string Type => "payment_source";
 
             /// <summary>
-            /// ID of the external account which has become a payment source.
+            /// Gets the ID of the external account which has become a payment source
             /// </summary>
             public string PaymentSourceId { get; }
 
