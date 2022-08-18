@@ -12,7 +12,6 @@ namespace TrueLayer.Payouts
     using GetPayoutUnion = OneOf<
         Pending,
         Authorized,
-        Successful,
         Executed,
         Failed
     >;

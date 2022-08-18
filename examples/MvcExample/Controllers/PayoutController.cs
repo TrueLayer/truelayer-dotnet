@@ -110,7 +110,6 @@ namespace MvcExample.Controllers
             return apiResponse.Data.Match(
                 authorizing => Pending(authorizing),
                 authorized => Success(authorized),
-                successful => Success(successful),
                 executed => Success(executed),
                 failed => Failed(failed.Status)
             );
