@@ -38,7 +38,7 @@ namespace TrueLayer.Payouts.Model
             public string PaymentSourceId { get; }
 
             /// <summary>
-            /// ID of the owning user of the external account.
+            /// Gets the ID of the owning user of the external account.
             /// </summary>
             public string UserId { get; }
 
