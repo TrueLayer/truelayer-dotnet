@@ -13,6 +13,7 @@ namespace TrueLayer.Payouts
         Pending,
         Authorized,
         Successful,
+        Executed,
         Failed
     >;
 
