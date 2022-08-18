@@ -3,7 +3,7 @@ using static TrueLayer.Payouts.Model.Beneficiary;
 
 namespace TrueLayer.Payouts.Model
 {
-    using BeneficiaryUnion = OneOf<PaymentSource, ExternalAccount>;
+    using BeneficiaryUnion = OneOf<PaymentSource, ExternalAccount, BusinessAccount>;
 
     /// <summary>
     /// Represents a request for payout

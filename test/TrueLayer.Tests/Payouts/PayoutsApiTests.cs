@@ -16,6 +16,8 @@ using Beneficiary = TrueLayer.Payouts.Model.Beneficiary;
 
 namespace TrueLayer.Tests.Payouts
 {
+    using PayoutBeneficiary = OneOf<Beneficiary.PaymentSource, Beneficiary.ExternalAccount, Beneficiary.BusinessAccount>;
+
     public class PayoutsApiTests
     {
         private readonly Mock<IApiClient> _apiClientMock;
@@ -42,8 +44,9 @@ namespace TrueLayer.Tests.Payouts
             _sut = new PayoutsApi(_apiClientMock.Object, _authApiMock.Object, trueLayerOptions);
         }
 
-        [Fact]
-        public async Task Generic_Successful_PayoutSource_Request()
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public async Task Generic_Successful_PayoutSource_Request(CreatePayoutRequest createPayoutRequest)
         {
             // Arrange
             var payoutResponseData = new CreatePayoutResponse("some-id");
@@ -55,9 +58,6 @@ namespace TrueLayer.Tests.Payouts
             _authApiMock
                 .Setup(x => x.GetAuthToken(It.IsAny<GetAuthTokenRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ApiResponse<GetAuthTokenResponse>(authData, HttpStatusCode.OK, "trace-id"));
-
-            var beneficiary = new Beneficiary.PaymentSource("payment-source-id", "user-id", "truelayer-dotnet");
-            var createPayoutRequest = new CreatePayoutRequest("merch-id", 100, "EUR", beneficiary);
 
             // Act
             var response = await _sut.CreatePayout(createPayoutRequest, "idempotency-key", CancellationToken.None);
@@ -107,40 +107,39 @@ namespace TrueLayer.Tests.Payouts
             actual.TraceId.ShouldBe("trace-id");
         }
 
-        private static CreatePayoutRequest CreatePayoutRequest(bool paymentSource = false)
-        {
-            OneOf<Beneficiary.PaymentSource, Beneficiary.ExternalAccount> beneficiary;
-
-            if (paymentSource)
-            {
-                beneficiary = new Beneficiary.PaymentSource(
-                    "payment-source-id",
-                    "user-id",
-                    "truelayer-dotnet"
-                );
-            }
-            else
-            {
-                beneficiary = new Beneficiary.ExternalAccount(
-                    "Ms. Lucky",
-                    "truelayer-dotnet",
-                    new AccountIdentifier.Iban("GB33BUKB20201555555555")
-                );
-            }
-
-            return new CreatePayoutRequest(
+        private static CreatePayoutRequest CreatePayoutRequest(PayoutBeneficiary beneficiary) =>
+            new(
                 "merchant-account-id",
                 100,
                 Currencies.GBP,
                 beneficiary
             );
-        }
 
         public static IEnumerable<object[]> TestData =>
             new List<object[]>
             {
-                new object[] { CreatePayoutRequest() },
-                new object[] { CreatePayoutRequest(true) },
+                new object[]
+                {
+                    CreatePayoutRequest(new Beneficiary.ExternalAccount(
+                        "Ms. Lucky",
+                        "truelayer-dotnet",
+                        new AccountIdentifier.Iban("GB33BUKB20201555555555")
+                    ))
+                },
+                new object[]
+                {
+                    CreatePayoutRequest(new Beneficiary.PaymentSource(
+                        "payment-source-id",
+                        "user-id",
+                        "truelayer-dotnet"
+                    ))
+                },
+                new object[]
+                {
+                    CreatePayoutRequest(new Beneficiary.BusinessAccount(
+                        "truelayer-dotnet"
+                    ))
+                },
             };
     }
 }
