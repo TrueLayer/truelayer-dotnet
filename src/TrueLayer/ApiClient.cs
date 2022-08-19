@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text.Json;
+using TrueLayer.Signing;
 #if NET5_0 || NET5_0_OR_GREATER
 using System.Net.Http.Json;
 #endif
@@ -20,7 +21,7 @@ namespace TrueLayer
     internal class ApiClient : IApiClient
     {
         private static readonly ProductInfoHeaderValue UserAgentHeader
-            = new ProductInfoHeaderValue("truelayer-dotnet", ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>());
+            = new("truelayer-dotnet", ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>());
 
         private readonly HttpClient _httpClient;
 
@@ -28,7 +29,6 @@ namespace TrueLayer
         /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
         /// </summary>
         /// <param name="httpClient">The client used to make HTTP requests.</param>
-        /// <param name="serializer">A serializer used to serialize and deserialize HTTP payloads.</param>
         public ApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
@@ -152,13 +152,17 @@ namespace TrueLayer
                     // Only serialize to string if signing is required,
                     string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
 
-                    signature = RequestSignature.Create(
-                        signingKey,
-                        httpMethod,
-                        uri,
-                        json,
-                        idempotencyKey
-                    );
+                    var signer = Signer.SignWith(signingKey.KeyId, signingKey.Value)
+                        .Method(httpMethod.Method)
+                        .Path(uri.AbsolutePath.TrimEnd('/'))
+                        .Body(json);
+
+                    if (!string.IsNullOrWhiteSpace(idempotencyKey))
+                    {
+                        signer.Header(CustomHeaders.IdempotencyKey, idempotencyKey);
+                    }
+
+                    signature = signer.Sign();
 
                     httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
                 }
