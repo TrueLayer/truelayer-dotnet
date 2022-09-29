@@ -3,17 +3,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Payments.Model;
-using static TrueLayer.Payments.Model.GetPaymentResponse;
 
 namespace TrueLayer.Payments
 {
+    using CreatePaymentUnion = OneOf<
+        CreatePaymentResponse.AuthorizationRequired,
+        CreatePaymentResponse.Authorized,
+        CreatePaymentResponse.Failed
+    >;
+
     using GetPaymentUnion = OneOf<
-        AuthorizationRequired,
-        Authorizing,
-        Authorized,
-        Executed,
-        Settled,
-        Failed
+        GetPaymentResponse.AuthorizationRequired,
+        GetPaymentResponse.Authorizing,
+        GetPaymentResponse.Authorized,
+        GetPaymentResponse.Executed,
+        GetPaymentResponse.Settled,
+        GetPaymentResponse.Failed
     >;
 
     /// <summary>
@@ -31,7 +36,7 @@ namespace TrueLayer.Payments
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the created payment if successful, otherwise problem details</returns>
-        Task<ApiResponse<CreatePaymentResponse>> CreatePayment(
+        Task<ApiResponse<CreatePaymentUnion>> CreatePayment(
             CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default);
 
         /// <summary>

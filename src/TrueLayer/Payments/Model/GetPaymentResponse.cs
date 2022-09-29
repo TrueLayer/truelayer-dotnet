@@ -77,7 +77,7 @@ namespace TrueLayer.Payments.Model
 
         /// <summary>
         /// Represents a payment that has been executed
-        /// For open loop payments this state is terminate. For closed-loop payments, wait for Settled.
+        /// For open loop payments this state is terminal. For closed-loop payments, wait for Settled.
         /// </summary>
         /// <param name="ExecutedAt">The date and time the payment executed</param>
         /// <returns></returns>
@@ -86,7 +86,7 @@ namespace TrueLayer.Payments.Model
 
         /// <summary>
         /// Represents a payment that has settled
-        /// This is a terminate state for closed-loop payments.
+        /// This is a terminal state for closed-loop payments.
         /// </summary>
         /// <param name="ExecutedAt">The date and time the payment executed</param>
         /// <param name="SettledAt">The date and time the payment was settled</param>
@@ -96,7 +96,7 @@ namespace TrueLayer.Payments.Model
         public record Settled(DateTime ExecutedAt, DateTime SettledAt, PaymentSource PaymentSource) : PaymentDetails;
 
         /// <summary>
-        /// Represents an authorized payment that failed to complete. This is a terminate state.
+        /// Represents a payment that failed to complete. This is a terminal state.
         /// </summary>
         /// <param name="FailedAt">The date and time the payment failed</param>
         /// <param name="FailureStage">The status the payment was in when it failed</param>

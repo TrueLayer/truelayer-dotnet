@@ -74,10 +74,23 @@ namespace MvcExample.Controllers
                 return View("Index");
             }
 
-            string redirectLink = _truelayer.Payments.CreateHostedPaymentPageLink(
-                apiResponse.Data!.Id, apiResponse.Data!.ResourceToken, new Uri(Url.ActionLink("Complete")));
-
-            return Redirect(redirectLink);
+            return apiResponse.Data.Match<IActionResult>(
+                authorizationRequired =>
+                {
+                    var hppLink = _truelayer.Payments.CreateHostedPaymentPageLink(authorizationRequired.Id,
+                        authorizationRequired.ResourceToken, new Uri(Url.ActionLink("Complete")));
+                    return Redirect(hppLink);
+                },
+                authorized =>
+                {
+                    ViewData["Status"] = authorized.Status;
+                    return View("Success");
+                },
+                failed =>
+                {
+                    ViewData["Status"] = failed.Status;
+                    return View("Failed");
+                });
         }
 
         [HttpGet]
