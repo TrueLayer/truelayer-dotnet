@@ -186,6 +186,40 @@ public class MyService
 
 For more examples see the [API documentation](https://docs.truelayer.com). Advanced customization options and documentation for contributors can be found in the [Wiki](https://github.com/TrueLayer/truelayer-sdk-net/wiki).
 
+### Retrieve provider details
+
+Inject `ITrueLayerClient` into your classes:
+
+```c#
+public class MyService
+{
+    private readonly ITrueLayerClient _client;
+
+    public MyService(ITrueLayerClient client)
+    {
+        _client = client;
+    }
+
+    public async Task<ActionResult> GetProvider(string id)
+    {
+        var apiResponse = await _client.PaymentsProviders.GetPaymentsProvider(id);
+
+        if (!apiResponse.IsSuccessful)
+        {
+            return HandleFailure(
+                apiResponse.StatusCode,
+                // Includes details of any errors
+                apiResponse.Problem
+            )
+        }
+
+        return OkObjectResult(apiResponse.Data.Id);
+    }
+}
+```
+
+For more examples see the [API documentation](https://docs.truelayer.com). Advanced customization options and documentation for contributors can be found in the [Wiki](https://github.com/TrueLayer/truelayer-sdk-net/wiki).
+
 ### Make a payout
 
 Inject `ITrueLayerClient` into your classes:

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using OneOf;
 using Shouldly;
@@ -28,14 +29,14 @@ namespace TrueLayer.AcceptanceTests
             response.IsSuccessful.ShouldBeTrue();
             response.Data.ShouldNotBeNull();
             response.Data.Id.ShouldBe(providerId);
-            response.Data.DisplayName.ShouldNotBeNull();
-            response.Data.IconUri.ShouldNotBeNull();
-            response.Data.LogoUri.ShouldNotBeNull();
-            response.Data.BgColor.ShouldNotBeNull();
-            response.Data.CountryCode.ShouldNotBeNull();
-            response.Data.Capabilities.Payments.BankTransfer.ShouldNotBeNull();
-            response.Data.Capabilities.Payments.BankTransfer.ReleaseChannel.ShouldNotBeNull();
-            response.Data.Capabilities.Payments.BankTransfer.Schemes.ShouldHaveSingleItem();
+            response.Data.DisplayName.ShouldNotBeNullOrWhiteSpace();
+            response.Data.IconUri.ShouldNotBeNullOrWhiteSpace();
+            response.Data.LogoUri.ShouldNotBeNullOrWhiteSpace();
+            response.Data.BgColor.ShouldNotBeNullOrWhiteSpace();
+            response.Data.CountryCode.ShouldNotBeNullOrWhiteSpace();
+            response.Data.Capabilities.Payments?.BankTransfer.ShouldNotBeNull();
+            response.Data.Capabilities.Payments?.BankTransfer?.ReleaseChannel.ShouldNotBeNullOrWhiteSpace();
+            response.Data.Capabilities.Payments?.BankTransfer?.Schemes.Count().ShouldBeGreaterThanOrEqualTo(1);
         }
 
         [Fact]
@@ -48,10 +49,10 @@ namespace TrueLayer.AcceptanceTests
             response.IsSuccessful.ShouldBeTrue();
             response.Data.ShouldNotBeNull();
             response.Data.Id.ShouldBe(providerId);
-            response.Data.DisplayName.ShouldNotBeNull();
-            response.Data.CountryCode.ShouldNotBeNull();
-            response.Data.Capabilities.Mandates.VrpSweeping.ShouldNotBeNull();
-            response.Data.Capabilities.Mandates.VrpSweeping.ReleaseChannel.ShouldNotBeNull();
+            response.Data.DisplayName.ShouldNotBeNullOrWhiteSpace();
+            response.Data.CountryCode.ShouldNotBeNullOrWhiteSpace();
+            response.Data.Capabilities.Mandates?.VrpSweeping.ShouldNotBeNull();
+            response.Data.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel.ShouldNotBeNullOrWhiteSpace();
         }
     }
 }
