@@ -1,0 +1,22 @@
+﻿@model DonateModel
+@{
+  ViewData["Title"] = "Providers";
+}
+
+<h1 class="display-4 mb-4 text-center">Get Provider</h1>
+
+<div class="row justify-content-center">
+  <form class="needs-validation col-sm-10" asp-action="GetProvider" asp-controller="Providers" method="get" novalidate>
+    @Html.ValidationSummary(true)
+    <div class="form-row">
+      <div class="input-group mb-3 col-md-12">
+        <input type="text" class="form-control form-control-lg" name="id" />
+        <div class="input-group-append">
+          <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+</div>
