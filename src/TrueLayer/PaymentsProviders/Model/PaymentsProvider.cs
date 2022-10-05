@@ -6,10 +6,10 @@ namespace TrueLayer.PaymentsProviders.Model
     public record PaymentsProvider(
         string Id,
         Capabilities Capabilities,
-        string? DisplayName,
-        string? IconUri,
-        string? LogoUri,
-        string? BgColor,
-        string? CountryCode
+        string? DisplayName = null,
+        string? IconUri = null,
+        string? LogoUri = null,
+        string? BgColor = null,
+        string? CountryCode = null
     );
 }
