@@ -1,0 +1,18 @@
+﻿@model DonateModel
+@{
+  ViewData["Title"] = "Get Provider Success";
+}
+
+<div class="text-center">
+
+  <h1 class="display-4 mb-4">Get Provider Success</h1>
+
+  <div class="alert alert-success" role="alert">
+    @ViewData["ProviderId"]
+    <img src="@ViewData["LogoUri"]" alt="Logo"/>
+  </div>
+  <br/>
+  <div class="alert alert-info" role="alert">
+    <label>Provider selected:</label>&nbsp;@ViewData["ProviderId"]
+  </div>
+</div>

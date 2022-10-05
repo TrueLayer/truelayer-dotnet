@@ -1,0 +1,37 @@
+using System;
+using System.Threading.Tasks;
+using TrueLayer.PaymentsProviders.Model;
+
+namespace TrueLayer.PaymentsProviders
+{
+    internal class PaymentsProvidersApi : IPaymentsProvidersApi
+    {
+        private const string ProdUrl = "https://api.truelayer.com/payments-providers/";
+        private const string SandboxUrl = "https://api.truelayer-sandbox.com/payments-providers/";
+
+        private readonly IApiClient _apiClient;
+        private readonly TrueLayerOptions _options;
+        private readonly Uri _baseUri;
+
+        public PaymentsProvidersApi(IApiClient apiClient, TrueLayerOptions options)
+        {
+            _apiClient = apiClient.NotNull(nameof(apiClient));
+            _options = options.NotNull(nameof(options));
+
+            options.Payments.NotNull(nameof(options.Payments))!.Validate();
+
+            _baseUri = options.Payments.Uri is not null
+                ? new Uri(options.Payments.Uri, "payments-providers/")
+                : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
+        }
+
+        public async Task<ApiResponse<PaymentsProvider>> GetPaymentsProvider(string id)
+        {
+            id.NotNullOrWhiteSpace(nameof(id));
+
+            UriBuilder baseUri = new(new Uri(_baseUri, id)) { Query = $"client_id={_options.ClientId}" };
+
+            return await _apiClient.GetAsync<PaymentsProvider>(baseUri.Uri);
+        }
+    }
+}
