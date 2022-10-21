@@ -73,7 +73,7 @@ namespace TrueLayer.AcceptanceTests
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
             createPaymentResponse.IsSuccessful.ShouldBeTrue();
-            var createPaymentUser = createPaymentResponse.Data!.User;
+            var createPaymentUser = createPaymentResponse.Data!.AsT0.User;
 
             // Act
             var getPaymentSourcesResponse

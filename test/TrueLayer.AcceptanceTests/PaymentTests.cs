@@ -29,16 +29,15 @@ namespace TrueLayer.AcceptanceTests
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
-            response.Data.ShouldBeOfType<CreatePaymentResponse>();
-
-            response.Data.ShouldNotBeNull();
-            response.Data.Id.ShouldNotBeNullOrWhiteSpace();
-            response.Data.ResourceToken.ShouldNotBeNullOrWhiteSpace();
-            response.Data.User.ShouldNotBeNull();
-            response.Data.User.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.IsT0.ShouldBeTrue();
+            response.Data.AsT0.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.AsT0.ResourceToken.ShouldNotBeNullOrWhiteSpace();
+            response.Data.AsT0.User.ShouldNotBeNull();
+            response.Data.AsT0.User.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.AsT0.Status.ShouldBe("authorization_required");
 
             string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
-                response.Data!.Id, response.Data!.ResourceToken, new Uri("https://redirect.mydomain.com"));
+                response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, new Uri("https://redirect.mydomain.com"));
             hppUri.ShouldNotBeNullOrWhiteSpace();
         }
 
@@ -50,9 +49,11 @@ namespace TrueLayer.AcceptanceTests
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
             response.IsSuccessful.ShouldBeTrue();
+            response.Data.IsT0.ShouldBeTrue();
+            var authorizationRequiredResponse = response.Data.AsT0;
 
             var getPaymentResponse
-                = await _fixture.Client.Payments.GetPayment(response.Data!.Id);
+                = await _fixture.Client.Payments.GetPayment(authorizationRequiredResponse.Id);
 
             getPaymentResponse.IsSuccessful.ShouldBeTrue();
 
@@ -84,7 +85,7 @@ namespace TrueLayer.AcceptanceTests
 
             payment.PaymentMethod.AsT0.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
             payment.User.ShouldNotBeNull();
-            payment.User.Id.ShouldBe(response.Data.User.Id);
+            payment.User.Id.ShouldBe(authorizationRequiredResponse.User.Id);
             payment.User.Name.ShouldBe(paymentRequest.User!.Name);
             payment.User.Email.ShouldBe(paymentRequest.User!.Email);
             payment.User.Phone.ShouldBe(paymentRequest.User!.Phone);

@@ -4,17 +4,22 @@ using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Auth;
 using TrueLayer.Payments.Model;
-using static TrueLayer.Payments.Model.GetPaymentResponse;
 
 namespace TrueLayer.Payments
 {
+    using CreatePaymentUnion = OneOf<
+        CreatePaymentResponse.AuthorizationRequired,
+        CreatePaymentResponse.Authorized,
+        CreatePaymentResponse.Failed
+    >;
+
     using GetPaymentUnion = OneOf<
-        AuthorizationRequired,
-        Authorizing,
-        Authorized,
-        Executed,
-        Settled,
-        Failed
+        GetPaymentResponse.AuthorizationRequired,
+        GetPaymentResponse.Authorizing,
+        GetPaymentResponse.Authorized,
+        GetPaymentResponse.Executed,
+        GetPaymentResponse.Settled,
+        GetPaymentResponse.Failed
     >;
 
     internal class PaymentsApi : IPaymentsApi
@@ -44,7 +49,7 @@ namespace TrueLayer.Payments
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<CreatePaymentResponse>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<CreatePaymentUnion>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
         {
             paymentRequest.NotNull(nameof(paymentRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
@@ -56,7 +61,7 @@ namespace TrueLayer.Payments
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.PostAsync<CreatePaymentResponse>(
+            return await _apiClient.PostAsync<CreatePaymentUnion>(
                 _baseUri,
                 paymentRequest,
                 idempotencyKey,
