@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.1</TargetFrameworks>
     <RootNamespace>TrueLayer</RootNamespace>
     <AssemblyName>TrueLayer.Client</AssemblyName>
     <PackageId>TrueLayer.Client</PackageId>
