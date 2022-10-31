@@ -16,7 +16,7 @@ namespace TrueLayer
         {
             _key = new Lazy<ECDsa>(() => CreateECDsaKey(PrivateKey));
         }
-        
+
         /// <summary>
         /// Sets the private key. Should not be shared with anyone outside of your organisation.
         /// </summary>
@@ -30,12 +30,12 @@ namespace TrueLayer
         internal ECDsa Value => _key.Value;
 
         private static ECDsa CreateECDsaKey(string privateKey)
-        {           
+        {
             privateKey.NotNullOrWhiteSpace(nameof(privateKey));
-            
+
             var key = ECDsa.Create();
 
-#if (NET5_0 || NET5_0_OR_GREATER)
+#if (NET6_0 || NET6_0_OR_GREATER)
             // Ref https://www.scottbrady91.com/C-Sharp/PEM-Loading-in-dotnet-core-and-dotnet
             key.ImportFromPem(privateKey);
 #else

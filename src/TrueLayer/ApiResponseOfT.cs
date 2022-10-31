@@ -36,7 +36,7 @@ namespace TrueLayer
         /// Gets whether the API request completed successfully
         /// </summary>
         /// <returns>True if successful, otherwise False</returns>
-#if NET5_0 || NET5_0_OR_GREATER
+#if NET6_0 || NET6_0_OR_GREATER
         [MemberNotNullWhen(true, nameof(Data))]
 #endif
         public override bool IsSuccessful => base.IsSuccessful;

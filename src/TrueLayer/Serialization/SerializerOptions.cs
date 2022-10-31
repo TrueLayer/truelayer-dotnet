@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TrueLayer.Serialization
 {
@@ -6,7 +7,7 @@ namespace TrueLayer.Serialization
     {
         public static readonly JsonSerializerOptions Default = new JsonSerializerOptions
         {
-            IgnoreNullValues = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             PropertyNamingPolicy = JsonSnakeCaseNamingPolicy.Instance,
             Converters = { new OneOfJsonConverterFactory() }
         };

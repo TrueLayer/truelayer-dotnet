@@ -9,7 +9,7 @@ using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text.Json;
 using TrueLayer.Signing;
-#if NET5_0 || NET5_0_OR_GREATER
+#if NET6_0 || NET6_0_OR_GREATER
 using System.Net.Http.Json;
 #endif
 
@@ -117,7 +117,7 @@ namespace TrueLayer
             {
                 try
                 {
-#if NET5_0 || NET5_0_OR_GREATER
+#if NET6_0 || NET6_0_OR_GREATER
                     data = await httpResponse.Content.ReadFromJsonAsync<TData>(SerializerOptions.Default, cancellationToken);
 #else
                     using var contentStream = await httpResponse.Content.ReadAsStreamAsync();
@@ -168,7 +168,7 @@ namespace TrueLayer
                 }
                 else // Otherwise we can serialize directly to stream for .NET 5.0 onwards
                 {
-#if (NET5_0 || NET5_0_OR_GREATER)
+#if (NET6_0 || NET6_0_OR_GREATER)
                     httpContent = JsonContent.Create(request, request.GetType(), options: SerializerOptions.Default);
 #else
                     // for older versions of .NET we'll have to fall back to using StringContent
