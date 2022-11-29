@@ -19,7 +19,7 @@ namespace TrueLayer.Payments.Model
             public string Type => "user_selected";
 
             /// <summary>
-            /// Gets or sets the filter used to determine the banks that should be displayed on the bank selection screen
+            /// Gets or inits the filter used to determine the banks that should be displayed on the bank selection screen
             /// </summary>
             public ProviderFilter? Filter { get; init; }
 
@@ -64,7 +64,7 @@ namespace TrueLayer.Payments.Model
             public string SchemeId { get; }
 
             /// <summary>
-            /// Gets or sets the account details for the remitter
+            /// Gets or inits the account details for the remitter
             /// </summary>
             public RemitterAccount? Remitter { get; init; }
         }

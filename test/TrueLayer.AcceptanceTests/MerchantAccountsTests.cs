@@ -95,7 +95,10 @@ namespace TrueLayer.AcceptanceTests
                     {
                         Filter = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } }
                     },
-                    new Beneficiary.MerchantAccount(merchantId)),
+                    new Beneficiary.MerchantAccount(merchantId)
+                    {
+                        Reference = "Test payment",
+                    }),
                 new PaymentUserRequest("Jane Doe", email: "jane.doe@example.com", phone: "+442079460087")
             );
     }

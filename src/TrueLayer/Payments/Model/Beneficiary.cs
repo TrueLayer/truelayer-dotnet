@@ -34,10 +34,15 @@ namespace TrueLayer.Payments.Model
             public string MerchantAccountId { get; }
 
             /// <summary>
-            /// The name of the beneficiary.
+            /// Gets or inits the name of the beneficiary.
             /// If unspecified, the API will use the account owner name associated to the selected merchant account.
             /// </summary>
             public string? AccountHolderName { get; init; }
+
+            /// <summary>
+            /// Gets or inits A reference for the payment. Not visible to the remitter.
+            /// </summary>
+            public string? Reference { get; init; }
         }
 
         /// <summary>

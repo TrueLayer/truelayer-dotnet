@@ -11,17 +11,17 @@ namespace TrueLayer
     public class TrueLayerOptions
     {
         /// <summary>
-        /// Gets or sets your TrueLayer client id.
+        /// Gets or inits your TrueLayer client id.
         /// </summary>
         public string? ClientId { get; init; }
 
         /// <summary>
-        /// Gets or sets your TrueLayer client secret.
+        /// Gets or inits your TrueLayer client secret.
         /// </summary>
         public string? ClientSecret { get; init; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to connect to the TrueLayer Sandbox.
+        /// Gets or inits a value indicating whether to connect to the TrueLayer Sandbox.
         /// </summary>
         public bool? UseSandbox { get; init; }
 
