@@ -36,12 +36,12 @@ namespace TrueLayer.Payments.Model
             public string Type => "bank_transfer";
 
             /// <summary>
-            /// Gets or sets the provider selection options
+            /// Gets or inits the provider selection options
             /// </summary>
             public ProviderUnion ProviderSelection { get; init; }
 
             /// <summary>
-            /// Gets or sets the beneficiary details
+            /// Gets or inits the beneficiary details
             /// </summary>
             public BeneficiaryUnion Beneficiary { get; init; }
         }
