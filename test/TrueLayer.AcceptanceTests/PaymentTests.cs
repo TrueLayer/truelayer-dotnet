@@ -10,7 +10,11 @@ using Xunit;
 namespace TrueLayer.AcceptanceTests
 {
     using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
-    using AccountIdentifierUnion = OneOf<AccountIdentifier.SortCodeAccountNumber, AccountIdentifier.Iban>;
+    using AccountIdentifierUnion = OneOf<
+        AccountIdentifier.SortCodeAccountNumber,
+        AccountIdentifier.Iban,
+        AccountIdentifier.Bban,
+        AccountIdentifier.Nrb>;
 
     public class PaymentTests : IClassFixture<ApiTestFixture>
     {
@@ -80,10 +84,12 @@ namespace TrueLayer.AcceptanceTests
                         Provider.Preselected providerSelectionReq = paymentRequest.PaymentMethod.AsT0.ProviderSelection.AsT1;
                         preselected.ProviderId.ShouldBe(providerSelectionReq.ProviderId);
                         preselected.SchemeId.ShouldBe(providerSelectionReq.SchemeId);
+                        preselected.Remitter.ShouldBe(providerSelectionReq.Remitter);
                     })
             );
 
             payment.PaymentMethod.AsT0.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
+            payment.PaymentMethod.AsT0.Beneficiary.ShouldBe(paymentRequest.PaymentMethod.AsT0.Beneficiary);
             payment.User.ShouldNotBeNull();
             payment.User.Id.ShouldBe(authorizationRequiredResponse.User.Id);
             payment.User.Name.ShouldBe(paymentRequest.User!.Name);
@@ -150,6 +156,28 @@ namespace TrueLayer.AcceptanceTests
                     new Provider.Preselected("mock-payments-fr-redirect", "sepa_credit_transfer_instant"),
                     new AccountIdentifier.Iban("IT60X0542811101000000123456"),
                     Currencies.EUR),
+            };
+            yield return new object[]
+            {
+                CreateTestPaymentRequest(
+                    new Provider.Preselected("mock-payments-pl-redirect", "polish_domestic_standard")
+                    {
+                        Remitter = new RemitterAccount(
+                            "John Doe", new AccountIdentifier.Nrb("12345678901234567890123456")),
+                    },
+                    new AccountIdentifier.Nrb("12345678901234567890123456"),
+                    Currencies.PLN),
+            };
+            yield return new object[]
+            {
+                CreateTestPaymentRequest(
+                    new Provider.Preselected("mock-payments-no-redirect", "norwegian_domestic_credit_transfer")
+                    {
+                        Remitter = new RemitterAccount(
+                            "John Doe", new AccountIdentifier.Bban("12345678901234567890123456")),
+                    },
+                    new AccountIdentifier.Bban("IT60X0542811101000000123456"),
+                    Currencies.NOK),
             };
         }
     }

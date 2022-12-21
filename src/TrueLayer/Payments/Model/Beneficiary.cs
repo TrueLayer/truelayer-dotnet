@@ -4,7 +4,7 @@ using static TrueLayer.Payments.Model.AccountIdentifier;
 
 namespace TrueLayer.Payments.Model
 {
-    using AccountIdentifierUnion = OneOf<SortCodeAccountNumber, Iban>;
+    using AccountIdentifierUnion = OneOf<SortCodeAccountNumber, Iban, Bban, Nrb>;
 
     public static class Beneficiary
     {

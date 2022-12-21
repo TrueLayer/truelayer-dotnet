@@ -4,7 +4,9 @@ namespace TrueLayer.Payments.Model
 {
     using AccountIdentifierUnion = OneOf<
         AccountIdentifier.SortCodeAccountNumber,
-        AccountIdentifier.Iban>;
+        AccountIdentifier.Iban,
+        AccountIdentifier.Bban,
+        AccountIdentifier.Nrb>;
 
     /// <summary>
     /// Represent a remitter account
