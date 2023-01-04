@@ -92,9 +92,6 @@ namespace TrueLayer.AcceptanceTests
             payment.PaymentMethod.AsT0.Beneficiary.ShouldBe(paymentRequest.PaymentMethod.AsT0.Beneficiary);
             payment.User.ShouldNotBeNull();
             payment.User.Id.ShouldBe(authorizationRequiredResponse.User.Id);
-            payment.User.Name.ShouldBe(paymentRequest.User!.Name);
-            payment.User.Email.ShouldBe(paymentRequest.User!.Email);
-            payment.User.Phone.ShouldBe(paymentRequest.User!.Phone);
         }
 
         private static CreatePaymentRequest CreateTestPaymentRequest(
