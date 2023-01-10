@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [0.3.3] - 2023-01-10
 ### Removed
-- Some user information from payment and mandate retrieval response
+- Some user information from payment response
     * `name`
     * `email`
     * `phone`
