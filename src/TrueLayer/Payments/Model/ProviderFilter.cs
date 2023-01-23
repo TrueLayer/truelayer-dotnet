@@ -19,10 +19,9 @@ namespace TrueLayer.Payments.Model
 
         /// <summary>
         /// Gets or inits the customer segments catered to by a provider that should be returned.
-        /// See <see cref="CustomerSegments"/>.
+        /// For the accepted values see <see cref="TrueLayer.CustomerSegments"/>.
         /// </summary>
-        /// <example>CustomerSegments.Business</example>
-        public string? CustomerSegments { get; init; }
+        public string[]? CustomerSegments { get; init; }
 
         /// <summary>
         /// Gets or inits the identifiers of the specific providers that should be returned.
