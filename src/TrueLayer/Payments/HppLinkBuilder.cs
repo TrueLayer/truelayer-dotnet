@@ -1,4 +1,5 @@
 using System;
+using TrueLayer.Payments.Enums;
 
 namespace TrueLayer.Payments
 {
@@ -12,20 +13,23 @@ namespace TrueLayer.Payments
         public HppLinkBuilder(Uri? baseUri = null, bool useSandbox = true)
         {
             _baseUri = baseUri ??
-                new Uri((useSandbox) ? SandboxUrl : ProdUrl);
+                       new Uri((useSandbox) ? SandboxUrl : ProdUrl);
         }
 
-        public string Build(string paymentId, string paymentToken, Uri returnUri)
+        public string Build(string id, string token, Uri returnUri, HppType hppType = HppType.Payment)
         {
-            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            paymentToken.NotNullOrWhiteSpace(nameof(paymentToken));
+            id.NotNullOrWhiteSpace(nameof(id));
+            token.NotNullOrWhiteSpace(nameof(token));
             returnUri.NotNull(nameof(returnUri));
 
-            var fragment = $"payment_id={paymentId}&resource_token={paymentToken}&return_uri={returnUri.AbsoluteUri}";
+            var idName = hppType == HppType.Payment ? "payment_id" : "mandate_id";
+            var fragment = $"{idName}={id}&resource_token={token}&return_uri={returnUri.AbsoluteUri}";
 
-            var builder = new UriBuilder(_baseUri);
-            builder.Path = "payments";
-            builder.Fragment = fragment;
+            var builder = new UriBuilder(_baseUri)
+            {
+                Path = hppType == HppType.Payment ? "payments" : "mandates",
+                Fragment = fragment
+            };
 
             return builder.Uri.AbsoluteUri;
         }
