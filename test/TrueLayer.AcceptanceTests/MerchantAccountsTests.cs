@@ -99,7 +99,12 @@ namespace TrueLayer.AcceptanceTests
                     {
                         Reference = "Test payment",
                     }),
-                new PaymentUserRequest("Jane Doe", email: "jane.doe@example.com", phone: "+442079460087")
+                new PaymentUserRequest(
+                    name: "Jane Doe", 
+                    email: "jane.doe@example.com",
+                    phone: "+442079460087",
+                    dateOfBirth: new DateTime(1999, 1, 1),
+                    address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St"))
             );
     }
 }
