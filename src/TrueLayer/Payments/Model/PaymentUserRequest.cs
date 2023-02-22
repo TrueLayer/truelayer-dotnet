@@ -1,3 +1,7 @@
+using System;
+using System.Text.Json.Serialization;
+using TrueLayer.Serialization;
+
 namespace TrueLayer.Payments.Model
 {
     /// <summary>
@@ -11,11 +15,21 @@ namespace TrueLayer.Payments.Model
         /// <param name="name">The user's name.</param>
         /// <param name="email">The user's email address.</param>
         /// <param name="phone">The user's phone number.</param>
-        public PaymentUserRequest(string? name = null, string? email = null, string? phone = null)
+        /// <param name="dateOfBirth">The user's date of birth</param>
+        /// <param name="address">The user's physical address</param>
+        public PaymentUserRequest(
+            string? name = null,
+            string? email = null,
+            string? phone = null,
+            DateTime? dateOfBirth = null,
+            Address? address = null)
         {
+            Address = address;
             Name = name.NotEmptyOrWhiteSpace(nameof(name));
             Email = email.NotEmptyOrWhiteSpace(nameof(email));
             Phone = phone.NotEmptyOrWhiteSpace(nameof(phone));
+            DateOfBirth = dateOfBirth?.Date;
+            Address = address;
         }
 
         /// <summary>
@@ -25,12 +39,22 @@ namespace TrueLayer.Payments.Model
         /// <param name="name">The user's name</param>
         /// <param name="email">The user's email address.</param>
         /// <param name="phone">The user's phone number.</param>
-        public PaymentUserRequest(string id, string? name = null, string? email = null, string? phone = null)
+        /// <param name="dateOfBirth">The user's date of birth</param>
+        /// <param name="address">The user's physical address</param>
+        public PaymentUserRequest(
+            string id,
+            string? name = null,
+            string? email = null,
+            string? phone = null,
+            DateTime? dateOfBirth = null,
+            Address? address = null)
         {
             Id = id.NotNullOrWhiteSpace(nameof(id));
             Name = name.NotEmptyOrWhiteSpace(nameof(name));
             Email = email.NotEmptyOrWhiteSpace(nameof(email));
             Phone = phone.NotEmptyOrWhiteSpace(nameof(phone));
+            DateOfBirth = dateOfBirth?.Date;
+            Address = address;
         }
 
         /// <summary>
@@ -52,5 +76,16 @@ namespace TrueLayer.Payments.Model
         /// Gets the user's phone number.
         /// </summary>
         public string? Phone { get; }
+        
+        /// <summary>
+        /// Gets the user's date of birth.
+        /// </summary>
+        [JsonConverter(typeof(DateTimeDateOnlyJsonConverter))]
+        public DateTime? DateOfBirth { get; }
+        
+        /// <summary>
+        /// Gets the user's physical address
+        /// </summary>
+        public Address? Address { get; }
     }
 }
