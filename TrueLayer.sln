@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		docs\index.md = docs\index.md
 		Directory.Build.props = Directory.Build.props
 		global.json = global.json
+		CHANGELOG.md = CHANGELOG.md
+		SECURITY.md = SECURITY.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{CD513AC9-E9A5-4941-A131-678BCE9DB2B0}"
