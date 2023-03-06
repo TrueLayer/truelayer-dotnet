@@ -4,8 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [1.1.0] - 2023-02-22
-### Added
-- `Address` and `DateofBirth` to `PaymentUserRequest`.
+### Unlisted
+- ~~`Address` and `DateofBirth` to `PaymentUserRequest`.~~
+- This version got unlisted because wrong. Please refer to version `1.2.0`.
 
 ## [1.0.0] - 2023-01-23
 ### Changed
