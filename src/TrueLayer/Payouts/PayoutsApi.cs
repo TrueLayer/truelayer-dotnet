@@ -46,7 +46,7 @@ namespace TrueLayer.Payouts
             payoutRequest.NotNull(nameof(payoutRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("paydirect"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -67,7 +67,7 @@ namespace TrueLayer.Payouts
         {
             id.NotNullOrWhiteSpace(nameof(id));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("paydirect"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
