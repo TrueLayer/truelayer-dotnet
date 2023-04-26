@@ -54,7 +54,7 @@ namespace TrueLayer.AcceptanceTests
             details.ShouldNotBeNull();
             details.Id.ShouldBe(response.Data.Id);
             details.Currency.ShouldBe(payoutRequest.Currency);
-            details.Status.ShouldBeOneOf("pending", "authorized", "successful", "failed");
+            details.Status.ShouldBeOneOf("pending", "authorized", "executed", "failed");
             details.CreatedAt.ShouldNotBeOneOf(DateTime.MinValue, DateTime.MaxValue);
         }
 
