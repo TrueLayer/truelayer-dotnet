@@ -16,15 +16,6 @@ namespace TrueLayer.Mandates.Model
     using Provider = OneOf<UserSelected, Preselected>;
     using Beneficiary = OneOf<ExternalAccount, MerchantAccount>;
 
-    public static class StatusLabels
-    {
-        public const string AuthorizationRequired = "authorization_required";
-        public const string Authorizing = "authorizing";
-        public const string Authorized  = "authorized";
-        public const string Failed = "failed";
-        public const string Revoked = "revoked";
-    }
-
     public abstract record MandateDetail(
         string Id,
         string Currency,
@@ -37,7 +28,7 @@ namespace TrueLayer.Mandates.Model
         Provider ProviderSelection,
         string Status);
 
-    [JsonDiscriminator(StatusLabels.AuthorizationRequired)]
+    [JsonDiscriminator(AuthorizationRequiredMandateDetail.Discriminator)]
     public record AuthorizationRequiredMandateDetail(
         string Id,
         string Currency,
@@ -59,9 +50,12 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status);
+            Status)
+    {
+        const string Discriminator = "authorization_required";
+    }
 
-    [JsonDiscriminator(StatusLabels.Authorizing)]
+    [JsonDiscriminator(AuthorizingMandateDetail.Discriminator)]
     public record AuthorizingMandateDetail(
         string Id,
         string Currency,
@@ -83,9 +77,12 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status);
+            Status)
+    {
+        const string Discriminator = "authorizing";
+    }
 
-    [JsonDiscriminator(StatusLabels.Authorized)]
+    [JsonDiscriminator(AuthorizedMandateDetail.Discriminator)]
     public record AuthorizedMandateDetail(
         string Id,
         string Currency,
@@ -109,9 +106,12 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status);
+            Status)
+    {
+        const string Discriminator = "authorized";
+    }
 
-    [JsonDiscriminator(StatusLabels.Failed)]
+    [JsonDiscriminator(FailedMandateDetail.Discriminator)]
     public record FailedMandateDetail(
         string Id,
         string Currency,
@@ -136,9 +136,12 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status);
+            Status)
+    {
+        const string Discriminator = "failed";
+    }
 
-    [JsonDiscriminator(StatusLabels.Revoked)]
+    [JsonDiscriminator(RevokedMandateDetail.Discriminator)]
     public record RevokedMandateDetail(
         string Id,
         string Currency,
@@ -164,5 +167,8 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status);
+            Status)
+    {
+        const string Discriminator = "revoked";
+    }
 }
