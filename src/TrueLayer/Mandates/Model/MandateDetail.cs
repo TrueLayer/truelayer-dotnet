@@ -28,7 +28,7 @@ namespace TrueLayer.Mandates.Model
         Provider ProviderSelection,
         string Status);
 
-    [JsonDiscriminator(AuthorizationRequiredMandateDetail.Discriminator)]
+    [JsonDiscriminator(Discriminator)]
     public record AuthorizationRequiredMandateDetail(
         string Id,
         string Currency,
@@ -55,7 +55,7 @@ namespace TrueLayer.Mandates.Model
         const string Discriminator = "authorization_required";
     }
 
-    [JsonDiscriminator(AuthorizingMandateDetail.Discriminator)]
+    [JsonDiscriminator(Discriminator)]
     public record AuthorizingMandateDetail(
         string Id,
         string Currency,
@@ -82,7 +82,7 @@ namespace TrueLayer.Mandates.Model
         const string Discriminator = "authorizing";
     }
 
-    [JsonDiscriminator(AuthorizedMandateDetail.Discriminator)]
+    [JsonDiscriminator(Discriminator)]
     public record AuthorizedMandateDetail(
         string Id,
         string Currency,
@@ -111,7 +111,7 @@ namespace TrueLayer.Mandates.Model
         const string Discriminator = "authorized";
     }
 
-    [JsonDiscriminator(FailedMandateDetail.Discriminator)]
+    [JsonDiscriminator(Discriminator)]
     public record FailedMandateDetail(
         string Id,
         string Currency,
@@ -141,7 +141,7 @@ namespace TrueLayer.Mandates.Model
         const string Discriminator = "failed";
     }
 
-    [JsonDiscriminator(RevokedMandateDetail.Discriminator)]
+    [JsonDiscriminator(Discriminator)]
     public record RevokedMandateDetail(
         string Id,
         string Currency,
