@@ -5,13 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Payments.Model;
+using static TrueLayer.Mandates.Model.Mandate;
 
 namespace TrueLayer.Mandates.Model
 {
-    using Mandate = OneOf<VRPCommercialMandate, VRPSweepingMandate>;
+    using MandateUnion = OneOf<VRPCommercialMandate, VRPSweepingMandate>;
 
     public record CreateMandateRequest(
-        Mandate Mandate,
+        MandateUnion Mandate,
         string Currency,
         PaymentUserRequest User,
         Constraints Constraints,

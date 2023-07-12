@@ -7,38 +7,37 @@ using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
-using static TrueLayer.Payments.Model.Provider;
-using static TrueLayer.Payments.Model.Beneficiary;
-using System.Reflection.Emit;
+using static TrueLayer.Mandates.Model.Provider;
+using static TrueLayer.Mandates.Model.Beneficiary;
 
 namespace TrueLayer.Mandates.Model
 {
-    using Provider = OneOf<UserSelected, Preselected>;
-    using Beneficiary = OneOf<ExternalAccount, MerchantAccount>;
+    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Preselected>;
+    using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
 
     public abstract record MandateDetail(
         string Id,
         string Currency,
-        Beneficiary Beneficiary,
+        BeneficiaryUnion Beneficiary,
         string Reference,
         PaymentUser User,
         DateTime CreatedAt,
         Constraints Constraints,
         Dictionary<string, string> Metadata,
-        Provider ProviderSelection,
+        ProviderUnion ProviderSelection,
         string Status);
 
     [JsonDiscriminator(Discriminator)]
     public record AuthorizationRequiredMandateDetail(
         string Id,
         string Currency,
-        Beneficiary Beneficiary,
+        BeneficiaryUnion Beneficiary,
         string Reference,
         PaymentUser User,
         DateTime CreatedAt,
         Constraints Constraints,
         Dictionary<string, string> Metadata,
-        Provider ProviderSelection,
+        ProviderUnion ProviderSelection,
         string Status)
         : MandateDetail(
             Id,
@@ -59,13 +58,13 @@ namespace TrueLayer.Mandates.Model
     public record AuthorizingMandateDetail(
         string Id,
         string Currency,
-        Beneficiary Beneficiary,
+        BeneficiaryUnion Beneficiary,
         string Reference,
         PaymentUser User,
         DateTime CreatedAt,
         Constraints Constraints,
         Dictionary<string, string> Metadata,
-        Provider ProviderSelection,
+        ProviderUnion ProviderSelection,
         string Status)
         : MandateDetail(
             Id,
@@ -86,13 +85,13 @@ namespace TrueLayer.Mandates.Model
     public record AuthorizedMandateDetail(
         string Id,
         string Currency,
-        Beneficiary Beneficiary,
+        BeneficiaryUnion Beneficiary,
         string Reference,
         PaymentUser User,
         DateTime CreatedAt,
         Constraints Constraints,
         Dictionary<string, string> Metadata,
-        Provider ProviderSelection,
+        ProviderUnion ProviderSelection,
         DateTime AuthorizedAt,
         RemitterAccount Remitter,
         string Status)
@@ -115,13 +114,13 @@ namespace TrueLayer.Mandates.Model
     public record FailedMandateDetail(
         string Id,
         string Currency,
-        Beneficiary Beneficiary,
+        BeneficiaryUnion Beneficiary,
         string Reference,
         PaymentUser User,
         DateTime CreatedAt,
         Constraints Constraints,
         Dictionary<string, string> Metadata,
-        Provider ProviderSelection,
+        ProviderUnion ProviderSelection,
         string FailureStage,
         string FailureReason,
         DateTime AuthorizationFailedAt,
@@ -145,13 +144,13 @@ namespace TrueLayer.Mandates.Model
     public record RevokedMandateDetail(
         string Id,
         string Currency,
-        Beneficiary Beneficiary,
+        BeneficiaryUnion Beneficiary,
         string Reference,
         PaymentUser User,
         DateTime CreatedAt,
         Constraints Constraints,
         Dictionary<string, string> Metadata,
-        Provider ProviderSelection,
+        ProviderUnion ProviderSelection,
         string RevocationSource,
         DateTime AuthorizedAt,
         DateTime RevokedAt,

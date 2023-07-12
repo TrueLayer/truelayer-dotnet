@@ -4,32 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OneOf;
-using static TrueLayer.Payments.Model.Provider;
-using static TrueLayer.Payments.Model.Beneficiary;
 using TrueLayer.Serialization;
+using static TrueLayer.Mandates.Model.Beneficiary;
+using static TrueLayer.Mandates.Model.Provider;
 
 namespace TrueLayer.Mandates.Model
 {
-    using Provider = OneOf<UserSelected, Preselected>;
-    using Beneficiary = OneOf<ExternalAccount, MerchantAccount>;
+    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Preselected>;
+    using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
 
-    [JsonDiscriminator(Discriminator)]
-    public record VRPCommercialMandate(
-        string Type,
-        Provider Provider,
-        Beneficiary Beneficiary,
-        string Reference) : IDiscriminated
+    public static class Mandate
     {
-        const string Discriminator = "commercial";
-    }
+        [JsonDiscriminator(Discriminator)]
+        public record VRPCommercialMandate(
+            string Type,
+            ProviderUnion Provider,
+            BeneficiaryUnion Beneficiary,
+            string Reference) : IDiscriminated
+        {
+            const string Discriminator = "commercial";
+        }
 
-    [JsonDiscriminator(Discriminator)]
-    public record VRPSweepingMandate(
-        string Type,
-        Provider Provider,
-        Beneficiary Beneficiary,
-        string Reference) : IDiscriminated
-    {
-        const string Discriminator = "sweeping";
+        [JsonDiscriminator(Discriminator)]
+        public record VRPSweepingMandate(
+            string Type,
+            ProviderUnion Provider,
+            BeneficiaryUnion Beneficiary,
+            string Reference) : IDiscriminated
+        {
+            const string Discriminator = "sweeping";
+        }
     }
 }
