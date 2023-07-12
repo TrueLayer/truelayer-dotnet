@@ -15,8 +15,6 @@ namespace TrueLayer.Mandates.Model
 {
     using Provider = OneOf<UserSelected, Preselected>;
     using Beneficiary = OneOf<ExternalAccount, MerchantAccount>;
-    using Status = OneOf<AuthorizationRequired, Authorizing, Authorized, Failed, Revoked>;
-    using FailureStage = OneOf<AuthorizationRequired, Authorizing, Authorized>;
 
     public static class StatusLabels
     {
@@ -26,21 +24,6 @@ namespace TrueLayer.Mandates.Model
         public const string Failed = "failed";
         public const string Revoked = "revoked";
     }
-
-    [JsonDiscriminator(StatusLabels.AuthorizationRequired)]
-    public record AuthorizationRequired { public string Label => StatusLabels.AuthorizationRequired; }
-
-    [JsonDiscriminator(StatusLabels.Authorizing)]
-    public record Authorizing { public string Label => StatusLabels.Authorizing; }
-
-    [JsonDiscriminator(StatusLabels.Authorized)]
-    public record Authorized { public string Label => StatusLabels.Authorized; }
-
-    [JsonDiscriminator(StatusLabels.Failed)]
-    public record Failed { public string Label => StatusLabels.Failed; }
-
-    [JsonDiscriminator(StatusLabels.Revoked)]
-    public record Revoked { public string Label => StatusLabels.Revoked; }
 
     public abstract record MandateDetail(
         string Id,
@@ -52,19 +35,7 @@ namespace TrueLayer.Mandates.Model
         Constraints Constraints,
         Dictionary<string, string> Metadata,
         Provider ProviderSelection,
-        Status status
-    ) : IDiscriminated
-    {
-        public string Type => status switch
-        {
-            var s when s.IsT0 => s.AsT0.Label,
-            var s when s.IsT1 => s.AsT1.Label,
-            var s when s.IsT2 => s.AsT2.Label,
-            var s when s.IsT3 => s.AsT3.Label,
-            var s when s.IsT4 => s.AsT4.Label,
-            _ => throw new NotImplementedException()
-        };
-    }
+        string Status);
 
     [JsonDiscriminator(StatusLabels.AuthorizationRequired)]
     public record AuthorizationRequiredMandateDetail(
@@ -76,7 +47,8 @@ namespace TrueLayer.Mandates.Model
         DateTime CreatedAt,
         Constraints Constraints,
         Dictionary<string, string> Metadata,
-        Provider ProviderSelection)
+        Provider ProviderSelection,
+        string Status)
         : MandateDetail(
             Id,
             Currency,
@@ -87,8 +59,7 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status.FromT0(new AuthorizationRequired())
-        );
+            Status);
 
     [JsonDiscriminator(StatusLabels.Authorizing)]
     public record AuthorizingMandateDetail(
@@ -100,7 +71,8 @@ namespace TrueLayer.Mandates.Model
         DateTime CreatedAt,
         Constraints Constraints,
         Dictionary<string, string> Metadata,
-        Provider ProviderSelection)
+        Provider ProviderSelection,
+        string Status)
         : MandateDetail(
             Id,
             Currency,
@@ -111,8 +83,7 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status.FromT1(new Authorizing())
-        );
+            Status);
 
     [JsonDiscriminator(StatusLabels.Authorized)]
     public record AuthorizedMandateDetail(
@@ -126,7 +97,8 @@ namespace TrueLayer.Mandates.Model
         Dictionary<string, string> Metadata,
         Provider ProviderSelection,
         DateTime AuthorizedAt,
-        RemitterAccount Remitter)
+        RemitterAccount Remitter,
+        string Status)
         : MandateDetail(
             Id,
             Currency,
@@ -137,8 +109,7 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status.FromT2(new Authorized())
-        );
+            Status);
 
     [JsonDiscriminator(StatusLabels.Failed)]
     public record FailedMandateDetail(
@@ -151,9 +122,10 @@ namespace TrueLayer.Mandates.Model
         Constraints Constraints,
         Dictionary<string, string> Metadata,
         Provider ProviderSelection,
-        FailureStage FailureStage,
+        string FailureStage,
         string FailureReason,
-        DateTime AuthorizationFailedAt)
+        DateTime AuthorizationFailedAt,
+        string Status)
         : MandateDetail(
             Id,
             Currency,
@@ -164,8 +136,7 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status.FromT3(new Failed())
-        );
+            Status);
 
     [JsonDiscriminator(StatusLabels.Revoked)]
     public record RevokedMandateDetail(
@@ -181,7 +152,8 @@ namespace TrueLayer.Mandates.Model
         string RevocationSource,
         DateTime AuthorizedAt,
         DateTime RevokedAt,
-        RemitterAccount Remitter)
+        RemitterAccount Remitter,
+        string Status)
         : MandateDetail(
             Id,
             Currency,
@@ -192,6 +164,5 @@ namespace TrueLayer.Mandates.Model
             Constraints,
             Metadata,
             ProviderSelection,
-            Status.FromT4(new Revoked())
-        );
+            Status);
 }
