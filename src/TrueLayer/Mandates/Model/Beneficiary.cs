@@ -22,14 +22,11 @@ namespace TrueLayer.Mandates.Model
         /// <param name="Type">Type of beneficiary.</param>
         /// <param name="MerchantAccountId">TrueLayer merchant account identifier.</param>
         /// <param name="AccountHolderName">Name of the beneficiary.</param>
-        [JsonDiscriminator(Discriminator)]
+        [JsonDiscriminator("merchant_account")]
         public record MerchantAccount(
             string Type,
             string MerchantAccountId,
-            string AccountHolderName) : IDiscriminated
-        {
-            const string Discriminator = "merchant_account";
-        }
+            string? AccountHolderName) : IDiscriminated;
 
         /// <summary>
         /// Represents an external beneficiary account
@@ -37,13 +34,10 @@ namespace TrueLayer.Mandates.Model
         /// <param name="Type">Type of beneficiary.</param>
         /// <param name="AccountHolderName">Name of the beneficiary.</param>
         /// <param name="AccountIdentifier">Unique identifier for the external account.</param>
-        [JsonDiscriminator(Discriminator)]
+        [JsonDiscriminator("external_account")]
         public record ExternalAccount(
             string Type,
             string AccountHolderName,
-            AccountIdentifier AccountIdentifier) : IDiscriminated
-        {
-            const string Discriminator = "external_account";
-        }
+            AccountIdentifier AccountIdentifier) : IDiscriminated;
     }
 }

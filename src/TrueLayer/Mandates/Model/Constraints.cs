@@ -15,8 +15,8 @@ namespace TrueLayer.Mandates.Model
     /// <param name="MaximumIndividualAmount">A 'cent' value representing the maximum amount that can be specified in a payment instruction.</param>
     /// <param name="PeriodicLimits">The limits for the payments that can be created by the mandate within a specified time period.</param>
     public record Constraints(
-        string ValidFrom,
-        string ValidTo,
+        DateTime? ValidFrom,
+        DateTime? ValidTo,
         int MaximumIndividualAmount,
         PeriodicLimits PeriodicLimits);
 }
