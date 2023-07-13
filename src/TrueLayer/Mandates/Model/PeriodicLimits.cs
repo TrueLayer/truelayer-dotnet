@@ -4,18 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Jose;
+using OneOf.Types;
 
 namespace TrueLayer.Mandates.Model
 {
     /// <summary>
-    /// The state of the constraints utilisation within each periodic limit defined in the mandate creation. There will always be at least 1 period state defined
+    /// The limits for the payments that can be created by the mandate within a specified time period. At least one periodic limit must be provided upon mandate creation.
     /// </summary>
-    /// <param name="Day">Utilisation of this mandate within the current day.</param>
-    /// <param name="Week">Utilisation of this mandate within the current week period.</param>
-    /// <param name="Fortnight">Utilisation of this mandate within the current fortnight period.</param>
-    /// <param name="Month">Utilisation of this mandate within the current month period.</param>
-    /// <param name="HalfYear">Utilisation of this mandate within the current half-year period.</param>
-    /// <param name="Year">Utilisation of this mandate within the current year period.</param>
+    /// <param name="Day">Limit for payments made within a day.</param>
+    /// <param name="Week">Limit for payments made within a week.</param>
+    /// <param name="Fortnight">Limit for payments made within a fortnight.</param>
+    /// <param name="Month">Limit for payments made within a month.</param>
+    /// <param name="HalfYear">Limit for payments made within 6 months.</param>
+    /// <param name="Year">Limit for payments made within a year.</param>
     public record PeriodicLimits(
         Limit Day,
         Limit Week,

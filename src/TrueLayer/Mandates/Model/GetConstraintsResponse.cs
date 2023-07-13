@@ -8,8 +8,7 @@ using Jose;
 namespace TrueLayer.Mandates.Model
 {
     /// <summary>
-    /// Gets the limits for the payments that can be created by the mandate.
-    /// If a payment is attempted that doesn't fit within these constraints it will fail.
+    /// Retrieve the constriants defined on the mandate, as well as the current utilisation of those constraints within the periods.
     /// </summary>
     /// <param name="ValidFrom">Start date time for which the consent remains valid.</param>
     /// <param name="ValidTo">End date time for which the consent remains valid.</param>
