@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace TrueLayer.Mandates.Model
 {
     public record PeriodicLimit(
-        PeriodicLimitDetail day,
-        PeriodicLimitDetail week,
-        PeriodicLimitDetail fortnight,
-        PeriodicLimitDetail month,
-        PeriodicLimitDetail halfYear,
-        PeriodicLimitDetail year
+        PeriodicLimitDetail Day,
+        PeriodicLimitDetail Week,
+        PeriodicLimitDetail Fortnight,
+        PeriodicLimitDetail Month,
+        PeriodicLimitDetail HalfYear,
+        PeriodicLimitDetail Year
     );
 }
