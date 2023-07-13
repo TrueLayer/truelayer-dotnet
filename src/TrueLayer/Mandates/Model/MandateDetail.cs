@@ -29,7 +29,7 @@ namespace TrueLayer.Mandates.Model
             ProviderUnion ProviderSelection,
             string Status);
 
-        [JsonDiscriminator(Discriminator)]
+        [JsonDiscriminator("authorization_required")]
         public record AuthorizationRequiredMandateDetail(
             string Id,
             string Currency,
@@ -51,12 +51,9 @@ namespace TrueLayer.Mandates.Model
                 Constraints,
                 Metadata,
                 ProviderSelection,
-                Status)
-        {
-            const string Discriminator = "authorization_required";
-        }
+                Status);
 
-        [JsonDiscriminator(Discriminator)]
+        [JsonDiscriminator("authorizing")]
         public record AuthorizingMandateDetail(
             string Id,
             string Currency,
@@ -78,12 +75,9 @@ namespace TrueLayer.Mandates.Model
                 Constraints,
                 Metadata,
                 ProviderSelection,
-                Status)
-        {
-            const string Discriminator = "authorizing";
-        }
+                Status);
 
-        [JsonDiscriminator(Discriminator)]
+        [JsonDiscriminator("authorized")]
         public record AuthorizedMandateDetail(
             string Id,
             string Currency,
@@ -107,12 +101,9 @@ namespace TrueLayer.Mandates.Model
                 Constraints,
                 Metadata,
                 ProviderSelection,
-                Status)
-        {
-            const string Discriminator = "authorized";
-        }
+                Status);
 
-        [JsonDiscriminator(Discriminator)]
+        [JsonDiscriminator("failed")]
         public record FailedMandateDetail(
             string Id,
             string Currency,
@@ -137,12 +128,9 @@ namespace TrueLayer.Mandates.Model
                 Constraints,
                 Metadata,
                 ProviderSelection,
-                Status)
-        {
-            const string Discriminator = "failed";
-        }
+                Status);
 
-        [JsonDiscriminator(Discriminator)]
+        [JsonDiscriminator("revoked")]
         public record RevokedMandateDetail(
             string Id,
             string Currency,
@@ -168,9 +156,6 @@ namespace TrueLayer.Mandates.Model
                 Constraints,
                 Metadata,
                 ProviderSelection,
-                Status)
-        {
-            const string Discriminator = "revoked";
-        }
+                Status);
     }
 }
