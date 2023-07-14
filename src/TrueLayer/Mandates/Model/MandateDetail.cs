@@ -22,10 +22,10 @@ namespace TrueLayer.Mandates.Model
             string Currency,
             BeneficiaryUnion Beneficiary,
             string Reference,
-            PaymentUser User,
+            PaymentUser? User,
             DateTime CreatedAt,
             Constraints Constraints,
-            Dictionary<string, string> Metadata,
+            Dictionary<string, string>? Metadata,
             ProviderUnion ProviderSelection,
             string Status);
 
@@ -48,10 +48,10 @@ namespace TrueLayer.Mandates.Model
             string Currency,
             BeneficiaryUnion Beneficiary,
             string Reference,
-            PaymentUser User,
+            PaymentUser? User,
             DateTime CreatedAt,
             Constraints Constraints,
-            Dictionary<string, string> Metadata,
+            Dictionary<string, string>? Metadata,
             ProviderUnion ProviderSelection,
             string Status)
             : MandateDetailBase(
@@ -85,12 +85,12 @@ namespace TrueLayer.Mandates.Model
             string Currency,
             BeneficiaryUnion Beneficiary,
             string Reference,
-            PaymentUser User,
+            PaymentUser? User,
             DateTime CreatedAt,
             Constraints Constraints,
-            Dictionary<string, string> Metadata,
+            Dictionary<string, string>? Metadata,
             ProviderUnion ProviderSelection,
-            string Status)
+            string Status) // Needs authorization_flow
             : MandateDetailBase(
                 Id,
                 Currency,
@@ -124,14 +124,14 @@ namespace TrueLayer.Mandates.Model
             string Currency,
             BeneficiaryUnion Beneficiary,
             string Reference,
-            PaymentUser User,
+            PaymentUser? User,
             DateTime CreatedAt,
             Constraints Constraints,
-            Dictionary<string, string> Metadata,
+            Dictionary<string, string>? Metadata,
             ProviderUnion ProviderSelection,
-            DateTime AuthorizedAt,
-            RemitterAccount Remitter,
-            string Status)
+            DateTime? AuthorizedAt,
+            RemitterAccount? Remitter,
+            string Status) // Needs authorization_flow
             : MandateDetailBase(
                 Id,
                 Currency,
@@ -166,15 +166,15 @@ namespace TrueLayer.Mandates.Model
             string Currency,
             BeneficiaryUnion Beneficiary,
             string Reference,
-            PaymentUser User,
+            PaymentUser? User,
             DateTime CreatedAt,
             Constraints Constraints,
-            Dictionary<string, string> Metadata,
+            Dictionary<string, string>? Metadata,
             ProviderUnion ProviderSelection,
             string FailureStage,
             string FailureReason,
-            DateTime AuthorizationFailedAt,
-            string Status)
+            DateTime AuthorizationFailedAt, // Should this be FailedAt?
+            string Status) // Needs authorization_flow
             : MandateDetailBase(
                 Id,
                 Currency,
@@ -210,16 +210,16 @@ namespace TrueLayer.Mandates.Model
             string Currency,
             BeneficiaryUnion Beneficiary,
             string Reference,
-            PaymentUser User,
+            PaymentUser? User,
             DateTime CreatedAt,
             Constraints Constraints,
-            Dictionary<string, string> Metadata,
+            Dictionary<string, string>? Metadata,
             ProviderUnion ProviderSelection,
             string RevocationSource,
             DateTime AuthorizedAt,
             DateTime RevokedAt,
-            RemitterAccount Remitter,
-            string Status)
+            RemitterAccount Remitter, // Should this be included?
+            string Status) // Needs authorization_flow
             : MandateDetailBase(
                 Id,
                 Currency,
