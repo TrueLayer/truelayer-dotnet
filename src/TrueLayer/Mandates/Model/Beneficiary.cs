@@ -12,7 +12,7 @@ namespace TrueLayer.Mandates.Model
     using AccountIdentifier = OneOf<SortCodeAccountNumber, Iban, Bban, Nrb>;
 
     /// <summary>
-    /// Represents a TrueLayer beneficiary merchant account
+    /// Represents a TrueLayer beneficiary account
     /// </summary>
     public static class Beneficiary
     {

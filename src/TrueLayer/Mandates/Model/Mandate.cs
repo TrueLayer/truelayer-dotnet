@@ -15,24 +15,32 @@ namespace TrueLayer.Mandates.Model
 
     public static class Mandate
     {
-        [JsonDiscriminator(Discriminator)]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Type">The type of VRP mandate that will be created.</param>
+        /// <param name="Provider">Provider selection.</param>
+        /// <param name="Beneficiary">Represents a beneficiary account.</param>
+        /// <param name="Reference">A custom reference for the mandate, available for regulated customers only. Pattern: ^[a-zA-Z0-9-:()\.,'\+ \?\/]{1,18}$. If not specified, one is automatically set to be the clients name, adjusted as needed.</param>
+        [JsonDiscriminator("commercial")]
         public record VRPCommercialMandate(
             string Type,
             ProviderUnion Provider,
             BeneficiaryUnion Beneficiary,
-            string Reference) : IDiscriminated
-        {
-            const string Discriminator = "commercial";
-        }
+            string? Reference) : IDiscriminated;
 
-        [JsonDiscriminator(Discriminator)]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Type">The type of VRP mandate that will be created.</param>
+        /// <param name="Provider">Provider selection.</param>
+        /// <param name="Beneficiary">Represents a beneficiary account.</param>
+        /// <param name="Reference"></param>
+        [JsonDiscriminator("sweeping")]
         public record VRPSweepingMandate(
             string Type,
             ProviderUnion Provider,
             BeneficiaryUnion Beneficiary,
-            string Reference) : IDiscriminated
-        {
-            const string Discriminator = "sweeping";
-        }
+            string? Reference) : IDiscriminated;
     }
 }

@@ -10,10 +10,7 @@ namespace TrueLayer.Mandates.Model
 {
     public static class Provider
     {
-        [JsonDiscriminator(Discriminator)]
-        public record Preselected(string Type, string ProviderId, RemitterAccount? Remitter) : IDiscriminated
-        {
-            const string Discriminator = "commercial";
-        }
+        [JsonDiscriminator("commercial")]
+        public record Preselected(string Type, string ProviderId, RemitterAccount? Remitter) : IDiscriminated;
     }
 }
