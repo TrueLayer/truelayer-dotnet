@@ -173,7 +173,7 @@ namespace TrueLayer.Mandates.Model
             ProviderUnion ProviderSelection,
             string FailureStage,
             string FailureReason,
-            DateTime AuthorizationFailedAt, // Should this be FailedAt?
+            DateTime FailedAt,
             string Status) // Needs authorization_flow
             : MandateDetailBase(
                 Id,
@@ -218,7 +218,6 @@ namespace TrueLayer.Mandates.Model
             string RevocationSource,
             DateTime AuthorizedAt,
             DateTime RevokedAt,
-            RemitterAccount Remitter, // Should this be included?
             string Status) // Needs authorization_flow
             : MandateDetailBase(
                 Id,
