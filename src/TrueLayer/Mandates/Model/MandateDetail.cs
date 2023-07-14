@@ -158,7 +158,7 @@ namespace TrueLayer.Mandates.Model
         /// <param name="ProviderSelection">Provider selection.</param>
         /// <param name="FailureStage">The status the mandate was in when it failed.</param>
         /// <param name="FailureReason">A readable detail for why the mandate failed.</param>
-        /// <param name="AuthorizationFailedAt">The date and time the mandate authorization was failed at.</param>
+        /// <param name="FailedAt">The date and time the mandate authorization was failed at.</param>
         /// <param name="Status">failed</param>
         [JsonDiscriminator("failed")]
         public record FailedMandateDetail(
@@ -202,7 +202,6 @@ namespace TrueLayer.Mandates.Model
         /// <param name="RevocationSource">Source for the revocation.</param>
         /// <param name="AuthorizedAt">The date and time the mandate was authorized at.</param>
         /// <param name="RevokedAt">The date and time the mandate was revoked at.</param>
-        /// <param name="Remitter">The routing information for the remitter bank account.</param>
         /// <param name="Status">revoked</param>
         [JsonDiscriminator("revoked")]
         public record RevokedMandateDetail(
