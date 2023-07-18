@@ -80,6 +80,7 @@ namespace TrueLayer.Mandates.Model
         /// <param name="Metadata">Optional field for adding custom key-value data to a resource. This object can contain a maximum of 10 key-value pairs, each with a key with a maximum length of 40 characters and a non-null value with a maximum length of 500 characters.</param>
         /// <param name="ProviderSelection">Provider selection.</param>
         /// <param name="Status">authorizing</param>
+        /// <param name="AuthorizationFlow">Contains information regarding the nature and the state of the authorization flow.</param>
         [JsonDiscriminator("authorizing")]
         public record AuthorizingMandateDetail(
             string Id,
@@ -92,7 +93,7 @@ namespace TrueLayer.Mandates.Model
             Dictionary<string, string>? Metadata,
             ProviderUnion ProviderSelection,
             string Status,
-            AuthorizationFlowWithConfiguration AuthorisationFlow)
+            AuthorizationFlowWithConfiguration AuthorizationFlow)
             : MandateDetailBase(
                 Id,
                 Currency,
@@ -120,6 +121,7 @@ namespace TrueLayer.Mandates.Model
         /// <param name="AuthorizedAt">The date and time the mandate was authorized at.</param>
         /// <param name="Remitter">The routing information for the remitter bank account.</param>
         /// <param name="Status">authorized</param>
+        /// <param name="AuthorizationFlow">Contains information regarding the nature and the state of the authorization flow.</param>
         [JsonDiscriminator("authorized")]
         public record AuthorizedMandateDetail(
             string Id,
@@ -134,7 +136,7 @@ namespace TrueLayer.Mandates.Model
             DateTime? AuthorizedAt,
             RemitterAccount? Remitter,
             string Status,
-            AuthorizationFlowWithConfiguration AuthorisationFlow)
+            AuthorizationFlowWithConfiguration AuthorizationFlow)
             : MandateDetailBase(
                 Id,
                 Currency,
@@ -163,6 +165,7 @@ namespace TrueLayer.Mandates.Model
         /// <param name="FailureReason">A readable detail for why the mandate failed.</param>
         /// <param name="FailedAt">The date and time the mandate authorization was failed at.</param>
         /// <param name="Status">failed</param>
+        /// <param name="AuthorizationFlow">Contains information regarding the nature and the state of the authorization flow.</param>
         [JsonDiscriminator("failed")]
         public record FailedMandateDetail(
             string Id,
@@ -178,7 +181,7 @@ namespace TrueLayer.Mandates.Model
             string FailureReason,
             DateTime FailedAt,
             string Status,
-            AuthorizationFlowWithConfiguration AuthorisationFlow)
+            AuthorizationFlowWithConfiguration AuthorizationFlow)
             : MandateDetailBase(
                 Id,
                 Currency,
@@ -207,6 +210,7 @@ namespace TrueLayer.Mandates.Model
         /// <param name="AuthorizedAt">The date and time the mandate was authorized at.</param>
         /// <param name="RevokedAt">The date and time the mandate was revoked at.</param>
         /// <param name="Status">revoked</param>
+        /// <param name="AuthorizationFlow">Contains information regarding the nature and the state of the authorization flow.</param>
         [JsonDiscriminator("revoked")]
         public record RevokedMandateDetail(
             string Id,
@@ -222,7 +226,7 @@ namespace TrueLayer.Mandates.Model
             DateTime AuthorizedAt,
             DateTime RevokedAt,
             string Status,
-            AuthorizationFlowWithConfiguration AuthorisationFlow)
+            AuthorizationFlowWithConfiguration AuthorizationFlow)
             : MandateDetailBase(
                 Id,
                 Currency,

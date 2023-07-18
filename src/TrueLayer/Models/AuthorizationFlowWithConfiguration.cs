@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace TrueLayer.Models
 {
-    public record AuthorizationFlowWithConfiguration
-        (Actions Actions, Configuration Configuration): AuthorizationFlow
-        (Actions);
+    /// <summary>
+    /// Contains information regarding the next action to be taken in the authorization flow.
+    /// </summary>
+    /// <param name="Actions">Contains the next action to be taken in the authorization flow.</param>
+    /// <param name="Configuration"></param>
+    public record AuthorizationFlowWithConfiguration (Actions Actions, Configuration Configuration) : AuthorizationFlow (Actions);
 }
