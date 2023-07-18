@@ -9,6 +9,7 @@ using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
 using static TrueLayer.Mandates.Model.Provider;
 using static TrueLayer.Mandates.Model.Beneficiary;
+using TrueLayer.Models;
 
 namespace TrueLayer.Mandates.Model
 {
@@ -90,7 +91,8 @@ namespace TrueLayer.Mandates.Model
             Constraints Constraints,
             Dictionary<string, string>? Metadata,
             ProviderUnion ProviderSelection,
-            string Status) // Needs authorization_flow
+            string Status,
+            AuthorizationFlowWithConfiguration AuthorisationFlow)
             : MandateDetailBase(
                 Id,
                 Currency,
@@ -131,7 +133,8 @@ namespace TrueLayer.Mandates.Model
             ProviderUnion ProviderSelection,
             DateTime? AuthorizedAt,
             RemitterAccount? Remitter,
-            string Status) // Needs authorization_flow
+            string Status,
+            AuthorizationFlowWithConfiguration AuthorisationFlow)
             : MandateDetailBase(
                 Id,
                 Currency,
@@ -174,7 +177,8 @@ namespace TrueLayer.Mandates.Model
             string FailureStage,
             string FailureReason,
             DateTime FailedAt,
-            string Status) // Needs authorization_flow
+            string Status,
+            AuthorizationFlowWithConfiguration AuthorisationFlow)
             : MandateDetailBase(
                 Id,
                 Currency,
@@ -217,7 +221,8 @@ namespace TrueLayer.Mandates.Model
             string RevocationSource,
             DateTime AuthorizedAt,
             DateTime RevokedAt,
-            string Status) // Needs authorization_flow
+            string Status,
+            AuthorizationFlowWithConfiguration AuthorisationFlow)
             : MandateDetailBase(
                 Id,
                 Currency,
