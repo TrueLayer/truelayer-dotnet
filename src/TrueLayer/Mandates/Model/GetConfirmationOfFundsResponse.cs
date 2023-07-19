@@ -6,5 +6,10 @@ using System.Threading.Tasks;
 
 namespace TrueLayer.Mandates.Model
 {
-    public record GetConfirmationOfFundsResponse(bool Confirmed, string Confirmed_at);
+    /// <summary>
+    /// Details of the fund confirmation
+    /// </summary>
+    /// <param name="Confirmed">Whether the funds are confirmed.</param>
+    /// <param name="ConfirmedAt">The date and time the funds were confirmed at.</param>
+    public record GetConfirmationOfFundsResponse(bool Confirmed, DateTime ConfirmedAt);
 }
