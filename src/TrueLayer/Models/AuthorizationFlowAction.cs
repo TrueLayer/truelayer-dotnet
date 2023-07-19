@@ -49,7 +49,7 @@ namespace TrueLayer.Models
         /// <param name="Type">wait</param>
         /// <param name="DisplayMessage">An optional message to be displayed to the end user while they are waiting.</param>
         [JsonDiscriminator("wait")]
-        public record WaitForOutcome(string Type, DisplayText DisplayMessage) : IDiscriminated;
+        public record WaitForOutcome(string Type, DisplayText? DisplayMessage) : IDiscriminated;
 
         /// <summary>
         /// Redirect action.
