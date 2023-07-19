@@ -7,6 +7,7 @@ using OneOf;
 using Moq;
 using Shouldly;
 using TrueLayer.Auth;
+using TrueLayer.Common;
 using TrueLayer.Payments;
 using TrueLayer.Payouts;
 using TrueLayer.Payouts.Model;
