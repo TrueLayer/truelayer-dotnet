@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
+using TrueLayer.Common;
 using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model
