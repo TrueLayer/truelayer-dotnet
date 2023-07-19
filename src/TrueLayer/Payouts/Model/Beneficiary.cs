@@ -1,3 +1,5 @@
+using System;
+using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payouts.Model.AccountIdentifier;
@@ -54,11 +56,18 @@ namespace TrueLayer.Payouts.Model
         [JsonDiscriminator("external_account")]
         public sealed record ExternalAccount : IDiscriminated
         {
-            public ExternalAccount(string accountHolderName, string reference, AccountIdentifierUnion accountIdentifier)
+            public ExternalAccount(
+                string accountHolderName,
+                string reference,
+                AccountIdentifierUnion accountIdentifier,
+                DateTime? dateOfBirth = null,
+                Address? address = null)
             {
                 AccountHolderName = accountHolderName.NotNullOrWhiteSpace(nameof(accountHolderName));
                 Reference = reference.NotNullOrWhiteSpace(nameof(reference));
                 AccountIdentifier = accountIdentifier;
+                DateOfBirth = dateOfBirth;
+                Address = address;
             }
 
             /// <summary>
@@ -80,6 +89,17 @@ namespace TrueLayer.Payouts.Model
             /// Gets the unique scheme identifier for the external account
             /// </summary>
             public AccountIdentifierUnion AccountIdentifier { get; }
+            
+            /// <summary>
+            /// Gets the user's date of birth.
+            /// </summary>
+            [JsonConverter(typeof(DateTimeDateOnlyJsonConverter))]
+            public DateTime? DateOfBirth { get; }
+        
+            /// <summary>
+            /// Gets the user's physical address
+            /// </summary>
+            public Address? Address { get; }
         }
 
         /// <summary>
