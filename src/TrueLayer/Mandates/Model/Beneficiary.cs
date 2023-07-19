@@ -26,7 +26,7 @@ namespace TrueLayer.Mandates.Model
         public record MerchantAccount(
             string Type,
             string MerchantAccountId,
-            string? AccountHolderName) : IDiscriminated;
+            string? AccountHolderName = null) : IDiscriminated;
 
         /// <summary>
         /// Represents an external beneficiary account

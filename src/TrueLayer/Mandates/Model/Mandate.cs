@@ -27,7 +27,7 @@ namespace TrueLayer.Mandates.Model
             string Type,
             ProviderUnion Provider,
             BeneficiaryUnion Beneficiary,
-            string? Reference) : IDiscriminated;
+            string? Reference = null) : IDiscriminated;
 
         /// <summary>
         /// 
@@ -41,6 +41,6 @@ namespace TrueLayer.Mandates.Model
             string Type,
             ProviderUnion Provider,
             BeneficiaryUnion Beneficiary,
-            string? Reference) : IDiscriminated;
+            string? Reference = null) : IDiscriminated;
     }
 }

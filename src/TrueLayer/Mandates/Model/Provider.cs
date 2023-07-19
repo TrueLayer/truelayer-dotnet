@@ -17,6 +17,6 @@ namespace TrueLayer.Mandates.Model
         /// <param name="ProviderId">The provider Id the PSU will use for this payment.</param>
         /// <param name="Remitter">Remitter</param>
         [JsonDiscriminator("commercial")]
-        public record Preselected(string Type, string ProviderId, RemitterAccount? Remitter) : IDiscriminated;
+        public record Preselected(string Type, string ProviderId, RemitterAccount? Remitter = null) : IDiscriminated;
     }
 }

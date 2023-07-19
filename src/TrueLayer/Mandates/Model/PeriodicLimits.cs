@@ -18,11 +18,11 @@ namespace TrueLayer.Mandates.Model
     /// <param name="HalfYear">Limit for payments made within 6 months.</param>
     /// <param name="Year">Limit for payments made within a year.</param>
     public record PeriodicLimits(
-        Limit? Day,
-        Limit? Week,
-        Limit? Fortnight,
-        Limit? Month,
-        Limit? HalfYear,
-        Limit? Year
+        Limit? Day = null,
+        Limit? Week = null,
+        Limit? Fortnight = null,
+        Limit? Month = null,
+        Limit? HalfYear = null,
+        Limit? Year = null
     );
 }
