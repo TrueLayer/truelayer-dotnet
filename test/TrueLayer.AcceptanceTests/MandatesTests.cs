@@ -10,6 +10,12 @@ using Xunit;
 namespace TrueLayer.AcceptanceTests
 {
     using TrueLayer.Mandates.Model;
+    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
+    using AccountIdentifierUnion = OneOf<
+        AccountIdentifier.SortCodeAccountNumber,
+        AccountIdentifier.Iban,
+        AccountIdentifier.Bban,
+        AccountIdentifier.Nrb>;
 
     public class MandatesTests : IClassFixture<ApiTestFixture>
     {
@@ -20,34 +26,51 @@ namespace TrueLayer.AcceptanceTests
             _fixture = fixture;
         }
 
-        public static IEnumerable<object[]> CreateTestMandateRequestTestData()
+        private static CreateMandateRequest CreateTestMandateRequest(
+            ProviderUnion providerSelection,
+            AccountIdentifierUnion accountIdentifier,
+            string currency = Currencies.GBP)
+            => new CreateMandateRequest(
+                OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>.FromT1(new Mandate.VRPSweepingMandate(
+                    "sweeping",
+                    providerSelection,
+                    new Mandates.Model.Beneficiary.ExternalAccount(
+                        "sort_code_account_number",
+                        "TrueLayer",
+                        accountIdentifier),
+                    "truelayer-dotnet")),
+                currency,
+                new PaymentUserRequest(
+                    id: "f9b48c9d-176b-46dd-b2da-fe1a2b77350c",
+                    name: "Remi Terr",
+                    email: "remi.terr@example.com",
+                    phone: "+44777777777"),
+                new Constraints(ValidFrom: "2023-07-14", ValidTo: "2024-07-21", 500,
+                    new PeriodicLimits(
+                    null,
+                    new Limit(1, PeriodAlignment.Calendar, "100"),
+                    new Limit(1, PeriodAlignment.Calendar, "100"),
+                    new Limit(1, PeriodAlignment.Calendar, "100"),
+                    new Limit(1, PeriodAlignment.Calendar, "100"),
+                    new Limit(1, PeriodAlignment.Calendar, "100")
+                )),
+                new Dictionary<string, string>());
+
+        private static IEnumerable<object[]> CreateTestMandateRequests()
         {
+            var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("111111", "10001000");
             yield return new object[]
             {
-                new CreateMandateRequest(
-                    new OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>(),
-                    Currencies.GBP,
-                    new PaymentUserRequest(
-                        name: "Jane Doe",
-                        email: "jane.doe@example.com",
-                        phone: "+442079460087",
-                        dateOfBirth: new DateTime(1999, 1, 1),
-                        address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
-                    new Constraints(ValidFrom: "2023-07-14", ValidTo: "2023-07-21", 500, new PeriodicLimits(
-                        new Limit(1, PeriodAlignment.Consent, "100"),
-                        new Limit(1, PeriodAlignment.Consent, "100"),
-                        new Limit(1, PeriodAlignment.Consent, "100"),
-                        new Limit(1, PeriodAlignment.Consent, "100"),
-                        new Limit(1, PeriodAlignment.Consent, "100"),
-                        new Limit(1, PeriodAlignment.Consent, "100")
-                    )),
-                    new Dictionary<string, string>()
-                )
+                CreateTestMandateRequest(new Payments.Model.Provider.UserSelected
+                    {
+                        Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "private_beta"},
+                    },
+                    sortCodeAccountNumber),
             };
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestMandateRequestTestData))]
+        [MemberData(nameof(CreateTestMandateRequests))]
         public async Task Can_create_mandate(CreateMandateRequest mandateRequest)
         {
             // Act
@@ -63,7 +86,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestMandateRequestTestData))]
+        [MemberData(nameof(CreateTestMandateRequests))]
         public async Task Can_revoke_mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange

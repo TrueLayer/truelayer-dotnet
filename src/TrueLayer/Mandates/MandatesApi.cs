@@ -36,14 +36,14 @@ namespace TrueLayer.Mandates
             mandateRequest.NotNull(nameof(mandateRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("recurring_payments:sweeping"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.PostAsync<CreateMandateResponse>(
+            var response = await _apiClient.PostAsync<CreateMandateResponse>(
                 _baseUri,
                 mandateRequest,
                 idempotencyKey,
@@ -51,6 +51,12 @@ namespace TrueLayer.Mandates
                 _options.Payments!.SigningKey,
                 cancellationToken
             );
+            if (!response.IsSuccessful)
+            {
+                throw new Exception($"{response.StatusCode} - {response.TraceId} - {response.Data}}}");
+            }
+
+            return response;
         }
 
 
