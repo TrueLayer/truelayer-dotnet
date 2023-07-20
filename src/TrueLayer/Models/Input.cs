@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -33,7 +34,14 @@ namespace TrueLayer.Models
         /// The type of text input that this represents.
         /// </summary>
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public enum Format { Any = 0, Numerical = 1, Alphabetical = 2, Alphanumerical = 3, Email = 4, SortCode = 5, AccountNumber = 6, Iban = 7 };
+        public enum Format {
+            [EnumMember(Value = "any")] Any = 0,
+            [EnumMember(Value = "numerical")] Numerical = 1,
+            [EnumMember(Value = "alphabetical")] Alphabetical = 2,
+            [EnumMember(Value = "alphanumerical")] Alphanumerical = 3,
+            [EnumMember(Value = "email")] Email = 4,
+            [EnumMember(Value = "sort_code")] SortCode = 5,
+            [EnumMember(Value = "account_number")] AccountNumber = 6, Iban = 7 };
 
         public abstract record InputBase(
             string Type,

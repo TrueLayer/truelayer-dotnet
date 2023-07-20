@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace TrueLayer.Models
         public record ProviderSelection(string Type, List<Provider> Providers) : IDiscriminated;
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public enum SubsequentActionHint { Redirect = 0, Form = 1 };
+        public enum SubsequentActionHint { [EnumMember(Value = "redirect")] Redirect = 0, [EnumMember(Value = "form")] Form = 1 };
 
         /// <summary>
         /// Consent action.
