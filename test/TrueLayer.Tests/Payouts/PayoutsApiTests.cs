@@ -7,6 +7,7 @@ using OneOf;
 using Moq;
 using Shouldly;
 using TrueLayer.Auth;
+using TrueLayer.Common;
 using TrueLayer.Payments;
 using TrueLayer.Payouts;
 using TrueLayer.Payouts.Model;
@@ -112,8 +113,8 @@ namespace TrueLayer.Tests.Payouts
                 "merchant-account-id",
                 100,
                 Currencies.GBP,
-                beneficiary
-            );
+                beneficiary,
+                metadata: new() {{"a", "b"}});
 
         public static IEnumerable<object[]> TestData =>
             new List<object[]>
@@ -123,7 +124,9 @@ namespace TrueLayer.Tests.Payouts
                     CreatePayoutRequest(new Beneficiary.ExternalAccount(
                         "Ms. Lucky",
                         "truelayer-dotnet",
-                        new AccountIdentifier.Iban("GB33BUKB20201555555555")
+                        new AccountIdentifier.Iban("GB33BUKB20201555555555"),
+                        dateOfBirth: new DateTime(1970, 12, 31),
+                        address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")
                     ))
                 },
                 new object[]

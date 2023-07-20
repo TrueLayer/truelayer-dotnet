@@ -7,6 +7,7 @@ using Shouldly;
 using Xunit;
 using System.Threading;
 using System.Linq;
+using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 
 namespace TrueLayer.AcceptanceTests
