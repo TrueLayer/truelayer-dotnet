@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Shouldly;
+using TrueLayer.Common;
 using TrueLayer.MerchantAccounts.Model;
 using TrueLayer.Payouts.Model;
 using Xunit;
@@ -80,8 +81,10 @@ namespace TrueLayer.AcceptanceTests
                 new Beneficiary.ExternalAccount(
                     "Ms. Lucky",
                     "truelayer-dotnet",
-                    new AccountIdentifier.Iban("GB33BUKB20201555555555")
-                )
+                    new AccountIdentifier.Iban("GB33BUKB20201555555555"),
+                    dateOfBirth: new DateTime(1970, 12, 31),
+                    address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
+                metadata: new() {{"a", "b"}}
             );
     }
 }
