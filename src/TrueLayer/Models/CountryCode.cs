@@ -8,6 +8,5 @@ using System.Threading.Tasks;
 namespace TrueLayer.Models
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum CountryCode { AT = 1, BE = 2, DE = 3, DK = 4, ES = 5, FI = 6, FR = 7, GB = 8, IE = 9, IT = 10, LT = 11, NL = 12, NO = 13, PL = 14, PT = 15, RO = 16 }
-
+    public enum CountryCode { AT = 0, BE = 1, DE = 2, DK = 3, ES = 4, FI = 5, FR = 6, GB = 7, IE = 8, IT = 9, LT = 10, NL = 11, NO = 12, PL = 13, PT = 14, RO = 15 }
 }
