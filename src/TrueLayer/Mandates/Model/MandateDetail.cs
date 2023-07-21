@@ -10,14 +10,27 @@ using TrueLayer.Serialization;
 using static TrueLayer.Mandates.Model.Provider;
 using static TrueLayer.Mandates.Model.Beneficiary;
 using TrueLayer.Models;
+using static TrueLayer.Mandates.Model.MandateDetail;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace TrueLayer.Mandates.Model
 {
     using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Preselected>;
     using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
+    using MandateDetailUnion = OneOf<AuthorizationRequiredMandateDetail, AuthorizingMandateDetail, AuthorizedMandateDetail, FailedMandateDetail, RevokedMandateDetail>;
 
     public static class MandateDetail
     {
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public enum Status
+        {
+            [EnumMember(Value = "authorization_required")] AuthorizationRequired,
+            [EnumMember(Value = "authorizing")] Authorizing,
+            [EnumMember(Value = "authorized")] Authorized,
+            [EnumMember(Value = "failed")] Failed,
+            [EnumMember(Value = "revoked")] Revoked
+        }
         public abstract record MandateDetailBase(
             string Id,
             string Currency,
@@ -26,7 +39,7 @@ namespace TrueLayer.Mandates.Model
             DateTime CreatedAt,
             Constraints Constraints,
             ProviderUnion ProviderSelection,
-            string Status,
+            Status Status,
             PaymentUser? User = null,
             Dictionary<string, string>? Metadata = null);
 
@@ -52,7 +65,7 @@ namespace TrueLayer.Mandates.Model
             DateTime CreatedAt,
             Constraints Constraints,
             ProviderUnion ProviderSelection,
-            string Status,
+            Status Status,
             PaymentUser? User = null,
             Dictionary<string, string>? Metadata = null)
             : MandateDetailBase(
@@ -90,7 +103,7 @@ namespace TrueLayer.Mandates.Model
             DateTime CreatedAt,
             Constraints Constraints,
             ProviderUnion ProviderSelection,
-            string Status,
+            Status Status,
             AuthorizationFlowWithConfiguration AuthorizationFlow,
             PaymentUser? User,
             Dictionary<string, string>? Metadata)
@@ -131,7 +144,7 @@ namespace TrueLayer.Mandates.Model
             DateTime CreatedAt,
             Constraints Constraints,
             ProviderUnion ProviderSelection,
-            string Status,
+            Status Status,
             AuthorizationFlowWithConfiguration AuthorizationFlow,
             DateTime? AuthorizedAt = null,
             RemitterAccount? Remitter = null,
@@ -178,7 +191,7 @@ namespace TrueLayer.Mandates.Model
             string FailureStage,
             string FailureReason,
             DateTime FailedAt,
-            string Status,
+            Status Status,
             AuthorizationFlowWithConfiguration AuthorizationFlow,
             PaymentUser? User = null,
             Dictionary<string, string>? Metadata = null)
@@ -224,7 +237,7 @@ namespace TrueLayer.Mandates.Model
             string RevocationSource,
             DateTime AuthorizedAt,
             DateTime RevokedAt,
-            string Status,
+            Status Status,
             AuthorizationFlowWithConfiguration AuthorizationFlow,
             PaymentUser? User = null,
             Dictionary<string, string>? Metadata = null)

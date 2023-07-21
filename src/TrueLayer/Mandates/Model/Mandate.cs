@@ -25,7 +25,7 @@ namespace TrueLayer.Mandates.Model
         [JsonDiscriminator("commercial")]
         public record VRPCommercialMandate(
             string Type,
-            ProviderUnion Provider,
+            ProviderUnion ProviderSelection,
             BeneficiaryUnion Beneficiary,
             string? Reference = null) : IDiscriminated;
 
@@ -39,7 +39,7 @@ namespace TrueLayer.Mandates.Model
         [JsonDiscriminator("sweeping")]
         public record VRPSweepingMandate(
             string Type,
-            ProviderUnion Provider,
+            ProviderUnion ProviderSelection,
             BeneficiaryUnion Beneficiary,
             string? Reference = null) : IDiscriminated;
     }
