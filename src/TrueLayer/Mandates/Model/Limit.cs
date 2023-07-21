@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 
 namespace TrueLayer.Mandates.Model
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum PeriodAlignment { [EnumMember(Value = "consent")] Consent = 0, [EnumMember(Value = "calendar")] Calendar = 1 }
+    public enum PeriodAlignment { Consent = 0, Calendar = 1 }
 
     /// <summary>
     /// The state of the constraints utilisation within the periodic limit defined in the mandate creation
