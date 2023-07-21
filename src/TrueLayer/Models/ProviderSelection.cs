@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace TrueLayer.Models
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ConfigurationStatus { Supported = 0, NotSupported = 1 };
 
     /// <summary>
