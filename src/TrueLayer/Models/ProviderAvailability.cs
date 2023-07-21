@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TrueLayer.Models
 {
-    public enum RecommendedStatus { [EnumMember(Value = "healthy")] Healthy = 0, [EnumMember(Value = "unhealthy")] Unhealthy = 1 }
+    public enum RecommendedStatus { Healthy = 0, Unhealthy = 1 }
 
     /// <summary>
     /// Provider Availability object
