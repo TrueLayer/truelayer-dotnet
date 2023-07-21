@@ -42,7 +42,7 @@ namespace TrueLayer.AcceptanceTests
                 new Constraints( 100,
                     new PeriodicLimits(
                         null,
-                        new Limit(1000, PeriodAlignment.calendar)),
+                        new Limit(1000, PeriodAlignment.Calendar)),
                         ValidFrom: DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), ValidTo: DateTime.UtcNow.AddMonths(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")),
                         new PaymentUserRequest(
                             id: "f9b48c9d-176b-46dd-b2da-fe1a2b77350c",
