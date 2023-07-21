@@ -1,8 +1,8 @@
 using System;
-using TrueLayer.Payments.Model;
+using TrueLayer.Common;
 using Xunit;
 
-namespace TrueLayer.Tests.Payments;
+namespace TrueLayer.Tests.Common;
 
 public class AddressTests
 {
