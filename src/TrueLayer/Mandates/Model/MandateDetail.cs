@@ -22,14 +22,13 @@ namespace TrueLayer.Mandates.Model
 
     public static class MandateDetail
     {
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public enum Status
         {
-            [EnumMember(Value = "authorization_required")] AuthorizationRequired,
-            [EnumMember(Value = "authorizing")] Authorizing,
-            [EnumMember(Value = "authorized")] Authorized,
-            [EnumMember(Value = "failed")] Failed,
-            [EnumMember(Value = "revoked")] Revoked
+            AuthorizationRequired,
+            Authorizing,
+            Authorized,
+            Failed,
+            Revoked
         }
         public abstract record MandateDetailBase(
             string Id,

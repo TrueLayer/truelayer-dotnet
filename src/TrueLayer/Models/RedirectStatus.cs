@@ -17,8 +17,7 @@ namespace TrueLayer.Models
     /// </summary>
     public static class RedirectStatus
     {
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public enum Type { [EnumMember(Value = "supported")] Supported = 0, [EnumMember(Value = "not_supported")] NotSupported = 1 }
+        public enum Type { Supported = 0, NotSupported = 1 }
 
         /// <summary>
         /// Supported redirect status object
