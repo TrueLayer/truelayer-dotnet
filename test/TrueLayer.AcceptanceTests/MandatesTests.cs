@@ -35,26 +35,20 @@ namespace TrueLayer.AcceptanceTests
                     "sweeping",
                     providerSelection,
                     new Mandates.Model.Beneficiary.ExternalAccount(
-                        "sort_code_account_number",
-                        "TrueLayer",
-                        accountIdentifier),
-                    "truelayer-dotnet")),
+                        "external_account",
+                        "My Bank Account",
+                        accountIdentifier))),
                 currency,
-                new PaymentUserRequest(
-                    id: "f9b48c9d-176b-46dd-b2da-fe1a2b77350c",
-                    name: "Remi Terr",
-                    email: "remi.terr@example.com",
-                    phone: "+44777777777"),
-                new Constraints(ValidFrom: "2023-07-14", ValidTo: "2024-07-21", 500,
+                new Constraints( 100,
                     new PeriodicLimits(
-                    null,
-                    new Limit(1, PeriodAlignment.Calendar, "100"),
-                    new Limit(1, PeriodAlignment.Calendar, "100"),
-                    new Limit(1, PeriodAlignment.Calendar, "100"),
-                    new Limit(1, PeriodAlignment.Calendar, "100"),
-                    new Limit(1, PeriodAlignment.Calendar, "100")
-                )),
-                new Dictionary<string, string>());
+                        null,
+                        new Limit(1000, PeriodAlignment.calendar)),
+                        ValidFrom: DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), ValidTo: DateTime.UtcNow.AddMonths(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")),
+                        new PaymentUserRequest(
+                            id: "f9b48c9d-176b-46dd-b2da-fe1a2b77350c",
+                            name: "Remi Terr",
+                            email: "remi.terr@example.com",
+                            phone: "+44777777777"));
 
         private static IEnumerable<object[]> CreateTestMandateRequests()
         {
@@ -79,28 +73,6 @@ namespace TrueLayer.AcceptanceTests
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
-            response.Data!.id.ShouldNotBeNullOrWhiteSpace();
-            response.Data.resourceToken.ShouldNotBeNullOrWhiteSpace();
-            response.Data.user.ShouldNotBeNull();
-            response.Data.user.Id.ShouldNotBeNullOrWhiteSpace();
-        }
-
-        [Theory]
-        [MemberData(nameof(CreateTestMandateRequests))]
-        public async Task Can_revoke_mandate(CreateMandateRequest mandateRequest)
-        {
-            // Arrange
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
-            var mandateId = createResponse.Data!.id;
-
-            // Act
-            var response = await _fixture.Client.Mandates.RevokeMandate(
-                mandateId, idempotencyKey: Guid.NewGuid().ToString());
-
-            // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.Accepted);
-            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
     }
 }

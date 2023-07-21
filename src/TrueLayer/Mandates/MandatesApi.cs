@@ -26,7 +26,7 @@ namespace TrueLayer.Mandates
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
             _baseUri = options.Payments.Uri is not null
-                ? new Uri(options.Payments.Uri, "mandates")
+                ? new Uri(options.Payments.Uri, "/v3/mandates")
                 : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 
@@ -35,46 +35,17 @@ namespace TrueLayer.Mandates
         {
             mandateRequest.NotNull(nameof(mandateRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("recurring_payments:sweeping"), cancellationToken);
+            var type = mandateRequest.Mandate.IsT0 ? mandateRequest.Mandate.AsT0.Type : mandateRequest.Mandate.AsT1.Type;
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{type}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            var response = await _apiClient.PostAsync<CreateMandateResponse>(
+            return await _apiClient.PostAsync<CreateMandateResponse>(
                 _baseUri,
                 mandateRequest,
-                idempotencyKey,
-                authResponse.Data!.AccessToken,
-                _options.Payments!.SigningKey,
-                cancellationToken
-            );
-            if (!response.IsSuccessful)
-            {
-                throw new Exception($"{response.StatusCode} - {response.TraceId} - {response.Data}}}");
-            }
-
-            return response;
-        }
-
-
-        /// <inheritdoc />
-        public async Task<ApiResponse<Task>> RevokeMandate(string id, string idempotencyKey, CancellationToken cancellationToken = default)
-        {
-            id.NotNullOrWhiteSpace(nameof(id));
-
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.PostAsync<Task>(
-                new Uri(_baseUri, $"mandates/{id}/revoke"),
-                null,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
