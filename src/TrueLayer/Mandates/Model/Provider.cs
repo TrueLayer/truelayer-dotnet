@@ -8,7 +8,7 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Mandates.Model
 {
-    internal static class Provider
+    public static class Provider
     {
         /// <summary>
         /// Provider Selection

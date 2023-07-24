@@ -6,6 +6,8 @@ using TrueLayer.Payouts;
 
 namespace TrueLayer
 {
+    using TrueLayer.Mandates;
+
     /// <summary>
     /// Provides access to TrueLayer APIs
     /// </summary>
@@ -35,5 +37,10 @@ namespace TrueLayer
         /// Gets the Merchant Accounts API resource
         /// </summary>
         IMerchantAccountsApi MerchantAccounts { get; }
+
+        /// <summary>
+        /// Gets the Mandates API resource
+        /// </summary>
+        IMandatesApi Mandates { get; }
     }
 }

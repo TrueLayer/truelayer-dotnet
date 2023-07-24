@@ -17,7 +17,7 @@ namespace TrueLayer.Mandates.Model
     /// <param name="Month">Limit for payments made within a month.</param>
     /// <param name="HalfYear">Limit for payments made within 6 months.</param>
     /// <param name="Year">Limit for payments made within a year.</param>
-    internal record PeriodicLimits(
+    public record PeriodicLimits(
         Limit? Day = null,
         Limit? Week = null,
         Limit? Fortnight = null,
