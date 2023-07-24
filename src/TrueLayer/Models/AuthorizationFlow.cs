@@ -13,11 +13,11 @@ namespace TrueLayer.Models
     /// Contains information regarding the next action to be taken in the authorization flow.
     /// </summary>
     /// <param name="Next">The next action that can be performed.</param>
-    public record Actions(AuthorizationFlowActionUnion Next);
+    internal record Actions(AuthorizationFlowActionUnion Next);
 
     /// <summary>
     /// Contains information regarding the nature and the state of the authorization flow.
     /// </summary>
     /// <param name="Actions">Contains the next action to be taken in the authorization flow.</param>
-    public record AuthorizationFlow(Actions Actions);
+    internal record AuthorizationFlow(Actions Actions);
 }

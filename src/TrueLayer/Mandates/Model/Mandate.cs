@@ -16,7 +16,7 @@ namespace TrueLayer.Mandates.Model
     public static class Mandate
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Type">The type of VRP mandate that will be created.</param>
         /// <param name="Provider">Provider selection.</param>
@@ -30,7 +30,7 @@ namespace TrueLayer.Mandates.Model
             string? Reference = null) : IDiscriminated;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Type">The type of VRP mandate that will be created.</param>
         /// <param name="Provider">Provider selection.</param>

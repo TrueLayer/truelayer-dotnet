@@ -15,7 +15,7 @@ namespace TrueLayer.Models
     /// <summary>
     /// Can the UI redirect the end user to a third-party page?
     /// </summary>
-    public static class RedirectStatus
+    internal static class RedirectStatus
     {
         public enum Type { Supported = 0, NotSupported = 1 }
 
