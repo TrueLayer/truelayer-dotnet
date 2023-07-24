@@ -74,5 +74,22 @@ namespace TrueLayer.AcceptanceTests
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
+
+
+        [Theory]
+        [MemberData(nameof(CreateTestMandateRequests))]
+        public async Task Can_get_mandate(CreateMandateRequest mandateRequest)
+        {
+            // Arrange
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var mandateId = createResponse.Data!.Id;
+            // Act
+            var response = await _fixture.Client.Mandates.GetMandate(mandateId);
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.Accepted);
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        }
     }
 }

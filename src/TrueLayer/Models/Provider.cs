@@ -18,7 +18,7 @@ namespace TrueLayer.Models
     /// <param name="Availability">Provider availability.</param>
     /// <param name="CountryCode"></param>
     /// <param name="SearchAliases">Alternative search terms that should be used to help users find this provider.</param>
-    internal record Provider(
+    public record Provider(
         string? Id = null,
         string? DisplayName = null,
         string? IconUri = null,

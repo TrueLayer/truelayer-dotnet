@@ -16,5 +16,5 @@ namespace TrueLayer.Models
     /// </summary>
     /// <param name="ProviderSelection">Can the UI render a provider selection screen?</param>
     /// <param name="Redirect">Can the UI redirect the end user to a third-party page?</param>
-    internal record Configuration (ProviderSelection ProviderSelection, RedirectStatusUnion Redirect);
+    public record Configuration (ProviderSelection ProviderSelection, RedirectStatusUnion Redirect);
 }

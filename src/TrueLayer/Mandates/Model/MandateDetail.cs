@@ -20,7 +20,7 @@ namespace TrueLayer.Mandates.Model
     using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
     using MandateDetailUnion = OneOf<AuthorizationRequiredMandateDetail, AuthorizingMandateDetail, AuthorizedMandateDetail, FailedMandateDetail, RevokedMandateDetail>;
 
-    internal static class MandateDetail
+    public static class MandateDetail
     {
         public enum Status
         {
