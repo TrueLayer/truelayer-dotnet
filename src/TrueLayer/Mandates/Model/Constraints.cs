@@ -14,7 +14,7 @@ namespace TrueLayer.Mandates.Model
     /// <param name="PeriodicLimits">The limits for the payments that can be created by the mandate within a specified time period. At least one periodic limit must be provided upon mandate creation.</param>
     /// <param name="ValidFrom">Start date time for which the consent remains valid using format YYYY-MM-DDTHH:mm:ss.sssZ</param>
     /// <param name="ValidTo">End date time for which the consent remains valid using format YYYY-MM-DDTHH:mm:ss.sssZ</param>
-    public record Constraints(
+    internal record Constraints(
         int MaximumIndividualAmount,
         PeriodicLimits PeriodicLimits,
         string? ValidFrom = null,

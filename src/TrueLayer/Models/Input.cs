@@ -14,7 +14,7 @@ namespace TrueLayer.Models
 {
     using ImageUnion = OneOf<Image.Uri, Image.Base64>;
 
-    public static class Input
+    internal static class Input
     {
         /// <summary>
         /// Display Text object.

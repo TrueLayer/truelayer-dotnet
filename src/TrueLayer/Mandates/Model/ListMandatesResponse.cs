@@ -17,5 +17,5 @@ namespace TrueLayer.Mandates.Model
     /// </summary>
     /// <param name="Items">Mandate detail items.</param>
     /// <param name="Pagination">Pagination object. Includes the next cursor to use as query parameters to fetch the page next to the one fetched.</param>
-    public record ListMandatesResponse(List<MandateDetailUnion> Items, PaginationMetadata Pagination);
+    internal record ListMandatesResponse(List<MandateDetailUnion> Items, PaginationMetadata Pagination);
 }
