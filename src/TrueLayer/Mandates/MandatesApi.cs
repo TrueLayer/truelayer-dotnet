@@ -35,7 +35,7 @@ namespace TrueLayer.Mandates
         {
             mandateRequest.NotNull(nameof(mandateRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-            var type = mandateRequest.Mandate.IsT0 ? mandateRequest.Mandate.AsT0.Type : mandateRequest.Mandate.AsT1.Type;
+            var type = mandateRequest.Mandate.Match(t0 => t0.Type, t1 => t1.Type);
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{type}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)

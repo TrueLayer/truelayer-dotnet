@@ -4,12 +4,12 @@ using System.Net;
 using System.Threading.Tasks;
 using OneOf;
 using Shouldly;
+using TrueLayer.Mandates.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
 
 namespace TrueLayer.AcceptanceTests
 {
-    using TrueLayer.Mandates.Model;
     using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
     using AccountIdentifierUnion = OneOf<
         AccountIdentifier.SortCodeAccountNumber,
@@ -30,7 +30,7 @@ namespace TrueLayer.AcceptanceTests
             ProviderUnion providerSelection,
             AccountIdentifierUnion accountIdentifier,
             string currency = Currencies.GBP)
-            => new CreateMandateRequest(
+            => new(
                 OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>.FromT1(new Mandate.VRPSweepingMandate(
                     "sweeping",
                     providerSelection,
@@ -39,16 +39,16 @@ namespace TrueLayer.AcceptanceTests
                         "My Bank Account",
                         accountIdentifier))),
                 currency,
-                new Constraints( 100,
-                    new PeriodicLimits(
-                        null,
-                        new Limit(1000, PeriodAlignment.Calendar)),
-                        ValidFrom: DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), ValidTo: DateTime.UtcNow.AddMonths(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")),
-                        new PaymentUserRequest(
-                            id: "f9b48c9d-176b-46dd-b2da-fe1a2b77350c",
-                            name: "Remi Terr",
-                            email: "remi.terr@example.com",
-                            phone: "+44777777777"));
+                new Constraints(
+                    MaximumIndividualAmount: 100,
+                    new PeriodicLimits(Week: new Limit(1000, PeriodAlignment.Calendar)),
+                    ValidFrom: DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                    ValidTo: DateTime.UtcNow.AddMonths(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")),
+                new PaymentUserRequest(
+                    id: "f9b48c9d-176b-46dd-b2da-fe1a2b77350c",
+                    name: "Remi Terr",
+                    email: "remi.terr@example.com",
+                    phone: "+44777777777"));
 
         private static IEnumerable<object[]> CreateTestMandateRequests()
         {
