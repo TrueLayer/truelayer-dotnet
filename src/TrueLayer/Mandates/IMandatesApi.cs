@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 namespace TrueLayer.Mandates
 {
     using TrueLayer.Mandates.Model;
+    using MandateDetailUnion = OneOf.OneOf<Model.MandateDetail.AuthorizationRequiredMandateDetail, Model.MandateDetail.AuthorizingMandateDetail, Model.MandateDetail.AuthorizedMandateDetail, Model.MandateDetail.FailedMandateDetail, Model.MandateDetail.RevokedMandateDetail>;
 
     /// <summary>
     /// Provides access to the TrueLayer Payments API
@@ -22,5 +23,32 @@ namespace TrueLayer.Mandates
         /// <returns>An API response that includes details of the created mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<CreateMandateResponse>> CreateMandate(
             CreateMandateRequest mandateRequest, string idempotencyKey, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a mandate
+        /// </summary>
+        /// <param name="mandateId">The id of the mandate to retrieve</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
+        Task<ApiResponse<MandateDetailUnion>> GetMandate(
+            string mandateId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a mandate
+        /// </summary>
+        /// <param name="query">The userId, cursor and limit of mandate</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
+        Task<ApiResponse<MandateDetailUnion>> ListMandate(
+            ListMandatesQuery query, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a mandate
+        /// </summary>
+        /// <param name="mandateId">The id of the mandate constraints to retrieve</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
+        Task<ApiResponse<GetConstraintsResponse>> getMandateConstraints(
+            string mandateId, CancellationToken cancellationToken = default);
     }
 }
