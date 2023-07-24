@@ -14,7 +14,7 @@ namespace TrueLayer.Mandates.Model
     /// <param name="StartDate">The start date for the current period.</param>
     /// <param name="EndDate">The end date for the current period, and start of the next period.</param>
     /// <param name="PeriodAlignment">Specifies whether the period starts on the date of consent creation or lines up with a calendar. If the PeriodAlignment is calendar, the limit is pro-rated in the first period to the remaining number of days.</param>
-    public record PeriodicLimitDetail(
+    internal record PeriodicLimitDetail(
         int MaximumAvailableAmount,
         int CurrentAmount,
         DateTime StartDate,

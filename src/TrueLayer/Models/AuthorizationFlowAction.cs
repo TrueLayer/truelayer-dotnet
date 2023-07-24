@@ -15,7 +15,7 @@ namespace TrueLayer.Models
 {
     using InputUnion = OneOf<Input.Text, Input.TextWithImage, Input.Select>;
 
-    public static class AuthorizationFlowAction
+    internal static class AuthorizationFlowAction
     {
         /// <summary>
         /// Provider selection represents the PSU action of selecting a provider.

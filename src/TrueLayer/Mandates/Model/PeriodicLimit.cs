@@ -16,7 +16,7 @@ namespace TrueLayer.Mandates.Model
     /// <param name="Month">Utilisation of this mandate within the current month period.</param>
     /// <param name="HalfYear">Utilisation of this mandate within the current half-year period.</param>
     /// <param name="Year">Utilisation of this mandate within the current year period.</param>
-    public record PeriodicLimit(
+    internal record PeriodicLimit(
         PeriodicLimitDetail? Day = null,
         PeriodicLimitDetail? Week = null,
         PeriodicLimitDetail? Fortnight = null,

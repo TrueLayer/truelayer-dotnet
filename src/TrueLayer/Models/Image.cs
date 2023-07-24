@@ -8,7 +8,7 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Models
 {
-    public static class Image
+    internal static class Image
     {
         /// <summary>
         /// Base64 image.

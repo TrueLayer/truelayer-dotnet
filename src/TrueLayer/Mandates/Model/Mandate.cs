@@ -13,7 +13,7 @@ namespace TrueLayer.Mandates.Model
     using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Preselected>;
     using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
 
-    public static class Mandate
+    internal static class Mandate
     {
         /// <summary>
         /// 
