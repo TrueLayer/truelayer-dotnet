@@ -28,27 +28,30 @@ namespace TrueLayer.Mandates
         /// Gets a mandate
         /// </summary>
         /// <param name="mandateId">The id of the mandate to retrieve</param>
+        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<MandateDetailUnion>> GetMandate(
-            string mandateId, CancellationToken cancellationToken = default);
+            string mandateId, MandateType mandateType , CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets a mandate
+        /// Lists mandates for a user
         /// </summary>
         /// <param name="query">The userId, cursor and limit of mandate</param>
+        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
-        Task<ApiResponse<MandateDetailUnion>> ListMandate(
-            ListMandatesQuery query, CancellationToken cancellationToken = default);
+        Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandate(
+            ListMandatesQuery query, MandateType mandateType, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets a mandate
+        /// Gets a mandates constraints
         /// </summary>
         /// <param name="mandateId">The id of the mandate constraints to retrieve</param>
+        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
-        Task<ApiResponse<GetConstraintsResponse>> getMandateConstraints(
-            string mandateId, CancellationToken cancellationToken = default);
+        Task<ApiResponse<GetConstraintsResponse>> GetMandateConstraints(
+            string mandateId, MandateType mandateType, CancellationToken cancellationToken = default);
     }
 }

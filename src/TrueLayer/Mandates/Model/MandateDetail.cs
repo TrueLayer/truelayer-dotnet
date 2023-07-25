@@ -22,14 +22,6 @@ namespace TrueLayer.Mandates.Model
 
     public static class MandateDetail
     {
-        public enum Status
-        {
-            AuthorizationRequired,
-            Authorizing,
-            Authorized,
-            Failed,
-            Revoked
-        }
         public abstract record MandateDetailBase(
             string Id,
             string Currency,
@@ -38,7 +30,7 @@ namespace TrueLayer.Mandates.Model
             DateTime CreatedAt,
             Constraints Constraints,
             ProviderUnion ProviderSelection,
-            Status Status,
+            string Status,
             PaymentUser? User = null,
             Dictionary<string, string>? Metadata = null);
 
@@ -64,7 +56,7 @@ namespace TrueLayer.Mandates.Model
             DateTime CreatedAt,
             Constraints Constraints,
             ProviderUnion ProviderSelection,
-            Status Status,
+            string Status,
             PaymentUser? User = null,
             Dictionary<string, string>? Metadata = null)
             : MandateDetailBase(
@@ -102,7 +94,7 @@ namespace TrueLayer.Mandates.Model
             DateTime CreatedAt,
             Constraints Constraints,
             ProviderUnion ProviderSelection,
-            Status Status,
+            string Status,
             AuthorizationFlowWithConfiguration AuthorizationFlow,
             PaymentUser? User,
             Dictionary<string, string>? Metadata)
@@ -143,7 +135,7 @@ namespace TrueLayer.Mandates.Model
             DateTime CreatedAt,
             Constraints Constraints,
             ProviderUnion ProviderSelection,
-            Status Status,
+            string Status,
             AuthorizationFlowWithConfiguration AuthorizationFlow,
             DateTime? AuthorizedAt = null,
             RemitterAccount? Remitter = null,
@@ -190,7 +182,7 @@ namespace TrueLayer.Mandates.Model
             string FailureStage,
             string FailureReason,
             DateTime FailedAt,
-            Status Status,
+            string Status,
             AuthorizationFlowWithConfiguration AuthorizationFlow,
             PaymentUser? User = null,
             Dictionary<string, string>? Metadata = null)
@@ -236,7 +228,7 @@ namespace TrueLayer.Mandates.Model
             string RevocationSource,
             DateTime AuthorizedAt,
             DateTime RevokedAt,
-            Status Status,
+            string Status,
             AuthorizationFlowWithConfiguration AuthorizationFlow,
             PaymentUser? User = null,
             Dictionary<string, string>? Metadata = null)

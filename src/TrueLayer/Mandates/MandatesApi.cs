@@ -55,11 +55,11 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<MandateDetailUnion>> GetMandate(string mandateId, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<MandateDetailUnion>> GetMandate(string mandateId, MandateType mandateType, CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("recurring_payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -74,9 +74,9 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<MandateDetailUnion>> ListMandate(ListMandatesQuery query, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandate(ListMandatesQuery query, MandateType mandateType, CancellationToken cancellationToken = default)
         {
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("recurring_payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -85,19 +85,19 @@ namespace TrueLayer.Mandates
 
             UriBuilder baseUri = new(new Uri(_baseUri, $"/v3/mandates")) { Query = $"client_id={_options.ClientId}/user_id={query.UserId}/cursor={query.Cursor}/limit={query.Limit}" };
 
-            return await _apiClient.GetAsync<MandateDetailUnion>(
+            return await _apiClient.GetAsync<ResourceCollection<MandateDetailUnion>>(
                 baseUri.Uri,
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
         }
-        
+
         /// <inheritdoc />
-        public async Task<ApiResponse<GetConstraintsResponse>> getMandateConstraints(string mandateId, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<GetConstraintsResponse>> GetMandateConstraints(string mandateId, MandateType mandateType, CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("recurring_payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -105,7 +105,7 @@ namespace TrueLayer.Mandates
             }
 
             return await _apiClient.GetAsync<GetConstraintsResponse>(
-                new Uri(_baseUri, $"/v3/mandates/{mandateId}"),
+                new Uri(_baseUri, $"/v3/mandates/{mandateId}/constraints"),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );

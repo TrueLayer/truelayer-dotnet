@@ -85,10 +85,41 @@ namespace TrueLayer.AcceptanceTests
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
             // Act
-            var response = await _fixture.Client.Mandates.GetMandate(mandateId);
+            var response = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.sweeping);
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.Accepted);
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        }
+
+        [Theory]
+        [MemberData(nameof(CreateTestMandateRequests))]
+        public async Task Can_list_mandate(CreateMandateRequest mandateRequest)
+        {
+            // Arrange
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            // Act
+            var response = await _fixture.Client.Mandates.ListMandate(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.sweeping);
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        }
+
+        [Theory]
+        [MemberData(nameof(CreateTestMandateRequests))]
+        public async Task Can_get_mandate_constraints(CreateMandateRequest mandateRequest)
+        {
+            // Arrange
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var mandateId = createResponse.Data!.Id;
+            // Act
+            var response = await _fixture.Client.Mandates.GetMandateConstraints(mandateId, MandateType.sweeping);
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
             createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
     }
