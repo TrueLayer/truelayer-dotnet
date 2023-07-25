@@ -91,24 +91,5 @@ namespace TrueLayer.Mandates
                 cancellationToken
             );
         }
-
-        /// <inheritdoc />
-        public async Task<ApiResponse<GetConstraintsResponse>> GetMandateConstraints(string mandateId, MandateType mandateType, CancellationToken cancellationToken = default)
-        {
-            mandateId.NotNullOrWhiteSpace(nameof(mandateId));
-
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType}"), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.GetAsync<GetConstraintsResponse>(
-                new Uri(_baseUri, $"/v3/mandates/{mandateId}/constraints"),
-                authResponse.Data!.AccessToken,
-                cancellationToken
-            );
-        }
     }
 }

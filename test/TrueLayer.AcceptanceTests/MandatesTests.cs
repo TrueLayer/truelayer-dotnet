@@ -106,21 +106,5 @@ namespace TrueLayer.AcceptanceTests
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
             createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
-
-        [Theory]
-        [MemberData(nameof(CreateTestMandateRequests))]
-        public async Task Can_get_mandate_constraints(CreateMandateRequest mandateRequest)
-        {
-            // Arrange
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
-            var mandateId = createResponse.Data!.Id;
-            // Act
-            var response = await _fixture.Client.Mandates.GetMandateConstraints(mandateId, MandateType.sweeping);
-
-            // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
-            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
-        }
     }
 }

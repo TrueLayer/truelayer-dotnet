@@ -43,15 +43,5 @@ namespace TrueLayer.Mandates
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandate(
             ListMandatesQuery query, MandateType mandateType, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Gets a mandates constraints
-        /// </summary>
-        /// <param name="mandateId">The id of the mandate constraints to retrieve</param>
-        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
-        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
-        /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
-        Task<ApiResponse<GetConstraintsResponse>> GetMandateConstraints(
-            string mandateId, MandateType mandateType, CancellationToken cancellationToken = default);
     }
 }
