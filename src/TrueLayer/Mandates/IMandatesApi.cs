@@ -1,10 +1,11 @@
 using System.Threading;
 using System.Threading.Tasks;
+using OneOf;
 
 namespace TrueLayer.Mandates
 {
     using TrueLayer.Mandates.Model;
-    using MandateDetailUnion = OneOf.OneOf<Model.MandateDetail.AuthorizationRequiredMandateDetail, Model.MandateDetail.AuthorizingMandateDetail, Model.MandateDetail.AuthorizedMandateDetail, Model.MandateDetail.FailedMandateDetail, Model.MandateDetail.RevokedMandateDetail>;
+    using MandateDetailUnion = OneOf<Model.MandateDetail.AuthorizationRequiredMandateDetail, Model.MandateDetail.AuthorizingMandateDetail, Model.MandateDetail.AuthorizedMandateDetail, Model.MandateDetail.FailedMandateDetail, Model.MandateDetail.RevokedMandateDetail>;
 
     /// <summary>
     /// Provides access to the TrueLayer Payments API
@@ -41,7 +42,7 @@ namespace TrueLayer.Mandates
         /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
-        Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandate(
+        Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandates(
             ListMandatesQuery query, MandateType mandateType, CancellationToken cancellationToken = default);
     }
 }

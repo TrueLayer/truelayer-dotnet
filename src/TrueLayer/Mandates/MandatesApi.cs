@@ -2,11 +2,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
+using OneOf;
 
 namespace TrueLayer.Mandates
 {
     using TrueLayer.Mandates.Model;
-    using MandateDetailUnion = OneOf.OneOf<Model.MandateDetail.AuthorizationRequiredMandateDetail, Model.MandateDetail.AuthorizingMandateDetail, Model.MandateDetail.AuthorizedMandateDetail, Model.MandateDetail.FailedMandateDetail, Model.MandateDetail.RevokedMandateDetail>;
+    using MandateDetailUnion = OneOf<Model.MandateDetail.AuthorizationRequiredMandateDetail, Model.MandateDetail.AuthorizingMandateDetail, Model.MandateDetail.AuthorizedMandateDetail, Model.MandateDetail.FailedMandateDetail, Model.MandateDetail.RevokedMandateDetail>;
 
     internal class MandatesApi : IMandatesApi
     {
@@ -74,7 +75,7 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandate(ListMandatesQuery query, MandateType mandateType, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandates(ListMandatesQuery query, MandateType mandateType, CancellationToken cancellationToken = default)
         {
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType}"), cancellationToken);
 

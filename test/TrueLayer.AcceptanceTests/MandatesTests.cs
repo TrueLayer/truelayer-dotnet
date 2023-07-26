@@ -100,7 +100,7 @@ namespace TrueLayer.AcceptanceTests
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             // Act
-            var response = await _fixture.Client.Mandates.ListMandate(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.sweeping);
+            var response = await _fixture.Client.Mandates.ListMandates(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.sweeping);
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
