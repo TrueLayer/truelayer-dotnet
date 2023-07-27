@@ -7,6 +7,7 @@ using OneOf;
 namespace TrueLayer.Mandates
 {
     using TrueLayer.Mandates.Model;
+    using TrueLayer.Models;
     using MandateDetailUnion = OneOf<Model.MandateDetail.AuthorizationRequiredMandateDetail, Model.MandateDetail.AuthorizingMandateDetail, Model.MandateDetail.AuthorizedMandateDetail, Model.MandateDetail.FailedMandateDetail, Model.MandateDetail.RevokedMandateDetail>;
 
     internal class MandatesApi : IMandatesApi
@@ -89,6 +90,29 @@ namespace TrueLayer.Mandates
             return await _apiClient.GetAsync<ResourceCollection<MandateDetailUnion>>(
                 baseUri.Uri,
                 authResponse.Data!.AccessToken,
+                cancellationToken
+            );
+        }
+
+        /// <inheritdoc />
+        public async Task<ApiResponse<AuthorizationFlow>> StartAuthorizationFlow(string mandateId, AuthorizationFlow request, string idempotencyKey, CancellationToken cancellationToken = default)
+        {
+            mandateId.NotNull(nameof(mandateId));
+            request.NotNull(nameof(request));
+            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:sweeping"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync<AuthorizationFlow>(
+                new Uri(_baseUri, $"/v3/mandates/{mandateId}/authorization-flow"),
+                request,
+                idempotencyKey,
+                authResponse.Data!.AccessToken,
+                _options.Payments!.SigningKey,
                 cancellationToken
             );
         }

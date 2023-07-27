@@ -10,6 +10,7 @@ using Xunit;
 
 namespace TrueLayer.AcceptanceTests
 {
+    using TrueLayer.Models;
     using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
     using AccountIdentifierUnion = OneOf<
         AccountIdentifier.SortCodeAccountNumber,
@@ -105,6 +106,28 @@ namespace TrueLayer.AcceptanceTests
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
             createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        }
+
+        [Theory]
+        [MemberData(nameof(CreateTestMandateRequests),nameof(CreateTestAuthorizationRequests))]
+        public async Task Can_start_authorization(CreateMandateRequest mandateRequest, CreateAuthorizationRequest authorizationRequest)
+        {
+            // Arrange
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var mandateId = createResponse.Data!.Id;
+            // Act
+            var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
+                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        }
+
+        private static AuthorizationFlow CreateTestAuthorizationRequests()
+        {
+            return new AuthorizationFlow(new Actions())
         }
     }
 }
