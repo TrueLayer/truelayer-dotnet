@@ -8,8 +8,6 @@ using OneOf;
 
 namespace TrueLayer.Models
 {
-    using InputUnion = OneOf<Input.Text, Input.TextWithImage, Input.Select>;
-
     /// <summary>
     /// Can the UI redirect the end user to a third-party page? Configuration options are available to constrain if TrueLayer's Hosted Payment Page should be leveraged.
     /// </summary>
