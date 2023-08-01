@@ -109,13 +109,16 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestMandateRequests),nameof(CreateTestAuthorizationRequests))]
-        public async Task Can_start_authorization(CreateMandateRequest mandateRequest, CreateAuthorizationRequest authorizationRequest)
+        [MemberData(nameof(CreateTestMandateRequests))]
+        public async Task Can_start_authorization(CreateMandateRequest mandateRequest)
         {
             // Arrange
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
+            StartAuthorizationFlowRequest authorizationRequest = new(
+                new ProviderSelection(ConfigurationStatus.Supported),
+                new Redirect(new Uri("https://my-site.com/mandate-return")));
             // Act
             var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
                 mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString());
@@ -125,9 +128,22 @@ namespace TrueLayer.AcceptanceTests
             createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
 
-        private static AuthorizationFlow CreateTestAuthorizationRequests()
+        [Theory]
+        [MemberData(nameof(CreateTestMandateRequests))]
+        public async Task Can_submit_provider_selection(CreateMandateRequest mandateRequest)
         {
-            return new AuthorizationFlow(new Actions())
+            // Arrange
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var mandateId = createResponse.Data!.Id;
+            SubmitProviderSelectionRequest request = new("mock-payments-gb-redirect");
+            // Act
+            var response = await _fixture.Client.Mandates.SubmitProviderSelection(
+                mandateId, request, idempotencyKey: Guid.NewGuid().ToString());
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
     }
 }

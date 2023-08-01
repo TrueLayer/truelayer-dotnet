@@ -13,5 +13,5 @@ namespace TrueLayer.Models
     /// Can the UI render a provider selection screen?
     /// </summary>
     /// <param name="Status"></param>
-    public record ProviderSelection(ConfigurationStatus Status);
+    public record ProviderSelection(ConfigurationStatus? Status);
 }

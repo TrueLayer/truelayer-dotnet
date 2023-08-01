@@ -6,6 +6,7 @@ namespace TrueLayer.Mandates
 {
     using TrueLayer.Mandates.Model;
     using TrueLayer.Models;
+    using AuthorizationResponseUnion = OneOf<Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing, Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
     using MandateDetailUnion = OneOf<Model.MandateDetail.AuthorizationRequiredMandateDetail, Model.MandateDetail.AuthorizingMandateDetail, Model.MandateDetail.AuthorizedMandateDetail, Model.MandateDetail.FailedMandateDetail, Model.MandateDetail.RevokedMandateDetail>;
 
     /// <summary>
@@ -57,7 +58,7 @@ namespace TrueLayer.Mandates
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
-        Task<ApiResponse<AuthorizationFlowResponse>> StartAuthorizationFlow(
+        Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
             string mandateId, StartAuthorizationFlowRequest request, string idempotencyKey, CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -71,17 +72,18 @@ namespace TrueLayer.Mandates
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
-        Task<ApiResponse<AuthorizationFlowResponse>> SubmitProviderSelection(
+        Task<ApiResponse<AuthorizationResponseUnion>> SubmitProviderSelection(
             string mandateId, SubmitProviderSelectionRequest request, string idempotencyKey, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets a mandate
+        /// Get Confirmation Of Funds
         /// </summary>
         /// <param name="mandateId">The id of the mandate to retrieve</param>
-        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
+        /// <param name="amountInMinor">The amount to be confirmed present in the bank account</param>
+        /// <param name="currency">The currency of the mandate</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(
-            string mandateId, MandateType mandateType , CancellationToken cancellationToken = default);
+            string mandateId, int amountInMinor, string currency, CancellationToken cancellationToken = default);
     }
 }
