@@ -10,6 +10,7 @@ using Xunit;
 
 namespace TrueLayer.AcceptanceTests
 {
+    using System.Linq;
     using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
     using MandateUnion = OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>;
     using AccountIdentifierUnion = OneOf<
@@ -122,6 +123,7 @@ namespace TrueLayer.AcceptanceTests
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.Data.AsT0.User!.Id.ShouldBe(createResponse.Data.User!.Id);
             createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
 
@@ -137,6 +139,7 @@ namespace TrueLayer.AcceptanceTests
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.Data!.Items.Count().ShouldBe(10);
             createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
     }

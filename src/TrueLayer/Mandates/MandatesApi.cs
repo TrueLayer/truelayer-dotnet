@@ -84,10 +84,15 @@ namespace TrueLayer.Mandates
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            UriBuilder baseUri = new(new Uri(_baseUri, $"/v3/mandates")) { Query = $"client_id={_options.ClientId}/user_id={query.UserId}/cursor={query.Cursor}/limit={query.Limit}" };
+            var queryParameters = System.Web.HttpUtility.ParseQueryString(string.Empty);
+            queryParameters["client_id"] = _options.ClientId;
+            queryParameters["user_id"] = query.UserId;
+            queryParameters["cursor"] = query.Cursor;
+            queryParameters["limit"] = query.Limit.ToString();
+            var baseUri = new Uri(_baseUri, "/v3/mandates?" + queryParameters);
 
             return await _apiClient.GetAsync<ResourceCollection<MandateDetailUnion>>(
-                baseUri.Uri,
+                baseUri,
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
