@@ -8,8 +8,8 @@ namespace TrueLayer.MerchantAccounts
 {
     internal class MerchantAccountsApi : IMerchantAccountsApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/merchant-accounts";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/merchant-accounts";
+        private const string ProdUrl = "https://api.truelayer.com/v3/merchant-accounts/";
+        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/merchant-accounts/";
         private readonly IApiClient _apiClient;
         private readonly Uri _baseUri;
         private readonly IAuthApi _auth;
@@ -22,7 +22,7 @@ namespace TrueLayer.MerchantAccounts
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
             _baseUri = options.Payments.Uri is not null
-                ? new Uri(options.Payments.Uri, "merchant-accounts")
+                ? new Uri(options.Payments.Uri, "/v3/merchant-accounts/")
                 : new Uri(options.UseSandbox ?? true ? SandboxUrl : ProdUrl);
         }
 
