@@ -8,7 +8,7 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Mandates.Model
 {
-    internal static class Provider
+    public static class Provider
     {
         /// <summary>
         /// Provider Selection
@@ -16,7 +16,7 @@ namespace TrueLayer.Mandates.Model
         /// <param name="Type">The type of provider.</param>
         /// <param name="ProviderId">The provider Id the PSU will use for this payment.</param>
         /// <param name="Remitter">Remitter</param>
-        [JsonDiscriminator("commercial")]
+        [JsonDiscriminator("preselected")]
         public record Preselected(string Type, string ProviderId, RemitterAccount? Remitter = null) : IDiscriminated;
     }
 }

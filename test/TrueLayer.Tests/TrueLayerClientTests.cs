@@ -37,6 +37,7 @@ namespace TrueLayer.Tests
             client.Auth.ShouldNotBeNull();
             client.Payments.ShouldNotBeNull();
             client.MerchantAccounts.ShouldNotBeNull();
+            client.Mandates.ShouldNotBeNull();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace TrueLayer.Mandates.Model
     /// <summary>
     /// Represents a TrueLayer beneficiary account
     /// </summary>
-    internal static class Beneficiary
+    public static class Beneficiary
     {
         /// <summary>
         /// Creates a new <see cref="MerchantAccount"/>

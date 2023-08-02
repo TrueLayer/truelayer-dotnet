@@ -1,22 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Mandates.Model.Beneficiary;
-using static TrueLayer.Mandates.Model.Provider;
 
 namespace TrueLayer.Mandates.Model
 {
-    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Preselected>;
+    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Provider.Preselected>;
     using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
 
-    internal static class Mandate
+    public static class Mandate
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Type">The type of VRP mandate that will be created.</param>
         /// <param name="Provider">Provider selection.</param>
@@ -30,7 +24,7 @@ namespace TrueLayer.Mandates.Model
             string? Reference = null) : IDiscriminated;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Type">The type of VRP mandate that will be created.</param>
         /// <param name="Provider">Provider selection.</param>
