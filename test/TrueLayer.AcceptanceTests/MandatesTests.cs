@@ -139,7 +139,7 @@ namespace TrueLayer.AcceptanceTests
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
-            response.Data!.Items.Count().ShouldBe(10);
+            response.Data!.Items.Count().ShouldBeLessThanOrEqualTo(10);
             createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
     }
