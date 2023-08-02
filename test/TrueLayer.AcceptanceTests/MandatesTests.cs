@@ -172,7 +172,7 @@ namespace TrueLayer.AcceptanceTests
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
-            SubmitProviderSelectionRequest request = new("mock-payments-gb-redirect");
+            SubmitProviderSelectionRequest request = new("ob-natwest-vrp-sandbox");
             // Act
             var response = await _fixture.Client.Mandates.SubmitProviderSelection(
                 mandateId, request, idempotencyKey: Guid.NewGuid().ToString());
