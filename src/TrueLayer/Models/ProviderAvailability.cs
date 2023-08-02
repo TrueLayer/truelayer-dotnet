@@ -15,7 +15,7 @@ namespace TrueLayer.Models
     /// <param name="RecommendedStatus"></param>
     /// <param name="ErrorRate">A ratio between the number of provider errors and all requests for the provider.</param>
     /// <param name="UpdatedAt">The point in time when this data was collected. Value is in UTC.</param>
-    internal record ProviderAvailability(
+    public record ProviderAvailability(
         string RecommendedStatus,
         float ErrorRate,
         DateTime UpdatedAt
