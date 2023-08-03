@@ -19,6 +19,8 @@ namespace TrueLayer.Models
     /// </summary>
     public record Consent();
 
+    public record ProviderSelectionRequest();
+
     /// <summary>
     /// Start the authorization flow for a mandate.
     /// </summary>
@@ -26,7 +28,7 @@ namespace TrueLayer.Models
     /// <param name="Redirect">Can the UI redirect the end user to a third-party page? Configuration options are available to constrain if TrueLayer's Hosted Payment Page should be leveraged.</param>
     /// <param name="Consent">Can the UI capture the user's consent? This field declares whether the UI supports the consent action, which is used to explicitly capture the end user's consent for initiating the payment. If it is omitted, the flow will continue without a consent action.</param>
     public record StartAuthorizationFlowRequest(
-        ProviderSelection ProviderSelection,
+        ProviderSelectionRequest ProviderSelection,
         Redirect Redirect,
         Consent? Consent = null);
 }
