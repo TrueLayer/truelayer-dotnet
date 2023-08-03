@@ -210,6 +210,7 @@ namespace TrueLayer.AcceptanceTests
 
             var authUri = new Uri($"{configuration.Payments?.Uri}spa/payments-provider-return");
 
+            client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var submitProviderParamsResponse =
