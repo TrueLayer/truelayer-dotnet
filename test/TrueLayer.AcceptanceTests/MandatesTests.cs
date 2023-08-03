@@ -180,18 +180,24 @@ namespace TrueLayer.AcceptanceTests
         private async Task AuthorizeMandate(AuthorizationResponseUnion authorizationFlowResponse)
         {
             var uri = authorizationFlowResponse.AsT0.AuthorizationFlow.Actions.Next.AsT4.Uri;
-            var client = new HttpClient();
+            var handler = new HttpClientHandler
+            {
+                AllowAutoRedirect = false
+            };
+            var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.Referrer = uri;
             var response = await client.GetAsync(uri);
             var paymentsSpaRedirectUrl = response.Headers.Location;
             bool isQuery = paymentsSpaRedirectUrl?.Query is not null;
             var rawParameters = isQuery ? paymentsSpaRedirectUrl?.Query : paymentsSpaRedirectUrl?.Fragment;
             var sanitizedParameters = rawParameters?.Replace("state=mandate-", "state=");
             string jsonPayload = isQuery
-                ? "{\"query\": \"?" + sanitizedParameters + "\"}"
+                ? "{\"query\": \"" + sanitizedParameters + "\"}"
                 : "{\"fragment\": \"#" + sanitizedParameters + "\"}";
             var baseUri = configuration.Payments?.Uri;
+            client.DefaultRequestHeaders.Clear();
             var submitProviderParamsResponse = await client.PostAsync(
-                $"{baseUri}/spa/payments-provider-return",
+                $"{baseUri}spa/payments-provider-return",
                 new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
             submitProviderParamsResponse.IsSuccessStatusCode.ShouldBeTrue();
         }
