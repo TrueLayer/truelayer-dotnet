@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace TrueLayer.Models
 {
-    internal enum ConfigurationStatus { Supported = 0, NotSupported = 1 };
+    public enum ConfigurationStatus { Supported = 0, NotSupported = 1 };
 
     /// <summary>
     /// Can the UI render a provider selection screen?
     /// </summary>
     /// <param name="Status"></param>
-    internal record ProviderSelection(ConfigurationStatus Status);
+    public record ProviderSelection(ConfigurationStatus Status);
 }

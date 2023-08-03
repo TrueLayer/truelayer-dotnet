@@ -14,7 +14,7 @@ namespace TrueLayer.Mandates.Model
     /// <param name="PeriodicLimits">The state of the constraints utilisation within each periodic limit defined in the mandate creation. There will always be at least 1 period state defined.</param>
     /// <param name="ValidFrom">Start date time for which the consent remains valid.</param>
     /// <param name="ValidTo">End date time for which the consent remains valid.</param>
-    internal record GetConstraintsResponse(
+    public record GetConstraintsResponse(
         int MaximumIndividualAmount,
         PeriodicLimit PeriodicLimits,
         DateTime? ValidFrom = null,
