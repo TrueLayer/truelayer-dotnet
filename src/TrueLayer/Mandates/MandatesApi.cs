@@ -11,8 +11,8 @@ namespace TrueLayer.Mandates
 
     internal class MandatesApi : IMandatesApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/v3/mandates";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/mandates";
+        private const string ProdUrl = "https://api.truelayer.com/v3/mandates/";
+        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/mandates/";
 
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
@@ -28,7 +28,7 @@ namespace TrueLayer.Mandates
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
             _baseUri = options.Payments.Uri is not null
-                ? new Uri(options.Payments.Uri, "/v3/mandates")
+                ? new Uri(options.Payments.Uri, "/v3/mandates/")
                 : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 
