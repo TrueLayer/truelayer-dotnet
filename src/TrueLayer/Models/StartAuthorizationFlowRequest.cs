@@ -19,6 +19,9 @@ namespace TrueLayer.Models
     /// </summary>
     public record Consent();
 
+    /// <summary>
+    /// Can the UI render a provider selection screen?
+    /// </summary>
     public record ProviderSelectionRequest();
 
     /// <summary>
