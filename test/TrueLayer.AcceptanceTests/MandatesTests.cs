@@ -119,7 +119,7 @@ namespace TrueLayer.AcceptanceTests
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
             // Act
-            var response = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.sweeping);
+            var response = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -135,7 +135,7 @@ namespace TrueLayer.AcceptanceTests
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             // Act
-            var response = await _fixture.Client.Mandates.ListMandates(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.sweeping);
+            var response = await _fixture.Client.Mandates.ListMandates(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.Sweeping);
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
