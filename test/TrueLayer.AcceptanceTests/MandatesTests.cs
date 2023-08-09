@@ -117,14 +117,15 @@ namespace TrueLayer.AcceptanceTests
             // Arrange
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
             var mandateId = createResponse.Data!.Id;
+
             // Act
             var response = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
             response.Data.AsT0.User!.Id.ShouldBe(createResponse.Data.User!.Id);
-            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
 
         [Theory]
@@ -134,13 +135,14 @@ namespace TrueLayer.AcceptanceTests
             // Arrange
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+
             // Act
             var response = await _fixture.Client.Mandates.ListMandates(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.Sweeping);
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
             response.Data!.Items.Count().ShouldBeLessThanOrEqualTo(10);
-            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
     }
 }
