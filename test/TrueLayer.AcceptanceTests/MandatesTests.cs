@@ -10,6 +10,7 @@ using Xunit;
 
 namespace TrueLayer.AcceptanceTests
 {
+    using System.Linq;
     using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
     using MandateUnion = OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>;
     using AccountIdentifierUnion = OneOf<
@@ -106,6 +107,42 @@ namespace TrueLayer.AcceptanceTests
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
             response.Data!.User.Id.ShouldBe(mandateRequest.User!.Id);
+        }
+
+
+        [Theory]
+        [MemberData(nameof(CreateTestMandateRequests))]
+        public async Task Can_get_mandate(CreateMandateRequest mandateRequest)
+        {
+            // Arrange
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+            var mandateId = createResponse.Data!.Id;
+
+            // Act
+            var response = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.Data.AsT0.User!.Id.ShouldBe(createResponse.Data.User!.Id);
+        }
+
+        [Theory]
+        [MemberData(nameof(CreateTestMandateRequests))]
+        public async Task Can_list_mandate(CreateMandateRequest mandateRequest)
+        {
+            // Arrange
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+
+            // Act
+            var response = await _fixture.Client.Mandates.ListMandates(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.Sweeping);
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.Data!.Items.Count().ShouldBeLessThanOrEqualTo(10);
         }
     }
 }
