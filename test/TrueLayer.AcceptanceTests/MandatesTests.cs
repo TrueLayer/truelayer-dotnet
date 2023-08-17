@@ -50,7 +50,7 @@ namespace TrueLayer.AcceptanceTests
                     ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", PROVIDER_ID)),
                     new Mandates.Model.Beneficiary.ExternalAccount(
                         "external_account",
-                        "Andrea Java SDK",
+                        "Bob NET SDK",
                         AccountIdentifierUnion.FromT0(accountIdentifier))))),
             };
             //yield return new CreateMandateRequest[]
