@@ -32,7 +32,7 @@ namespace TrueLayer.AcceptanceTests
         private readonly ApiTestFixture _fixture;
         private TrueLayerOptions configuration;
         public string RETURN_URI = "http://localhost:3000/callback";
-        public static string PROVIDER_ID = "ob-natwest-vrp-sandbox";
+        public static string PROVIDER_ID = "ob-uki-mock-bank-sbox"; // Beta provider in closed access, requires a whitelisted ClientId.
 
         public MandatesTests(ApiTestFixture fixture)
         {
