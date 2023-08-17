@@ -214,13 +214,13 @@ namespace TrueLayer.AcceptanceTests
             var redirectResponse = await client.GetAsync(redirectUri);
             var paymentsSpaRedirectUrl = redirectResponse.Headers.Location;
 
-            var isQuery = false; // paymentsSpaRedirectUrl?.Query is not null;
-            var rawParameters = isQuery ? paymentsSpaRedirectUrl?.Query : paymentsSpaRedirectUrl?.Fragment;
+            var isFragment = paymentsSpaRedirectUrl?.Fragment is not null;
+            var rawParameters = isFragment ? paymentsSpaRedirectUrl?.Fragment : paymentsSpaRedirectUrl?.Query;
             var sanitizedParameters = rawParameters?.Replace("state=mandate-", "state=");
 
-            var jsonPayload = isQuery
-                ? "{\"query\":\"" + sanitizedParameters + "\"}"
-                : "{\"fragment\":\"" + sanitizedParameters + "\"}";
+            var jsonPayload = isFragment
+                ? "{\"fragment\":\"" + sanitizedParameters + "\"}"
+                : "{\"query\":\"" + sanitizedParameters + "\"}";
 
             var authUri = new Uri($"{configuration.Payments?.Uri}spa/payments-provider-return");
 
@@ -231,8 +231,6 @@ namespace TrueLayer.AcceptanceTests
                 await client.PostAsync(
                     authUri,
                     new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
-
-            var responseContent = await submitProviderParamsResponse.Content.ReadAsStringAsync();
 
             submitProviderParamsResponse.IsSuccessStatusCode.ShouldBeTrue();
         }
