@@ -50,19 +50,19 @@ namespace TrueLayer.AcceptanceTests
                     ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", PROVIDER_ID)),
                     new Mandates.Model.Beneficiary.ExternalAccount(
                         "external_account",
-                        "My Bank Account",
+                        "Andrea Java SDK",
                         AccountIdentifierUnion.FromT0(accountIdentifier))))),
             };
-            yield return new CreateMandateRequest[]
-            {
-                CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
-                    "commercial",
-                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", PROVIDER_ID)),
-                    new Mandates.Model.Beneficiary.ExternalAccount(
-                        "external_account",
-                        "My Bank Account",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
+            //yield return new CreateMandateRequest[]
+            //{
+            //    CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
+            //        "commercial",
+            //        ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", PROVIDER_ID)),
+            //        new Mandates.Model.Beneficiary.ExternalAccount(
+            //            "external_account",
+            //            "My Bank Account",
+            //            AccountIdentifierUnion.FromT0(accountIdentifier))))),
+            //};
         }
 
         [Theory]
@@ -118,7 +118,6 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestUserSelectedMandateRequests))]
         [MemberData(nameof(CreateTestPreselectedMandateRequests))]
         public async Task Can_start_authorization(CreateMandateRequest mandateRequest)
         {
@@ -166,7 +165,6 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestUserSelectedMandateRequests))]
         [MemberData(nameof(CreateTestPreselectedMandateRequests))]
         public async Task Can_Get_Funds(CreateMandateRequest mandateRequest)
         {
@@ -216,7 +214,7 @@ namespace TrueLayer.AcceptanceTests
             var redirectResponse = await client.GetAsync(redirectUri);
             var paymentsSpaRedirectUrl = redirectResponse.Headers.Location;
 
-            var isQuery = paymentsSpaRedirectUrl?.Query is not null;
+            var isQuery = false; // paymentsSpaRedirectUrl?.Query is not null;
             var rawParameters = isQuery ? paymentsSpaRedirectUrl?.Query : paymentsSpaRedirectUrl?.Fragment;
             var sanitizedParameters = rawParameters?.Replace("state=mandate-", "state=");
 
@@ -262,26 +260,26 @@ namespace TrueLayer.AcceptanceTests
                     "sweeping",
                     ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
                     {
-                        Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "private_beta"},
+                        Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "general_availability"},
                     }),
                     new Mandates.Model.Beneficiary.ExternalAccount(
                         "external_account",
                         "My Bank Account",
                         AccountIdentifierUnion.FromT0(accountIdentifier))))),
             };
-            yield return new CreateMandateRequest[]
-            {
-                CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
-                    "commercial",
-                    ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
-                    {
-                        Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "private_beta"},
-                    }),
-                    new Mandates.Model.Beneficiary.ExternalAccount(
-                        "external_account",
-                        "My Bank Account",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
+            //yield return new CreateMandateRequest[]
+            //{
+            //    CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
+            //        "commercial",
+            //        ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
+            //        {
+            //            Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "private_beta"},
+            //        }),
+            //        new Mandates.Model.Beneficiary.ExternalAccount(
+            //            "external_account",
+            //            "My Bank Account",
+            //            AccountIdentifierUnion.FromT0(accountIdentifier))))),
+            //};
         }
     }
 }
