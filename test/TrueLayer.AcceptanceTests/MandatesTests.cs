@@ -33,6 +33,8 @@ namespace TrueLayer.AcceptanceTests
         private TrueLayerOptions configuration;
         public string RETURN_URI = "http://localhost:3000/callback";
         public static string PROVIDER_ID = "ob-uki-mock-bank-sbox"; // Beta provider in closed access, requires a whitelisted ClientId.
+        public static string COMMERCIAL_PROVIDER_ID = "ob-natwest-vrp-sandbox"; // Provider to satisfy commercial mandates creation.
+        public static AccountIdentifier.SortCodeAccountNumber accountIdentifier = new("140662", "10003957");
 
         public MandatesTests(ApiTestFixture fixture)
         {
@@ -40,34 +42,11 @@ namespace TrueLayer.AcceptanceTests
             configuration = fixture.ServiceProvider.GetRequiredService<IOptions<TrueLayerOptions>>().Value;
         }
 
-        private static IEnumerable<CreateMandateRequest[]> CreateTestPreselectedMandateRequests()
-        {
-            var accountIdentifier = new AccountIdentifier.SortCodeAccountNumber("140662", "10003957");
-            yield return new CreateMandateRequest[]
-            {
-                CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
-                    "sweeping",
-                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", PROVIDER_ID)),
-                    new Mandates.Model.Beneficiary.ExternalAccount(
-                        "external_account",
-                        "Bob NET SDK",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
-            //yield return new CreateMandateRequest[]
-            //{
-            //    CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
-            //        "commercial",
-            //        ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", PROVIDER_ID)),
-            //        new Mandates.Model.Beneficiary.ExternalAccount(
-            //            "external_account",
-            //            "My Bank Account",
-            //            AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            //};
-        }
-
         [Theory]
-        [MemberData(nameof(CreateTestUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestPreselectedMandateRequests))]
+        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialPreselectedMandateRequests))]
         public async Task Can_create_mandate(CreateMandateRequest mandateRequest)
         {
             // Act
@@ -81,8 +60,10 @@ namespace TrueLayer.AcceptanceTests
 
 
         [Theory]
-        [MemberData(nameof(CreateTestUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestPreselectedMandateRequests))]
+        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialPreselectedMandateRequests))]
         public async Task Can_get_mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange
@@ -100,8 +81,10 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestPreselectedMandateRequests))]
+        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialPreselectedMandateRequests))]
         public async Task Can_list_mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange
@@ -118,7 +101,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestPreselectedMandateRequests))]
+        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
         public async Task Can_start_authorization(CreateMandateRequest mandateRequest)
         {
             // Arrange
@@ -142,14 +125,15 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
         public async Task Can_submit_provider_selection(CreateMandateRequest mandateRequest)
         {
             // Arrange
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
-            SubmitProviderSelectionRequest request = new(PROVIDER_ID);
+            SubmitProviderSelectionRequest request = new(COMMERCIAL_PROVIDER_ID);
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
                 new Redirect(new Uri(RETURN_URI)));
@@ -165,7 +149,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestPreselectedMandateRequests))]
+        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
         public async Task Can_Get_Funds(CreateMandateRequest mandateRequest)
         {
             // Arrange
@@ -249,10 +233,37 @@ namespace TrueLayer.AcceptanceTests
             return await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
         }
 
-        private static IEnumerable<CreateMandateRequest[]> CreateTestUserSelectedMandateRequests()
+        private static IEnumerable<CreateMandateRequest[]> CreateTestSweepingPreselectedMandateRequests()
         {
-            var accountIdentifier = new AccountIdentifier.SortCodeAccountNumber("140662", "10003957");
-            yield return new CreateMandateRequest[]
+            yield return new[]
+            {
+                CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
+                    "sweeping",
+                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", PROVIDER_ID)),
+                    new Mandates.Model.Beneficiary.ExternalAccount(
+                        "external_account",
+                        "Bob NET SDK",
+                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
+            };
+        }
+
+        private static IEnumerable<CreateMandateRequest[]> CreateTestCommercialPreselectedMandateRequests()
+        {
+            yield return new[]
+            {
+                CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
+                    "commercial",
+                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", COMMERCIAL_PROVIDER_ID)),
+                    new Mandates.Model.Beneficiary.ExternalAccount(
+                        "external_account",
+                        "My Bank Account",
+                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
+            };
+        }
+
+        private static IEnumerable<CreateMandateRequest[]> CreateTestSweepingUserSelectedMandateRequests()
+        {
+            yield return new[]
             {
                 CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
                     "sweeping",
@@ -265,19 +276,23 @@ namespace TrueLayer.AcceptanceTests
                         "My Bank Account",
                         AccountIdentifierUnion.FromT0(accountIdentifier))))),
             };
-            //yield return new CreateMandateRequest[]
-            //{
-            //    CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
-            //        "commercial",
-            //        ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
-            //        {
-            //            Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "private_beta"},
-            //        }),
-            //        new Mandates.Model.Beneficiary.ExternalAccount(
-            //            "external_account",
-            //            "My Bank Account",
-            //            AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            //};
+        }
+
+        private static IEnumerable<CreateMandateRequest[]> CreateTestCommercialUserSelectedMandateRequests()
+        {
+            yield return new[]
+            {
+                CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
+                    "commercial",
+                    ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
+                    {
+                        Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "general_availability"},
+                    }),
+                    new Mandates.Model.Beneficiary.ExternalAccount(
+                        "external_account",
+                        "My Bank Account",
+                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
+            };
         }
     }
 }
