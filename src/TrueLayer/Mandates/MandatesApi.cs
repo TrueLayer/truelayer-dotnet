@@ -105,12 +105,12 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(string mandateId, StartAuthorizationFlowRequest request, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(string mandateId, StartAuthorizationFlowRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
         {
             mandateId.NotNull(nameof(mandateId));
             request.NotNull(nameof(request));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:sweeping"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -128,12 +128,12 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitProviderSelection(string mandateId, SubmitProviderSelectionRequest request, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitProviderSelection(string mandateId, SubmitProviderSelectionRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
         {
             mandateId.NotNull(nameof(mandateId));
             request.NotNull(nameof(request));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:sweeping"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -151,11 +151,11 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(string mandateId, int amountInMinor, string currency, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(string mandateId, int amountInMinor, string currency, MandateType mandateType, CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:sweeping"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {

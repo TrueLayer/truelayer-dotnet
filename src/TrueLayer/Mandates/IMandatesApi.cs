@@ -56,6 +56,7 @@ namespace TrueLayer.Mandates
         /// Start the authorization flow for a mandate.
         /// </summary>
         /// <param name="mandateId">The id of the mandate to retrieve</param>
+        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
         /// <param name="request">The start authorization flow request</param>
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
@@ -64,12 +65,13 @@ namespace TrueLayer.Mandates
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
-            string mandateId, StartAuthorizationFlowRequest request, string idempotencyKey, CancellationToken cancellationToken = default);
+            string mandateId, StartAuthorizationFlowRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Submit the provider details selected by the PSU.
         /// </summary>
         /// <param name="mandateId">The id of the mandate to retrieve</param>
+        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
         /// <param name="request">The provider selection request</param>
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
@@ -78,17 +80,18 @@ namespace TrueLayer.Mandates
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<AuthorizationResponseUnion>> SubmitProviderSelection(
-            string mandateId, SubmitProviderSelectionRequest request, string idempotencyKey, CancellationToken cancellationToken = default);
+            string mandateId, SubmitProviderSelectionRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get Confirmation Of Funds
         /// </summary>
         /// <param name="mandateId">The id of the mandate to retrieve</param>
+        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
         /// <param name="amountInMinor">The amount to be confirmed present in the bank account</param>
         /// <param name="currency">The currency of the mandate</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(
-            string mandateId, int amountInMinor, string currency, CancellationToken cancellationToken = default);
+            string mandateId, int amountInMinor, string currency, MandateType mandateType, CancellationToken cancellationToken = default);
     }
 }

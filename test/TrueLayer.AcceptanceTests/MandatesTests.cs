@@ -114,7 +114,7 @@ namespace TrueLayer.AcceptanceTests
 
             // Act
             var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
-                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString());
+                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
             await AuthorizeMandate(response);
             var mandate = await WaitForMandateToBeAuthorized(mandateId);
 
@@ -138,10 +138,10 @@ namespace TrueLayer.AcceptanceTests
                 new ProviderSelectionRequest(),
                 new Redirect(new Uri(RETURN_URI)));
             await _fixture.Client.Mandates.StartAuthorizationFlow(
-                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString());
+                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
             // Act
             var response = await _fixture.Client.Mandates.SubmitProviderSelection(
-                mandateId, request, idempotencyKey: Guid.NewGuid().ToString());
+                mandateId, request, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -162,10 +162,10 @@ namespace TrueLayer.AcceptanceTests
 
             // Act
             var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
-                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString());
+                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
             await AuthorizeMandate(response);
             await WaitForMandateToBeAuthorized(mandateId);
-            var fundsResponse = await _fixture.Client.Mandates.GetConfirmationOfFunds(mandateId, 1, "GBP");
+            var fundsResponse = await _fixture.Client.Mandates.GetConfirmationOfFunds(mandateId, 1, "GBP", MandateType.Sweeping);
 
             // Assert
             fundsResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
