@@ -10,5 +10,5 @@ namespace TrueLayer.Models
     /// Submit the provider details selected by the PSU
     /// </summary>
     /// <param name="ProviderId"></param>
-    internal record SubmitProviderSelectionRequest(string ProviderId);
+    public record SubmitProviderSelectionRequest(string ProviderId);
 }
