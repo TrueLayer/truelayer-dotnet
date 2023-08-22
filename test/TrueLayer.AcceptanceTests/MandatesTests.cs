@@ -12,6 +12,7 @@ namespace TrueLayer.AcceptanceTests
 {
     using System.Linq;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Text;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
@@ -23,9 +24,15 @@ namespace TrueLayer.AcceptanceTests
         AccountIdentifier.Iban,
         AccountIdentifier.Bban,
         AccountIdentifier.Nrb>;
-    using MandateDetailUnion = OneOf<MandateDetail.AuthorizationRequiredMandateDetail, MandateDetail.AuthorizingMandateDetail, MandateDetail.AuthorizedMandateDetail, MandateDetail.FailedMandateDetail, MandateDetail.RevokedMandateDetail>;
-    using AuthorizationResponseUnion = OneOf<Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing, Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
-    using System.Net.Http.Headers;
+    using MandateDetailUnion = OneOf<
+        MandateDetail.AuthorizationRequiredMandateDetail,
+        MandateDetail.AuthorizingMandateDetail,
+        MandateDetail.AuthorizedMandateDetail,
+        MandateDetail.FailedMandateDetail,
+        MandateDetail.RevokedMandateDetail>;
+    using AuthorizationResponseUnion = OneOf<
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
 
     public class MandatesTests : IClassFixture<ApiTestFixture>
     {

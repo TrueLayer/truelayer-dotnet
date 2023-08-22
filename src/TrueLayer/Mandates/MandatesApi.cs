@@ -8,7 +8,9 @@ namespace TrueLayer.Mandates
 {
     using TrueLayer.Mandates.Model;
     using TrueLayer.Models;
-    using AuthorizationResponseUnion = OneOf<Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing, Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
+    using AuthorizationResponseUnion = OneOf<
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
     using MandateDetailUnion = OneOf<
         Model.MandateDetail.AuthorizationRequiredMandateDetail,
         Model.MandateDetail.AuthorizingMandateDetail,
