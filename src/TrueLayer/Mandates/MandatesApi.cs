@@ -7,6 +7,10 @@ using OneOf;
 namespace TrueLayer.Mandates
 {
     using TrueLayer.Mandates.Model;
+    using TrueLayer.Models;
+    using AuthorizationResponseUnion = OneOf<
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
     using MandateDetailUnion = OneOf<
         Model.MandateDetail.AuthorizationRequiredMandateDetail,
         Model.MandateDetail.AuthorizingMandateDetail,
@@ -16,8 +20,8 @@ namespace TrueLayer.Mandates
 
     internal class MandatesApi : IMandatesApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/v3/mandates";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/mandates";
+        private const string ProdUrl = "https://api.truelayer.com/v3/mandates/";
+        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/mandates/";
 
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
@@ -97,6 +101,71 @@ namespace TrueLayer.Mandates
 
             return await _apiClient.GetAsync<ResourceCollection<MandateDetailUnion>>(
                 baseUriBuilder.Uri,
+                authResponse.Data!.AccessToken,
+                cancellationToken
+            );
+        }
+
+        /// <inheritdoc />
+        public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(string mandateId, StartAuthorizationFlowRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
+        {
+            mandateId.NotNullOrWhiteSpace(nameof(mandateId));
+            request.NotNull(nameof(request));
+            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync<AuthorizationResponseUnion>(
+                new Uri(_baseUri, $"/v3/mandates/{mandateId}/authorization-flow"),
+                request,
+                idempotencyKey,
+                authResponse.Data!.AccessToken,
+                _options.Payments!.SigningKey,
+                cancellationToken
+            );
+        }
+
+        /// <inheritdoc />
+        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitProviderSelection(string mandateId, SubmitProviderSelectionRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
+        {
+            mandateId.NotNullOrWhiteSpace(nameof(mandateId));
+            request.NotNull(nameof(request));
+            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync<AuthorizationResponseUnion>(
+                new Uri(_baseUri, $"/v3/mandates/{mandateId}/authorization-flow/actions/provider-selection"),
+                request,
+                idempotencyKey,
+                authResponse.Data!.AccessToken,
+                _options.Payments!.SigningKey,
+                cancellationToken
+            );
+        }
+
+        /// <inheritdoc />
+        public async Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(string mandateId, int amountInMinor, string currency, MandateType mandateType, CancellationToken cancellationToken = default)
+        {
+            mandateId.NotNullOrWhiteSpace(nameof(mandateId));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.GetAsync<GetConfirmationOfFundsResponse>(
+                new Uri(_baseUri, $"/v3/mandates/{mandateId}/funds?amount_in_minor={amountInMinor}&currency={currency}"),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
