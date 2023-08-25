@@ -18,6 +18,13 @@ namespace TrueLayer.Sdk.Tests
         private readonly MockHttpMessageHandler _httpMessageHandler;
         private readonly ApiClient _apiClient;
         private readonly TestResponse _stub;
+        private readonly string _privateKey = @"-----BEGIN EC PRIVATE KEY-----
+MIHcAgEBBEIALJ2sKM+8mVDfTIlk50rqB5lkxaLBt+OECvhXq3nEaB+V0nqljZ9c
+5aHRN3qqxMzNLvxFQ+4twifa4ezkMK2/j5WgBwYFK4EEACOhgYkDgYYABADmhZbj
+i8bgJRfMTdtzy+5VbS5ScMaKC1LQfhII+PTzGzOr+Ts7Qv8My5cmYU5qarGK3tWF
+c3VMlcFZw7Y0iLjxAQFPvHqJ9vn3xWp+d3JREU1vQJ9daXswwbcoer88o1oVFmFf
+WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
+-----END EC PRIVATE KEY-----";
 
         public ApiClientTests()
         {
@@ -75,6 +82,31 @@ namespace TrueLayer.Sdk.Tests
         }
 
         [Fact]
+        public async Task Posts_http_content_and_expects_no_response_content()
+        {
+            string requestJson = JsonSerializer.Serialize(new
+            {
+                data = "http-content"
+            }, SerializerOptions.Default);
+
+            _httpMessageHandler
+                .Expect(HttpMethod.Post, "http://localhost/post-http-content")
+                .WithHeaders("Authorization", "Bearer access-token")
+                .WithContent(requestJson)
+                .Respond(HttpStatusCode.NoContent);
+
+            ApiResponse response = await _apiClient.PostAsync(
+                new Uri("http://localhost/post-http-content"),
+                new StringContent(requestJson),
+                "access-token"
+            );
+
+            response.ShouldNotBeNull();
+            response.IsSuccessful.ShouldBeTrue();
+            response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        }
+
+        [Fact]
         public async Task Posts_serialized_object_and_returns_deserialized_json()
         {
             var obj = new
@@ -97,6 +129,33 @@ namespace TrueLayer.Sdk.Tests
             );
 
             AssertSame(response, _stub);
+        }
+
+        [Fact]
+        public async Task Posts_serialized_object_and_expects_no_response_content()
+        {
+            var obj = new
+            {
+                data = "object"
+            };
+
+            var json = JsonSerializer.Serialize(obj, SerializerOptions.Default);
+
+            _httpMessageHandler
+                .Expect(HttpMethod.Post, "http://localhost/post-object")
+                .WithHeaders("Authorization", "Bearer access-token")
+                .WithContent(json)
+                .Respond(HttpStatusCode.NoContent);
+
+            ApiResponse response = await _apiClient.PostAsync(
+                new Uri("http://localhost/post-object"),
+                obj,
+                accessToken: "access-token"
+            );
+
+            response.ShouldNotBeNull();
+            response.IsSuccessful.ShouldBeTrue();
+            response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         }
 
         [Theory]
@@ -176,22 +235,14 @@ namespace TrueLayer.Sdk.Tests
         }
 
         [Fact]
-        public async Task Generates_request_signature_when_signing_key_provided()
+        public async Task Generates_request_signature_when_signing_key_and_body_provided()
         {
             var obj = new
             {
                 key = "value"
             };
-
-            var privateKey = @"-----BEGIN EC PRIVATE KEY-----
-MIHcAgEBBEIALJ2sKM+8mVDfTIlk50rqB5lkxaLBt+OECvhXq3nEaB+V0nqljZ9c
-5aHRN3qqxMzNLvxFQ+4twifa4ezkMK2/j5WgBwYFK4EEACOhgYkDgYYABADmhZbj
-i8bgJRfMTdtzy+5VbS5ScMaKC1LQfhII+PTzGzOr+Ts7Qv8My5cmYU5qarGK3tWF
-c3VMlcFZw7Y0iLjxAQFPvHqJ9vn3xWp+d3JREU1vQJ9daXswwbcoer88o1oVFmFf
-WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
------END EC PRIVATE KEY-----";
-
-            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = privateKey };
+            
+            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = _privateKey };
 
             var requestUri = new Uri("http://localhost/signing");
             var idempotencyKey = Guid.NewGuid().ToString();
@@ -205,6 +256,32 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             var response = await _apiClient.PostAsync<TestResponse>(
                 requestUri,
                 obj,
+                idempotencyKey: idempotencyKey,
+                signingKey: signingKey);
+        }
+
+        [Fact]
+        public async Task Generates_request_signature_when_signing_key_and_no_content_provided()
+        {
+            var obj = new
+            {
+                key = "value"
+            };
+
+            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = _privateKey };
+
+            var requestUri = new Uri("http://localhost/signing");
+            var idempotencyKey = Guid.NewGuid().ToString();
+
+            _httpMessageHandler
+                .Expect(HttpMethod.Post, "http://localhost/signing")
+                .With(r => r.Headers.Contains(CustomHeaders.Signature))
+                .WithHeaders(CustomHeaders.IdempotencyKey, idempotencyKey)
+                .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, "{}");
+
+            var response = await _apiClient.PostAsync<TestResponse>(
+                requestUri,
+                null,
                 idempotencyKey: idempotencyKey,
                 signingKey: signingKey);
         }
