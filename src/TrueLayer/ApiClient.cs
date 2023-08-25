@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -9,14 +10,13 @@ using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text.Json;
 using TrueLayer.Signing;
-using System.Xml.Linq;
+
 #if NET6_0 || NET6_0_OR_GREATER
 using System.Net.Http.Json;
 #endif
 
 namespace TrueLayer
 {
-    using System.Net;
 
     /// <summary>
     /// Handles the authentication, serialization and sending of HTTP requests to TrueLayer APIs.
