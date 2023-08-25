@@ -17,7 +17,6 @@ using System.Net.Http.Json;
 
 namespace TrueLayer
 {
-
     /// <summary>
     /// Handles the authentication, serialization and sending of HTTP requests to TrueLayer APIs.
     /// </summary>
