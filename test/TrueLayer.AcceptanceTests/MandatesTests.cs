@@ -265,7 +265,7 @@ namespace TrueLayer.AcceptanceTests
             {
                 await Task.Delay(1000);
                 var mandate = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
-                if (mandate.Data.AsT2.Status == "authorized")
+                if (mandate.Data.IsT2 && mandate.Data.AsT2.Status == "authorized")
                 {
                     return mandate;
                 }
