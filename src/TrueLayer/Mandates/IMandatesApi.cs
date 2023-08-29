@@ -6,7 +6,9 @@ namespace TrueLayer.Mandates
 {
     using TrueLayer.Mandates.Model;
     using TrueLayer.Models;
-    using AuthorizationResponseUnion = OneOf<Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing, Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
+    using AuthorizationResponseUnion = OneOf<
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
     using MandateDetailUnion = OneOf<
         Model.MandateDetail.AuthorizationRequiredMandateDetail,
         Model.MandateDetail.AuthorizingMandateDetail,
@@ -93,5 +95,27 @@ namespace TrueLayer.Mandates
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(
             string mandateId, int amountInMinor, string currency, MandateType mandateType, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a mandates constraints
+        /// </summary>
+        /// <param name="mandateId">The id of the mandate constraints to retrieve</param>
+        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
+        Task<ApiResponse<GetConstraintsResponse>> GetMandateConstraints(
+            string mandateId, MandateType mandateType, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Revoke mandate
+        /// </summary>
+        /// <param name="id">The id of the mandate</param>
+        /// <param name="idempotencyKey">
+        /// An idempotency key to allow safe retrying without the operation being performed multiple times.
+        /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// </param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>An API response that includes the payment details if successful, otherwise problem details</returns>
+        Task<ApiResponse> RevokeMandate(string id, string idempotencyKey, CancellationToken cancellationToken = default);
     }
 }
