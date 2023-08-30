@@ -10,7 +10,6 @@ using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text.Json;
 using TrueLayer.Signing;
-
 #if NET6_0 || NET6_0_OR_GREATER
 using System.Net.Http.Json;
 #endif
