@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -88,12 +89,46 @@ namespace TrueLayer
             return await CreateResponseAsync<TData>(httpResponse, cancellationToken);
         }
 
+        public async Task<ApiResponse> PostAsync(Uri uri, HttpContent? httpContent = null, string? accessToken = null, CancellationToken cancellationToken = default)
+        {
+            if (uri is null) throw new ArgumentNullException(nameof(uri));
+
+            using var httpResponse = await SendRequestAsync(
+                httpMethod: HttpMethod.Post,
+                uri: uri,
+                idempotencyKey: null,
+                accessToken: accessToken,
+                httpContent: httpContent,
+                signature: null,
+                cancellationToken: cancellationToken
+            );
+
+            return await CreateResponseAsync(httpResponse, cancellationToken);
+        }
+
+        public async Task<ApiResponse> PostAsync(Uri uri, object? request = null, string? idempotencyKey = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default)
+        {
+            if (uri is null) throw new ArgumentNullException(nameof(uri));
+
+            using var httpResponse = await SendJsonRequestAsync(
+                httpMethod: HttpMethod.Post,
+                uri: uri,
+                idempotencyKey: idempotencyKey,
+                accessToken: accessToken,
+                request: request,
+                signingKey: signingKey,
+                cancellationToken: cancellationToken
+            );
+
+            return await CreateResponseAsync(httpResponse, cancellationToken);
+        }
+
         private async Task<ApiResponse<TData>> CreateResponseAsync<TData>(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
         {
             httpResponse.Headers.TryGetValues(CustomHeaders.TraceId, out var traceIdHeader);
             string? traceId = traceIdHeader?.FirstOrDefault();
 
-            if (httpResponse.IsSuccessStatusCode)
+            if (httpResponse.IsSuccessStatusCode && httpResponse.StatusCode != HttpStatusCode.NoContent)
             {
                 var data = await DeserializeJsonAsync<TData>(httpResponse, traceId, cancellationToken);
                 return new ApiResponse<TData>(data, httpResponse.StatusCode, traceId);
@@ -107,6 +142,21 @@ namespace TrueLayer
             }
 
             return new ApiResponse<TData>(httpResponse.StatusCode, traceId);
+        }
+
+        private async Task<ApiResponse> CreateResponseAsync(HttpResponseMessage httpResponse, CancellationToken cancellationToken)
+        {
+            httpResponse.Headers.TryGetValues(CustomHeaders.TraceId, out var traceIdHeader);
+            string? traceId = traceIdHeader?.FirstOrDefault();
+
+            // In .NET Standard 2.1 HttpResponse.Content can be null
+            if (httpResponse.Content?.Headers.ContentType?.MediaType == "application/problem+json")
+            {
+                var problemDetails = await DeserializeJsonAsync<ProblemDetails>(httpResponse, traceId, cancellationToken);
+                return new ApiResponse(problemDetails, httpResponse.StatusCode, traceId);
+            }
+
+            return new ApiResponse(httpResponse.StatusCode, traceId);
         }
 
         private async Task<TData> DeserializeJsonAsync<TData>(HttpResponseMessage httpResponse, string? traceId, CancellationToken cancellationToken)
@@ -145,37 +195,38 @@ namespace TrueLayer
             HttpContent? httpContent = null;
             string? signature = null;
 
-            if (request is { })
+            if (signingKey != null)
             {
-                if (signingKey != null)
+                var signer = Signer.SignWith(signingKey.KeyId, signingKey.Value)
+                    .Method(httpMethod.Method)
+                    .Path(uri.AbsolutePath.TrimEnd('/'));
+
+                if (request is { })
                 {
                     // Only serialize to string if signing is required,
                     string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
 
-                    var signer = Signer.SignWith(signingKey.KeyId, signingKey.Value)
-                        .Method(httpMethod.Method)
-                        .Path(uri.AbsolutePath.TrimEnd('/'))
-                        .Body(json);
-
-                    if (!string.IsNullOrWhiteSpace(idempotencyKey))
-                    {
-                        signer.Header(CustomHeaders.IdempotencyKey, idempotencyKey);
-                    }
-
-                    signature = signer.Sign();
+                    signer.Body(json);
 
                     httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
                 }
-                else // Otherwise we can serialize directly to stream for .NET 5.0 onwards
+
+                if (!string.IsNullOrWhiteSpace(idempotencyKey))
                 {
-#if (NET6_0 || NET6_0_OR_GREATER)
-                    httpContent = JsonContent.Create(request, request.GetType(), options: SerializerOptions.Default);
-#else
-                    // for older versions of .NET we'll have to fall back to using StringContent
-                    string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
-                    httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
-#endif
+                    signer.Header(CustomHeaders.IdempotencyKey, idempotencyKey);
                 }
+
+                signature = signer.Sign();
+            }
+            else if (request is { }) // Otherwise we can serialize directly to stream for .NET 5.0 onwards
+            {
+#if (NET6_0 || NET6_0_OR_GREATER)
+                httpContent = JsonContent.Create(request, request.GetType(), options: SerializerOptions.Default);
+#else
+                // for older versions of .NET we'll have to fall back to using StringContent
+                string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
+                httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+#endif
             }
 
             return SendRequestAsync(httpMethod, uri, idempotencyKey, accessToken, httpContent, signature, cancellationToken);

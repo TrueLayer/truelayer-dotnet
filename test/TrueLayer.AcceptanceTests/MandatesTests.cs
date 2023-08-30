@@ -180,6 +180,39 @@ namespace TrueLayer.AcceptanceTests
             fundsResponse.Data!.Confirmed.ShouldBeTrue();
         }
 
+        [Theory]
+        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
+        public async Task Can_get_mandate_constraints(CreateMandateRequest mandateRequest)
+        {
+            // Arrange
+            string mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
+
+            // Act
+            var response = await _fixture.Client.Mandates.GetMandateConstraints(
+                mandateId,
+                mandateRequest.Mandate.Match(
+                    commercialMandate => MandateType.Commercial,
+                    sweepingMandate => MandateType.Sweeping));
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        }
+
+        [Theory]
+        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
+        public async Task Can_revoke_mandate(CreateMandateRequest mandateRequest)
+        {
+            // Arrange
+            string mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
+
+            // Act
+            var response = await _fixture.Client.Mandates.RevokeMandate(
+                mandateId, idempotencyKey: Guid.NewGuid().ToString());
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        }
+
         private static CreateMandateRequest CreateTestMandateRequest(
             MandateUnion mandate,
             string currency = Currencies.GBP)
@@ -232,12 +265,31 @@ namespace TrueLayer.AcceptanceTests
             {
                 await Task.Delay(1000);
                 var mandate = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
-                if (mandate.Data.AsT2.Status == "authorized")
+                if (mandate.Data.IsT2 && mandate.Data.AsT2.Status == "authorized")
                 {
                     return mandate;
                 }
             }
             return await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
+        }
+
+        private async Task<string> CreateAuthorizedSweepingMandate(CreateMandateRequest mandateRequest)
+        {
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var mandateId = createResponse.Data!.Id;
+
+            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+
+            StartAuthorizationFlowRequest authorizationRequest = new(
+                new ProviderSelectionRequest(),
+                new Redirect(new Uri(RETURN_URI)));
+
+            var startAuthResponse = await _fixture.Client.Mandates.StartAuthorizationFlow(
+                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
+            await AuthorizeMandate(startAuthResponse);
+            await WaitForMandateToBeAuthorized(mandateId);
+            return mandateId;
         }
 
         private static IEnumerable<CreateMandateRequest[]> CreateTestSweepingPreselectedMandateRequests()

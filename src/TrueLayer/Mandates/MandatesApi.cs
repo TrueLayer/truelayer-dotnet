@@ -170,5 +170,46 @@ namespace TrueLayer.Mandates
                 cancellationToken
             );
         }
+
+        /// <inheritdoc />
+        public async Task<ApiResponse<GetConstraintsResponse>> GetMandateConstraints(string mandateId, MandateType mandateType, CancellationToken cancellationToken = default)
+        {
+            mandateId.NotNullOrWhiteSpace(nameof(mandateId));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.GetAsync<GetConstraintsResponse>(
+                new Uri(_baseUri, $"/v3/mandates/{mandateId}/constraints"),
+                authResponse.Data!.AccessToken,
+                cancellationToken
+            );
+        }
+
+        /// <inheritdoc />
+        public async Task<ApiResponse> RevokeMandate(string id, string idempotencyKey, CancellationToken cancellationToken = default)
+        {
+            id.NotNullOrWhiteSpace(nameof(id));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("recurring_payments:sweeping"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync(
+                new Uri(_baseUri, $"/v3/mandates/{id}/revoke"),
+                null,
+                idempotencyKey,
+                authResponse.Data!.AccessToken,
+                _options.Payments!.SigningKey,
+                cancellationToken
+            );
+        }
     }
 }
