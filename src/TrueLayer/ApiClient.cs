@@ -20,8 +20,8 @@ namespace TrueLayer
     /// </summary>
     internal class ApiClient : IApiClient
     {
-        private static readonly ProductInfoHeaderValue UserAgentHeader
-            = new("truelayer-dotnet", ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>());
+        private static readonly String TlAgentHeader
+            = $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>()}";
 
         private readonly HttpClient _httpClient;
 
@@ -212,7 +212,7 @@ namespace TrueLayer
                 httpRequest.Headers.Add(CustomHeaders.IdempotencyKey, idempotencyKey);
             }
 
-            httpRequest.Headers.UserAgent.Add(UserAgentHeader);
+            httpRequest.Headers.Add(CustomHeaders.Agent, TlAgentHeader);
 
             // HttpCompletionOption.ResponseHeadersRead reduces allocations by by avoiding the pre-buffering of the response content
             // and allows us to access the content stream faster.
