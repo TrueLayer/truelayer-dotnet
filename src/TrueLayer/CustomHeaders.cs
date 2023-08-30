@@ -6,5 +6,6 @@ namespace TrueLayer
         public const string TraceId = "Tl-Trace-Id";
         public const string Signature = "Tl-Signature";
         public const string IdempotencyKey = "Idempotency-Key";
+        public const string Agent = "TL-Agent";
     }
 }
