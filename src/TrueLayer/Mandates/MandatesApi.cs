@@ -152,6 +152,27 @@ namespace TrueLayer.Mandates
             );
         }
 
+        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(string mandateId, MandateType mandateType, string idempotencyKey, CancellationToken cancellationToken = default)
+        {
+            mandateId.NotNullOrWhiteSpace(nameof(mandateId));
+            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync<AuthorizationResponseUnion>(
+                new Uri(_baseUri, $"/v3/mandates/{mandateId}/authorization-flow/actions/consent"),
+                null,
+                idempotencyKey,
+                authResponse.Data!.AccessToken,
+                _options.Payments!.SigningKey,
+                cancellationToken
+            );
+        }
+
         /// <inheritdoc />
         public async Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(string mandateId, int amountInMinor, string currency, MandateType mandateType, CancellationToken cancellationToken = default)
         {

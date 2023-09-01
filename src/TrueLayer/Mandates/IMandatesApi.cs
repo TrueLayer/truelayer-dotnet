@@ -85,6 +85,19 @@ namespace TrueLayer.Mandates
             string mandateId, SubmitProviderSelectionRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Submit the consent given by the user
+        /// </summary>
+        /// <param name="mandateId">The id of the mandate</param>
+        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
+        /// <param name="idempotencyKey">
+        /// An idempotency key to allow safe retrying without the operation being performed multiple times.
+        /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// </param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>An API response that includes the authorization flow action details if successful, otherwise problem details</returns>
+        Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(string mandateId, MandateType mandateType, string idempotencyKey, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Get Confirmation Of Funds
         /// </summary>
         /// <param name="mandateId">The id of the mandate to retrieve</param>
