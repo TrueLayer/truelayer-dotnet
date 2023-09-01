@@ -242,7 +242,11 @@ namespace TrueLayer.AcceptanceTests
 
             // Act
             var response = await _fixture.Client.Mandates.RevokeMandate(
-                mandateId, idempotencyKey: Guid.NewGuid().ToString());
+                mandateId,
+                idempotencyKey: Guid.NewGuid().ToString(),
+                mandateRequest.Mandate.Match(
+                    commercialMandate => MandateType.Commercial,
+                    sweepingMandate => MandateType.Sweeping));
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.NoContent);

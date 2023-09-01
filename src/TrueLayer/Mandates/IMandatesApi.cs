@@ -129,6 +129,6 @@ namespace TrueLayer.Mandates
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes the payment details if successful, otherwise problem details</returns>
-        Task<ApiResponse> RevokeMandate(string id, string idempotencyKey, CancellationToken cancellationToken = default);
+        Task<ApiResponse> RevokeMandate(string id, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
     }
 }

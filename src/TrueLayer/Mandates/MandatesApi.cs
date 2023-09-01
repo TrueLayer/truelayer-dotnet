@@ -212,11 +212,11 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse> RevokeMandate(string id, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse> RevokeMandate(string id, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("recurring_payments:sweeping"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
