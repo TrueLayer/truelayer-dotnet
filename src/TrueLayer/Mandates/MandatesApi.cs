@@ -152,7 +152,7 @@ namespace TrueLayer.Mandates
             );
         }
 
-        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(string mandateId, MandateType mandateType, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(string mandateId, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));

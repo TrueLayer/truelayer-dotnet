@@ -156,6 +156,41 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
+        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
+        public async Task Can_submit_consent(CreateMandateRequest mandateRequest)
+        {
+            // Arrange
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+            var mandateId = createResponse.Data!.Id;
+            var mandateType = mandateRequest.Mandate.IsT0 ? MandateType.Commercial : MandateType.Sweeping;
+
+            StartAuthorizationFlowRequest authorizationRequest = new(
+                new ProviderSelectionRequest(),
+                new Redirect(new Uri(RETURN_URI)),
+                new Consent());
+
+            await _fixture.Client.Mandates.StartAuthorizationFlow(
+                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
+
+            SubmitProviderSelectionRequest submitProviderRequest = new(mandateRequest.Mandate.Match(
+                c => COMMERCIAL_PROVIDER_ID,
+                s => PROVIDER_ID));
+
+            await _fixture.Client.Mandates.SubmitProviderSelection(
+                mandateId, submitProviderRequest, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
+
+            // Act
+            var response = await _fixture.Client.Mandates.SubmitConsent(
+                mandateId, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        }
+
+        [Theory]
         [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
         public async Task Can_Get_Funds(CreateMandateRequest mandateRequest)
         {

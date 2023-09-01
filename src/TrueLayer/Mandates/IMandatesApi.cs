@@ -95,7 +95,7 @@ namespace TrueLayer.Mandates
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes the authorization flow action details if successful, otherwise problem details</returns>
-        Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(string mandateId, MandateType mandateType, string idempotencyKey, CancellationToken cancellationToken = default);
+        Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(string mandateId, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get Confirmation Of Funds
