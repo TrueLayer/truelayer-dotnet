@@ -252,6 +252,30 @@ namespace TrueLayer.AcceptanceTests
             response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         }
 
+        [Theory]
+        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
+        public async Task Can_create_mandate_payment(CreateMandateRequest mandateRequest)
+        {
+            // Arrange
+            var mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
+
+            var paymentRequest = CreateTestMandatePaymentRequest(mandateRequest, mandateId);
+
+            // Act
+            var response = await _fixture.Client.Payments.CreatePayment(
+                paymentRequest,
+                idempotencyKey: Guid.NewGuid().ToString());
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.Created);
+            response.Data.IsT1.ShouldBeTrue();
+            response.Data.AsT1.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.AsT1.ResourceToken.ShouldNotBeNullOrWhiteSpace();
+            response.Data.AsT1.User.ShouldNotBeNull();
+            response.Data.AsT1.User.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.AsT1.Status.ShouldBe("authorized");
+        }
+
         private static CreateMandateRequest CreateTestMandateRequest(
             MandateUnion mandate,
             string currency = Currencies.GBP)
@@ -267,6 +291,15 @@ namespace TrueLayer.AcceptanceTests
                     email: "remi.terr@example.com",
                     phone: "+44777777777"),
                 Metadata: new Dictionary<string, string> { { "a_custom_key", "a-custom-value" } });
+
+        private static CreatePaymentRequest CreateTestMandatePaymentRequest(
+            CreateMandateRequest mandateRequest,
+            string mandateId)
+            => new (
+                mandateRequest.Constraints.MaximumIndividualAmount,
+                mandateRequest.Currency,
+                new PaymentMethod.Mandate(mandateId, "reference", null),
+                mandateRequest.User);
 
         private async Task AuthorizeMandate(AuthorizationResponseUnion authorizationFlowResponse)
         {
