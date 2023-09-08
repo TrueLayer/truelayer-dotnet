@@ -223,11 +223,11 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
         }
 
         [Fact]
-        public async Task Sets_user_agent_header()
+        public async Task Sets_TL_agent_header()
         {
             _httpMessageHandler
                 .Expect(HttpMethod.Get, "http://localhost/user-agent")
-                .WithHeaders("User-Agent", $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ApiClient>()}")
+                .WithHeaders(CustomHeaders.Agent, $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ApiClient>()}")
                 .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, "{}");
 
             var response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/user-agent"));

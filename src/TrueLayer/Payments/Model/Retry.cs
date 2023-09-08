@@ -44,10 +44,10 @@ namespace TrueLayer.Payments.Model
             /// </summary>
             /// <param name="for">How long to retry this payment for</param>
             /// <param name="ensureMinimumBalanceInMinor">The payment is attempted only if the remaining balance in the account is at least this amount</param>
-            public Smart(string @for, long? ensureMinimumBalanceInMinor)
+            public Smart(string @for, uint? ensureMinimumBalanceInMinor)
             {
                 For = @for.NotNullOrWhiteSpace(nameof(@for));
-                EnsureMinimumBalanceInMinor = ensureMinimumBalanceInMinor?.GreaterThan(0, nameof(ensureMinimumBalanceInMinor));
+                EnsureMinimumBalanceInMinor = ensureMinimumBalanceInMinor?.GreaterThan((uint)0, nameof(ensureMinimumBalanceInMinor));
             }
 
             /// <summary>
@@ -63,7 +63,7 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// The payment is attempted only if the remaining balance in the account is at least this amount
             /// </summary>
-            public long? EnsureMinimumBalanceInMinor { get; init; }
+            public uint? EnsureMinimumBalanceInMinor { get; init; }
         }
     }
 }
