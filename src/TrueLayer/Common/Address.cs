@@ -1,4 +1,4 @@
-namespace TrueLayer.Payments.Model;
+namespace TrueLayer.Common;
 
 public record Address
 {
