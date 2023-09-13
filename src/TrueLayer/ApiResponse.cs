@@ -8,13 +8,13 @@ namespace TrueLayer
     /// </summary>
     public class ApiResponse
     {
-        internal ApiResponse(HttpStatusCode statusCode, string? traceId)
+        public ApiResponse(HttpStatusCode statusCode, string? traceId)
         {
             StatusCode = statusCode;
             TraceId = traceId;
         }
 
-        internal ApiResponse(ProblemDetails problemDetails, HttpStatusCode statusCode, string? traceId)
+        public ApiResponse(ProblemDetails problemDetails, HttpStatusCode statusCode, string? traceId)
         {
             StatusCode = statusCode;
             TraceId = traceId;
