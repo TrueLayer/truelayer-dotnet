@@ -46,7 +46,8 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                         new AccountIdentifier.SortCodeAccountNumber("567890", "12345678")
                     )
                 ),
-                new PaymentUserRequest(id: Guid.NewGuid().ToString())
+                new PaymentUserRequest(id: Guid.NewGuid().ToString()),
+                null
             );
     }
 }

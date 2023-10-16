@@ -96,7 +96,8 @@ namespace TrueLayer.AcceptanceTests
         private static CreatePaymentRequest CreateTestPaymentRequest(
             ProviderUnion providerSelection,
             AccountIdentifierUnion accountIdentifier,
-            string currency = Currencies.GBP)
+            string currency = Currencies.GBP,
+            RelatedProducts? relatedProducts = null)
             => new CreatePaymentRequest(
                 100,
                 currency,
@@ -108,11 +109,12 @@ namespace TrueLayer.AcceptanceTests
                         accountIdentifier
                     )),
                 new PaymentUserRequest(
-                    name: "Jane Doe", 
+                    name: "Jane Doe",
                     email: "jane.doe@example.com",
                     phone: "+442079460087",
                     dateOfBirth: new DateTime(1999, 1, 1),
-                    address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St"))
+                    address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
+                relatedProducts
             );
 
         private static IEnumerable<object[]> CreateTestPaymentRequests()
@@ -143,7 +145,8 @@ namespace TrueLayer.AcceptanceTests
                         Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606")),
                     },
                     new AccountIdentifier.Iban("IT60X0542811101000000123456"),
-                    Currencies.EUR),
+                    Currencies.EUR,
+                    new RelatedProducts(new SignupPlus())),
             };
             yield return new object[]
             {
