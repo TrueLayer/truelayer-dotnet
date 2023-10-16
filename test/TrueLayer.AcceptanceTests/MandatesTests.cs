@@ -299,7 +299,8 @@ namespace TrueLayer.AcceptanceTests
                 mandateRequest.Constraints.MaximumIndividualAmount,
                 mandateRequest.Currency,
                 new PaymentMethod.Mandate(mandateId, "reference", null),
-                mandateRequest.User);
+                mandateRequest.User,
+                new RelatedProducts(new SignupPlus()));
 
         private async Task AuthorizeMandate(AuthorizationResponseUnion authorizationFlowResponse)
         {
