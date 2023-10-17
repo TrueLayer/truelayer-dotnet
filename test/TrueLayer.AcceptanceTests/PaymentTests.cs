@@ -70,8 +70,7 @@ namespace TrueLayer.AcceptanceTests
             payment.CreatedAt.ShouldNotBe(default);
             payment.PaymentMethod.AsT0.ShouldNotBeNull();
 
-            payment.PaymentMethod.Switch(
-                bankTransfer => bankTransfer.ProviderSelection.Switch(
+            payment.PaymentMethod.AsT0.ProviderSelection.Switch(
                     userSelected =>
                     {
                         Provider.UserSelected providerSelectionReq = paymentRequest.PaymentMethod.AsT0.ProviderSelection.AsT0;
@@ -86,8 +85,7 @@ namespace TrueLayer.AcceptanceTests
                         preselected.ProviderId.ShouldBe(providerSelectionReq.ProviderId);
                         preselected.SchemeId.ShouldBe(providerSelectionReq.SchemeId);
                         preselected.Remitter.ShouldBe(providerSelectionReq.Remitter);
-                    })
-            );
+                    });
 
             payment.PaymentMethod.AsT0.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
             payment.PaymentMethod.AsT0.Beneficiary.ShouldBe(paymentRequest.PaymentMethod.AsT0.Beneficiary);

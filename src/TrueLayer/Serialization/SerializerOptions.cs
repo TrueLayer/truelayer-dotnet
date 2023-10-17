@@ -9,7 +9,7 @@ namespace TrueLayer.Serialization
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             PropertyNamingPolicy = JsonSnakeCaseNamingPolicy.Instance,
-            Converters = { new OneOfJsonConverterFactory() }
+            Converters = { new OneOfJsonConverterFactory(), new JsonStringEnumConverter(JsonSnakeCaseNamingPolicy.Instance) }
         };
     }
 }

@@ -30,4 +30,9 @@
       <None Update="appsettings.*" CopyToOutputDirectory="Always" />
       <None Update="*.pem" CopyToOutputDirectory="Always" />
     </ItemGroup>
+    <ItemGroup>
+      <Content Update="ec512-private-key.pem">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
   </Project>

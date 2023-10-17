@@ -6,8 +6,8 @@ namespace TrueLayer.PaymentsProviders
 {
     internal class PaymentsProvidersApi : IPaymentsProvidersApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/payments-providers/";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/payments-providers/";
+        private const string ProdUrl = "https://api.truelayer.com/v3/payments-providers/";
+        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/payments-providers/";
 
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
@@ -21,7 +21,7 @@ namespace TrueLayer.PaymentsProviders
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
             _baseUri = options.Payments.Uri is not null
-                ? new Uri(options.Payments.Uri, "payments-providers/")
+                ? new Uri(options.Payments.Uri, "/v3/payments-providers/")
                 : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
         }
 

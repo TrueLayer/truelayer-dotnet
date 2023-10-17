@@ -3,7 +3,7 @@ using static TrueLayer.Payments.Model.PaymentMethod;
 
 namespace TrueLayer.Payments.Model
 {
-    using PaymentMethodUnion = OneOf<BankTransfer>;
+    using PaymentMethodUnion = OneOf<BankTransfer, Mandate>;
 
     /// <summary>
     /// Represents a request for payment
