@@ -259,7 +259,7 @@ namespace TrueLayer.AcceptanceTests
             // Arrange
             var mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
 
-            var paymentRequest = CreateTestMandatePaymentRequest(mandateRequest, mandateId);
+            var paymentRequest = CreateTestMandatePaymentRequest(mandateRequest, mandateId, false);
 
             // Act
             var response = await _fixture.Client.Payments.CreatePayment(
@@ -294,13 +294,14 @@ namespace TrueLayer.AcceptanceTests
 
         private static CreatePaymentRequest CreateTestMandatePaymentRequest(
             CreateMandateRequest mandateRequest,
-            string mandateId)
+            string mandateId,
+            bool setRelatedProducts = true)
             => new (
                 mandateRequest.Constraints.MaximumIndividualAmount,
                 mandateRequest.Currency,
                 new PaymentMethod.Mandate(mandateId, "reference", null),
                 mandateRequest.User,
-                new RelatedProducts(new SignupPlus()));
+                setRelatedProducts ? new RelatedProducts(new SignupPlus()) : null);
 
         private async Task AuthorizeMandate(AuthorizationResponseUnion authorizationFlowResponse)
         {
