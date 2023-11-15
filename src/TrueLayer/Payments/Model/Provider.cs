@@ -1,7 +1,13 @@
+using System;
+using OneOf;
 using TrueLayer.Serialization;
+using static TrueLayer.Payments.Model.SchemeSelection;
 
 namespace TrueLayer.Payments.Model
 {
+    using PreselectedSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, Preselected, UserSelected>;
+    using UserSelectedSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, UserSelected>;
+
     /// <summary>
     /// Provider types
     /// </summary>
@@ -33,7 +39,13 @@ namespace TrueLayer.Payments.Model
             /// Gets the id of the scheme associated to the selected provider that was used to make the payment over.
             /// The field is populated only when a <see cref="GetPaymentResponse"/> is returned
             /// </summary>
+            [Obsolete("The field will be removed soon. Please start using the new <see cref=\"SchemeSelection\"/> field.", error: false)]
             public string? SchemeId { get; init; }
+
+            /// <summary>
+            /// Gets or inits the scheme selection preferred to make the payment.
+            /// </summary>
+            public UserSelectedSchemeSelectionUnion? SchemeSelection { get; init; }
         }
 
         /// <summary>
@@ -46,6 +58,12 @@ namespace TrueLayer.Payments.Model
             {
                 ProviderId = providerId.NotNull(nameof(providerId));
                 SchemeId = schemeId.NotNull(nameof(schemeId));
+            }
+
+            public Preselected(string providerId, PreselectedSchemeSelectionUnion schemeSelection)
+            {
+                ProviderId = providerId.NotNull(nameof(providerId));
+                SchemeSelection = schemeSelection.NotNull(nameof(providerId));
             }
 
             /// <summary>
@@ -61,12 +79,20 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets the id of the scheme to make the payment over
             /// </summary>
-            public string SchemeId { get; }
+            [Obsolete(
+                "The field will be removed soon. Please start using the new <see cref=\"SchemeSelection\"/> field.",
+                error: false)]
+            public string? SchemeId { get; } = null;
 
             /// <summary>
             /// Gets or inits the account details for the remitter
             /// </summary>
             public RemitterAccount? Remitter { get; init; }
+
+            /// <summary>
+            /// Gets or inits the scheme selection preferred to make the payment.
+            /// </summary>
+            public PreselectedSchemeSelectionUnion? SchemeSelection { get; init; }
         }
     }
 }
