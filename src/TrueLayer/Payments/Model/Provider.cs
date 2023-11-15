@@ -1,12 +1,13 @@
 using System;
+using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.SchemeSelection;
 
 namespace TrueLayer.Payments.Model
 {
-    using PreselectedSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, Preselected, UserSelected>;
-    using UserSelectedSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, UserSelected>;
+    using PreselectedProviderSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, Preselected, UserSelected>;
+    using UserSelectedProviderSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, UserSelected>;
 
     /// <summary>
     /// Provider types
@@ -45,7 +46,7 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets or inits the scheme selection preferred to make the payment.
             /// </summary>
-            public UserSelectedSchemeSelectionUnion? SchemeSelection { get; init; }
+            public UserSelectedProviderSchemeSelectionUnion? SchemeSelection { get; init; }
         }
 
         /// <summary>
@@ -54,16 +55,16 @@ namespace TrueLayer.Payments.Model
         [JsonDiscriminator("preselected")]
         public record Preselected : IDiscriminated
         {
-            public Preselected(string providerId, string schemeId)
+            public Preselected(string providerId, string? schemeId = null, PreselectedProviderSchemeSelectionUnion? schemeSelection = null)
             {
-                ProviderId = providerId.NotNull(nameof(providerId));
-                SchemeId = schemeId.NotNull(nameof(schemeId));
-            }
+                if (string.IsNullOrWhiteSpace(schemeId) && schemeSelection is null)
+                {
+                    throw new ArgumentException("Please specify either the SchemeId or the SchemeSelection option");
+                }
 
-            public Preselected(string providerId, PreselectedSchemeSelectionUnion schemeSelection)
-            {
                 ProviderId = providerId.NotNull(nameof(providerId));
-                SchemeSelection = schemeSelection.NotNull(nameof(providerId));
+                SchemeId = schemeId;
+                SchemeSelection = schemeSelection;
             }
 
             /// <summary>
@@ -92,7 +93,7 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets or inits the scheme selection preferred to make the payment.
             /// </summary>
-            public PreselectedSchemeSelectionUnion? SchemeSelection { get; init; }
+            public PreselectedProviderSchemeSelectionUnion? SchemeSelection { get; init; }
         }
     }
 }
