@@ -69,5 +69,10 @@ public static class SchemeSelection
         /// Gets the scheme selection type
         /// </summary>
         public string Type => "preselected";
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string? SchemeId { get; init; }
     }
 }
