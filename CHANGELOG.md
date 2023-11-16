@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [1.5.0] - 2023-11-16
 ### Added
-- Added schema selection options for the provider filters objects to be submitted when creating a payment.
+- Added scheme selection options for the provider selection objects to be submitted when creating a payment.
 
 ## [1.4.0] - 2023-10-17
 ### Added
