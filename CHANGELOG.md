@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.5.0] - 2023-11-16
+### Added
+- Added scheme selection options for the provider selection objects to be submitted when creating a payment.
+
 ## [1.4.0] - 2023-10-17
 ### Added
 - Added mandates APIs. Thanks to @mohammedmiah99, @Ryan-Palmer and @ubunoir for their contributions.
