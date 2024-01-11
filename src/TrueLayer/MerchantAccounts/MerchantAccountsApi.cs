@@ -47,6 +47,7 @@ namespace TrueLayer.MerchantAccounts
         public async Task<ApiResponse<MerchantAccount>> GetMerchantAccount(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
+            id.NotAnUrl(nameof(id));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 
@@ -67,7 +68,9 @@ namespace TrueLayer.MerchantAccounts
         public async Task<ApiResponse<GetPaymentSourcesResponse>> GetPaymentSources(string merchantAccountId, string userId, CancellationToken cancellationToken = default)
         {
             merchantAccountId.NotNullOrWhiteSpace(nameof(merchantAccountId));
+            merchantAccountId.NotAnUrl(nameof(merchantAccountId));
             userId.NotNullOrWhiteSpace(nameof(userId));
+            userId.NotAnUrl(nameof(userId));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 

@@ -39,5 +39,29 @@ namespace TrueLayer.Tests
         [Fact]
         public void Greater_than_does_not_throw_if_greater_than_value()
             => _ = 10.GreaterThan(5, "value");
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("not_a_url")]
+        [InlineData("anotherNonUrl")]
+        [InlineData("7effef4a-17f2-4139-aee2-fae13544530a")]
+        [InlineData("85BF9448-A93F-4F5F-A325-8B5BA7845F83")]
+        [InlineData("{C5A41B28-109A-41C5-8CFD-695CC52A7539}")]
+        [InlineData("12345")]
+        public void NotAnUrl_WithNullOrNonUrlValue_ReturnsSameValue(string? value)
+        {
+            Assert.Equal(value, value.NotAnUrl("value"));
+        }
+
+        [Theory]
+        [InlineData("http://example.com")]
+        [InlineData("https://example.com")]
+        [InlineData("/relative/url")]
+        [InlineData("http://example.com?query=string")]
+        [InlineData("http://example.com/path%20with%20spaces")]
+        [InlineData("string with spaces")]
+        [InlineData("A7+uG3zwvUiKtrwb/ZtQow==")]
+        public void NotAnUrl_WithUrlValue_ThrowsArgumentException(string value)
+            => Assert.Throws<ArgumentException>(() => value.NotAnUrl("value"));
     }
 }

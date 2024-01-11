@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace TrueLayer
 {
@@ -87,5 +88,26 @@ namespace TrueLayer
 
             return value;
         }
+
+        /// <summary>
+        /// Validates that the provided <paramref name="value"/> is not an URL
+        /// </summary>
+        /// <param name="value">The value to validate</param>
+        /// <param name="name">The name of the argument</param>
+        /// <returns>The value of <paramref name="value"/> if it is not an URL</returns>
+        /// <exception cref="ArgumentException">Thrown when the value is an URL</exception>
+        /// <example>
+        /// <code>
+        /// _id = id.NotAnUrl(nameof(id));
+        /// </code>
+        /// </example>
+        [DebuggerStepThrough]
+        public static string? NotAnUrl(this string? value, string name)
+            => value is not null
+               && (value.Contains(' ')
+                || Uri.IsWellFormedUriString(value, UriKind.Absolute)
+                || (value.Contains('/') && Uri.IsWellFormedUriString(value, UriKind.Relative)))
+                ? throw new ArgumentException("Value is malformed", name)
+                : value;
     }
 }

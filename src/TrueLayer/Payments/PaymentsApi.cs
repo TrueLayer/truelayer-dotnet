@@ -26,7 +26,6 @@ namespace TrueLayer.Payments
     {
         private const string ProdUrl = "https://api.truelayer.com/v3/payments/";
         private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/payments/";
-        internal static string[] RequiredScopes = new[] { "payments" };
 
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
@@ -43,9 +42,10 @@ namespace TrueLayer.Payments
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
+            var baseUri = (options.UseSandbox ?? true) ? SandboxUrl : ProdUrl;
             _baseUri = options.Payments.Uri is not null
                 ? new Uri(options.Payments.Uri, "/v3/payments/")
-                : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
+                : new Uri(baseUri);
         }
 
         /// <inheritdoc />
@@ -76,6 +76,7 @@ namespace TrueLayer.Payments
         public async Task<ApiResponse<GetPaymentUnion>> GetPayment(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
+            id.NotAnUrl(nameof(id));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 

@@ -36,9 +36,10 @@ namespace TrueLayer.Mandates
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
+            var baseUri = (options.UseSandbox ?? true) ? SandboxUrl : ProdUrl;
             _baseUri = options.Payments.Uri is not null
                 ? new Uri(options.Payments.Uri, "/v3/mandates/")
-                : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
+                : new Uri(baseUri);
         }
 
         /// <inheritdoc />
@@ -68,6 +69,7 @@ namespace TrueLayer.Mandates
         public async Task<ApiResponse<MandateDetailUnion>> GetMandate(string mandateId, MandateType mandateType, CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
+            mandateId.NotAnUrl(nameof(mandateId));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
@@ -94,8 +96,8 @@ namespace TrueLayer.Mandates
             }
 
             var queryParameters = System.Web.HttpUtility.ParseQueryString(string.Empty);
-            queryParameters["user_id"] = query.UserId;
-            queryParameters["cursor"] = query.Cursor;
+            queryParameters["user_id"] = query.UserId.NotAnUrl($"{nameof(query)}.{nameof(query.UserId)}");
+            queryParameters["cursor"] = query.Cursor.NotAnUrl($"{nameof(query)}.{nameof(query.UserId)}");
             queryParameters["limit"] = query.Limit.ToString();
             var baseUriBuilder = new UriBuilder(_baseUri) { Query = queryParameters.ToString() };
 
