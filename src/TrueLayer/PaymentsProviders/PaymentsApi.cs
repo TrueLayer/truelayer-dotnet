@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using TrueLayer.Extensions;
 using TrueLayer.PaymentsProviders.Model;
 
 namespace TrueLayer.PaymentsProviders
@@ -30,7 +31,7 @@ namespace TrueLayer.PaymentsProviders
             id.NotNullOrWhiteSpace(nameof(id));
             id.NotAnUrl(nameof(id));
 
-            UriBuilder baseUri = new(new Uri(_baseUri, id)) { Query = $"client_id={_options.ClientId}" };
+            UriBuilder baseUri = new(_baseUri.Append(id)) { Query = $"client_id={_options.ClientId}" };
 
             return await _apiClient.GetAsync<PaymentsProvider>(baseUri.Uri);
         }

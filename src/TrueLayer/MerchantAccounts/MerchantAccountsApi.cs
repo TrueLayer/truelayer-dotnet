@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
+using TrueLayer.Extensions;
 using TrueLayer.MerchantAccounts.Model;
 
 namespace TrueLayer.MerchantAccounts
@@ -80,7 +81,7 @@ namespace TrueLayer.MerchantAccounts
             }
 
             return await _apiClient.GetAsync<GetPaymentSourcesResponse>(
-                new Uri(_baseUri, $"merchant-accounts/{merchantAccountId}/payment-sources?user_id={userId}"),
+                _baseUri.Append($"merchant-accounts/{merchantAccountId}/payment-sources?user_id={userId}"),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );

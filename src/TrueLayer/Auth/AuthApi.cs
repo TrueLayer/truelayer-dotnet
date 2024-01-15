@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using TrueLayer.Extensions;
 
 namespace TrueLayer.Auth
 {
@@ -42,7 +43,7 @@ namespace TrueLayer.Auth
             }
 
             return await _apiClient.PostAsync<GetAuthTokenResponse>(
-                new Uri(_baseUri, "connect/token"), new FormUrlEncodedContent(values), null, cancellationToken);
+                _baseUri.Append("connect/token"), new FormUrlEncodedContent(values), null, cancellationToken);
         }
     }
 }

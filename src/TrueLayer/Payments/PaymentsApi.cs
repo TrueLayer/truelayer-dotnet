@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Auth;
+using TrueLayer.Extensions;
 using TrueLayer.Payments.Model;
 
 namespace TrueLayer.Payments
@@ -86,7 +87,7 @@ namespace TrueLayer.Payments
             }
 
             return await _apiClient.GetAsync<GetPaymentUnion>(
-                new Uri(_baseUri, id),
+                _baseUri.Append(id),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );

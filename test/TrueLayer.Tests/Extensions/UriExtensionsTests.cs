@@ -28,12 +28,19 @@ namespace TrueLayer.Tests.Extensions
             Uri baseUri = new(baseUrl);
 
             yield return new object[] { baseUri, new[] {"test"}, new Uri($"{baseUrl}test") };
+            yield return new object[] { baseUri, new[] {"/test"}, new Uri($"{baseUrl}test") };
             yield return new object[] { baseUri, new[] {"test", "/test2/"}, new Uri($"{baseUrl}test/test2") };
             yield return new object[]
             {
                 new Uri("http://test.foo.test/extra-path"),
                 new[] { "test/" },
                 new Uri("http://test.foo.test/extra-path/test"),
+            };
+            yield return new object[]
+            {
+                new Uri("http://test.foo.test"),
+                new[] { "/test" },
+                new Uri("http://test.foo.test/test"),
             };
         }
     }

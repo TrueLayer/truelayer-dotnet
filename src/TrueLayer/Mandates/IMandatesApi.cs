@@ -122,13 +122,13 @@ namespace TrueLayer.Mandates
         /// <summary>
         /// Revoke mandate
         /// </summary>
-        /// <param name="id">The id of the mandate</param>
+        /// <param name="mandateId">The id of the mandate</param>
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes the payment details if successful, otherwise problem details</returns>
-        Task<ApiResponse> RevokeMandate(string id, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
+        Task<ApiResponse> RevokeMandate(string mandateId, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
     }
 }
