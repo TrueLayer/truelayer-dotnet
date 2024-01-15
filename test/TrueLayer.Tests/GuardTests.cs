@@ -48,9 +48,9 @@ namespace TrueLayer.Tests
         [InlineData("85BF9448-A93F-4F5F-A325-8B5BA7845F83")]
         [InlineData("{C5A41B28-109A-41C5-8CFD-695CC52A7539}")]
         [InlineData("12345")]
-        public void NotAnUrl_WithNullOrNonUrlValue_ReturnsSameValue(string? value)
+        public void NotAUrl_WithNullOrNonUrlValue_ReturnsSameValue(string? value)
         {
-            Assert.Equal(value, value.NotAnUrl("value"));
+            Assert.Equal(value, value.NotAUrl("value"));
         }
 
         [Theory]
@@ -58,10 +58,15 @@ namespace TrueLayer.Tests
         [InlineData("https://example.com")]
         [InlineData("/relative/url")]
         [InlineData("http://example.com?query=string")]
+        [InlineData("http://example.com?query=string&otherquery=foo")]
         [InlineData("http://example.com/path%20with%20spaces")]
         [InlineData("string with spaces")]
         [InlineData("A7+uG3zwvUiKtrwb/ZtQow==")]
-        public void NotAnUrl_WithUrlValue_ThrowsArgumentException(string value)
-            => Assert.Throws<ArgumentException>(() => value.NotAnUrl("value"));
+        [InlineData("\\/g8ph66mx5ltptbsdfwmr6kut2k8bw8kx.oastify.com")]
+        [InlineData("fake.test.com")]
+        [InlineData("fake.com")]
+        [InlineData("fake.com/")]
+        public void NotAUrl_WithUrlValue_ThrowsArgumentException(string value)
+            => Assert.Throws<ArgumentException>(() => value.NotAUrl("value"));
     }
 }

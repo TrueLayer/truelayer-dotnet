@@ -29,7 +29,7 @@ namespace TrueLayer.PaymentsProviders
         public async Task<ApiResponse<PaymentsProvider>> GetPaymentsProvider(string id)
         {
             id.NotNullOrWhiteSpace(nameof(id));
-            id.NotAnUrl(nameof(id));
+            id.NotAUrl(nameof(id));
 
             UriBuilder baseUri = new(_baseUri.Append(id)) { Query = $"client_id={_options.ClientId}" };
 

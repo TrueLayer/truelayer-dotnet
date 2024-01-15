@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace TrueLayer
 {
@@ -98,15 +99,17 @@ namespace TrueLayer
         /// <exception cref="ArgumentException">Thrown when the value is an URL</exception>
         /// <example>
         /// <code>
-        /// _id = id.NotAnUrl(nameof(id));
+        /// _id = id.NotAUrl(nameof(id));
         /// </code>
         /// </example>
         [DebuggerStepThrough]
-        public static string? NotAnUrl(this string? value, string name)
+        public static string? NotAUrl(this string? value, string name)
             => value is not null
                && (value.Contains(' ')
                 || Uri.IsWellFormedUriString(value, UriKind.Absolute)
-                || (value.Contains('/') && Uri.IsWellFormedUriString(value, UriKind.Relative)))
+                || value.StartsWith('\\')
+                || value.Contains('/')
+                || value.Contains('.'))
                 ? throw new ArgumentException("Value is malformed", name)
                 : value;
     }

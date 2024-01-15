@@ -66,7 +66,7 @@ namespace TrueLayer.Payouts
         public async Task<ApiResponse<GetPayoutUnion>> GetPayout(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
-            id.NotAnUrl(nameof(id));
+            id.NotAUrl(nameof(id));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 
