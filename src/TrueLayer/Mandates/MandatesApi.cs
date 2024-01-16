@@ -3,27 +3,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
 using OneOf;
+using TrueLayer.Common;
 using TrueLayer.Extensions;
+using TrueLayer.Mandates.Model;
+using TrueLayer.Models;
 
 namespace TrueLayer.Mandates
 {
-    using TrueLayer.Mandates.Model;
-    using TrueLayer.Models;
     using AuthorizationResponseUnion = OneOf<
-        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
-        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
+        AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
+        AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
     using MandateDetailUnion = OneOf<
-        Model.MandateDetail.AuthorizationRequiredMandateDetail,
-        Model.MandateDetail.AuthorizingMandateDetail,
-        Model.MandateDetail.AuthorizedMandateDetail,
-        Model.MandateDetail.FailedMandateDetail,
-        Model.MandateDetail.RevokedMandateDetail>;
+        MandateDetail.AuthorizationRequiredMandateDetail,
+        MandateDetail.AuthorizingMandateDetail,
+        MandateDetail.AuthorizedMandateDetail,
+        MandateDetail.FailedMandateDetail,
+        MandateDetail.RevokedMandateDetail>;
 
     internal class MandatesApi : IMandatesApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/v3/mandates/";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/mandates/";
-
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
         private readonly Uri _baseUri;
@@ -37,10 +35,12 @@ namespace TrueLayer.Mandates
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            var baseUri = (options.UseSandbox ?? true) ? SandboxUrl : ProdUrl;
-            _baseUri = options.Payments.Uri is not null
-                ? new Uri(options.Payments.Uri, "/v3/mandates/")
-                : new Uri(baseUri);
+            var baseUri = (options.UseSandbox ?? true)
+                ? TrueLayerBaseUris.SandboxApiBaseUri
+                : TrueLayerBaseUris.ProdApiBaseUri;
+
+            _baseUri = (options.Payments.Uri ?? baseUri)
+                .Append("/v3/mandates/");
         }
 
         /// <inheritdoc />

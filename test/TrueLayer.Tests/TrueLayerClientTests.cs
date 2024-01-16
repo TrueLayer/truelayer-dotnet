@@ -33,7 +33,7 @@ namespace TrueLayer.Tests
                 }
             };
 
-            var client = new TrueLayerClient(new ApiClient(new HttpClient()), Options.Create(options));
+            var client = new TrueLayerClient(new ApiClient(new HttpClient(), Options.Create(options)), Options.Create(options));
             client.Auth.ShouldNotBeNull();
             client.Payments.ShouldNotBeNull();
             client.MerchantAccounts.ShouldNotBeNull();

@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
+using TrueLayer.Common;
 using TrueLayer.Signing;
 #if NET6_0 || NET6_0_OR_GREATER
 using System.Net.Http.Json;
@@ -25,20 +27,23 @@ namespace TrueLayer
             = $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>()}";
 
         private readonly HttpClient _httpClient;
+        private readonly TrueLayerOptions _options;
 
         /// <summary>
         /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
         /// </summary>
         /// <param name="httpClient">The client used to make HTTP requests.</param>
-        public ApiClient(HttpClient httpClient)
+        /// <param name="options"></param>
+        public ApiClient(HttpClient httpClient, IOptions<TrueLayerOptions> options)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
         /// <inheritdoc />
         public async Task<ApiResponse<TData>> GetAsync<TData>(Uri uri, string? accessToken = null, CancellationToken cancellationToken = default)
         {
-            if (uri is null) throw new ArgumentNullException(nameof(uri));
+            uri.HasValidBaseUri(nameof(uri), _options);
 
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Get,
@@ -56,7 +61,7 @@ namespace TrueLayer
         /// <inheritdoc />
         public async Task<ApiResponse<TData>> PostAsync<TData>(Uri uri, HttpContent? httpContent = null, string? accessToken = null, CancellationToken cancellationToken = default)
         {
-            if (uri is null) throw new ArgumentNullException(nameof(uri));
+            uri.HasValidBaseUri(nameof(uri), _options);
 
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Post,
@@ -74,7 +79,7 @@ namespace TrueLayer
         /// <inheritdoc />
         public async Task<ApiResponse<TData>> PostAsync<TData>(Uri uri, object? request = null, string? idempotencyKey = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default)
         {
-            if (uri is null) throw new ArgumentNullException(nameof(uri));
+            uri.HasValidBaseUri(nameof(uri), _options);
 
             using var httpResponse = await SendJsonRequestAsync(
                 httpMethod: HttpMethod.Post,
@@ -91,7 +96,7 @@ namespace TrueLayer
 
         public async Task<ApiResponse> PostAsync(Uri uri, HttpContent? httpContent = null, string? accessToken = null, CancellationToken cancellationToken = default)
         {
-            if (uri is null) throw new ArgumentNullException(nameof(uri));
+            uri.HasValidBaseUri(nameof(uri), _options);
 
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Post,
@@ -108,7 +113,7 @@ namespace TrueLayer
 
         public async Task<ApiResponse> PostAsync(Uri uri, object? request = null, string? idempotencyKey = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default)
         {
-            if (uri is null) throw new ArgumentNullException(nameof(uri));
+            uri.HasValidBaseUri(nameof(uri), _options);
 
             using var httpResponse = await SendJsonRequestAsync(
                 httpMethod: HttpMethod.Post,

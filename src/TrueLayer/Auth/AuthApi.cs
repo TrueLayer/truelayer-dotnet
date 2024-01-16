@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using TrueLayer.Common;
 using TrueLayer.Extensions;
 
 namespace TrueLayer.Auth
 {
     internal class AuthApi : IAuthApi
     {
-        internal const string ProdUrl = "https://auth.truelayer.com/";
-        internal const string SandboxUrl = "https://auth.truelayer-sandbox.com/";
-
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
         private readonly Uri _baseUri;
@@ -21,8 +19,11 @@ namespace TrueLayer.Auth
             _apiClient = apiClient.NotNull(nameof(apiClient));
             _options = options.NotNull(nameof(options));
 
-            _baseUri = options.Auth?.Uri ??
-                      new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
+            var baseUri = (options.UseSandbox ?? true)
+                ? TrueLayerBaseUris.SandboxAuthBaseUri
+                : TrueLayerBaseUris.ProdAuthBaseUri;
+
+            _baseUri = options.Auth?.Uri ?? baseUri;
         }
 
         /// <inheritdoc />

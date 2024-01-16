@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Auth;
+using TrueLayer.Common;
 using TrueLayer.Extensions;
 using TrueLayer.Payments.Model;
 
@@ -25,9 +26,6 @@ namespace TrueLayer.Payments
 
     internal class PaymentsApi : IPaymentsApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/v3/payments/";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/payments/";
-
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
         private readonly Uri _baseUri;
@@ -43,10 +41,12 @@ namespace TrueLayer.Payments
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            var baseUri = (options.UseSandbox ?? true) ? SandboxUrl : ProdUrl;
-            _baseUri = options.Payments.Uri is not null
-                ? new Uri(options.Payments.Uri, "/v3/payments/")
-                : new Uri(baseUri);
+            var baseUri = (options.UseSandbox ?? true)
+                ? TrueLayerBaseUris.SandboxApiBaseUri
+                : TrueLayerBaseUris.ProdApiBaseUri;
+
+            _baseUri = (options.Payments.Uri ?? baseUri)
+                .Append("/v3/payments/");
         }
 
         /// <inheritdoc />
