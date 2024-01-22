@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Auth;
+using TrueLayer.Common;
+using TrueLayer.Extensions;
 using TrueLayer.Payments.Model;
 
 namespace TrueLayer.Payments
@@ -24,10 +26,6 @@ namespace TrueLayer.Payments
 
     internal class PaymentsApi : IPaymentsApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/v3/payments/";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/payments/";
-        internal static string[] RequiredScopes = new[] { "payments" };
-
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
         private readonly Uri _baseUri;
@@ -43,9 +41,12 @@ namespace TrueLayer.Payments
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            _baseUri = options.Payments.Uri is not null
-                ? new Uri(options.Payments.Uri, "/v3/payments/")
-                : new Uri((options.UseSandbox ?? true) ? SandboxUrl : ProdUrl);
+            var baseUri = (options.UseSandbox ?? true)
+                ? TrueLayerBaseUris.SandboxApiBaseUri
+                : TrueLayerBaseUris.ProdApiBaseUri;
+
+            _baseUri = (options.Payments.Uri ?? baseUri)
+                .Append("/v3/payments/");
         }
 
         /// <inheritdoc />
@@ -76,6 +77,7 @@ namespace TrueLayer.Payments
         public async Task<ApiResponse<GetPaymentUnion>> GetPayment(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
+            id.NotAUrl(nameof(id));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 
@@ -85,7 +87,7 @@ namespace TrueLayer.Payments
             }
 
             return await _apiClient.GetAsync<GetPaymentUnion>(
-                new Uri(_baseUri, id),
+                _baseUri.Append(id),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );

@@ -2,14 +2,14 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
+using TrueLayer.Common;
+using TrueLayer.Extensions;
 using TrueLayer.MerchantAccounts.Model;
 
 namespace TrueLayer.MerchantAccounts
 {
     internal class MerchantAccountsApi : IMerchantAccountsApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/v3/merchant-accounts";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/v3/merchant-accounts";
         private readonly IApiClient _apiClient;
         private readonly Uri _baseUri;
         private readonly IAuthApi _auth;
@@ -21,9 +21,12 @@ namespace TrueLayer.MerchantAccounts
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            _baseUri = options.Payments.Uri is not null
-                ? new Uri(options.Payments.Uri, "/v3/merchant-accounts")
-                : new Uri(options.UseSandbox ?? true ? SandboxUrl : ProdUrl);
+            var baseUri = (options.UseSandbox ?? true)
+                ? TrueLayerBaseUris.SandboxApiBaseUri
+                : TrueLayerBaseUris.ProdApiBaseUri;
+
+            _baseUri = (options.Payments.Uri ?? baseUri)
+                .Append("/v3/merchant-accounts");
         }
 
         /// <inheritdoc />
@@ -47,6 +50,7 @@ namespace TrueLayer.MerchantAccounts
         public async Task<ApiResponse<MerchantAccount>> GetMerchantAccount(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
+            id.NotAUrl(nameof(id));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 
@@ -67,7 +71,9 @@ namespace TrueLayer.MerchantAccounts
         public async Task<ApiResponse<GetPaymentSourcesResponse>> GetPaymentSources(string merchantAccountId, string userId, CancellationToken cancellationToken = default)
         {
             merchantAccountId.NotNullOrWhiteSpace(nameof(merchantAccountId));
+            merchantAccountId.NotAUrl(nameof(merchantAccountId));
             userId.NotNullOrWhiteSpace(nameof(userId));
+            userId.NotAUrl(nameof(userId));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 
@@ -77,7 +83,7 @@ namespace TrueLayer.MerchantAccounts
             }
 
             return await _apiClient.GetAsync<GetPaymentSourcesResponse>(
-                new Uri(_baseUri, $"merchant-accounts/{merchantAccountId}/payment-sources?user_id={userId}"),
+                _baseUri.Append($"merchant-accounts/{merchantAccountId}/payment-sources?user_id={userId}"),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );

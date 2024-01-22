@@ -10,6 +10,7 @@ using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 
 namespace TrueLayer.Sdk.Tests
 {
@@ -31,8 +32,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             _httpMessageHandler = new MockHttpMessageHandler();
 
             _apiClient = new ApiClient(
-                _httpMessageHandler.ToHttpClient()
-            );
+                _httpMessageHandler.ToHttpClient(), Options.Create(new TrueLayerOptions()));
 
             _stub = new TestResponse
             {
@@ -241,7 +241,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             {
                 key = "value"
             };
-            
+
             var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = _privateKey };
 
             var requestUri = new Uri("http://localhost/signing");
