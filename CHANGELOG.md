@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.0] - 2024-01-22
+- Fixed SSRF vulnerability with a CVSS score of 8.6 (High)
+
 ## [1.5.0] - 2023-11-16
 ### Added
 - Added scheme selection options for the provider selection objects to be submitted when creating a payment.
