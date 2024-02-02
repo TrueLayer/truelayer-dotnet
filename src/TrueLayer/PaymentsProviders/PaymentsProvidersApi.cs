@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using TrueLayer.Auth;
 using TrueLayer.Common;
 using TrueLayer.Extensions;
 using TrueLayer.PaymentsProviders.Model;
@@ -9,13 +10,13 @@ namespace TrueLayer.PaymentsProviders
     internal class PaymentsProvidersApi : IPaymentsProvidersApi
     {
         private readonly IApiClient _apiClient;
-        private readonly TrueLayerOptions _options;
+        private readonly IAuthApi _auth;
         private readonly Uri _baseUri;
 
-        public PaymentsProvidersApi(IApiClient apiClient, TrueLayerOptions options)
+        public PaymentsProvidersApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
         {
             _apiClient = apiClient.NotNull(nameof(apiClient));
-            _options = options.NotNull(nameof(options));
+            _auth = auth.NotNull(nameof(auth));
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
@@ -32,9 +33,19 @@ namespace TrueLayer.PaymentsProviders
             id.NotNullOrWhiteSpace(nameof(id));
             id.NotAUrl(nameof(id));
 
-            UriBuilder baseUri = new(_baseUri.Append(id)) { Query = $"client_id={_options.ClientId}" };
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"));
 
-            return await _apiClient.GetAsync<PaymentsProvider>(baseUri.Uri);
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            UriBuilder baseUri = new(_baseUri.Append(id));
+
+            return await _apiClient.GetAsync<PaymentsProvider>(
+                baseUri.Uri,
+                accessToken: authResponse.Data!.AccessToken
+            );
         }
     }
 }
