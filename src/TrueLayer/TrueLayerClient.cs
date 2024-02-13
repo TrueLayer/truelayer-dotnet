@@ -26,7 +26,7 @@ namespace TrueLayer
 
             Auth = new AuthApi(apiClient, options.Value);
             _payments = new(() => new PaymentsApi(apiClient, Auth, options.Value));
-            _paymentsProviders = new(() => new PaymentsProvidersApi(apiClient, options.Value));
+            _paymentsProviders = new(() => new PaymentsProvidersApi(apiClient, Auth, options.Value));
             _payouts = new(() => new PayoutsApi(apiClient, Auth, options.Value));
             _merchants = new(() => new MerchantAccountsApi(apiClient, Auth, options.Value));
             _mandates = new(() => new MandatesApi(apiClient, Auth, options.Value));
