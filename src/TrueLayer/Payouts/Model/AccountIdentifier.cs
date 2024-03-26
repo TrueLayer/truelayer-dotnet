@@ -26,7 +26,6 @@ namespace TrueLayer.Payouts.Model
              AccountNumber = accountNumber.VerifyNotNull("accountNumber");
          }
     
-         [CompilerGenerated]
          protected SortCodeAccountNumber(SortCodeAccountNumber original)
          {
              SortCode = original.SortCode;
