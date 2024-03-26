@@ -35,7 +35,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.Validate();
             });
 
-            IHttpClientBuilder httpClientBuilder = services.AddHttpClient<IApiClient, ApiClient>();
+            //Allow naming of the Service to recall - Allows to have multiple configurations within the same web project
+            IHttpClientBuilder httpClientBuilder = services.AddHttpClient<IApiClient, ApiClient>(configurationSectionName);
             configureBuilder?.Invoke(httpClientBuilder);
 
             services.AddTransient<ITrueLayerClient, TrueLayerClient>();
