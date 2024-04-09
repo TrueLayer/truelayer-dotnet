@@ -3,7 +3,7 @@ using static TrueLayer.Payments.Model.PaymentMethod;
 
 namespace TrueLayer.Payments.Model
 {
-    using PaymentMethodUnion = OneOf<BankTransfer>;
+    using PaymentMethodUnion = OneOf<BankTransfer, Mandate>;
 
     /// <summary>
     /// Represents a request for payment
@@ -17,16 +17,19 @@ namespace TrueLayer.Payments.Model
         /// <param name="currency">The three-letter ISO alpha currency code</param>
         /// <param name="paymentMethod">The method of payment</param>
         /// <param name="user">The end user details</param>
+        /// <param name="relatedProducts">Related products</param>
         public CreatePaymentRequest(
             long amountInMinor,
             string currency,
             PaymentMethodUnion paymentMethod,
-            PaymentUserRequest? user)
+            PaymentUserRequest? user,
+            RelatedProducts? relatedProducts)
         {
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
             Currency = currency.NotNullOrWhiteSpace(nameof(currency));
             PaymentMethod = paymentMethod;
             User = user;
+            RelatedProducts = relatedProducts;
         }
 
         /// <summary>
@@ -49,5 +52,10 @@ namespace TrueLayer.Payments.Model
         /// Gets the end user details
         /// </summary>
         public PaymentUserRequest? User { get; }
+
+        /// <summary>
+        /// Gets the related products
+        /// </summary>
+        public RelatedProducts? RelatedProducts { get; }
     }
 }

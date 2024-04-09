@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -52,7 +52,8 @@ namespace MvcExample.Controllers
                         "truelayer-dotnet",
                         new AccountIdentifier.SortCodeAccountNumber("567890", "12345678"))),
                 new PaymentUserRequest(name: donateModel.Name, email: donateModel.Email, dateOfBirth: new DateTime(1999, 1, 1),
-                    address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St", "Awesome building"))
+                    address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St", "Awesome building")),
+                null
             );
 
             var apiResponse = await _truelayer.Payments.CreatePayment(
@@ -103,7 +104,7 @@ namespace MvcExample.Controllers
 
             var apiResponse = await _truelayer.Payments.GetPayment(paymentId);
 
-            IActionResult Failed(string status, OneOf<PaymentMethod.BankTransfer>? paymentMethod)
+            IActionResult Failed(string status, OneOf<PaymentMethod.BankTransfer, PaymentMethod.Mandate>? paymentMethod)
             {
                 ViewData["Status"] = status;
 
@@ -118,13 +119,14 @@ namespace MvcExample.Controllers
                 return View("Success");
             }
 
-            void SetProviderAndSchemeId(OneOf<PaymentMethod.BankTransfer>? paymentMethod)
+            void SetProviderAndSchemeId(OneOf<PaymentMethod.BankTransfer, PaymentMethod.Mandate>? paymentMethod)
             {
                 (string providerId, string schemeId) = paymentMethod?.Match(
                     bankTransfer => bankTransfer.ProviderSelection.Match(
                         userSelected => (userSelected.ProviderId, userSelected.SchemeId),
                         preselected => (preselected.ProviderId, preselected.SchemeId)
-                    )) ??  ("unavailable", "unavailable");
+                    ),
+                    mandate => ("unavailable", "unavailable")) ??  ("unavailable", "unavailable");
 
                 ViewData["ProviderId"] = providerId;
                 ViewData["SchemeId"] = schemeId;

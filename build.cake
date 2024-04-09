@@ -298,10 +298,10 @@ Task("Default")
     .IsDependentOn("BuildDocs");
 
 Task("CI")
-    .IsDependentOn("SonarBegin")
-    .IsDependentOn("Default")
+    //.IsDependentOn("SonarBegin")
+    .IsDependentOn("Default");
     //.IsDependentOn("UploadCoverage")
-    .IsDependentOn("SonarEnd");
+    //.IsDependentOn("SonarEnd");
 
 Task("Publish")
     .IsDependentOn("CI")

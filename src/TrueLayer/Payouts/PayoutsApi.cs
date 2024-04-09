@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Auth;
+using TrueLayer.Common;
 using TrueLayer.Extensions;
 using TrueLayer.Payouts.Model;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
@@ -18,9 +19,6 @@ namespace TrueLayer.Payouts
 
     internal class PayoutsApi : IPayoutsApi
     {
-        private const string ProdUrl = "https://api.truelayer.com/payouts";
-        private const string SandboxUrl = "https://api.truelayer-sandbox.com/payouts";
-
         private readonly IApiClient _apiClient;
         private readonly TrueLayerOptions _options;
         private readonly Uri _baseUri;
@@ -34,10 +32,12 @@ namespace TrueLayer.Payouts
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            string payoutsApiUrl = (options.UseSandbox ?? true) ? SandboxUrl : ProdUrl;
-            _baseUri = options.Payments.Uri is not null
-                ? new Uri(options.Payments.Uri, "payouts")
-                : new Uri(payoutsApiUrl);
+            var baseUri = (options.UseSandbox ?? true)
+                ? TrueLayerBaseUris.SandboxApiBaseUri
+                : TrueLayerBaseUris.ProdApiBaseUri;
+
+            _baseUri = (options.Payments.Uri ?? baseUri)
+                .Append("/v3/payouts/");
         }
 
         /// <inheritdoc />
@@ -66,6 +66,7 @@ namespace TrueLayer.Payouts
         public async Task<ApiResponse<GetPayoutUnion>> GetPayout(string id, CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
+            id.NotAUrl(nameof(id));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
 

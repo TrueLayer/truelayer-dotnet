@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
             configureBuilder?.Invoke(httpClientBuilder);
 
             services.AddTransient<ITrueLayerClient, TrueLayerClient>();
-            
+
             return services;
         }
     }
