@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
 using TrueLayer.Common;
@@ -46,6 +47,11 @@ namespace TrueLayer.PaymentsProviders
                 baseUri.Uri,
                 accessToken: authResponse.Data!.AccessToken
             );
+        }
+
+        public Task<ApiResponse<List<PaymentsProvider>>> SearchPaymentsProviders(SearchPaymentProvidersRequest searchPaymentProvidersRequest)
+        {
+            throw new NotImplementedException();
         }
     }
 }

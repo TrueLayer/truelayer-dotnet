@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 using OneOf;
 using Shouldly;
 using TrueLayer.Payments.Model;
+using TrueLayer.PaymentsProviders.Model;
 using Xunit;
 
 namespace TrueLayer.AcceptanceTests
 {
-    using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
     using AccountIdentifierUnion = OneOf<AccountIdentifier.SortCodeAccountNumber, AccountIdentifier.Iban>;
+    using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
 
     public class PaymentProvidersTests : IClassFixture<ApiTestFixture>
     {
@@ -53,6 +54,28 @@ namespace TrueLayer.AcceptanceTests
             response.Data.CountryCode.ShouldNotBeNullOrWhiteSpace();
             response.Data.Capabilities.Mandates?.VrpSweeping.ShouldNotBeNull();
             response.Data.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel.ShouldNotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public async Task Can_search_payments_providers()
+        {
+            var searchRequest = new SearchPaymentProvidersRequest
+            {
+
+            };
+
+            var response = await _fixture.Client.PaymentsProviders.SearchPaymentsProviders(searchRequest);
+
+            response.IsSuccessful.ShouldBeTrue();
+            response.Data.ShouldNotBeNull().ShouldNotBeEmpty();
+            response.Data.ForEach(pp =>
+            {
+                pp.Id.ShouldNotBeEmpty();
+                pp.DisplayName.ShouldNotBeNullOrWhiteSpace();
+                pp.CountryCode.ShouldNotBeNullOrWhiteSpace();
+                pp.Capabilities.Mandates?.VrpSweeping.ShouldNotBeNull();
+                pp.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel.ShouldNotBeNullOrWhiteSpace();
+            });
         }
     }
 }
