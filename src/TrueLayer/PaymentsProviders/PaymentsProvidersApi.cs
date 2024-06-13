@@ -49,9 +49,22 @@ namespace TrueLayer.PaymentsProviders
             );
         }
 
-        public Task<ApiResponse<List<PaymentsProvider>>> SearchPaymentsProviders(SearchPaymentProvidersRequest searchPaymentProvidersRequest)
+        public async Task<ApiResponse<List<PaymentsProvider>>> SearchPaymentsProviders(SearchPaymentProvidersRequest searchPaymentProvidersRequest)
         {
-            throw new NotImplementedException();
+            searchPaymentProvidersRequest.NotNull(nameof(searchPaymentProvidersRequest));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"));
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync<List<PaymentsProvider>>(
+                _baseUri.Append("/search"),
+                request: searchPaymentProvidersRequest,
+                accessToken: authResponse.Data!.AccessToken
+            );
         }
     }
 }
