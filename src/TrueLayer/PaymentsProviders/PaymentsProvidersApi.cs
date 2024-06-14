@@ -49,9 +49,9 @@ namespace TrueLayer.PaymentsProviders
             );
         }
 
-        public async Task<ApiResponse<List<PaymentsProvider>>> SearchPaymentsProviders(SearchPaymentProvidersRequest searchPaymentProvidersRequest)
+        public async Task<ApiResponse<SearchPaymentsProvidersResponse>> SearchPaymentsProviders(SearchPaymentsProvidersRequest searchPaymentsProvidersRequest)
         {
-            searchPaymentProvidersRequest.NotNull(nameof(searchPaymentProvidersRequest));
+            searchPaymentsProvidersRequest.NotNull(nameof(searchPaymentsProvidersRequest));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"));
 
@@ -60,9 +60,9 @@ namespace TrueLayer.PaymentsProviders
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.PostAsync<List<PaymentsProvider>>(
+            return await _apiClient.PostAsync<SearchPaymentsProvidersResponse>(
                 _baseUri.Append("/search"),
-                request: searchPaymentProvidersRequest,
+                request: searchPaymentsProvidersRequest,
                 accessToken: authResponse.Data!.AccessToken
             );
         }

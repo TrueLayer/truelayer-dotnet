@@ -19,8 +19,8 @@ namespace TrueLayer.PaymentsProviders
         /// <summary>
         /// Search for payments providers matching the given criteria
         /// </summary>
-        /// <param name="searchPaymentProvidersRequest">The provider search request</param>
+        /// <param name="searchPaymentsProvidersRequest">The provider search request</param>
         /// <returns>An API response that includes all the providers that match the criteria specified on the request</returns>
-        Task<ApiResponse<List<PaymentsProvider>>> SearchPaymentsProviders(SearchPaymentProvidersRequest searchPaymentProvidersRequest);
+        Task<ApiResponse<SearchPaymentsProvidersResponse>> SearchPaymentsProviders(SearchPaymentsProvidersRequest searchPaymentsProvidersRequest);
     }
 }
