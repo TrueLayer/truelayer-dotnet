@@ -27,30 +27,38 @@ namespace TrueLayer.Serialization
 
             var doc = JsonDocument.ParseValue(ref reader);
 
-            if (!doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator) 
-                && !doc.RootElement.TryGetProperty("status", out discriminator)) // Hack until payment response uses a `type` field
+            if (doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator)
+                && (_descriptor.TypeFactories.TryGetValue(discriminator.GetString()!, out var typeFactory)))
             {
-                throw new JsonException();
+                return InokeDiscriminatorFactory(options, readerClone, typeFactory);
             }
 
-            if (_descriptor.TypeFactories.TryGetValue(discriminator.GetString()!, out var typeFactory))
+            // Fallback to status field
+            if (doc.RootElement.TryGetProperty("status", out discriminator)
+                && (_descriptor.TypeFactories.TryGetValue(discriminator.GetString()!, out typeFactory)))
             {
-                object? deserializedObject = JsonSerializer.Deserialize(ref readerClone, typeFactory.FieldType, options);
-
-                if (deserializedObject is null)
-                {
-                    throw new ArgumentNullException(nameof(deserializedObject));
-                }
-
-                if (typeFactory.Factory is Func<object, T> factory)
-                {
-                    return factory.Invoke(deserializedObject);
-                }
-
-                throw new JsonException($"Unable to execute OneOf factory for type {typeFactory.FieldType.FullName}");
+                return InokeDiscriminatorFactory(options, readerClone, typeFactory);
             }
 
             throw new JsonException($"Unknown discriminator {discriminator}");
+        }
+
+        private static T? InokeDiscriminatorFactory(JsonSerializerOptions options, Utf8JsonReader readerClone,
+            (Type FieldType, Delegate Factory) typeFactory)
+        {
+            object? deserializedObject = JsonSerializer.Deserialize(ref readerClone, typeFactory.FieldType, options);
+
+            if (deserializedObject is null)
+            {
+                throw new ArgumentNullException(nameof(deserializedObject));
+            }
+
+            if (typeFactory.Factory is Func<object, T> factory)
+            {
+                return factory.Invoke(deserializedObject);
+            }
+
+            throw new JsonException($"Unable to execute OneOf factory for type {typeFactory.FieldType.FullName}");
         }
 
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
