@@ -14,8 +14,14 @@ namespace TrueLayer.AcceptanceTests
             IConfiguration configuration = LoadConfiguration();
 
             ServiceProvider = new ServiceCollection()
-                .AddTrueLayer(configuration)
-                .AddSingleton<IConfigureOptions<TrueLayerOptions>, ConfigureTrueLayerOptions>()
+                .AddTrueLayer(configuration, options =>
+                {
+                    string privateKey = File.ReadAllText("ec512-private-key.pem");
+                    if (options.Payments?.SigningKey != null)
+                    {
+                        options.Payments.SigningKey.PrivateKey = privateKey;
+                    }
+                })
                 .BuildServiceProvider();
 
             Client = ServiceProvider.GetRequiredService<ITrueLayerClient>();
@@ -31,17 +37,5 @@ namespace TrueLayer.AcceptanceTests
                 .AddJsonFile("appsettings.local.json", true)
                 .AddEnvironmentVariables()
                 .Build();
-    }
-
-    public class ConfigureTrueLayerOptions : IConfigureOptions<TrueLayerOptions>
-    {
-        public void Configure(TrueLayerOptions options)
-        {
-            string privateKey = File.ReadAllText("ec512-private-key.pem");
-            if (options.Payments?.SigningKey != null)
-            {
-                options.Payments.SigningKey.PrivateKey = privateKey;
-            }
-        }
     }
 }
