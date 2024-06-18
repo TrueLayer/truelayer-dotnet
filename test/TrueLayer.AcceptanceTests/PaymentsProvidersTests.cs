@@ -1,14 +1,19 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OneOf;
 using Shouldly;
+using TrueLayer.Models;
 using TrueLayer.Payments.Model;
+using TrueLayer.PaymentsProviders.Model;
 using Xunit;
+using AuthorizationFlow = TrueLayer.PaymentsProviders.Model.AuthorizationFlow;
+using Provider = TrueLayer.Payments.Model.Provider;
 
 namespace TrueLayer.AcceptanceTests
 {
-    using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
     using AccountIdentifierUnion = OneOf<AccountIdentifier.SortCodeAccountNumber, AccountIdentifier.Iban>;
+    using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
 
     public class PaymentProvidersTests : IClassFixture<ApiTestFixture>
     {
@@ -53,6 +58,28 @@ namespace TrueLayer.AcceptanceTests
             response.Data.CountryCode.ShouldNotBeNullOrWhiteSpace();
             response.Data.Capabilities.Mandates?.VrpSweeping.ShouldNotBeNull();
             response.Data.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel.ShouldNotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public async Task Can_search_payments_providers()
+        {
+            var searchRequest = new SearchPaymentsProvidersRequest(
+                new AuthorizationFlow(new AuthorizationFlowConfiguration())
+            );
+
+            var response = await _fixture.Client.PaymentsProviders.SearchPaymentsProviders(searchRequest);
+
+            response.IsSuccessful.ShouldBeTrue();
+            response.Data.ShouldNotBeNull();
+            response.Data.Items.ShouldNotBeNull().ShouldNotBeEmpty();
+            response.Data.Items.ForEach(pp =>
+            {
+                pp.Id.ShouldNotBeEmpty();
+                pp.DisplayName.ShouldNotBeNullOrWhiteSpace();
+                pp.CountryCode.ShouldNotBeNullOrWhiteSpace();
+                pp.Capabilities.Mandates?.VrpSweeping.ShouldNotBeNull();
+                pp.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel.ShouldNotBeNullOrWhiteSpace();
+            });
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
 using TrueLayer.Common;
@@ -44,6 +45,24 @@ namespace TrueLayer.PaymentsProviders
 
             return await _apiClient.GetAsync<PaymentsProvider>(
                 baseUri.Uri,
+                accessToken: authResponse.Data!.AccessToken
+            );
+        }
+
+        public async Task<ApiResponse<SearchPaymentsProvidersResponse>> SearchPaymentsProviders(SearchPaymentsProvidersRequest searchPaymentsProvidersRequest)
+        {
+            searchPaymentsProvidersRequest.NotNull(nameof(searchPaymentsProvidersRequest));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"));
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync<SearchPaymentsProvidersResponse>(
+                _baseUri.Append("/search"),
+                request: searchPaymentsProvidersRequest,
                 accessToken: authResponse.Data!.AccessToken
             );
         }
