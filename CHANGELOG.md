@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.7.2] - 2024-06-18
+### Added
+- Added `POST /v3/payments-providers/search` endpoint.
+- Fixed deserialization issue with some responses from the Mandates APIs
+
 ## [1.6.1] - 2024-02-13
 ### Changed
 - Changed `GET payments-providers/{id}` to set the `Authorization` header on the request instead of the `client_id` on the query parameter.
