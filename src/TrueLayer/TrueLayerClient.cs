@@ -25,11 +25,11 @@ namespace TrueLayer
             options.NotNull(nameof(options));
 
             Auth = new AuthApi(apiClient, options.Value);
-            _payments = new(() => new PaymentsApi(apiClient, Auth, options.Value));
-            _paymentsProviders = new(() => new PaymentsProvidersApi(apiClient, Auth, options.Value));
-            _payouts = new(() => new PayoutsApi(apiClient, Auth, options.Value));
-            _merchants = new(() => new MerchantAccountsApi(apiClient, Auth, options.Value));
-            _mandates = new(() => new MandatesApi(apiClient, Auth, options.Value));
+            _payments = new Lazy<IPaymentsApi>(() => new PaymentsApi(apiClient, Auth, options.Value));
+            _paymentsProviders = new Lazy<IPaymentsProvidersApi>(() => new PaymentsProvidersApi(apiClient, Auth, options.Value));
+            _payouts = new Lazy<IPayoutsApi>(() => new PayoutsApi(apiClient, Auth, options.Value));
+            _merchants = new Lazy<IMerchantAccountsApi>(() => new MerchantAccountsApi(apiClient, Auth, options.Value));
+            _mandates = new Lazy<IMandatesApi>(() => new MandatesApi(apiClient, Auth, options.Value));
         }
 
         public IAuthApi Auth { get; }
