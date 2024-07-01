@@ -11,10 +11,10 @@ using TrueLayer.Payments.Model.AuthorizationFlow;
 namespace TrueLayer.Payments
 {
     using CreatePaymentUnion = OneOf<
-        CreatePaymentResponse.Authorizing,
         CreatePaymentResponse.AuthorizationRequired,
         CreatePaymentResponse.Authorized,
-        CreatePaymentResponse.Failed
+        CreatePaymentResponse.Failed,
+        CreatePaymentResponse.Authorizing
     >;
 
     using GetPaymentUnion = OneOf<
