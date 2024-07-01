@@ -4,7 +4,12 @@ using OneOf;
 namespace TrueLayer.Payments.Model.AuthorizationFlow
 {
     using ProviderSelectionUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
-    using SchemeSelectionUnion = OneOf<SchemeSelection.UserSelected, SchemeSelection.Preselected, SchemeSelection.InstantOnly, SchemeSelection.InstantPreferred>;
+    using SchemeSelectionUnion = OneOf<
+        SchemeSelection.UserSelected,
+        SchemeSelection.Preselected,
+        SchemeSelection.InstantOnly,
+        SchemeSelection.InstantPreferred
+    >;
 
     /// <summary>
     /// Can the UI redirect the end user to a third-party page? Configuration options are available to constrain if TrueLayer's Hosted Payment Page should be leveraged.
@@ -41,4 +46,6 @@ namespace TrueLayer.Payments.Model.AuthorizationFlow
         Form? Form = null,
         Consent? Consent = null,
         UserAccountSelection? UserAccountSelection = null);
+
+
 }
