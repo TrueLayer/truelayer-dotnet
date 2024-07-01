@@ -72,15 +72,16 @@ namespace TrueLayer.AcceptanceTests
                 paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
-            response.Data.IsT0.ShouldBeTrue();
-            response.Data.AsT0.Id.ShouldNotBeNullOrWhiteSpace();
-            response.Data.AsT0.ResourceToken.ShouldNotBeNullOrWhiteSpace();
-            response.Data.AsT0.User.ShouldNotBeNull();
-            response.Data.AsT0.User.Id.ShouldNotBeNullOrWhiteSpace();
-            response.Data.AsT0.Status.ShouldBe("authorizing");
+            response.Data.IsT3.ShouldBeTrue();
+            CreatePaymentResponse.Authorizing authorizing = response.Data.AsT3;
+            authorizing.Id.ShouldNotBeNullOrWhiteSpace();
+            authorizing.ResourceToken.ShouldNotBeNullOrWhiteSpace();
+            authorizing.User.ShouldNotBeNull();
+            authorizing.User.Id.ShouldNotBeNullOrWhiteSpace();
+            authorizing.Status.ShouldBe("authorizing");
 
             string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
-                response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, new Uri("https://redirect.mydomain.com"));
+                authorizing.Id, authorizing.ResourceToken, new Uri("https://redirect.mydomain.com"));
             hppUri.ShouldNotBeNullOrWhiteSpace();
         }
 
