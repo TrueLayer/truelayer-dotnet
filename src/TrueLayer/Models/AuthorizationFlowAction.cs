@@ -1,14 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Serialization;
-using static System.Net.Mime.MediaTypeNames;
 using static TrueLayer.Models.Input;
 
 namespace TrueLayer.Models
@@ -25,7 +18,7 @@ namespace TrueLayer.Models
         [JsonDiscriminator("provider_selection")]
         public record ProviderSelection(string Type, List<Provider> Providers) : IDiscriminated;
 
-        public enum SubsequentActionHint { Redirect = 0, Form = 1 };
+        public enum SubsequentActionHint { Redirect = 0 };
 
         /// <summary>
         /// Consent action.

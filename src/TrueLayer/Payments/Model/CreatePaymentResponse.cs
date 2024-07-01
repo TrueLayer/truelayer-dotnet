@@ -47,6 +47,15 @@ namespace TrueLayer.Payments.Model
         public record Authorized : PaymentDetails;
 
         /// <summary>
+        /// Represents a payment that is being authorizing by the end user
+        /// </summary>
+        [JsonDiscriminator("authorizing")]
+        public record Authorizing : PaymentDetails
+        {
+            public AuthorizationFlow.AuthorizationFlow AuthorizationFlow { get; init; } = null!;
+        }
+
+        /// <summary>
         /// Represents a payment that failed to complete. This is a terminal state.
         /// </summary>
         /// <param name="FailureStage">The status the payment was in when it failed</param>

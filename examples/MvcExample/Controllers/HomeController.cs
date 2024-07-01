@@ -78,6 +78,10 @@ namespace MvcExample.Controllers
             }
 
             return apiResponse.Data.Match<IActionResult>(
+                authorizing => {
+                    ViewData["Status"] = authorizing.Status;
+                    return View("Success");
+                },
                 authorizationRequired =>
                 {
                     var hppLink = _truelayer.Payments.CreateHostedPaymentPageLink(authorizationRequired.Id,

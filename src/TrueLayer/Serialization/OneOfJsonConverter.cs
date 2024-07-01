@@ -30,20 +30,20 @@ namespace TrueLayer.Serialization
             if (doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator)
                 && (_descriptor.TypeFactories.TryGetValue(discriminator.GetString()!, out var typeFactory)))
             {
-                return InokeDiscriminatorFactory(options, readerClone, typeFactory);
+                return InvokeDiscriminatorFactory(options, readerClone, typeFactory);
             }
 
             // Fallback to status field
             if (doc.RootElement.TryGetProperty("status", out discriminator)
                 && (_descriptor.TypeFactories.TryGetValue(discriminator.GetString()!, out typeFactory)))
             {
-                return InokeDiscriminatorFactory(options, readerClone, typeFactory);
+                return InvokeDiscriminatorFactory(options, readerClone, typeFactory);
             }
 
             throw new JsonException($"Unknown discriminator {discriminator}");
         }
 
-        private static T? InokeDiscriminatorFactory(JsonSerializerOptions options, Utf8JsonReader readerClone,
+        private static T? InvokeDiscriminatorFactory(JsonSerializerOptions options, Utf8JsonReader readerClone,
             (Type FieldType, Delegate Factory) typeFactory)
         {
             object? deserializedObject = JsonSerializer.Deserialize(ref readerClone, typeFactory.FieldType, options);

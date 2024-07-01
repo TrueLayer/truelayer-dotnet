@@ -1,4 +1,5 @@
 using OneOf;
+using TrueLayer.Payments.Model.AuthorizationFlow;
 using static TrueLayer.Payments.Model.PaymentMethod;
 
 namespace TrueLayer.Payments.Model
@@ -18,18 +19,22 @@ namespace TrueLayer.Payments.Model
         /// <param name="paymentMethod">The method of payment</param>
         /// <param name="user">The end user details</param>
         /// <param name="relatedProducts">Related products</param>
+        /// <param name="authorizationFlow">The authorization flow parameter.
+        /// If provided, the start authorization flow endpoint does not need to be called</param>
         public CreatePaymentRequest(
             long amountInMinor,
             string currency,
             PaymentMethodUnion paymentMethod,
-            PaymentUserRequest? user,
-            RelatedProducts? relatedProducts)
+            PaymentUserRequest? user = null,
+            RelatedProducts? relatedProducts = null,
+            StartAuthorizationFlowRequest? authorizationFlow = null)
         {
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
             Currency = currency.NotNullOrWhiteSpace(nameof(currency));
             PaymentMethod = paymentMethod;
             User = user;
             RelatedProducts = relatedProducts;
+            AuthorizationFlow = authorizationFlow;
         }
 
         /// <summary>
@@ -57,5 +62,10 @@ namespace TrueLayer.Payments.Model
         /// Gets the related products
         /// </summary>
         public RelatedProducts? RelatedProducts { get; }
+
+        /// <summary>
+        /// Gets the payments authorization flow request
+        /// </summary>
+        public StartAuthorizationFlowRequest? AuthorizationFlow { get; }
     }
 }
