@@ -6,6 +6,7 @@ using OneOf;
 using Shouldly;
 using TrueLayer.Common;
 using TrueLayer.Payments.Model;
+using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
 
 namespace TrueLayer.AcceptanceTests
@@ -16,8 +17,11 @@ namespace TrueLayer.AcceptanceTests
         AccountIdentifier.Iban,
         AccountIdentifier.Bban,
         AccountIdentifier.Nrb>;
-    using PreselectedProviderSchemeSelectionUnion = OneOf<SchemeSelection.InstantOnly, SchemeSelection.InstantPreferred, SchemeSelection.Preselected, SchemeSelection.UserSelected>;
-    using UserSelectedProviderSchemeSelectionUnion = OneOf<SchemeSelection.InstantOnly, SchemeSelection.InstantPreferred, SchemeSelection.UserSelected>;
+    using PreselectedProviderSchemeSelectionUnion = OneOf<
+        SchemeSelection.InstantOnly,
+        SchemeSelection.InstantPreferred,
+        SchemeSelection.Preselected,
+        SchemeSelection.UserSelected>;
 
     public class PaymentTests : IClassFixture<ApiTestFixture>
     {
@@ -42,6 +46,38 @@ namespace TrueLayer.AcceptanceTests
             response.Data.AsT0.User.ShouldNotBeNull();
             response.Data.AsT0.User.Id.ShouldNotBeNullOrWhiteSpace();
             response.Data.AsT0.Status.ShouldBe("authorization_required");
+
+            string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
+                response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, new Uri("https://redirect.mydomain.com"));
+            hppUri.ShouldNotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public async Task Can_create_payment_with_auth_flow()
+        {
+            var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
+            var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+            {
+                Remitter = new RemitterAccount("John Doe", sortCodeAccountNumber),
+            };
+            var paymentRequest = CreateTestPaymentRequest(
+                providerSelection,
+                sortCodeAccountNumber,
+                authorizationFlow: new StartAuthorizationFlowRequest(
+                    providerSelection, new SchemeSelection.Preselected(),
+                    new Redirect(new Uri("http://localhost:3000/callback")))
+            );
+
+            var response = await _fixture.Client.Payments.CreatePayment(
+                paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+            response.StatusCode.ShouldBe(HttpStatusCode.Created);
+            response.Data.IsT0.ShouldBeTrue();
+            response.Data.AsT0.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.AsT0.ResourceToken.ShouldNotBeNullOrWhiteSpace();
+            response.Data.AsT0.User.ShouldNotBeNull();
+            response.Data.AsT0.User.Id.ShouldNotBeNullOrWhiteSpace();
+            response.Data.AsT0.Status.ShouldBe("authorizing");
 
             string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
                 response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, new Uri("https://redirect.mydomain.com"));
@@ -95,6 +131,7 @@ namespace TrueLayer.AcceptanceTests
             payment.User.Id.ShouldBe(authorizationRequiredResponse.User.Id);
         }
 
+
         private static void AssertSchemeSelection(
             PreselectedProviderSchemeSelectionUnion? actualSchemeSelection,
             PreselectedProviderSchemeSelectionUnion? expectedSchemeSelection,
@@ -121,7 +158,8 @@ namespace TrueLayer.AcceptanceTests
             ProviderUnion providerSelection,
             AccountIdentifierUnion accountIdentifier,
             string currency = Currencies.GBP,
-            RelatedProducts? relatedProducts = null)
+            RelatedProducts? relatedProducts = null,
+            StartAuthorizationFlowRequest? authorizationFlow = null)
             => new CreatePaymentRequest(
                 100,
                 currency,
@@ -138,7 +176,8 @@ namespace TrueLayer.AcceptanceTests
                     phone: "+442079460087",
                     dateOfBirth: new DateTime(1999, 1, 1),
                     address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
-                relatedProducts
+                relatedProducts,
+                authorizationFlow
             );
 
         private static IEnumerable<object[]> CreateTestPaymentRequests()

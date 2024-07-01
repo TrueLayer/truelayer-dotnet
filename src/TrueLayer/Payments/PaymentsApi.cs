@@ -6,10 +6,12 @@ using TrueLayer.Auth;
 using TrueLayer.Common;
 using TrueLayer.Extensions;
 using TrueLayer.Payments.Model;
+using TrueLayer.Payments.Model.AuthorizationFlow;
 
 namespace TrueLayer.Payments
 {
     using CreatePaymentUnion = OneOf<
+        CreatePaymentResponse.Authorizing,
         CreatePaymentResponse.AuthorizationRequired,
         CreatePaymentResponse.Authorized,
         CreatePaymentResponse.Failed
@@ -22,6 +24,11 @@ namespace TrueLayer.Payments
         GetPaymentResponse.Executed,
         GetPaymentResponse.Settled,
         GetPaymentResponse.Failed
+    >;
+
+    using AuthorizationResponseUnion = OneOf<
+        AuthorizationFlowResponse.AuthorizationFlowAuthorizing,
+        AuthorizationFlowResponse.AuthorizationFlowAuthorizationFailed
     >;
 
     internal class PaymentsApi : IPaymentsApi
@@ -96,5 +103,34 @@ namespace TrueLayer.Payments
         /// <inheritdoc />
         public string CreateHostedPaymentPageLink(string paymentId, string paymentToken, Uri returnUri)
             => _hppLinkBuilder.Build(paymentId, paymentToken, returnUri);
+
+        /// <inheritdoc />
+        public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
+            string paymentId,
+            string idempotencyKey,
+            StartAuthorizationFlowRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+            request.NotNull(nameof(request));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
+                new GetAuthTokenRequest("payments"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync<AuthorizationResponseUnion>(
+                _baseUri,
+                request,
+                idempotencyKey,
+                authResponse.Data!.AccessToken,
+                _options.Payments!.SigningKey,
+                cancellationToken
+            );
+        }
     }
 }
