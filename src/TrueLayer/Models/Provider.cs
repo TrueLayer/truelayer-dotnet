@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using TrueLayer.PaymentsProviders.Model;
 
 namespace TrueLayer.Models
 {
@@ -18,6 +14,7 @@ namespace TrueLayer.Models
     /// <param name="Availability">Provider availability.</param>
     /// <param name="CountryCode"></param>
     /// <param name="SearchAliases">Alternative search terms that should be used to help users find this provider.</param>
+    /// <prama name="Schemes">List of schemes supported by the provider.</prama>
     public record Provider(
         string? Id = null,
         string? DisplayName = null,
@@ -26,5 +23,6 @@ namespace TrueLayer.Models
         string? BgColor = null,
         ProviderAvailability? Availability = null,
         CountryCode? CountryCode = null,
-        List<string>? SearchAliases = null);
+        List<string>? SearchAliases = null,
+        List<Scheme>? Schemes = null);
 }
