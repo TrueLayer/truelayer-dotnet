@@ -18,7 +18,7 @@ namespace TrueLayer.Models
         [JsonDiscriminator("provider_selection")]
         public record ProviderSelection(string Type, List<Provider> Providers) : IDiscriminated;
 
-        public enum SubsequentActionHint { Redirect = 0 };
+        public enum SubsequentActionHint { Redirect = 0, Form = 1 };
 
         /// <summary>
         /// Consent action.
