@@ -22,7 +22,7 @@ namespace TrueLayer.Auth
         /// Gets the OAuth scope value
         /// </summary>
         public string? Scope { get; }
-        
+
         /// <summary>
         /// Gets whether the access token request is scoped
         /// </summary>

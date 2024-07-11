@@ -17,22 +17,22 @@ namespace TrueLayer.AcceptanceTests
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
     using TrueLayer.Models;
-    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
-    using MandateUnion = OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>;
     using AccountIdentifierUnion = OneOf<
         AccountIdentifier.SortCodeAccountNumber,
         AccountIdentifier.Iban,
         AccountIdentifier.Bban,
         AccountIdentifier.Nrb>;
+    using AuthorizationResponseUnion = OneOf<
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
+        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
     using MandateDetailUnion = OneOf<
         MandateDetail.AuthorizationRequiredMandateDetail,
         MandateDetail.AuthorizingMandateDetail,
         MandateDetail.AuthorizedMandateDetail,
         MandateDetail.FailedMandateDetail,
         MandateDetail.RevokedMandateDetail>;
-    using AuthorizationResponseUnion = OneOf<
-        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
-        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
+    using MandateUnion = OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>;
+    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
 
     public class MandatesTests : IClassFixture<ApiTestFixture>
     {
@@ -296,7 +296,7 @@ namespace TrueLayer.AcceptanceTests
             CreateMandateRequest mandateRequest,
             string mandateId,
             bool setRelatedProducts = true)
-            => new (
+            => new(
                 mandateRequest.Constraints.MaximumIndividualAmount,
                 mandateRequest.Currency,
                 new PaymentMethod.Mandate(mandateId, "reference", null),

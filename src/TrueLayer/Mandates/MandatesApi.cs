@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayer.Auth;
 using OneOf;
+using TrueLayer.Auth;
 using TrueLayer.Common;
 using TrueLayer.Extensions;
 using TrueLayer.Mandates.Model;

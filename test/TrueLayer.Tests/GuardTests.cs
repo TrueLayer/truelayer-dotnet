@@ -100,7 +100,7 @@ namespace TrueLayer.Tests
             bool useSandbox,
             Type exceptionType)
         {
-            var value = url != null ?  new Uri(url) : null;
+            var value = url != null ? new Uri(url) : null;
             var options = new TrueLayerOptions()
             {
                 UseSandbox = useSandbox,

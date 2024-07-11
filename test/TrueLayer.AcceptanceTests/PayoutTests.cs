@@ -18,7 +18,7 @@ namespace TrueLayer.AcceptanceTests
 
         public PayoutTests(ApiTestFixture fixture)
         {
-             _fixture = fixture;
+            _fixture = fixture;
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace TrueLayer.AcceptanceTests
                     new AccountIdentifier.Iban("GB33BUKB20201555555555"),
                     dateOfBirth: new DateTime(1970, 12, 31),
                     address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
-                metadata: new() {{"a", "b"}}
+                metadata: new() { { "a", "b" } }
             );
     }
 }

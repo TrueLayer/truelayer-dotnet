@@ -18,7 +18,7 @@ namespace TrueLayer.AcceptanceTests
         [Fact]
         public async Task Can_get_auth_token()
         {
-            ApiResponse<GetAuthTokenResponse> apiResponse 
+            ApiResponse<GetAuthTokenResponse> apiResponse
                 = await _fixture.Client.Auth.GetAuthToken(new GetAuthTokenRequest());
 
             apiResponse.IsSuccessful.ShouldBeTrue();
@@ -34,7 +34,7 @@ namespace TrueLayer.AcceptanceTests
         [Fact]
         public async Task Can_get_scoped_access_token()
         {
-            GetAuthTokenResponse? apiResponse 
+            GetAuthTokenResponse? apiResponse
                 = await _fixture.Client.Auth.GetAuthToken(new GetAuthTokenRequest("payments"));
 
             apiResponse.ShouldNotBeNull();

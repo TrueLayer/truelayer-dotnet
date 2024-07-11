@@ -11,7 +11,7 @@ namespace TrueLayer.Serialization
             Upper,
             NewWord
         }
-        
+
         public static string ToSnakeCase(this string s)
         {
             const char separator = '_';

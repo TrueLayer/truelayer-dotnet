@@ -21,7 +21,7 @@ namespace TrueLayer.Models
         /// </summary>
         /// <param name="Key">A key that is intended to be used as a translation key to look up and render localised text. If a key is not provided, it indicates that this value cannot be localised and that the default value should always be preferred.</param>
         /// <param name="DefaultValue">A value that can be used as a default to show to the user, if the key cannot be used to look up a relevant value.</param>
-        public record DisplayText([property: JsonPropertyName("default")]string DefaultValue, string? Key = null);
+        public record DisplayText([property: JsonPropertyName("default")] string DefaultValue, string? Key = null);
 
         /// <summary>
         /// A regex to validate the input against.
@@ -33,7 +33,8 @@ namespace TrueLayer.Models
         /// <summary>
         /// The type of text input that this represents.
         /// </summary>
-        public enum Format {
+        public enum Format
+        {
             Any = 0,
             Numerical = 1,
             Alphabetical = 2,
@@ -41,7 +42,8 @@ namespace TrueLayer.Models
             Email = 4,
             SortCode = 5,
             AccountNumber = 6,
-            Iban = 7 };
+            Iban = 7
+        };
 
         public abstract record InputBase(
             string Type,
@@ -151,7 +153,7 @@ namespace TrueLayer.Models
         /// <param name="Id">The identifier of the option, this is the value to be submitted back to the API.</param>
         /// <param name="DisplayText">The value to show to the PSU in the UI select dropdown.</param>
         /// <param name="SearchAliases">Alternative search terms for this option.</param>
-        public record Option (string Id, DisplayText DisplayText, List<string> SearchAliases);
+        public record Option(string Id, DisplayText DisplayText, List<string> SearchAliases);
 
         /// <summary>
         /// Select input object.

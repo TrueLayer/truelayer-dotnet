@@ -90,13 +90,13 @@ namespace TrueLayer.Payouts.Model
             /// Gets the unique scheme identifier for the external account
             /// </summary>
             public AccountIdentifierUnion AccountIdentifier { get; }
-            
+
             /// <summary>
             /// Gets the user's date of birth.
             /// </summary>
             [JsonConverter(typeof(DateTimeDateOnlyJsonConverter))]
             public DateTime? DateOfBirth { get; }
-        
+
             /// <summary>
             /// Gets the user's physical address
             /// </summary>

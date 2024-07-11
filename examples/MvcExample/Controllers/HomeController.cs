@@ -78,7 +78,8 @@ namespace MvcExample.Controllers
             }
 
             return apiResponse.Data.Match<IActionResult>(
-                authorizing => {
+                authorizing =>
+                {
                     ViewData["Status"] = authorizing.Status;
                     return View("Success");
                 },
@@ -101,7 +102,8 @@ namespace MvcExample.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Complete([FromQuery(Name = "payment_id")]string paymentId)
+        [Obsolete]
+        public async Task<IActionResult> Complete([FromQuery(Name = "payment_id")] string paymentId)
         {
             if (string.IsNullOrWhiteSpace(paymentId))
                 return StatusCode((int)HttpStatusCode.BadRequest);
@@ -130,7 +132,7 @@ namespace MvcExample.Controllers
                         userSelected => (userSelected.ProviderId, userSelected.SchemeId),
                         preselected => (preselected.ProviderId, preselected.SchemeId)
                     ),
-                    mandate => ("unavailable", "unavailable")) ??  ("unavailable", "unavailable");
+                    mandate => ("unavailable", "unavailable")) ?? ("unavailable", "unavailable");
 
                 ViewData["ProviderId"] = providerId;
                 ViewData["SchemeId"] = schemeId;

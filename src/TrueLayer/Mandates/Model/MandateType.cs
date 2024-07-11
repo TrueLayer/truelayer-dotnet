@@ -1,4 +1,4 @@
-﻿namespace TrueLayer.Mandates.Model;
+namespace TrueLayer.Mandates.Model;
 
 using System;
 

@@ -12,7 +12,7 @@ namespace TrueLayer.Payments
         /// Gets or sets the public key used to sign outgoing payment requests
         /// </summary>
         public SigningKey? SigningKey { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the Hosted Payment Page URI. Defaults to Sandbox or Live depending on the value of <see cref="TrueLayerOptions.UseSandbox"/>
         /// </summary>
@@ -21,7 +21,7 @@ namespace TrueLayer.Payments
         internal override void Validate()
         {
             base.Validate();
-            
+
             if (SigningKey is null)
             {
                 throw new ValidationException("The signing key is required");

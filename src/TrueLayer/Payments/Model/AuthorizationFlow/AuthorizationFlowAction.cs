@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using TrueLayer.Serialization;
 using OneOf;
+using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model.AuthorizationFlow;
 

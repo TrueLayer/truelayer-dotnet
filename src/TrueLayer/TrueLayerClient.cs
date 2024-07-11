@@ -1,8 +1,8 @@
 using System;
 using Microsoft.Extensions.Options;
 using TrueLayer.Auth;
-using TrueLayer.Payments;
 using TrueLayer.MerchantAccounts;
+using TrueLayer.Payments;
 using TrueLayer.PaymentsProviders;
 using TrueLayer.Payouts;
 

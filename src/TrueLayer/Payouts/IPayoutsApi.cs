@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayer.Payouts.Model;
 using OneOf;
+using TrueLayer.Payouts.Model;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
 
 namespace TrueLayer.Payouts

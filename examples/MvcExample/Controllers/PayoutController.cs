@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,7 +35,7 @@ namespace MvcExample.Controllers
             {
                 return View("Index");
             }
-            
+
             var externalAccount = new Beneficiary.ExternalAccount(
                 "TrueLayer",
                 "truelayer-dotnet",
@@ -43,13 +43,13 @@ namespace MvcExample.Controllers
                 dateOfBirth: new DateTime(1970, 12, 31),
                 address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")
             );
-            
+
             var payoutRequest = new CreatePayoutRequest(
                 payoutModel.MerchantAccountId,
                 payoutModel.AmountInMajor.ToMinorCurrencyUnit(2),
                 Currencies.GBP,
                 externalAccount,
-                 metadata: new() {{"a", "b"}});
+                 metadata: new() { { "a", "b" } });
 
             var apiResponse = await _truelayer.Payouts.CreatePayout(
                 payoutRequest,

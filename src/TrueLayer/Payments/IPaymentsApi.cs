@@ -7,13 +7,16 @@ using TrueLayer.Payments.Model.AuthorizationFlow;
 
 namespace TrueLayer.Payments
 {
+    using AuthorizationResponseUnion = OneOf<
+        AuthorizationFlowResponse.AuthorizationFlowAuthorizing,
+        AuthorizationFlowResponse.AuthorizationFlowAuthorizationFailed
+    >;
     using CreatePaymentUnion = OneOf<
         CreatePaymentResponse.AuthorizationRequired,
         CreatePaymentResponse.Authorized,
         CreatePaymentResponse.Failed,
         CreatePaymentResponse.Authorizing
     >;
-
     using GetPaymentUnion = OneOf<
         GetPaymentResponse.AuthorizationRequired,
         GetPaymentResponse.Authorizing,
@@ -21,11 +24,6 @@ namespace TrueLayer.Payments
         GetPaymentResponse.Executed,
         GetPaymentResponse.Settled,
         GetPaymentResponse.Failed
-    >;
-
-    using AuthorizationResponseUnion = OneOf<
-        AuthorizationFlowResponse.AuthorizationFlowAuthorizing,
-        AuthorizationFlowResponse.AuthorizationFlowAuthorizationFailed
     >;
 
     /// <summary>

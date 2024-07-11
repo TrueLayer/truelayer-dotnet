@@ -1,6 +1,6 @@
 using TrueLayer.Auth;
-using TrueLayer.Payments;
 using TrueLayer.MerchantAccounts;
+using TrueLayer.Payments;
 using TrueLayer.PaymentsProviders;
 using TrueLayer.Payouts;
 

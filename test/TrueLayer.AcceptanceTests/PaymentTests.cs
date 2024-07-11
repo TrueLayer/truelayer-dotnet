@@ -12,7 +12,6 @@ using Xunit.Abstractions;
 
 namespace TrueLayer.AcceptanceTests;
 
-using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
 using AccountIdentifierUnion = OneOf<
     AccountIdentifier.SortCodeAccountNumber,
     AccountIdentifier.Iban,
@@ -23,6 +22,7 @@ using PaymentsSchemeSelectionUnion = OneOf<
     SchemeSelection.InstantPreferred,
     SchemeSelection.Preselected,
     SchemeSelection.UserSelected>;
+using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
 
 public partial class PaymentTests : IClassFixture<ApiTestFixture>
 {
@@ -95,6 +95,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
     [Theory]
     [MemberData(nameof(CreateTestPaymentRequests))]
+    [Obsolete]
     public async Task Can_get_authorization_required_payment(CreatePaymentRequest paymentRequest)
     {
         var response = await _fixture.Client.Payments.CreatePayment(
@@ -192,7 +193,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     private static IEnumerable<object[]> CreateTestPaymentRequests()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
-        var providerFilterMockGbRedirect = new ProviderFilter {ProviderIds = new[] {"mock-payments-gb-redirect"}};
+        var providerFilterMockGbRedirect = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } };
         yield return new object[]
         {
             CreateTestPaymentRequest(new Provider.UserSelected

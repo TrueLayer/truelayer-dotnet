@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using OneOf;
 using AccountIdentifier = TrueLayer.Payments.Model.AccountIdentifier;
-using System.Collections.Generic;
 
 namespace TrueLayer.MerchantAccounts.Model
 {
