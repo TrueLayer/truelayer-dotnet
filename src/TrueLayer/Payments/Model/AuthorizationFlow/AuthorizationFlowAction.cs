@@ -7,10 +7,12 @@ namespace TrueLayer.Payments.Model.AuthorizationFlow;
 
 using AuthorizationFlowActionUnion = OneOf<
     Models.AuthorizationFlowAction.ProviderSelection,
-    AuthorizationFlowAction.Consent,
-    Models.AuthorizationFlowAction.Form,
+    AuthorizationFlowAction.SchemeSelection,
+    Models.AuthorizationFlowAction.Redirect,
     Models.AuthorizationFlowAction.WaitForOutcome,
-    Models.AuthorizationFlowAction.Redirect
+    Models.AuthorizationFlowAction.Form,
+    AuthorizationFlowAction.Consent,
+    AuthorizationFlowAction.UserAccountSelection
 >;
 
 /// <summary>

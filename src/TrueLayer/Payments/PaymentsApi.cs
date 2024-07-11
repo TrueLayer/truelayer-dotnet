@@ -124,7 +124,7 @@ namespace TrueLayer.Payments
             }
 
             return await _apiClient.PostAsync<AuthorizationResponseUnion>(
-                _baseUri,
+                _baseUri.Append(paymentId).Append("/authorization-flow"),
                 request,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
