@@ -77,13 +77,13 @@ namespace TrueLayer.Payments.Model
         /// Gets the user's phone number.
         /// </summary>
         public string? Phone { get; }
-        
+
         /// <summary>
         /// Gets the user's date of birth.
         /// </summary>
         [JsonConverter(typeof(DateTimeDateOnlyJsonConverter))]
         public DateTime? DateOfBirth { get; }
-        
+
         /// <summary>
         /// Gets the user's physical address
         /// </summary>

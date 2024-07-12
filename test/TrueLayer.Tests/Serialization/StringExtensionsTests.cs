@@ -9,7 +9,7 @@ namespace TrueLayer.Tests.Serialization
         [Theory]
         [MemberData(nameof(SnakeCaseData))]
         public void Can_convert_to_snake_case(string expected, string actual) => Assert.Equal(expected, actual.ToSnakeCase());
-        
+
         public static IEnumerable<object[]> SnakeCaseData()
         {
             var snakeCaseSamples = new List<object[]>

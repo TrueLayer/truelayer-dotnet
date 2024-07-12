@@ -25,7 +25,7 @@ namespace TrueLayer
         /// Gets the HTTP status code of the response
         /// </summary>
         public HttpStatusCode StatusCode { get; }
-        
+
         /// <summary>
         /// Gets the TrueLayer trace identifier for the request
         /// </summary>

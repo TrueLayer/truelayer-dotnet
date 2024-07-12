@@ -14,7 +14,7 @@ public class AddressTests
         Assert.Throws<ArgumentException>("addressLine1",
             () => new Address("city", "state", "country Code", "zip", addressLine1));
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
@@ -24,7 +24,7 @@ public class AddressTests
         Assert.Throws<ArgumentException>("city",
             () => new Address(city, "state", "zip", "country Code", "addressLine1"));
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
@@ -34,7 +34,7 @@ public class AddressTests
         Assert.Throws<ArgumentException>("state",
             () => new Address("city", state, "zip", "country Code", "addressLine1"));
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
@@ -44,7 +44,7 @@ public class AddressTests
         Assert.Throws<ArgumentException>("zip",
             () => new Address("city", "state", zip, "country Code", "addressLine1"));
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
@@ -54,7 +54,7 @@ public class AddressTests
         Assert.Throws<ArgumentException>("countryCode",
             () => new Address("city", "state", "zip", countryCode, "addressLine1"));
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]

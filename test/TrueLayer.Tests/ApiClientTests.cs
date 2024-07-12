@@ -1,16 +1,16 @@
-using System.Net.Http;
-using System.Threading.Tasks;
-using Xunit;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Net;
-using Shouldly;
-using RichardSzalay.MockHttp;
+using System.Net.Http;
 using System.Net.Mime;
-using TrueLayer.Serialization;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using RichardSzalay.MockHttp;
+using Shouldly;
+using TrueLayer.Serialization;
+using Xunit;
 
 namespace TrueLayer.Sdk.Tests
 {

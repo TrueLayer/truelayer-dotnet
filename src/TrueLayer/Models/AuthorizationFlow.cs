@@ -1,13 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OneOf;
 
 namespace TrueLayer.Models
 {
-    using AuthorizationFlowActionUnion = OneOf<AuthorizationFlowAction.ProviderSelection, AuthorizationFlowAction.Consent, AuthorizationFlowAction.Form, AuthorizationFlowAction.WaitForOutcome, AuthorizationFlowAction.Redirect>;
+    using AuthorizationFlowActionUnion = OneOf<
+        AuthorizationFlowAction.ProviderSelection,
+        AuthorizationFlowAction.Consent,
+        AuthorizationFlowAction.Form,
+        AuthorizationFlowAction.WaitForOutcome,
+        AuthorizationFlowAction.Redirect
+    >;
 
     /// <summary>
     /// Contains information regarding the next action to be taken in the authorization flow.

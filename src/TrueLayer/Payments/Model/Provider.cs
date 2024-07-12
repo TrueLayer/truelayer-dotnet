@@ -55,6 +55,7 @@ namespace TrueLayer.Payments.Model
         [JsonDiscriminator("preselected")]
         public record Preselected : IDiscriminated
         {
+            [Obsolete]
             public Preselected(string providerId, string? schemeId = null, PreselectedProviderSchemeSelectionUnion? schemeSelection = null)
             {
                 if (string.IsNullOrWhiteSpace(schemeId) && schemeSelection is null)

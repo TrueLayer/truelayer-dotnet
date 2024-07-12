@@ -3,15 +3,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Payments.Model;
+using TrueLayer.Payments.Model.AuthorizationFlow;
 
 namespace TrueLayer.Payments
 {
+    using AuthorizationResponseUnion = OneOf<
+        AuthorizationFlowResponse.AuthorizationFlowAuthorizing,
+        AuthorizationFlowResponse.AuthorizationFlowAuthorizationFailed
+    >;
     using CreatePaymentUnion = OneOf<
         CreatePaymentResponse.AuthorizationRequired,
         CreatePaymentResponse.Authorized,
-        CreatePaymentResponse.Failed
+        CreatePaymentResponse.Failed,
+        CreatePaymentResponse.Authorizing
     >;
-
     using GetPaymentUnion = OneOf<
         GetPaymentResponse.AuthorizationRequired,
         GetPaymentResponse.Authorizing,
@@ -58,5 +63,23 @@ namespace TrueLayer.Payments
         /// </param>
         /// <returns>The HPP link you can redirect the end user to</returns>
         string CreateHostedPaymentPageLink(string paymentId, string paymentToken, Uri returnUri);
+
+        /// <summary>
+        /// Start the authorization flow for a payment.
+        /// </summary>
+        /// <param name="paymentId">The payment identifier</param>
+        /// <param name="idempotencyKey">
+        /// An idempotency key to allow safe retrying without the operation being performed multiple times.
+        /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// </param>
+        /// <param name="request">The start authorization request details</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns></returns>
+        Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
+            string paymentId,
+            string idempotencyKey,
+            StartAuthorizationFlowRequest request,
+            CancellationToken cancellationToken = default);
+
     }
 }
