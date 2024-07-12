@@ -42,7 +42,7 @@ namespace TrueLayer.Mandates
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<MandateDetailUnion>> GetMandate(
-            string mandateId, MandateType mandateType , CancellationToken cancellationToken = default);
+            string mandateId, MandateType mandateType, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Lists mandates for a user

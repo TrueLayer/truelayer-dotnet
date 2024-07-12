@@ -27,9 +27,9 @@ namespace TrueLayer.Tests.Extensions
             string baseUrl = "http://test.foo.com/";
             Uri baseUri = new(baseUrl);
 
-            yield return new object[] { baseUri, new[] {"test"}, new Uri($"{baseUrl}test") };
-            yield return new object[] { baseUri, new[] {"/test"}, new Uri($"{baseUrl}test") };
-            yield return new object[] { baseUri, new[] {"test", "/test2/"}, new Uri($"{baseUrl}test/test2") };
+            yield return new object[] { baseUri, new[] { "test" }, new Uri($"{baseUrl}test") };
+            yield return new object[] { baseUri, new[] { "/test" }, new Uri($"{baseUrl}test") };
+            yield return new object[] { baseUri, new[] { "test", "/test2/" }, new Uri($"{baseUrl}test/test2") };
             yield return new object[]
             {
                 new Uri("http://test.foo.test/extra-path"),

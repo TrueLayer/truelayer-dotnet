@@ -25,22 +25,22 @@ public record Address
     /// Gets full street address including house number and street name.
     /// </summary>
     public string AddressLine1 { get; }
-        
+
     /// <summary>
     /// Gets details like building name, suite, apartment number, etc.
     /// </summary>
     public string? AddressLine2 { get; }
-        
+
     /// <summary>
     /// Gets the name of the city / locality.
     /// </summary>
     public string City { get; }
-        
+
     /// <summary>
     /// Gets the name of the country / stat.
     /// </summary>
     public string State { get; }
-        
+
     /// <summary>
     /// Gets the zip code or postal code
     /// </summary>

@@ -48,12 +48,12 @@ namespace TrueLayer.Payouts.Model
         /// </summary>
         /// <example>EUR</example>
         public string Currency { get; }
-        
+
         /// <summary>
         /// Gets the beneficiary details
         /// </summary>
         public BeneficiaryUnion Beneficiary { get; }
-        
+
         public Dictionary<string, string>? Metadata { get; }
     }
 }

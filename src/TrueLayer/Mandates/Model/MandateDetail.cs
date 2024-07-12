@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
 using OneOf;
+using TrueLayer.Models;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
 using static TrueLayer.Mandates.Model.Beneficiary;
-using TrueLayer.Models;
 using static TrueLayer.Mandates.Model.MandateDetail;
 
 namespace TrueLayer.Mandates.Model
 {
-    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Provider.Preselected>;
     using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
     using MandateDetailUnion = OneOf<AuthorizationRequiredMandateDetail, AuthorizingMandateDetail, AuthorizedMandateDetail, FailedMandateDetail, RevokedMandateDetail>;
+    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Provider.Preselected>;
 
     public static class MandateDetail
     {

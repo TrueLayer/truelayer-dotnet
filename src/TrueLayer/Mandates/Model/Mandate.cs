@@ -4,8 +4,8 @@ using static TrueLayer.Mandates.Model.Beneficiary;
 
 namespace TrueLayer.Mandates.Model
 {
-    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Provider.Preselected>;
     using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
+    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Provider.Preselected>;
 
     public static class Mandate
     {

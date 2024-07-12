@@ -1,13 +1,13 @@
 using OneOf;
-using static TrueLayer.Payments.Model.Provider;
-using static TrueLayer.Payments.Model.Beneficiary;
-using static TrueLayer.Payments.Model.Retry;
 using TrueLayer.Serialization;
+using static TrueLayer.Payments.Model.Beneficiary;
+using static TrueLayer.Payments.Model.Provider;
+using static TrueLayer.Payments.Model.Retry;
 
 namespace TrueLayer.Payments.Model
 {
-    using ProviderUnion = OneOf<UserSelected, Preselected>;
     using BeneficiaryUnion = OneOf<MerchantAccount, ExternalAccount>;
+    using ProviderUnion = OneOf<UserSelected, Preselected>;
     using RetryUnion = OneOf<Standard, Smart>;
 
     /// <summary>

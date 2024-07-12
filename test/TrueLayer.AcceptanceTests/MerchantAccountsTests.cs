@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using TrueLayer.MerchantAccounts.Model;
-using Shouldly;
-using Xunit;
-using System.Threading;
 using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using Shouldly;
 using TrueLayer.Common;
+using TrueLayer.MerchantAccounts.Model;
 using TrueLayer.Payments.Model;
+using Xunit;
 
 namespace TrueLayer.AcceptanceTests
 {

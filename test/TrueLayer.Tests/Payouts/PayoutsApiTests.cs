@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using OneOf;
 using Moq;
+using OneOf;
 using Shouldly;
 using TrueLayer.Auth;
 using TrueLayer.Common;
@@ -114,7 +114,7 @@ namespace TrueLayer.Tests.Payouts
                 100,
                 Currencies.GBP,
                 beneficiary,
-                metadata: new() {{"a", "b"}});
+                metadata: new() { { "a", "b" } });
 
         public static IEnumerable<object[]> TestData =>
             new List<object[]>
