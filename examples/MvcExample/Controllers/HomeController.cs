@@ -102,7 +102,6 @@ namespace MvcExample.Controllers
         }
 
         [HttpGet]
-        [Obsolete]
         public async Task<IActionResult> Complete([FromQuery(Name = "payment_id")] string paymentId)
         {
             if (string.IsNullOrWhiteSpace(paymentId))
