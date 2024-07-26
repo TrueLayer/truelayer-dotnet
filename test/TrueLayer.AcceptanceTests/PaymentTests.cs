@@ -259,7 +259,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         string currency = Currencies.GBP,
         RelatedProducts? relatedProducts = null,
         StartAuthorizationFlowRequest? authorizationFlow = null,
-        BeneficiaryUnion? beneficiary = null)
+        BeneficiaryUnion? beneficiary = null,
+        Retry.BaseRetry? retry = null)
         => new CreatePaymentRequest(
             100,
             currency,
@@ -269,8 +270,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                     "TrueLayer",
                     "truelayer-dotnet",
                     accountIdentifier
-                )),
-
+                ),
+                retry),
             new PaymentUserRequest(
                 name: "Jane Doe",
                 email: "jane.doe@example.com",
@@ -450,6 +451,29 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 },
                 new AccountIdentifier.Bban("IT60X0542811101000000123456"),
                 Currencies.NOK),
+        };
+        // Create a payment with retry
+        yield return new object[]
+        {
+            CreateTestPaymentRequest(new Provider.UserSelected
+                {
+                    Filter = providerFilterMockGbRedirect,
+                    SchemeSelection = new SchemeSelection.InstantOnly() { AllowRemitterFee = true },
+                },
+                sortCodeAccountNumber,
+                retry: new Retry.BaseRetry()),
+        };
+        yield return new object[]
+        {
+            CreateTestPaymentRequest(
+                new Provider.Preselected(
+                    "mock-payments-gb-redirect",
+                    schemeSelection: new SchemeSelection.InstantPreferred() { AllowRemitterFee = false })
+                {
+                    Remitter = remitterSortAccountNumber,
+                },
+                sortCodeAccountNumber,
+                retry: new Retry.BaseRetry()),
         };
     }
 
