@@ -26,10 +26,12 @@ namespace TrueLayer.Payments.Model
             /// </summary>
             /// <param name="providerSelection">The options for selecting a provider for the payment</param>
             /// <param name="beneficiary">The details of the payment destination</param>
-            public BankTransfer(ProviderUnion providerSelection, BeneficiaryUnion beneficiary)
+            /// <param name="retry">The retry object flag for the payment</param>
+            public BankTransfer(ProviderUnion providerSelection, BeneficiaryUnion beneficiary, BaseRetry? retry = null)
             {
                 ProviderSelection = providerSelection.NotNull(nameof(providerSelection));
                 Beneficiary = beneficiary.NotNull(nameof(beneficiary));
+                Retry = retry;
             }
 
             /// <summary>
@@ -46,6 +48,11 @@ namespace TrueLayer.Payments.Model
             /// Gets or inits the beneficiary details
             /// </summary>
             public BeneficiaryUnion Beneficiary { get; init; }
+
+            /// <summary>
+            /// Gets or inits the retry flag object for the payment
+            /// </summary>
+            public BaseRetry? Retry { get; init; }
         }
 
         /// <summary>

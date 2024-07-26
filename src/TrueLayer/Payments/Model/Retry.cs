@@ -7,6 +7,8 @@ namespace TrueLayer.Payments.Model
     /// </summary>
     public static class Retry
     {
+        public record BaseRetry();
+
         /// <summary>
         /// Standard retry feature
         /// </summary>
