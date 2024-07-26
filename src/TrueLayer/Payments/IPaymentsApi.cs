@@ -15,7 +15,8 @@ namespace TrueLayer.Payments
         CreatePaymentResponse.AuthorizationRequired,
         CreatePaymentResponse.Authorized,
         CreatePaymentResponse.Failed,
-        CreatePaymentResponse.Authorizing
+        CreatePaymentResponse.Authorizing,
+        CreatePaymentResponse.AttemptFailed
     >;
     using GetPaymentUnion = OneOf<
         GetPaymentResponse.AuthorizationRequired,
