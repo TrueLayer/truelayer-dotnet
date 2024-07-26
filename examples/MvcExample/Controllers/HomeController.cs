@@ -98,6 +98,11 @@ namespace MvcExample.Controllers
                 {
                     ViewData["Status"] = failed.Status;
                     return View("Failed");
+                },
+                attemptFailed =>
+                {
+                    ViewData["Status"] = attemptFailed.Status;
+                    return View("Failed");
                 });
         }
 
