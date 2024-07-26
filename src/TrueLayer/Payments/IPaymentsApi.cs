@@ -81,14 +81,40 @@ namespace TrueLayer.Payments
             StartAuthorizationFlowRequest request,
             CancellationToken cancellationToken = default);
 
-        //TODO: doc
-        //TODO: empty response?
-        Task<ApiResponse> CreatePaymentRefund(string paymentId, string idempotencyKey, CreatePaymentRefundRequest createPaymentRefundRequest);
+        /// <summary>
+        /// Create a partial or full refund for a payment.
+        /// </summary>
+        /// <param name="paymentId">The payment identifier</param>
+        /// <param name="idempotencyKey">
+        /// An idempotency key to allow safe retrying without the operation being performed multiple times.
+        /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// </param>
+        /// <param name="request">The create payment refund request</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>The id of the created refund</returns>
+        Task<ApiResponse<CreatePaymentRefundResponse>> CreatePaymentRefund(string paymentId,
+            string idempotencyKey,
+            CreatePaymentRefundRequest request,
+            CancellationToken cancellationToken = default);
 
-        //TODO: doc
-        Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(string paymentId);
+        /// <summary>
+        /// Get the list of all refunds for a payment.
+        /// </summary>
+        /// <param name="paymentId">The payment identifier</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>The list of refunds for a payment.</returns>
+        Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(string paymentId,
+            CancellationToken cancellationToken = default);
 
-        //TODO: doc
-        Task<ApiResponse<Refund>> GetPaymentRefund(string paymentId, string refundId);
+        /// <summary>
+        /// Get a specific refund for a payment.
+        /// </summary>
+        /// <param name="paymentId">The payment identifier</param>
+        /// <param name="refundId">The refund identifier</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>The details of the selected refund</returns>
+        Task<ApiResponse<Refund>> GetPaymentRefund(string paymentId,
+            string refundId,
+            CancellationToken cancellationToken = default);
     }
 }

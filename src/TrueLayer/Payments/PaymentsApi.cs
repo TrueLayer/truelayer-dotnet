@@ -131,14 +131,14 @@ namespace TrueLayer.Payments
             );
         }
 
-        public async Task<ApiResponse> CreatePaymentRefund(string paymentId, string idempotencyKey, CreatePaymentRefundRequest request)
+        public async Task<ApiResponse<CreatePaymentRefundResponse>> CreatePaymentRefund(string paymentId,
+            string idempotencyKey, CreatePaymentRefundRequest request, CancellationToken cancellationToken = default)
         {
-            //TODO: discuss idempotency key mechanism
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
             request.NotNull(nameof(request));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest("payments"));
+                new GetAuthTokenRequest("payments"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -146,21 +146,23 @@ namespace TrueLayer.Payments
             }
 
             //TODO: how are cancellations handled?
-            return await _apiClient.PostAsync<Task>(
+            return await _apiClient.PostAsync<CreatePaymentRefundResponse>(
                 _baseUri.Append(paymentId).Append("/refunds"),
                 request,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
-                _options.Payments!.SigningKey
+                _options.Payments!.SigningKey,
+                cancellationToken
             );
         }
 
-        public async Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(string paymentId)
+        public async Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(string paymentId,
+            CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest("payments"));
+                new GetAuthTokenRequest("payments"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -170,17 +172,19 @@ namespace TrueLayer.Payments
             //TODO: how are cancellations handled?
             return await _apiClient.GetAsync<ListPaymentRefundsResponse>(
                 _baseUri.Append(paymentId).Append("/refunds"),
-                authResponse.Data!.AccessToken
+                authResponse.Data!.AccessToken,
+                cancellationToken
             );
         }
 
-        public async Task<ApiResponse<Refund>> GetPaymentRefund(string paymentId, string refundId)
+        public async Task<ApiResponse<Refund>> GetPaymentRefund(string paymentId,
+            string refundId, CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
             refundId.NotNullOrWhiteSpace(nameof(refundId));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest("payments"));
+                new GetAuthTokenRequest("payments"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -190,7 +194,8 @@ namespace TrueLayer.Payments
             //TODO: how are cancellations handled?
             return await _apiClient.GetAsync<Refund>(
                 _baseUri.Append(paymentId).Append("/refunds/").Append(refundId),
-                authResponse.Data!.AccessToken
+                authResponse.Data!.AccessToken,
+                cancellationToken
             );
         }
     }
