@@ -145,7 +145,6 @@ namespace TrueLayer.Payments
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            //TODO: how are cancellations handled?
             return await _apiClient.PostAsync<CreatePaymentRefundResponse>(
                 _baseUri.Append(paymentId).Append("/refunds"),
                 request,
@@ -169,7 +168,6 @@ namespace TrueLayer.Payments
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            //TODO: how are cancellations handled?
             return await _apiClient.GetAsync<ListPaymentRefundsResponse>(
                 _baseUri.Append(paymentId).Append("/refunds"),
                 authResponse.Data!.AccessToken,
@@ -191,7 +189,6 @@ namespace TrueLayer.Payments
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            //TODO: how are cancellations handled?
             return await _apiClient.GetAsync<Refund>(
                 _baseUri.Append(paymentId).Append("/refunds/").Append(refundId),
                 authResponse.Data!.AccessToken,
