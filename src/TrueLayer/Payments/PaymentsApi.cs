@@ -130,5 +130,68 @@ namespace TrueLayer.Payments
                 cancellationToken
             );
         }
+
+        public async Task<ApiResponse> CreatePaymentRefund(string paymentId, string idempotencyKey, CreatePaymentRefundRequest request)
+        {
+            //TODO: discuss idempotency key mechanism
+            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+            request.NotNull(nameof(request));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
+                new GetAuthTokenRequest("payments"));
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            //TODO: how are cancellations handled?
+            return await _apiClient.PostAsync<Task>(
+                _baseUri.Append(paymentId).Append("/refunds"),
+                request,
+                idempotencyKey,
+                authResponse.Data!.AccessToken,
+                _options.Payments!.SigningKey
+            );
+        }
+
+        public async Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(string paymentId)
+        {
+            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
+                new GetAuthTokenRequest("payments"));
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            //TODO: how are cancellations handled?
+            return await _apiClient.GetAsync<ListPaymentRefundsResponse>(
+                _baseUri.Append(paymentId).Append("/refunds"),
+                authResponse.Data!.AccessToken
+            );
+        }
+
+        public async Task<ApiResponse<Refund>> GetPaymentRefund(string paymentId, string refundId)
+        {
+            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+            refundId.NotNullOrWhiteSpace(nameof(refundId));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
+                new GetAuthTokenRequest("payments"));
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            //TODO: how are cancellations handled?
+            return await _apiClient.GetAsync<Refund>(
+                _baseUri.Append(paymentId).Append("/refunds/").Append(refundId),
+                authResponse.Data!.AccessToken
+            );
+        }
     }
 }

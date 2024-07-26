@@ -81,5 +81,14 @@ namespace TrueLayer.Payments
             StartAuthorizationFlowRequest request,
             CancellationToken cancellationToken = default);
 
+        //TODO: doc
+        //TODO: empty response?
+        Task<ApiResponse> CreatePaymentRefund(string paymentId, string idempotencyKey, CreatePaymentRefundRequest createPaymentRefundRequest);
+
+        //TODO: doc
+        Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(string paymentId);
+
+        //TODO: doc
+        Task<ApiResponse<Refund>> GetPaymentRefund(string paymentId, string refundId);
     }
 }

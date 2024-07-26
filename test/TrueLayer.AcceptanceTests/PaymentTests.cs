@@ -9,6 +9,7 @@ using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -141,6 +142,23 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         payment.User.Id.ShouldBe(authorizationRequiredResponse.User.Id);
     }
 
+    [Fact]
+    public Task Can_create_payment_refund()
+    {
+        throw new NotImplementedException();
+    }
+
+    [Fact]
+    public Task Can_get_payment_refund_list()
+    {
+        throw new NotImplementedException();
+    }
+
+    [Fact]
+    public Task Can_get_payment_refund_detail()
+    {
+        throw new NotImplementedException();
+    }
 
     private static void AssertSchemeSelection(
         PaymentsSchemeSelectionUnion? actualSchemeSelection,
