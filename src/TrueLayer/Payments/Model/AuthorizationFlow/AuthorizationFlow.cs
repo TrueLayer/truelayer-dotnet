@@ -47,5 +47,22 @@ namespace TrueLayer.Payments.Model.AuthorizationFlow
         Consent? Consent = null,
         UserAccountSelection? UserAccountSelection = null);
 
-
+    /// <summary>
+    /// Contains the information regarding the configuration of the authorization flow.
+    /// </summary>
+    /// <param name="ProviderSelection">The configured provider selection option</param>
+    /// <param name="SchemeSelection">The configured scheme selection option</param>
+    /// <param name="Form">The configured form option</param>
+    /// <param name="Redirect">The configured redirect option</param>
+    /// <param name="Consent">The configured consent option</param>
+    /// <param name="UserAccountSelection">The configured user account selection option</param>
+    /// <param name="Retry">The configured retry option</param>
+    public record Configuration(
+        ProviderSelectionUnion? ProviderSelection = null,
+        SchemeSelectionUnion? SchemeSelection = null,
+        Redirect? Redirect = null,
+        Form? Form = null,
+        Consent? Consent = null,
+        UserAccountSelection? UserAccountSelection = null,
+        Retry.BaseRetry? Retry = null);
 }

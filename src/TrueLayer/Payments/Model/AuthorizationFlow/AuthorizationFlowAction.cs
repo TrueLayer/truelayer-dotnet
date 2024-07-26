@@ -25,7 +25,7 @@ public record Actions(AuthorizationFlowActionUnion Next);
 /// Contains information regarding the nature and the state of the authorization flow.
 /// </summary>
 /// <param name="Actions">Contains the next action to be taken in the authorization flow.</param>
-public record AuthorizationFlow(Actions Actions);
+public record AuthorizationFlow(Actions Actions, Configuration? Configuration);
 
 /// <summary>
 /// This static class contains the different types of actions that can be taken during the authorization flow.
