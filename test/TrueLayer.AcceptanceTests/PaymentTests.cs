@@ -143,9 +143,33 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
-    public Task Can_create_payment_refund()
+    public async Task Can_create_payment_refund()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
+        var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+        {
+            Remitter = new RemitterAccount("John Doe", sortCodeAccountNumber),
+        };
+
+        var paymentRequest = CreateTestPaymentRequest(
+            providerSelection,
+            sortCodeAccountNumber,
+            authorizationFlow: new StartAuthorizationFlowRequest(
+                providerSelection, new SchemeSelection.Preselected(),
+                new Redirect(new Uri("http://localhost:3000/callback")))
+        );
+
+        var response = await _fixture.Client.Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        response.Data.IsT3.ShouldBeTrue();
+        CreatePaymentResponse.Authorizing authorizing = response.Data.AsT3;
+        authorizing.Status.ShouldBe("authorizing");
+        // The next action is a redirect
+        authorizing.AuthorizationFlow.Actions.Next.IsT2.ShouldBeTrue();
+        var redirectUri = authorizing.AuthorizationFlow.Actions.Next.AsT2.Uri;
+        redirectUri.ShouldNotBeNull();
     }
 
     [Fact]
