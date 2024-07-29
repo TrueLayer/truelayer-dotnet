@@ -29,6 +29,8 @@ namespace TrueLayer.Payments
         GetPaymentResponse.Failed
     >;
 
+    using RefundUnion = OneOf<Pending, Authorized>;
+
     internal class PaymentsApi : IPaymentsApi
     {
         private readonly IApiClient _apiClient;
@@ -175,7 +177,7 @@ namespace TrueLayer.Payments
             );
         }
 
-        public async Task<ApiResponse<Refund>> GetPaymentRefund(string paymentId,
+        public async Task<ApiResponse<RefundUnion>> GetPaymentRefund(string paymentId,
             string refundId, CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
@@ -189,7 +191,7 @@ namespace TrueLayer.Payments
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.GetAsync<Refund>(
+            return await _apiClient.GetAsync<RefundUnion>(
                 _baseUri.Append(paymentId).Append("/refunds/").Append(refundId),
                 authResponse.Data!.AccessToken,
                 cancellationToken

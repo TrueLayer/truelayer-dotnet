@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using OneOf;
 
 namespace TrueLayer.Payments.Model;
 
-public record ListPaymentRefundsResponse(List<Refund> Items);
+using RefundUnion = OneOf<Pending, Authorized>;
+
+public record ListPaymentRefundsResponse(List<RefundUnion> Items);

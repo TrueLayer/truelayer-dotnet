@@ -26,6 +26,9 @@ namespace TrueLayer.Payments
         GetPaymentResponse.Failed
     >;
 
+    using RefundUnion = OneOf<Pending, Authorized>;
+
+
     /// <summary>
     /// Provides access to the TrueLayer Payments API
     /// </summary>
@@ -113,7 +116,7 @@ namespace TrueLayer.Payments
         /// <param name="refundId">The refund identifier</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>The details of the selected refund</returns>
-        Task<ApiResponse<Refund>> GetPaymentRefund(string paymentId,
+        Task<ApiResponse<RefundUnion>> GetPaymentRefund(string paymentId,
             string refundId,
             CancellationToken cancellationToken = default);
     }
