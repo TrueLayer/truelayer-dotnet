@@ -3,6 +3,6 @@ using OneOf;
 
 namespace TrueLayer.Payments.Model;
 
-using RefundUnion = OneOf<Pending, Authorized>;
+using RefundUnion = OneOf<RefundPending, RefundAuthorized>;
 
 public record ListPaymentRefundsResponse(List<RefundUnion> Items);

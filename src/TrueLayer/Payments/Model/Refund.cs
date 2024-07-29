@@ -1,24 +1,32 @@
+using System;
 using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model
 {
     public abstract record RefundBase
     {
-        public uint? AmountInMinor { get; init; }
+        public uint AmountInMinor { get; init; }
 
         public string Currency { get; init; } = null!;
     }
 
     [JsonDiscriminator("pending")]
-    public record Pending : RefundBase
+    public sealed record RefundPending : RefundBase
     {
         public string Status => "pending";
     };
 
     [JsonDiscriminator("authorized")]
-    public record Authorized : RefundBase
+    public sealed record RefundAuthorized : RefundBase
     {
         public string Status => "authorized";
+    };
+
+    [JsonDiscriminator("executed")]
+    public sealed record RefundExecuted : RefundBase
+    {
+        public string Status => "executed";
+        public DateTime ExecutedAt { get; init; }
     };
 }
 

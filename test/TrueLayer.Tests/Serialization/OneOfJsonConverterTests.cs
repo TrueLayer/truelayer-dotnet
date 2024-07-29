@@ -1,6 +1,7 @@
 using System.Text.Json;
 using OneOf;
 using Shouldly;
+using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
 using Xunit;
 
@@ -58,6 +59,23 @@ namespace TrueLayer.Tests.Serialization
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
             oneOf.AsT1.BarProp.ShouldBe(10);
             oneOf.Value.ShouldBeOfType<Bar>();
+        }
+
+        [Fact]
+        public void Can_read_from_status_discriminator_Refund()
+        {
+            string json = @"{
+                    ""status"": ""executed"",
+                    ""AmountInMinor"": 1000,
+                    ""ExecutedAt"": ""2021-01-01T00:00:00Z""
+                }
+            ";
+
+            var oneOf = JsonSerializer.Deserialize<OneOf<RefundPending, RefundAuthorized, RefundExecuted>>(json, _options);
+            oneOf.Value.ShouldBeOfType<RefundExecuted>();
+            oneOf.AsT2.AmountInMinor.ShouldBe<uint>(1000);
+            oneOf.AsT2.Status.ShouldBe("executed");
+            oneOf.AsT2.ExecutedAt.ShouldBe(new System.DateTime(2021, 1, 1, 0, 0, 0, System.DateTimeKind.Utc));
         }
 
         [Fact]
