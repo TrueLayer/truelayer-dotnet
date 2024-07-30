@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using OneOf;
 using Shouldly;
 using TrueLayer.Common;
@@ -9,7 +12,6 @@ using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -24,16 +26,19 @@ using PaymentsSchemeSelectionUnion = OneOf<
     SchemeSelection.Preselected,
     SchemeSelection.UserSelected>;
 using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
+using BeneficiaryUnion = OneOf<Beneficiary.MerchantAccount, Beneficiary.ExternalAccount>;
 
 public partial class PaymentTests : IClassFixture<ApiTestFixture>
 {
     private readonly ApiTestFixture _fixture;
+    private TrueLayerOptions _configuration;
     private readonly ITestOutputHelper _testOutputHelper;
 
     public PaymentTests(ApiTestFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
         _testOutputHelper = testOutputHelper;
+        _configuration = fixture.ServiceProvider.GetRequiredService<IOptions<TrueLayerOptions>>().Value;
     }
 
     [Theory]
@@ -143,43 +148,62 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
-    public async Task Can_create_payment_refund()
+    public async Task Can_create_and_get_payment_refund()
     {
         // Arrange
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
-        var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
-        {
-            Remitter = new RemitterAccount("John Doe", sortCodeAccountNumber),
-        };
+        var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service");
+
+        var merchantAccounts = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
+        merchantAccounts.IsSuccessful.ShouldBeTrue();
+        var gbpMerchantAccount = merchantAccounts.Data!.Items.First(m => m.Currency == Currencies.GBP);
 
         var paymentRequest = CreateTestPaymentRequest(
             providerSelection,
             sortCodeAccountNumber,
             authorizationFlow: new StartAuthorizationFlowRequest(
-                providerSelection, new SchemeSelection.Preselected(),
-                new Redirect(new Uri("http://localhost:3000/callback")))
+                ProviderSelection: providerSelection,
+                Redirect: new Redirect(new Uri("http://localhost:3000/callback"), new Uri("http://localhost:3000/callback"))),
+            beneficiary: new Beneficiary.MerchantAccount(gbpMerchantAccount.Id)
         );
 
-        var response = await _fixture.Client.Payments.CreatePayment(
+        var createdPaymentResponse = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
-        response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        response.Data.IsT3.ShouldBeTrue();
-        CreatePaymentResponse.Authorizing authorizing = response.Data.AsT3;
-        authorizing.Status.ShouldBe("authorizing");
+
+        createdPaymentResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        createdPaymentResponse.Data.IsT3.ShouldBeTrue();
+        CreatePaymentResponse.Authorizing createdPayment = createdPaymentResponse.Data.AsT3;
+        createdPayment.Status.ShouldBe("authorizing");
         // The next action is a redirect
-        authorizing.AuthorizationFlow.Actions.Next.IsT2.ShouldBeTrue();
-        var redirectUri = authorizing.AuthorizationFlow.Actions.Next.AsT2.Uri;
+        createdPayment.AuthorizationFlow.Actions.Next.IsT2.ShouldBeTrue();
+        var redirectUri = createdPayment.AuthorizationFlow.Actions.Next.AsT2.Uri;
         redirectUri.ShouldNotBeNull();
+
+        await TestUtils.RunAndAssertHeadlessResourceAuthorisation(_configuration,
+            redirectUri,
+            HeadlessResourceAuthorization.New(HeadlessResource.Payments, HeadlessResourceAction.Execute));
+        _fixture.Client.WaitForPaymentToBeSettled(createdPayment.Id);
+
+        // Act && assert
+        var createRefundResponse = await _fixture.Client.Payments.CreatePaymentRefund(paymentId: createdPayment.Id,
+            idempotencyKey: Guid.NewGuid().ToString(),
+            new CreatePaymentRefundRequest(Reference: "a-reference"));
+        createRefundResponse.IsSuccessful.ShouldBeTrue();
+        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
+
+        var getPaymentRefundResponse = await _fixture.Client.Payments.GetPaymentRefund(
+            paymentId: createdPayment.Id,
+            refundId: createRefundResponse.Data!.Id);
+
+        // Assert
+        createRefundResponse.IsSuccessful.ShouldBeTrue();
+        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
+
+        getPaymentRefundResponse.IsSuccessful.ShouldBeTrue();
     }
 
     [Fact]
     public Task Can_get_payment_refund_list()
-    {
-        throw new NotImplementedException();
-    }
-
-    [Fact]
-    public Task Can_get_payment_refund_detail()
     {
         throw new NotImplementedException();
     }
@@ -211,17 +235,19 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         AccountIdentifierUnion accountIdentifier,
         string currency = Currencies.GBP,
         RelatedProducts? relatedProducts = null,
-        StartAuthorizationFlowRequest? authorizationFlow = null)
+        StartAuthorizationFlowRequest? authorizationFlow = null,
+        BeneficiaryUnion? beneficiary = null)
         => new CreatePaymentRequest(
             100,
             currency,
             new PaymentMethod.BankTransfer(
                 providerSelection,
-                new Beneficiary.ExternalAccount(
+                beneficiary ?? new Beneficiary.ExternalAccount(
                     "TrueLayer",
                     "truelayer-dotnet",
                     accountIdentifier
                 )),
+
             new PaymentUserRequest(
                 name: "Jane Doe",
                 email: "jane.doe@example.com",

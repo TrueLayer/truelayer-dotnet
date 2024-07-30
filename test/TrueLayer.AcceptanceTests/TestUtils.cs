@@ -1,49 +1,106 @@
 using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Shouldly;
 
 namespace TrueLayer.AcceptanceTests;
 
+public class HeadlessResourceAuthorization
+{
+    public static HeadlessResourceAuthorization New(HeadlessResource resource, HeadlessResourceAction action) =>
+        new()
+        {
+            Resource = resource,
+            Action = action,
+            Payload = $@"{{""action"":""{action}"", ""redirect"": false}}",
+            Path = resource switch {
+                HeadlessResource.Payments => "single-immediate-payments",
+                HeadlessResource.Mandates => "vrp-consents",
+                _ => throw new ArgumentOutOfRangeException(nameof(resource), resource, null)
+            }
+        };
+
+    public HeadlessResource Resource { get; set; }
+    public HeadlessResourceAction Action { get; set; }
+    public string Path { get; set; } = null!;
+    public string Payload { get; set; } = null!;
+}
+
+public enum HeadlessResourceAction
+{
+    Invalid,
+    Execute,
+    Authorize,
+    RejectAuthorization
+}
+
+public enum HeadlessResource {
+    Invalid,
+    Payments,
+    Mandates
+}
+
 public static class TestUtils
 {
-    public class HeadlessResourceAuthorization
+    public static void WaitForPaymentToBeSettled(this ITrueLayerClient client, string paymentId, TimeSpan? timeout = null)
     {
-        public HeadlessResourceAuthorization(HeadlessResource resource, HeadlessResourceAction action)
+        timeout ??= TimeSpan.FromSeconds(30);
+
+        var completedGracefully = Task.Run(async () =>
         {
-            Resource = resource;
-            Action = action;
+            bool isSettled;
+            do
+            {
+                var payment = await client.Payments.GetPayment(paymentId);
+
+                // Exit immediately if there's an error
+                payment.IsSuccessful.ShouldBeTrue();
+
+                isSettled = payment.Data.IsT4;
+
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            } while (!isSettled);
+        }).Wait(timeout.Value);
+
+        if (!completedGracefully)
+        {
+            throw new Exception("Payment did not settle in time");
         }
-
-        public HeadlessResource Resource { get; }
-        public HeadlessResourceAction Action { get; }
-        public string Path { get; set; } = null!;
-        public string Payload { get; set; } = null!;
     }
 
-    public enum HeadlessResourceAction
+    public async static Task RunAndAssertHeadlessResourceAuthorisation(
+        TrueLayerOptions configuration,
+        Uri redirectUri,
+        HeadlessResourceAuthorization authorization)
     {
-        Invalid,
-        Execute,
-        Authorize,
-        RejectAuthorization
-    }
+        var resourceId = redirectUri.PathAndQuery.Split("/").Last();
+        var token = redirectUri.Fragment.Split("=").Last();
+        resourceId.ShouldNotBeEmpty();
+        token.ShouldNotBeEmpty();
 
-    public enum HeadlessResource {
-        Invalid,
-        Payments,
-        Mandates
-    }
+        var url = $"{redirectUri.Scheme}://{redirectUri.Host}/api/{authorization.Path}/{resourceId}/action";
+        var testClient = new HttpClient();
+        testClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        var authResponse = await testClient.PostAsync(url,
+            new StringContent(authorization.Payload, System.Text.Encoding.UTF8, "application/json"));
+        authResponse.IsSuccessStatusCode.ShouldBeTrue();
 
-    public static HeadlessResourceAuthorization RunAndAssertHeadlessResourceAuthorisation(
-        HeadlessResource resource, HeadlessResourceAction action)
-    {
-        HeadlessResourceAuthorization testHeadlessResourceAuthorization =
-            new HeadlessResourceAuthorization(resource, action);
-        testHeadlessResourceAuthorization.Payload = $"{{\"action\":\"{action}\", \"redirect\": false}}";
+        var authResponseString = await authResponse.Content.ReadAsStringAsync();
+        var authResponseUri = new Uri(authResponseString);
 
-        return resource switch
-        {
-            HeadlessResource.Payments => testHeadlessResourceAuthorization,
-            HeadlessResource.Mandates => testHeadlessResourceAuthorization,
-            _ => throw new ArgumentOutOfRangeException(nameof(resource), resource, null)
-        };
+        String query = authorization.Resource == HeadlessResource.Mandates
+            ? authResponseUri.Query.Replace("mandate-", "")
+            : authResponseUri.Query;
+
+        var jsonPayload = $@"{{""query"":""{query.Split("?").Last()}"", ""fragment"": ""{authResponseUri.Fragment.Split("?").Last()}""}}";
+        var submitParamsUri =  new Uri($"{configuration.Payments?.Uri}payments-provider-return");
+        testClient.DefaultRequestHeaders.Clear();
+        var submitProviderParamsResponse =
+            await testClient.PostAsync(
+                submitParamsUri,
+                new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
+
+        submitProviderParamsResponse.IsSuccessStatusCode.ShouldBeTrue();
     }
 }
