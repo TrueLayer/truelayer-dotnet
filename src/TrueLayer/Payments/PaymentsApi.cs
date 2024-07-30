@@ -29,6 +29,8 @@ namespace TrueLayer.Payments
         GetPaymentResponse.Failed
     >;
 
+    using RefundUnion = OneOf<RefundPending, RefundAuthorized>;
+
     internal class PaymentsApi : IPaymentsApi
     {
         private readonly IApiClient _apiClient;
@@ -127,6 +129,71 @@ namespace TrueLayer.Payments
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
+                cancellationToken
+            );
+        }
+
+        public async Task<ApiResponse<CreatePaymentRefundResponse>> CreatePaymentRefund(string paymentId,
+            string idempotencyKey, CreatePaymentRefundRequest request, CancellationToken cancellationToken = default)
+        {
+            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+            request.NotNull(nameof(request));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
+                new GetAuthTokenRequest("payments"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync<CreatePaymentRefundResponse>(
+                _baseUri.Append(paymentId).Append("/refunds"),
+                request,
+                idempotencyKey,
+                authResponse.Data!.AccessToken,
+                _options.Payments!.SigningKey,
+                cancellationToken
+            );
+        }
+
+        public async Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(string paymentId,
+            CancellationToken cancellationToken = default)
+        {
+            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
+                new GetAuthTokenRequest("payments"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.GetAsync<ListPaymentRefundsResponse>(
+                _baseUri.Append(paymentId).Append("/refunds"),
+                authResponse.Data!.AccessToken,
+                cancellationToken
+            );
+        }
+
+        public async Task<ApiResponse<RefundUnion>> GetPaymentRefund(string paymentId,
+            string refundId, CancellationToken cancellationToken = default)
+        {
+            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+            refundId.NotNullOrWhiteSpace(nameof(refundId));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
+                new GetAuthTokenRequest("payments"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.GetAsync<RefundUnion>(
+                _baseUri.Append(paymentId).Append("/refunds/").Append(refundId),
+                authResponse.Data!.AccessToken,
                 cancellationToken
             );
         }

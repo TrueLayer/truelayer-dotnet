@@ -303,6 +303,7 @@ namespace TrueLayer.AcceptanceTests
                 mandateRequest.User,
                 setRelatedProducts ? new RelatedProducts(new SignupPlus()) : null);
 
+        //TODO: replace with new common utility to authorize resources
         private async Task AuthorizeMandate(AuthorizationResponseUnion authorizationFlowResponse)
         {
             var handler = new HttpClientHandler { AllowAutoRedirect = false };

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using OneOf;
 using Shouldly;
+using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
 using Xunit;
 
@@ -58,6 +59,27 @@ namespace TrueLayer.Tests.Serialization
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
             oneOf.AsT1.BarProp.ShouldBe(10);
             oneOf.Value.ShouldBeOfType<Bar>();
+        }
+
+        [Fact]
+        public void Can_read_from_status_discriminator_Refund()
+        {
+            string json = @"{
+                    ""status"": ""failed"",
+                    ""AmountInMinor"": 1000,
+                    ""CreatedAt"": ""2021-01-01T00:00:00Z"",
+                    ""FailedAt"": ""2021-01-01T00:02:00Z"",
+                    ""FailureReason"": ""Something bad happened""
+                }
+            ";
+
+            var oneOf = JsonSerializer.Deserialize<OneOf<RefundPending, RefundAuthorized, RefundExecuted, RefundFailed>>(json, _options);
+            oneOf.Value.ShouldBeOfType<RefundFailed>();
+            oneOf.AsT3.AmountInMinor.ShouldBe<uint>(1000);
+            oneOf.AsT3.Status.ShouldBe("failed");
+            oneOf.AsT3.CreatedAt.ShouldBe(new System.DateTime(2021, 1, 1, 0, 0, 0, System.DateTimeKind.Utc));
+            oneOf.AsT3.FailedAt.ShouldBe(new System.DateTime(2021, 1, 1, 0, 2, 0, System.DateTimeKind.Utc));
+            oneOf.AsT3.FailureReason.ShouldBe("Something bad happened");
         }
 
         [Fact]
