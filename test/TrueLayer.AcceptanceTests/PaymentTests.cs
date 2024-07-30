@@ -151,6 +151,72 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     public async Task Can_create_and_get_payment_refund()
     {
         // Arrange
+        var paymentId = await CreateAndAuthorisePayment();
+
+        // Act && assert
+        var createRefundResponse = await _fixture.Client.Payments.CreatePaymentRefund(paymentId: paymentId,
+            idempotencyKey: Guid.NewGuid().ToString(),
+            new CreatePaymentRefundRequest(Reference: "a-reference"));
+        createRefundResponse.IsSuccessful.ShouldBeTrue();
+        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
+
+        var getPaymentRefundResponse = await _fixture.Client.Payments.GetPaymentRefund(
+            paymentId: paymentId,
+            refundId: createRefundResponse.Data!.Id);
+
+        // Assert
+        createRefundResponse.IsSuccessful.ShouldBeTrue();
+        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
+        getPaymentRefundResponse.IsSuccessful.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Can_create_and_list_payment_refunds()
+    {
+        // Arrange
+        var paymentId = await CreateAndAuthorisePayment();
+
+        // Act && assert
+        var createRefundResponse = await _fixture.Client.Payments.CreatePaymentRefund(paymentId: paymentId,
+            idempotencyKey: Guid.NewGuid().ToString(),
+            new CreatePaymentRefundRequest(Reference: "a-reference"));
+        createRefundResponse.IsSuccessful.ShouldBeTrue();
+        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
+
+        // Act
+        var listPaymentRefundsResponse = await _fixture.Client.Payments.ListPaymentRefunds(paymentId);
+
+        // Assert
+        createRefundResponse.IsSuccessful.ShouldBeTrue();
+        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
+        listPaymentRefundsResponse.IsSuccessful.ShouldBeTrue();
+        listPaymentRefundsResponse.Data!.Items.Count.ShouldBe(1);
+    }
+
+    private static void AssertSchemeSelection(
+        PaymentsSchemeSelectionUnion? actualSchemeSelection,
+        PaymentsSchemeSelectionUnion? expectedSchemeSelection,
+        string? actualSchemeId,
+        string? expectedSchemeId)
+    {
+        if (actualSchemeSelection is null && expectedSchemeSelection is null)
+        {
+            actualSchemeId.ShouldBeEquivalentTo(expectedSchemeId);
+            return;
+        }
+
+        actualSchemeSelection.ShouldNotBeNull();
+        expectedSchemeSelection.ShouldNotBeNull();
+        var expectedSelection = expectedSchemeSelection.Value;
+        actualSchemeSelection.Value.Switch(
+            instantOnly => { instantOnly.AllowRemitterFee.ShouldBe(expectedSelection.AsT0.AllowRemitterFee); },
+            instantPreferred => { instantPreferred.AllowRemitterFee.ShouldBe(expectedSelection.AsT1.AllowRemitterFee); },
+            preselectedSchemeSelection => { preselectedSchemeSelection.SchemeId.ShouldBe(expectedSelection.AsT2.SchemeId); },
+            userSelected => { expectedSelection.IsT3.ShouldBe(true); });
+    }
+
+    private async Task<string> CreateAndAuthorisePayment()
+    {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
         var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service");
 
@@ -182,52 +248,9 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         await TestUtils.RunAndAssertHeadlessResourceAuthorisation(_configuration,
             redirectUri,
             HeadlessResourceAuthorization.New(HeadlessResource.Payments, HeadlessResourceAction.Execute));
-        _fixture.Client.WaitForPaymentToBeSettled(createdPayment.Id);
+        WaitForPaymentToBeSettled(createdPayment.Id);
 
-        // Act && assert
-        var createRefundResponse = await _fixture.Client.Payments.CreatePaymentRefund(paymentId: createdPayment.Id,
-            idempotencyKey: Guid.NewGuid().ToString(),
-            new CreatePaymentRefundRequest(Reference: "a-reference"));
-        createRefundResponse.IsSuccessful.ShouldBeTrue();
-        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
-
-        var getPaymentRefundResponse = await _fixture.Client.Payments.GetPaymentRefund(
-            paymentId: createdPayment.Id,
-            refundId: createRefundResponse.Data!.Id);
-
-        // Assert
-        createRefundResponse.IsSuccessful.ShouldBeTrue();
-        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
-
-        getPaymentRefundResponse.IsSuccessful.ShouldBeTrue();
-    }
-
-    [Fact]
-    public Task Can_get_payment_refund_list()
-    {
-        throw new NotImplementedException();
-    }
-
-    private static void AssertSchemeSelection(
-        PaymentsSchemeSelectionUnion? actualSchemeSelection,
-        PaymentsSchemeSelectionUnion? expectedSchemeSelection,
-        string? actualSchemeId,
-        string? expectedSchemeId)
-    {
-        if (actualSchemeSelection is null && expectedSchemeSelection is null)
-        {
-            actualSchemeId.ShouldBeEquivalentTo(expectedSchemeId);
-            return;
-        }
-
-        actualSchemeSelection.ShouldNotBeNull();
-        expectedSchemeSelection.ShouldNotBeNull();
-        var expectedSelection = expectedSchemeSelection.Value;
-        actualSchemeSelection.Value.Switch(
-            instantOnly => { instantOnly.AllowRemitterFee.ShouldBe(expectedSelection.AsT0.AllowRemitterFee); },
-            instantPreferred => { instantPreferred.AllowRemitterFee.ShouldBe(expectedSelection.AsT1.AllowRemitterFee); },
-            preselectedSchemeSelection => { preselectedSchemeSelection.SchemeId.ShouldBe(expectedSelection.AsT2.SchemeId); },
-            userSelected => { expectedSelection.IsT3.ShouldBe(true); });
+        return createdPayment.Id;
     }
 
     private static CreatePaymentRequest CreateTestPaymentRequest(
@@ -428,5 +451,31 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 new AccountIdentifier.Bban("IT60X0542811101000000123456"),
                 Currencies.NOK),
         };
+    }
+
+    private void WaitForPaymentToBeSettled(string paymentId, TimeSpan? timeout = null)
+    {
+        timeout ??= TimeSpan.FromSeconds(30);
+
+        var completedGracefully = Task.Run(async () =>
+        {
+            bool isSettled;
+            do
+            {
+                var payment = await _fixture.Client.Payments.GetPayment(paymentId);
+
+                // Exit immediately if there's an error
+                payment.IsSuccessful.ShouldBeTrue();
+
+                isSettled = payment.Data.IsT4;
+
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            } while (!isSettled);
+        }).Wait(timeout.Value);
+
+        if (!completedGracefully)
+        {
+            throw new Exception("Payment did not settle in time");
+        }
     }
 }

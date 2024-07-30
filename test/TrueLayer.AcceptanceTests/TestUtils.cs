@@ -6,7 +6,6 @@ using Shouldly;
 
 namespace TrueLayer.AcceptanceTests;
 
-//TODO: use this in mandates tests as well!
 public class HeadlessResourceAuthorization
 {
     public static HeadlessResourceAuthorization New(HeadlessResource resource, HeadlessResourceAction action) =>
@@ -44,32 +43,6 @@ public enum HeadlessResource {
 
 public static class TestUtils
 {
-    public static void WaitForPaymentToBeSettled(this ITrueLayerClient client, string paymentId, TimeSpan? timeout = null)
-    {
-        timeout ??= TimeSpan.FromSeconds(30);
-
-        var completedGracefully = Task.Run(async () =>
-        {
-            bool isSettled;
-            do
-            {
-                var payment = await client.Payments.GetPayment(paymentId);
-
-                // Exit immediately if there's an error
-                payment.IsSuccessful.ShouldBeTrue();
-
-                isSettled = payment.Data.IsT4;
-
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            } while (!isSettled);
-        }).Wait(timeout.Value);
-
-        if (!completedGracefully)
-        {
-            throw new Exception("Payment did not settle in time");
-        }
-    }
-
     public async static Task RunAndAssertHeadlessResourceAuthorisation(
         TrueLayerOptions configuration,
         Uri redirectUri,

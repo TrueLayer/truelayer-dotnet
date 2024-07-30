@@ -66,6 +66,7 @@ namespace TrueLayer.Mandates
             );
         }
 
+        //TODO: is it correct that this method expects a mandate type?
         /// <inheritdoc />
         public async Task<ApiResponse<MandateDetailUnion>> GetMandate(string mandateId, MandateType mandateType, CancellationToken cancellationToken = default)
         {
