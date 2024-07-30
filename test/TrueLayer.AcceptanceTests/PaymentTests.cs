@@ -20,6 +20,7 @@ using AccountIdentifierUnion = OneOf<
     AccountIdentifier.Iban,
     AccountIdentifier.Bban,
     AccountIdentifier.Nrb>;
+
 using PaymentsSchemeSelectionUnion = OneOf<
     SchemeSelection.InstantOnly,
     SchemeSelection.InstantPreferred,
@@ -73,11 +74,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var paymentRequest = CreateTestPaymentRequest(
             providerSelection,
             sortCodeAccountNumber,
-            authorizationFlow: new StartAuthorizationFlowRequest(
-                providerSelection, new SchemeSelection.Preselected(),
-                new Redirect(new Uri("http://localhost:3000/callback")))
-        );
-
+            initAuthorizationFlow: true);
         var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
@@ -151,7 +148,10 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     public async Task Can_create_and_get_payment_refund()
     {
         // Arrange
-        var paymentId = await CreateAndAuthorisePayment();
+        var paymentRequest = CreateTestPaymentRequest(
+            beneficiary: await CreateMerchantBeneficiaryAsync(),
+            initAuthorizationFlow: true);
+        var paymentId = await CreateAndAuthorisePaymentAsync(paymentRequest);
 
         // Act && assert
         var createRefundResponse = await _fixture.Client.Payments.CreatePaymentRefund(paymentId: paymentId,
@@ -174,7 +174,10 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     public async Task Can_create_and_list_payment_refunds()
     {
         // Arrange
-        var paymentId = await CreateAndAuthorisePayment();
+        var paymentRequest = CreateTestPaymentRequest(
+            beneficiary: await CreateMerchantBeneficiaryAsync(),
+            initAuthorizationFlow: true);
+        var paymentId = await CreateAndAuthorisePaymentAsync(paymentRequest);
 
         // Act && assert
         var createRefundResponse = await _fixture.Client.Payments.CreatePaymentRefund(paymentId: paymentId,
@@ -215,24 +218,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             userSelected => { expectedSelection.IsT3.ShouldBe(true); });
     }
 
-    private async Task<string> CreateAndAuthorisePayment()
+    private async Task<string> CreateAndAuthorisePaymentAsync(CreatePaymentRequest paymentRequest)
     {
-        var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
-        var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service");
-
-        var merchantAccounts = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
-        merchantAccounts.IsSuccessful.ShouldBeTrue();
-        var gbpMerchantAccount = merchantAccounts.Data!.Items.First(m => m.Currency == Currencies.GBP);
-
-        var paymentRequest = CreateTestPaymentRequest(
-            providerSelection,
-            sortCodeAccountNumber,
-            authorizationFlow: new StartAuthorizationFlowRequest(
-                ProviderSelection: providerSelection,
-                Redirect: new Redirect(new Uri("http://localhost:3000/callback"), new Uri("http://localhost:3000/callback"))),
-            beneficiary: new Beneficiary.MerchantAccount(gbpMerchantAccount.Id)
-        );
-
         var createdPaymentResponse = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
@@ -241,6 +228,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         CreatePaymentResponse.Authorizing createdPayment = createdPaymentResponse.Data.AsT3;
         createdPayment.Status.ShouldBe("authorizing");
         // The next action is a redirect
+        createdPayment.AuthorizationFlow.ShouldNotBeNull();
         createdPayment.AuthorizationFlow.Actions.Next.IsT2.ShouldBeTrue();
         var redirectUri = createdPayment.AuthorizationFlow.Actions.Next.AsT2.Uri;
         redirectUri.ShouldNotBeNull();
@@ -253,24 +241,43 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         return createdPayment.Id;
     }
 
+    private async Task<BeneficiaryUnion> CreateMerchantBeneficiaryAsync()
+    {
+        var merchantAccounts = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
+            merchantAccounts.IsSuccessful.ShouldBeTrue();
+            var gbpMerchantAccount = merchantAccounts.Data!.Items.First(m => m.Currency == Currencies.GBP);
+        return new Beneficiary.MerchantAccount(gbpMerchantAccount.Id);
+    }
+
     private static CreatePaymentRequest CreateTestPaymentRequest(
-        ProviderUnion providerSelection,
-        AccountIdentifierUnion accountIdentifier,
+        ProviderUnion? providerSelection = null,
+        AccountIdentifierUnion? accountIdentifier = null,
         string currency = Currencies.GBP,
         RelatedProducts? relatedProducts = null,
-        StartAuthorizationFlowRequest? authorizationFlow = null,
         BeneficiaryUnion? beneficiary = null,
-        Retry.BaseRetry? retry = null)
-        => new CreatePaymentRequest(
+        Retry.BaseRetry? retry = null,
+        bool initAuthorizationFlow = false)
+    {
+        accountIdentifier ??= new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
+        providerSelection ??= new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service");
+        beneficiary ??= new Beneficiary.ExternalAccount(
+            "TrueLayer",
+            "truelayer-dotnet",
+            accountIdentifier.Value);
+        var authorizationFlow = initAuthorizationFlow
+            ? new StartAuthorizationFlowRequest(
+                ProviderSelection: providerSelection,
+                Redirect: new Redirect(
+                    new Uri("http://localhost:3000/callback"),
+                    new Uri("http://localhost:3000/callback")))
+            : null;
+
+        return new CreatePaymentRequest(
             100,
             currency,
             new PaymentMethod.BankTransfer(
-                providerSelection,
-                beneficiary ?? new Beneficiary.ExternalAccount(
-                    "TrueLayer",
-                    "truelayer-dotnet",
-                    accountIdentifier
-                ),
+                providerSelection.Value,
+                beneficiary.Value,
                 retry),
             new PaymentUserRequest(
                 name: "Jane Doe",
@@ -281,6 +288,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             relatedProducts,
             authorizationFlow
         );
+    }
 
     private static IEnumerable<object[]> CreateTestPaymentRequests()
     {
