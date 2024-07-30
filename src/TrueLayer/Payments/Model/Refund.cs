@@ -3,6 +3,7 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model
 {
+    //TODO complete
     public abstract record RefundBase
     {
         public uint AmountInMinor { get; init; }

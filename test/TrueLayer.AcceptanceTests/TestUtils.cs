@@ -6,6 +6,7 @@ using Shouldly;
 
 namespace TrueLayer.AcceptanceTests;
 
+//TODO: use this in mandates tests as well!
 public class HeadlessResourceAuthorization
 {
     public static HeadlessResourceAuthorization New(HeadlessResource resource, HeadlessResourceAction action) =>
