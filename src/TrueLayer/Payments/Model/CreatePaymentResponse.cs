@@ -62,17 +62,5 @@ namespace TrueLayer.Payments.Model
         /// <param name="FailureReason">The reason for failure</param>
         [JsonDiscriminator("failed")]
         public record Failed(string FailureStage, string FailureReason) : PaymentDetails;
-
-        /// <summary>
-        /// Represents a payment that failed to complete due to an error in the authorization flow
-        /// </summary>
-        /// <param name="FailureStage"></param>
-        /// <param name="FailureReason"></param>
-        [JsonDiscriminator("attempt_failed")]
-        public record AttemptFailed(string FailureStage, string FailureReason) : Failed(FailureStage, FailureReason)
-        {
-            public AuthorizationFlow.AuthorizationFlow? AuthorizationFlow { get; init; } = null;
-            public PaymentSource? PaymentSource { get; init; } = null;
-        }
     }
 }

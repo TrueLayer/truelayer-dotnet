@@ -16,7 +16,7 @@ namespace TrueLayer.Payments.Model
         /// Base class containing common properties for all payment states
         /// </summary>
         /// <value></value>
-        public record PaymentDetails
+        public abstract record PaymentDetails
         {
             /// <summary>
             /// Gets the unique identifier of the payment
@@ -104,5 +104,26 @@ namespace TrueLayer.Payments.Model
         /// <returns></returns>
         [JsonDiscriminator("failed")]
         public record Failed(DateTime FailedAt, string FailureStage, string FailureReason) : PaymentDetails;
+
+
+        /// <summary>
+        /// Represents a payment that failed to complete due to an error in the authorization flow
+        /// </summary>
+        /// <param name="FailedAt">The date and time the payment failed</param>
+        /// <param name="FailureStage">The status the payment was in when it failed</param>
+        /// <param name="FailureReason">The reason for failure</param>
+        [JsonDiscriminator("attempt_failed")]
+        public record AttemptFailed(DateTime FailedAt, string FailureStage, string FailureReason) : Failed(FailedAt, FailureStage, FailureReason)
+        {
+            /// <summary>
+            /// Gets the details of the authorization flow used for the payment
+            /// </summary>
+            public AuthorizationFlow.AuthorizationFlow? AuthorizationFlow { get; init; } = null;
+
+            /// <summary>
+            /// Gets the details of the source of funds for the payment<
+            /// </summary>
+            public PaymentSource? PaymentSource { get; init; } = null;
+        }
     }
 }

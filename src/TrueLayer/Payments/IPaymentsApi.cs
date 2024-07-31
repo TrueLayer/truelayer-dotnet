@@ -15,8 +15,7 @@ namespace TrueLayer.Payments
         CreatePaymentResponse.AuthorizationRequired,
         CreatePaymentResponse.Authorized,
         CreatePaymentResponse.Failed,
-        CreatePaymentResponse.Authorizing,
-        CreatePaymentResponse.AttemptFailed
+        CreatePaymentResponse.Authorizing
     >;
     using GetPaymentUnion = OneOf<
         GetPaymentResponse.AuthorizationRequired,
@@ -24,7 +23,8 @@ namespace TrueLayer.Payments
         GetPaymentResponse.Authorized,
         GetPaymentResponse.Executed,
         GetPaymentResponse.Settled,
-        GetPaymentResponse.Failed
+        GetPaymentResponse.Failed,
+        GetPaymentResponse.AttemptFailed
     >;
 
     using RefundUnion = OneOf<RefundPending, RefundAuthorized>;
