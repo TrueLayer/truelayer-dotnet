@@ -39,13 +39,15 @@ namespace TrueLayer.Payments.Model.AuthorizationFlow
     /// <param name="UserAccountSelection">Can your UI render a user account selection screen?
     /// If the user has previously consented to saving their bank account details with TrueLayer, they can choose from their saved accounts to speed up following payments.
     /// This field states whether your UI can render a selection screen for these saved accounts. If you omit this, the user isn't presented with this option.</param>
+    /// <param name="Retry">The retry opt-in option for the authorization flow</param>
     public record StartAuthorizationFlowRequest(
         ProviderSelectionUnion? ProviderSelection = null,
         SchemeSelectionUnion? SchemeSelection = null,
         Redirect? Redirect = null,
         Form? Form = null,
         Consent? Consent = null,
-        UserAccountSelection? UserAccountSelection = null);
+        UserAccountSelection? UserAccountSelection = null,
+        Retry.BaseRetry? Retry = null);
 
     /// <summary>
     /// Contains the information regarding the configuration of the authorization flow.

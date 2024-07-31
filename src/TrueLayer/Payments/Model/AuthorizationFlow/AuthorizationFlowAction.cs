@@ -12,7 +12,8 @@ using AuthorizationFlowActionUnion = OneOf<
     Models.AuthorizationFlowAction.WaitForOutcome,
     Models.AuthorizationFlowAction.Form,
     AuthorizationFlowAction.Consent,
-    AuthorizationFlowAction.UserAccountSelection
+    AuthorizationFlowAction.UserAccountSelection,
+    AuthorizationFlowAction.Retry
 >;
 
 /// <summary>
@@ -69,4 +70,12 @@ public static class AuthorizationFlowAction
         Fee Fee);
 
     public record Fee(int AmountInMinor, string Currency);
+
+    [JsonDiscriminator("retry")]
+    public record Retry(string Type, List<RetryOption> RetryOptions) : IDiscriminated;
+
+    public enum RetryOption
+    {
+        Restart,
+    }
 }
