@@ -60,11 +60,20 @@ namespace TrueLayer.AcceptanceTests
             response.Data.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel.ShouldNotBeNullOrWhiteSpace();
         }
 
-        [Fact]
-        public async Task Can_search_payments_providers()
+        [Theory]
+        [MemberData(nameof(SearchPaymentProvidersData))]
+        public async Task Can_search_payments_providers(
+            List<string>? countries = null,
+            List<string>? currencies = null,
+            string? releaseChannel = null,
+            List<string>? customerSegments = null)
         {
             var searchRequest = new SearchPaymentsProvidersRequest(
-                new AuthorizationFlow(new AuthorizationFlowConfiguration())
+                new AuthorizationFlow(new AuthorizationFlowConfiguration()),
+                countries,
+                currencies,
+                releaseChannel,
+                customerSegments
             );
 
             var response = await _fixture.Client.PaymentsProviders.SearchPaymentsProviders(searchRequest);
@@ -77,9 +86,26 @@ namespace TrueLayer.AcceptanceTests
                 pp.Id.ShouldNotBeEmpty();
                 pp.DisplayName.ShouldNotBeNullOrWhiteSpace();
                 pp.CountryCode.ShouldNotBeNullOrWhiteSpace();
+                pp.CountryCode.ShouldNotBeNullOrWhiteSpace();
+                if (countries != null && countries.Any())
+                {
+                    countries.ShouldContain(pp.CountryCode);
+                }
                 pp.Capabilities.Mandates?.VrpSweeping.ShouldNotBeNull();
                 pp.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel.ShouldNotBeNullOrWhiteSpace();
             });
+        }
+
+        public static IEnumerable<object?[]> SearchPaymentProvidersData()
+        {
+            yield return new object?[] { null, null, null, null };
+            yield return new object?[] { new List<string> { "GB" }, null, null, null };
+            yield return new object?[] { new List<string> { "GB" }, new List<string> { "GBP" }, null, null };
+            yield return new object?[] { new List<string> { "GB" }, new List<string> { "GBP" }, "general_availability", null };
+            yield return new object?[] { new List<string> { "GB" }, new List<string> { "GBP" }, "private_beta", null };
+            yield return new object?[] { new List<string> { "GB" }, new List<string> { "GBP" }, "public_beta", null };
+            yield return new object?[] { new List<string> { "GB" }, new List<string> { "GBP" }, "general_availability", new List<string> { "retail" } };
+            yield return new object?[] { new List<string> { "GB" }, new List<string> { "GBP" }, "general_availability", new List<string> { "retail", "corporate" } };
         }
     }
 }
