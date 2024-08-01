@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.10.0] - 2024-08-01
+### Changed
+- Replaced `ReleaseChannels` parameter from `SearchPaymentsProvideerRequest` with `ResleaseChannel` (single `string` value)
+### Added
+- Added support to `GET /v3/payments/{id}/refunds` endpoint.
+- Added support to `GET /v3/payments/{payment_id}/refunds/{refund_id}` endpoint.
+- Added support to `POST /v3/payments/{payment_id}/refunds` endpoint.
+
+## [1.9.0] - 2024-07-22
+### Changed
+- Removed unnecessary `[Obsolete]` attributes
+
 ## [1.8.0] - 2024-07-12
 ### Added
 - Added support to `POST /v3/payments/{id}/authorization-flow` endpoint.
