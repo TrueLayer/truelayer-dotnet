@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using OneOf;
@@ -26,6 +27,11 @@ namespace TrueLayer.Serialization
             Utf8JsonReader readerClone = reader;
 
             var doc = JsonDocument.ParseValue(ref reader);
+
+            if (doc.RootElement.ValueKind == JsonValueKind.Object && !doc.RootElement.EnumerateObject().Any())
+            {
+                return default;
+            }
 
             if (doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator)
                 && (_descriptor.TypeFactories.TryGetValue(discriminator.GetString()!, out var typeFactory)))

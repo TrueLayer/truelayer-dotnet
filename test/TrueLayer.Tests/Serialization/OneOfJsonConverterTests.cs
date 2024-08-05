@@ -62,6 +62,21 @@ namespace TrueLayer.Tests.Serialization
         }
 
         [Fact]
+        public void Can_fallback_to_status_discriminator_when_type_discriminator_does_not_match()
+        {
+            string json = @"{
+                    ""type"": ""NotMatched"",
+                    ""status"": ""Bar"",
+                    ""BarProp"": 10
+                }
+            ";
+
+            var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
+            oneOf.AsT1.BarProp.ShouldBe(10);
+            oneOf.Value.ShouldBeOfType<Bar>();
+        }
+
+        [Fact]
         public void Can_read_from_status_discriminator_Refund()
         {
             string json = @"{
@@ -110,6 +125,17 @@ namespace TrueLayer.Tests.Serialization
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Other>>(json, _options);
             oneOf.Value.ShouldBeOfType<Other>();
+        }
+
+        [Fact]
+        public void Returns_default_value_for_empty_objects()
+        {
+            string json = @"{
+                }
+            ";
+
+            var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Other>>(json, _options);
+            oneOf.Value.ShouldBe(default);
         }
 
         [Fact]
