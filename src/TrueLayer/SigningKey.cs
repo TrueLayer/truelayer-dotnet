@@ -20,7 +20,7 @@ namespace TrueLayer
         /// <summary>
         /// Sets the private key. Should not be shared with anyone outside of your organisation.
         /// </summary>
-        public string PrivateKey { internal get; set; } = null!;
+        public string PrivateKey { get; set; } = null!;
 
         /// <summary>
         /// Gets the TrueLayer Key identifier available from the Console
