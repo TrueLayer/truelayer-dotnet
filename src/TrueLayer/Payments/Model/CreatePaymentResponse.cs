@@ -52,7 +52,7 @@ namespace TrueLayer.Payments.Model
         [JsonDiscriminator("authorizing")]
         public record Authorizing : PaymentDetails
         {
-            public AuthorizationFlow.AuthorizationFlow AuthorizationFlow { get; init; } = null!;
+            public AuthorizationFlow.AuthorizationFlow? AuthorizationFlow { get; init; } = null;
         }
 
         /// <summary>

@@ -146,7 +146,8 @@ namespace MvcExample.Controllers
                 authorized => SuccessOrPending(authorized),
                 success => SuccessOrPending(success),
                 settled => SuccessOrPending(settled),
-                failed => Failed(failed.Status, failed.PaymentMethod)
+                failed => Failed(failed.Status, failed.PaymentMethod),
+                attemptFailed => Failed(attemptFailed.Status, attemptFailed.PaymentMethod)
             );
         }
 

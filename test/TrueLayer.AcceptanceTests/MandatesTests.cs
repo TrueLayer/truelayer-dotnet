@@ -66,11 +66,11 @@ namespace TrueLayer.AcceptanceTests
         }
 
 
-        [Theory(Skip = "Flaky tests, need to be fixed")]
+        [Theory]
         [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests), Skip = "It returns forbidden. Need to investigate.")]
         [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialPreselectedMandateRequests))]
+        [MemberData(nameof(CreateTestCommercialPreselectedMandateRequests), Skip = "It returns forbidden. Need to investigate.")]
         public async Task Can_get_mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange

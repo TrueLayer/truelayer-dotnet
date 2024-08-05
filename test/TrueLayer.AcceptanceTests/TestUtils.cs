@@ -32,7 +32,7 @@ public enum HeadlessResourceAction
     Invalid,
     Execute,
     Authorize,
-    RejectAuthorization
+    RejectAuthorisation
 }
 
 public enum HeadlessResource {
@@ -63,7 +63,7 @@ public static class TestUtils
         var authResponseString = await authResponse.Content.ReadAsStringAsync();
         var authResponseUri = new Uri(authResponseString);
 
-        String query = authorization.Resource == HeadlessResource.Mandates
+        var query = authorization.Resource == HeadlessResource.Mandates
             ? authResponseUri.Query.Replace("mandate-", "")
             : authResponseUri.Query;
 

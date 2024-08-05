@@ -12,7 +12,8 @@ using AuthorizationFlowActionUnion = OneOf<
     Models.AuthorizationFlowAction.WaitForOutcome,
     Models.AuthorizationFlowAction.Form,
     AuthorizationFlowAction.Consent,
-    AuthorizationFlowAction.UserAccountSelection
+    AuthorizationFlowAction.UserAccountSelection,
+    AuthorizationFlowAction.Retry
 >;
 
 /// <summary>
@@ -25,7 +26,7 @@ public record Actions(AuthorizationFlowActionUnion Next);
 /// Contains information regarding the nature and the state of the authorization flow.
 /// </summary>
 /// <param name="Actions">Contains the next action to be taken in the authorization flow.</param>
-public record AuthorizationFlow(Actions Actions);
+public record AuthorizationFlow(Actions Actions, Configuration? Configuration);
 
 /// <summary>
 /// This static class contains the different types of actions that can be taken during the authorization flow.
@@ -69,4 +70,12 @@ public static class AuthorizationFlowAction
         Fee Fee);
 
     public record Fee(int AmountInMinor, string Currency);
+
+    [JsonDiscriminator("retry")]
+    public record Retry(string Type, List<RetryOption> RetryOptions) : IDiscriminated;
+
+    public enum RetryOption
+    {
+        Restart,
+    }
 }
