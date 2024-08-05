@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.11.0] - 2024-08-05
+### Added
+- Added support to `retry` parameter in `CreatePaymentRequest` model
+- Added support to `AttemptFailed` status in `CreatePaymentResponse` model
+### Changed
+- `Truelayer.Payments.SigningKey.PrivateKey` can now be set via configuration binding
+
 ## [1.10.0] - 2024-08-01
 ### Changed
 - Replaced `ReleaseChannels` parameter from `SearchPaymentsProvideerRequest` with `ResleaseChannel` (single `string` value)
