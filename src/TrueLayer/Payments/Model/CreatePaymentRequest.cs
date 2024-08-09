@@ -23,6 +23,7 @@ namespace TrueLayer.Payments.Model
         /// <param name="authorizationFlow">The authorization flow parameter.
         /// If provided, the start authorization flow endpoint does not need to be called</param>
         /// <param name="metadata"></param>
+        /// <param name="riskAssessment"></param>
         public CreatePaymentRequest(
             long amountInMinor,
             string currency,
@@ -30,7 +31,8 @@ namespace TrueLayer.Payments.Model
             PaymentUserRequest? user = null,
             RelatedProducts? relatedProducts = null,
             StartAuthorizationFlowRequest? authorizationFlow = null,
-            Dictionary<string, string>? metadata = null)
+            Dictionary<string, string>? metadata = null,
+            RiskAssessment? riskAssessment = null)
         {
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
             Currency = currency.NotNullOrWhiteSpace(nameof(currency));
@@ -39,6 +41,7 @@ namespace TrueLayer.Payments.Model
             RelatedProducts = relatedProducts;
             AuthorizationFlow = authorizationFlow;
             Metadata = metadata;
+            RiskAssessment = riskAssessment;
         }
 
         /// <summary>
@@ -72,6 +75,14 @@ namespace TrueLayer.Payments.Model
         /// </summary>
         public StartAuthorizationFlowRequest? AuthorizationFlow { get; }
 
+        /// <summary>
+        /// Gets the metadata for the payment
+        /// </summary>
         public Dictionary<string, string>? Metadata { get; }
+
+        /// <summary>
+        /// Gets the risk assessment configuration
+        /// </summary>
+        public RiskAssessment? RiskAssessment { get; }
     }
 }
