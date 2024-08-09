@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.PaymentMethod;
@@ -54,6 +55,11 @@ namespace TrueLayer.Payments.Model
             /// Gets the end user details
             /// </summary>
             public PaymentUser User { get; init; } = null!;
+
+            /// <summary>
+            /// Gets the metadata added to the payment.
+            /// </summary>
+            public Dictionary<string, string>? Metadata { get; init; } = null;
         }
 
         /// <summary>
