@@ -2,7 +2,7 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model;
 
-public static class RemitterVerification
+public static class Verification
 {
     [JsonDiscriminator("automated")]
     public sealed record Automated: IDiscriminated

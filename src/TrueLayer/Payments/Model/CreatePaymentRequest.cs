@@ -22,8 +22,8 @@ namespace TrueLayer.Payments.Model
         /// <param name="relatedProducts">Related products</param>
         /// <param name="authorizationFlow">The authorization flow parameter.
         /// If provided, the start authorization flow endpoint does not need to be called</param>
-        /// <param name="metadata"></param>
-        /// <param name="riskAssessment"></param>
+        /// <param name="metadata">Add to the payment a list of custom key-value pairs as metadata</param>
+        /// <param name="riskAssessment">The risk assessment and the payment_creditable webhook configuration.</param>
         public CreatePaymentRequest(
             long amountInMinor,
             string currency,

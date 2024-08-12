@@ -5,7 +5,7 @@ using static TrueLayer.Payments.Model.AccountIdentifier;
 namespace TrueLayer.Payments.Model
 {
     using AccountIdentifierUnion = OneOf<SortCodeAccountNumber, Iban, Bban, Nrb>;
-    using VerificationUnion = OneOf<RemitterVerification.Automated>;
+    using VerificationUnion = OneOf<Verification.Automated>;
 
     public static class Beneficiary
     {
@@ -46,7 +46,7 @@ namespace TrueLayer.Payments.Model
             public string? Reference { get; init; }
 
             /// <summary>
-            /// Gets or inits verification remitter information
+            /// Gets or inits verification information for the payment.
             /// </summary>
             public VerificationUnion? Verification { get; init; }
         }

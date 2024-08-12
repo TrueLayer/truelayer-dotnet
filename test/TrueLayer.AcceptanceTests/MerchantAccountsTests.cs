@@ -100,7 +100,7 @@ namespace TrueLayer.AcceptanceTests
                     new Beneficiary.MerchantAccount(merchantId)
                     {
                         Reference = "Test payment",
-                        Verification = new RemitterVerification.Automated
+                        Verification = new Verification.Automated
                         {
                             RemitterName = false,
                             RemitterDateOfBirth = false
