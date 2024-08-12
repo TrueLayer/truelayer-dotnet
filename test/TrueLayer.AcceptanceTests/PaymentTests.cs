@@ -337,7 +337,13 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 dateOfBirth: new DateTime(1999, 1, 1),
                 address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
             relatedProducts,
-            authorizationFlow
+            authorizationFlow,
+            metadata: new Dictionary<string, string>
+            {
+                ["test-key-1"] = "test-value-1",
+                ["test-key-2"] = "test-value-2",
+            },
+            riskAssessment: new RiskAssessment("test")
         );
     }
 
