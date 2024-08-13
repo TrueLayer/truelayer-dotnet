@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using OneOf;
 using Shouldly;
 using TrueLayer.Common;
 using TrueLayer.MerchantAccounts.Model;
@@ -99,6 +100,11 @@ namespace TrueLayer.AcceptanceTests
                     new Beneficiary.MerchantAccount(merchantId)
                     {
                         Reference = "Test payment",
+                        Verification = new Verification.Automated
+                        {
+                            RemitterName = false,
+                            RemitterDateOfBirth = false
+                        }
                     }),
                 new PaymentUserRequest(
                     name: "Jane Doe",
