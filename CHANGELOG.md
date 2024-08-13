@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.12.0] - 2024-08-13
+### Added
+= Added support to `risk_assessment` parameter in `CreatePaymentRequest`
+- Added support to `metdata` field to `CreatePaymentRequest` and `GetPaymentResponse` models
+- Added support to `verification` field on `MerchantAccount` beneficiary type for `CreatePaymentRequest`
+
 ## [1.11.0] - 2024-08-05
 ### Added
 - Added support to `retry` parameter in `CreatePaymentRequest` model
