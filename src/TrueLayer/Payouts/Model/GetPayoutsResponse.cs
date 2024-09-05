@@ -1,8 +1,13 @@
 using System;
+using OneOf;
 using TrueLayer.Serialization;
+using static TrueLayer.Payouts.Model.Beneficiary;
+
 
 namespace TrueLayer.Payouts.Model
 {
+    using BeneficiaryUnion = OneOf<PaymentSource, ExternalAccount, BusinessAccount>;
+
     /// <summary>
     /// Get Payout Response Types
     /// </summary>
@@ -34,6 +39,11 @@ namespace TrueLayer.Payouts.Model
             /// </summary>
             /// <example>EUR</example>
             public string Currency { get; init; } = null!;
+
+            /// <summary>
+            /// Gets the beneficiary details
+            /// </summary>
+            public BeneficiaryUnion Beneficiary { get; init; }
 
             /// <summary>
             /// Gets the status of the payout
