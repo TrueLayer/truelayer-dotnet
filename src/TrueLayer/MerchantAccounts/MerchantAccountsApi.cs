@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
@@ -59,9 +60,8 @@ namespace TrueLayer.MerchantAccounts
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            var getUri = new Uri(_baseUri.AbsoluteUri.EndsWith('/') ? _baseUri + id : _baseUri + "/" + id);
             return await _apiClient.GetAsync<MerchantAccount>(
-                getUri,
+                _baseUri.Append(id),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
@@ -83,7 +83,43 @@ namespace TrueLayer.MerchantAccounts
             }
 
             return await _apiClient.GetAsync<GetPaymentSourcesResponse>(
-                _baseUri.Append($"merchant-accounts/{merchantAccountId}/payment-sources?user_id={userId}"),
+                _baseUri.Append($"{merchantAccountId}/payment-sources?user_id={userId}"),
+                authResponse.Data!.AccessToken,
+                cancellationToken
+            );
+        }
+
+        /// <inheritdoc />
+        public async Task<ApiResponse<GetTransactionsResponse>> GetTransactions(
+            string merchantAccountId,
+            DateTimeOffset from,
+            DateTimeOffset to,
+            bool usePagination = true,
+            string? cursor = null,
+            string? type = null,
+            CancellationToken cancellationToken = default)
+        {
+            merchantAccountId.NotNullOrWhiteSpace(nameof(merchantAccountId));
+            merchantAccountId.NotAUrl(nameof(merchantAccountId));
+            to.GreaterThan(from, nameof(to), nameof(from));
+            cursor.NotAUrl(nameof(cursor));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.GetAsync<GetTransactionsResponse>(
+                _baseUri.Append($"/{merchantAccountId}/transactions")
+                    .AppendQueryParameters(new Dictionary<string, string?>
+                    {
+                        ["from"] = from.ToString("yyyy-MM-ddTHH:MM:ss.HHMM"),
+                        ["to"] = to.ToString("yyyy-MM-ddTHH:MM:ss.HHMM"),
+                        ["cursor"] = cursor,
+                        ["type"] = type
+                    }),
                 authResponse.Data!.AccessToken,
                 cancellationToken
             );
