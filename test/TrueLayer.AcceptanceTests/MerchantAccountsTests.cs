@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using OneOf;
 using Shouldly;
 using TrueLayer.Common;
 using TrueLayer.MerchantAccounts.Model;
@@ -26,10 +25,10 @@ namespace TrueLayer.AcceptanceTests
         public async Task Can_get_merchant_accounts()
         {
             // Arrange
-            var canceller = new CancellationTokenSource(5000).Token;
+            var cancellationToken = new CancellationTokenSource(5000).Token;
 
             // Act
-            var response = await _fixture.Client.MerchantAccounts.ListMerchantAccounts(canceller);
+            var response = await _fixture.Client.MerchantAccounts.ListMerchantAccounts(cancellationToken);
 
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {response.TraceId}");
@@ -41,23 +40,143 @@ namespace TrueLayer.AcceptanceTests
         public async Task Can_get_specific_merchant_account()
         {
             // Arrange
-            var canceller = new CancellationTokenSource(5000).Token;
+            var cancellationToken = new CancellationTokenSource(5000).Token;
 
-            var listMerchants = await _fixture.Client.MerchantAccounts.ListMerchantAccounts(canceller);
-            listMerchants.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
-            listMerchants.Data.ShouldNotBeNull();
-            listMerchants.Data.Items.ShouldNotBeEmpty();
-            var merchantId = listMerchants.Data.Items.First().Id;
+            (string merchantId, string? traceId) = await GetMerchantAccountId(cancellationToken);
 
             // Act
-            var merchantResponse = await _fixture.Client.MerchantAccounts.GetMerchantAccount(merchantId, canceller);
+            var merchantResponse = await _fixture.Client.MerchantAccounts.GetMerchantAccount(merchantId, cancellationToken);
 
             // Assert
-            merchantResponse.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
+            merchantResponse.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {traceId}");
             merchantResponse.Data.ShouldNotBeNull();
             merchantResponse.Data.Id.ShouldBe(merchantId);
             merchantResponse.Data.AccountHolderName.ShouldNotBeNullOrWhiteSpace();
             merchantResponse.Data.Currency.ShouldNotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public async Task Can_get_merchant_account_transactions()
+        {
+            // Arrange
+            var cancellationToken = new CancellationTokenSource().Token;
+
+            (string merchantId, string? traceId) = await GetMerchantAccountId(cancellationToken);
+
+            // Act
+            var merchantResponse = await _fixture.Client.MerchantAccounts.GetTransactions(
+                merchantId,
+                DateTimeOffset.UtcNow.AddYears(-1),
+                DateTimeOffset.UtcNow,
+                cancellationToken: CancellationToken.None);
+
+            // Assert
+            merchantResponse.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {traceId}");
+            merchantResponse.Data.ShouldNotBeNull();
+            merchantResponse.Data.Items.ShouldNotBeEmpty();
+            foreach (var item in merchantResponse.Data.Items)
+            {
+                item.Match(
+                    payment => AssertTransaction(payment),
+                    externalPayment => AssertTransaction(externalPayment),
+                    pendingPayout => AssertTransaction(pendingPayout),
+                    executedPayout => AssertTransaction(executedPayout),
+                    refund => AssertTransaction(refund));
+            }
+
+            merchantResponse.Data.Pagination?.NextCursor.ShouldNotBeNullOrWhiteSpace();
+        }
+
+        private static void AssertBaseTransaction(MerchantAccountTransactions.BaseTransaction baseTransaction,string[] expectedStatuses)
+        {
+            baseTransaction.ShouldNotBeNull();
+            baseTransaction.Id.ShouldNotBeNullOrWhiteSpace();
+            baseTransaction.Currency.ShouldNotBeNullOrWhiteSpace();
+            baseTransaction.AmountInMinor.ShouldBeGreaterThan(0);
+            baseTransaction.Status.ShouldBeOneOf(expectedStatuses);
+        }
+
+        private static bool AssertTransaction(MerchantAccountTransactions.MerchantAccountPayment payment)
+        {
+            AssertBaseTransaction(payment, new [] { "settled" });
+            payment.SettledAt.ShouldNotBeOneOf(DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
+            payment.PaymentSource.ShouldNotBeNull();
+            payment.PaymentId.ShouldNotBeNullOrWhiteSpace();
+            return true;
+        }
+
+        private static bool AssertTransaction(MerchantAccountTransactions.ExternalPayment externalPayment)
+        {
+            AssertBaseTransaction(externalPayment, new []{ "settled" });
+            externalPayment.SettledAt.ShouldNotBeOneOf(DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
+            externalPayment.Remitter.ShouldNotBeNull();
+            externalPayment.ReturnFor.Match(
+                returnedBy =>
+                {
+                    returnedBy?.ReturnedId.ShouldNotBeNullOrWhiteSpace();
+                    return true;
+                },
+                returnedTo => true);
+            return true;
+        }
+
+        private static void AssertBaseTransactionPayout(MerchantAccountTransactions.BaseTransactionPayout baseTransaction)
+        {
+           AssertBaseTransaction(baseTransaction, new [] { "executed", "pending" });
+            baseTransaction.CreatedAt.ShouldNotBeOneOf(DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
+            baseTransaction.Beneficiary.Match(
+                externalAccount =>
+                {
+                    externalAccount.Reference.ShouldNotBeNullOrWhiteSpace();
+                    return true;
+                },
+                paymentSource =>
+                {
+                    paymentSource.Reference.ShouldNotBeNullOrWhiteSpace();
+                    return true;
+                },
+                businessAccount =>
+                {
+                    businessAccount.Reference.ShouldNotBeNullOrWhiteSpace();
+                    return true;
+                },
+                userDetermined =>
+                {
+                    userDetermined.Reference.ShouldNotBeNullOrWhiteSpace();
+                    return true;
+                });
+            baseTransaction.ContextCode.ShouldNotBeNullOrWhiteSpace();
+            baseTransaction.PayoutId.ShouldNotBeNullOrWhiteSpace();
+        }
+
+        private static bool AssertTransaction(MerchantAccountTransactions.PendingPayout pendingPayout)
+        {
+            AssertBaseTransactionPayout(pendingPayout);
+            return true;
+        }
+
+        private static bool AssertTransaction(MerchantAccountTransactions.ExecutedPayout executedPayout)
+        {
+            AssertBaseTransactionPayout(executedPayout);
+            return true;
+        }
+
+        private static bool AssertTransaction(MerchantAccountTransactions.Refund refund)
+        {
+            AssertBaseTransaction(refund, new []{ "executed", "pending" });
+            refund.PaymentId.ShouldNotBeNullOrWhiteSpace();
+            refund.RefundId.ShouldNotBeNull();
+            return true;
+        }
+
+        private async Task<(string merchantId, string? traceId)> GetMerchantAccountId(CancellationToken cancellationToken)
+        {
+            var listMerchants = await _fixture.Client.MerchantAccounts.ListMerchantAccounts(cancellationToken);
+            listMerchants.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
+            listMerchants.Data.ShouldNotBeNull();
+            listMerchants.Data.Items.ShouldNotBeEmpty();
+            var merchantId = listMerchants.Data.Items.First().Id;
+            return (merchantId, listMerchants.TraceId);
         }
 
         [Fact]
