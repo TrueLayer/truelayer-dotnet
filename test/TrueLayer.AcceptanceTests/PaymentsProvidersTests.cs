@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using OneOf;
 using Shouldly;
-using TrueLayer.Models;
 using TrueLayer.Payments.Model;
 using TrueLayer.PaymentsProviders.Model;
 using Xunit;
@@ -12,9 +11,6 @@ using Provider = TrueLayer.Payments.Model.Provider;
 
 namespace TrueLayer.AcceptanceTests
 {
-    using AccountIdentifierUnion = OneOf<AccountIdentifier.SortCodeAccountNumber, AccountIdentifier.Iban>;
-    using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
-
     public class PaymentProvidersTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;

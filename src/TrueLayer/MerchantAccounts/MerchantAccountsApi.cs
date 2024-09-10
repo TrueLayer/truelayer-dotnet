@@ -43,7 +43,7 @@ namespace TrueLayer.MerchantAccounts
             return await _apiClient.GetAsync<ResourceCollection<MerchantAccount>>(
                 _baseUri,
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
 
@@ -63,7 +63,7 @@ namespace TrueLayer.MerchantAccounts
             return await _apiClient.GetAsync<MerchantAccount>(
                 _baseUri.Append(id),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken:cancellationToken
             );
         }
 
@@ -85,7 +85,7 @@ namespace TrueLayer.MerchantAccounts
             return await _apiClient.GetAsync<GetPaymentSourcesResponse>(
                 _baseUri.Append($"{merchantAccountId}/payment-sources?user_id={userId}"),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
 
@@ -111,16 +111,22 @@ namespace TrueLayer.MerchantAccounts
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
+            var customHeaders = new Dictionary<string, string>
+            {
+                ["tl-use-pagination"] = usePagination.ToString()
+            };
+
             return await _apiClient.GetAsync<GetTransactionsResponse>(
                 _baseUri.Append($"/{merchantAccountId}/transactions")
                     .AppendQueryParameters(new Dictionary<string, string?>
                     {
-                        ["from"] = from.ToString("yyyy-MM-ddTHH:MM:ss.HHMM"),
-                        ["to"] = to.ToString("yyyy-MM-ddTHH:MM:ss.HHMM"),
+                        ["from"] = from.ToString("yyyy-MM-ddTHH:MM:ssZ"),
+                        ["to"] = to.ToString("yyyy-MM-ddTHH:MM:ssZ"),
                         ["cursor"] = cursor,
                         ["type"] = type
                     }),
                 authResponse.Data!.AccessToken,
+                customHeaders,
                 cancellationToken
             );
         }

@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using OneOf;
 using TrueLayer.Models;
 using TrueLayer.Payments.Model;
-using TrueLayer.Payouts.Model;
 using TrueLayer.Serialization;
+using PayoutBeneficiary = TrueLayer.Payouts.Model.Beneficiary;
 using static TrueLayer.MerchantAccounts.Model.MerchantAccountTransactions;
 
 namespace TrueLayer.MerchantAccounts.Model;
 
-[GenerateOneOf]
-public partial class MerchantAccountTransactionUnion
-    : OneOfBase<MerchantAccountPayment, ExternalPayment, PendingPayout, ExecutedPayout, Refund>
-{ }
+using ReturnForUnion = OneOf<ReturnFor.Idenfied, ReturnFor.Unknow>;
+using MerchantAccountTransactionUnion = OneOf<MerchantAccountPayment, ExternalPayment, PendingPayout, ExecutedPayout, Refund>;
+using PayoutBeneficiaryUnion = OneOf<
+        PayoutBeneficiary.PaymentSource,
+        PayoutBeneficiary.ExternalAccount,
+        PayoutBeneficiary.BusinessAccount,
+        PayoutBeneficiary.UserDetermined>;
 
 public record GetTransactionsResponse(IList<MerchantAccountTransactionUnion> Items, Pagination Pagination);
 
@@ -131,6 +134,7 @@ public static class MerchantAccountTransactions
     /// <inheritdoc cref="BaseTransactionPayout"/>
     /// <param name="ExecutedAt">The date and time the transaction was executed</param>
     /// <param name="ReturnedBy">Unique ID for the external payment that returned this payout</param>
+    [JsonDiscriminator(Discriminator)]
     public sealed record ExecutedPayout(
         string Id,
         string Currency,
@@ -159,9 +163,15 @@ public static class MerchantAccountTransactions
     /// <summary>
     /// Represents payment refund out of the merchant account
     /// </summary>
-    /// <inheritdoc cref="BaseTransactionPayout"/>
+    /// <inheritdoc cref="BaseTransaction"/>
+    /// <param name="CreatedAt">The date and time the transaction was created</param>
     /// <param name="ExecutedAt">The date and time the transaction was executed</param>
+    /// <param name="Beneficiary">The transaction's payout beneficiary</param>
+    /// <param name="ContextCode">The context code for the refund</param>
+    /// <param name="RefundId">Unique ID for the refund</param>
+    /// <param name="PaymentId">Unique ID for the payment</param>
     /// <param name="ReturnedBy">Unique ID for the external payment that returned this payout</param>
+    [JsonDiscriminator(Discriminator)]
     public sealed record Refund(
         string Id,
         string Currency,
@@ -171,17 +181,14 @@ public static class MerchantAccountTransactions
         DateTimeOffset ExecutedAt,
         PayoutBeneficiaryUnion Beneficiary,
         string ContextCode,
-        string PayoutId,
+        string RefundId,
+        string PaymentId,
         string ReturnedBy)
-        : BaseTransactionPayout(
+        : BaseTransaction(
             Id,
             Currency,
             AmountInMinor,
-            Status,
-            CreatedAt,
-            Beneficiary,
-            ContextCode,
-            PayoutId), IDiscriminated
+            Status), IDiscriminated
     {
         const string Discriminator = "refund";
         public string Type => Discriminator;

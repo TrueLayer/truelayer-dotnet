@@ -83,7 +83,7 @@ namespace TrueLayer.Mandates
             return await _apiClient.GetAsync<MandateDetailUnion>(
                 _baseUri.Append(mandateId),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
 
@@ -106,7 +106,7 @@ namespace TrueLayer.Mandates
             return await _apiClient.GetAsync<ResourceCollection<MandateDetailUnion>>(
                 baseUriBuilder.Uri,
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
 
@@ -196,7 +196,7 @@ namespace TrueLayer.Mandates
             return await _apiClient.GetAsync<GetConfirmationOfFundsResponse>(
                 _baseUri.Append($"{mandateId}/funds?amount_in_minor={amountInMinor}&currency={currency}"),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
 
@@ -216,7 +216,7 @@ namespace TrueLayer.Mandates
             return await _apiClient.GetAsync<GetConstraintsResponse>(
                 _baseUri.Append($"{mandateId}/constraints"),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
 

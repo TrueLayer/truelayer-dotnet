@@ -4,16 +4,10 @@ using OneOf;
 using TrueLayer.Common;
 using TrueLayer.Serialization;
 using static TrueLayer.Payouts.Model.AccountIdentifier;
-using static TrueLayer.Payouts.Model.Beneficiary;
 
 namespace TrueLayer.Payouts.Model
 {
     using AccountIdentifierUnion = OneOf<Iban, SortCodeAccountNumber>;
-
-    [GenerateOneOf]
-    public partial class PayoutBeneficiaryUnion
-        : OneOfBase<PaymentSource, ExternalAccount, BusinessAccount, UserDetermined>
-    { }
 
     public static class Beneficiary
     {
@@ -120,14 +114,6 @@ namespace TrueLayer.Payouts.Model
         public sealed record BusinessAccount : IDiscriminated
         {
             const string Discriminator = "business_account";
-            /// <summary>
-            /// Creates a new <see cref="BusinessAccount"/>.
-            /// </summary>
-            /// <param name="reference">A reference for the payout.</param>
-            public BusinessAccount(string reference)
-            {
-                Reference = reference.NotNullOrWhiteSpace(nameof(reference));
-            }
 
             /// <summary>
             /// Creates a new <see cref="BusinessAccount"/>.
@@ -135,7 +121,10 @@ namespace TrueLayer.Payouts.Model
             /// <param name="reference">A reference for the payout.</param>
             /// <param name="accountHolderName">The business account holder name</param>
             /// <param name="accountIdentifier">The unique identifier for the business account</param>
-            public BusinessAccount(string reference, string accountHolderName, AccountIdentifierUnion accountIdentifier)
+            public BusinessAccount(
+                string reference,
+                string? accountHolderName = null,
+                AccountIdentifierUnion? accountIdentifier = null)
             {
                 Reference = reference.NotNullOrWhiteSpace(nameof(reference));
                 AccountHolderName = accountHolderName;
@@ -150,7 +139,7 @@ namespace TrueLayer.Payouts.Model
             /// <summary>
             /// Gets the name of the business account holder
             /// </summary>
-            public string AccountHolderName { get; } = "";
+            public string? AccountHolderName { get; } = "";
 
             /// <summary>
             /// Gets the reference for the business bank account holder
@@ -160,7 +149,7 @@ namespace TrueLayer.Payouts.Model
             /// <summary>
             /// Gets the unique scheme identifier for the business account
             /// </summary>
-            public AccountIdentifierUnion AccountIdentifier { get; }
+            public AccountIdentifierUnion? AccountIdentifier { get; }
         }
 
         [JsonDiscriminator(Discriminator)]

@@ -3,9 +3,6 @@ using OneOf;
 
 namespace TrueLayer.MerchantAccounts.Model;
 
-[GenerateOneOf]
-public partial class ReturnForUnion : OneOfBase<ReturnFor.Idenfied, ReturnFor.Unknow> { }
-
 public static class ReturnFor
 {
     /// <summary>

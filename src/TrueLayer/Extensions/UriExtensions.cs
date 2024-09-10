@@ -25,7 +25,7 @@ namespace TrueLayer.Extensions
 
             var query = string.Join("&", queryParams
                 .Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && kvp.Value != null)
-                .Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value!.Trim())}"));
+                .Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={kvp.Value!.Trim()}"));
 
             var uriBuilder = new UriBuilder(uri)
             {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,7 +11,6 @@ using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
-using TrueLayer.Common;
 using TrueLayer.Signing;
 #if NET6_0 || NET6_0_OR_GREATER
 using System.Net.Http.Json;
@@ -23,7 +23,7 @@ namespace TrueLayer
     /// </summary>
     internal class ApiClient : IApiClient
     {
-        private static readonly String TlAgentHeader
+        private static readonly string TlAgentHeader
             = $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>()}";
 
         private readonly HttpClient _httpClient;
@@ -41,7 +41,11 @@ namespace TrueLayer
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<TData>> GetAsync<TData>(Uri uri, string? accessToken = null, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<TData>> GetAsync<TData>(
+            Uri uri,
+            string? accessToken = null,
+            IDictionary<string, string>? customHeaders = null,
+            CancellationToken cancellationToken = default)
         {
             uri.HasValidBaseUri(nameof(uri), _options);
 
@@ -52,6 +56,7 @@ namespace TrueLayer
                 accessToken: accessToken,
                 httpContent: null,
                 signature: null,
+                customHeaders: customHeaders,
                 cancellationToken: cancellationToken
             );
 
@@ -191,11 +196,12 @@ namespace TrueLayer
         private Task<HttpResponseMessage> SendJsonRequestAsync(
             HttpMethod httpMethod,
             Uri uri,
-            string? idempotencyKey,
-            string? accessToken,
-            object? request,
-            SigningKey? signingKey,
-            CancellationToken cancellationToken)
+            string? idempotencyKey = null,
+            string? accessToken = null,
+            object? request = null,
+            SigningKey? signingKey = null,
+            IDictionary<string, string>? customHeaders = null,
+            CancellationToken cancellationToken = default)
         {
             HttpContent? httpContent = null;
             string? signature = null;
@@ -234,17 +240,26 @@ namespace TrueLayer
 #endif
             }
 
-            return SendRequestAsync(httpMethod, uri, idempotencyKey, accessToken, httpContent, signature, cancellationToken);
+            return SendRequestAsync(
+                httpMethod,
+                uri,
+                idempotencyKey,
+                accessToken,
+                httpContent,
+                signature,
+                customHeaders,
+                cancellationToken);
         }
 
         private Task<HttpResponseMessage> SendRequestAsync(
             HttpMethod httpMethod,
             Uri uri,
-            string? idempotencyKey,
-            string? accessToken,
-            HttpContent? httpContent,
-            string? signature,
-            CancellationToken cancellationToken)
+            string? idempotencyKey = null,
+            string? accessToken = null,
+            HttpContent? httpContent = null,
+            string? signature = null,
+            IDictionary<string, string>? customHeaders = null,
+            CancellationToken cancellationToken = default)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
 
@@ -269,6 +284,17 @@ namespace TrueLayer
             }
 
             httpRequest.Headers.Add(CustomHeaders.Agent, TlAgentHeader);
+
+            if (customHeaders is not null)
+            {
+                foreach (var (key, value) in customHeaders)
+                {
+                    if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(value) && !httpRequest.Headers.Contains(key))
+                    {
+                        httpRequest.Headers.Add(key, value);
+                    }
+                }
+            }
 
             // HttpCompletionOption.ResponseHeadersRead reduces allocations by by avoiding the pre-buffering of the response content
             // and allows us to access the content stream faster.
