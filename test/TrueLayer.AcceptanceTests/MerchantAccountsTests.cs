@@ -60,7 +60,7 @@ namespace TrueLayer.AcceptanceTests
             merchantResponse.Data.Currency.ShouldNotBeNullOrWhiteSpace();
         }
 
-        [Fact(Skip = "This test is not working as expected.")]
+        [Fact]
         public async Task Can_get_payment_sources()
         {
             // Arrange
@@ -102,7 +102,7 @@ namespace TrueLayer.AcceptanceTests
                         Reference = "Test payment",
                         Verification = new Verification.Automated
                         {
-                            RemitterName = false,
+                            RemitterName = true,
                             RemitterDateOfBirth = false
                         }
                     }),
