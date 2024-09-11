@@ -34,7 +34,7 @@ namespace TrueLayer.Serialization
             }
 
             doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator);
-            string? discriminatorValue = discriminator.GetString();
+            string? discriminatorValue = GetStringValue(discriminator);
             if (!string.IsNullOrWhiteSpace(discriminatorValue)
                 && (_descriptor.TypeFactories.TryGetValue(discriminatorValue, out var typeFactory)))
             {
@@ -43,7 +43,7 @@ namespace TrueLayer.Serialization
 
             // Fallback to status field
             doc.RootElement.TryGetProperty("status", out discriminator);
-            string? statusValue = discriminator.GetString();
+            string? statusValue = GetStringValue(discriminator);
             if (!string.IsNullOrWhiteSpace(statusValue)
                 && (_descriptor.TypeFactories.TryGetValue(statusValue, out typeFactory)))
             {
@@ -59,6 +59,9 @@ namespace TrueLayer.Serialization
 
             throw new JsonException($"Unknown discriminator {discriminator}");
         }
+
+        private static string? GetStringValue(JsonElement jsonElement)
+            => jsonElement.ValueKind == JsonValueKind.String ? jsonElement.GetString() : null;
 
         private static T? InvokeDiscriminatorFactory(JsonSerializerOptions options, Utf8JsonReader readerClone,
             (Type FieldType, Delegate Factory) typeFactory)
