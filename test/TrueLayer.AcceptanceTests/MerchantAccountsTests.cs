@@ -175,7 +175,8 @@ namespace TrueLayer.AcceptanceTests
             listMerchants.StatusCode.ShouldBe(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
             listMerchants.Data.ShouldNotBeNull();
             listMerchants.Data.Items.ShouldNotBeEmpty();
-            var merchantId = listMerchants.Data.Items.First().Id;
+            var merchantId = listMerchants.Data.Items
+                .First(m => string.Equals(m.Currency, Currencies.GBP, StringComparison.OrdinalIgnoreCase)).Id;
             return (merchantId, listMerchants.TraceId);
         }
 
