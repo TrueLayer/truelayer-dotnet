@@ -78,7 +78,7 @@ namespace TrueLayer.Payouts
             return await _apiClient.GetAsync<GetPayoutUnion>(
                 _baseUri.Append(id),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
     }

@@ -33,21 +33,35 @@ namespace TrueLayer.Serialization
                 return default;
             }
 
-            if (doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator)
-                && (_descriptor.TypeFactories.TryGetValue(discriminator.GetString()!, out var typeFactory)))
+            doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator);
+            string? discriminatorValue = GetStringValue(discriminator);
+            if (!string.IsNullOrWhiteSpace(discriminatorValue)
+                && (_descriptor.TypeFactories.TryGetValue(discriminatorValue, out var typeFactory)))
             {
                 return InvokeDiscriminatorFactory(options, readerClone, typeFactory);
             }
 
             // Fallback to status field
-            if (doc.RootElement.TryGetProperty("status", out discriminator)
-                && (_descriptor.TypeFactories.TryGetValue(discriminator.GetString()!, out typeFactory)))
+            doc.RootElement.TryGetProperty("status", out discriminator);
+            string? statusValue = GetStringValue(discriminator);
+            if (!string.IsNullOrWhiteSpace(statusValue)
+                && (_descriptor.TypeFactories.TryGetValue(statusValue, out typeFactory)))
+            {
+                return InvokeDiscriminatorFactory(options, readerClone, typeFactory);
+            }
+
+            var statusTypeDiscriminator = string.Join("_", statusValue, discriminatorValue);
+            if (!string.IsNullOrWhiteSpace(statusTypeDiscriminator)
+                && (_descriptor.TypeFactories.TryGetValue(statusTypeDiscriminator, out typeFactory)))
             {
                 return InvokeDiscriminatorFactory(options, readerClone, typeFactory);
             }
 
             throw new JsonException($"Unknown discriminator {discriminator}");
         }
+
+        private static string? GetStringValue(JsonElement jsonElement)
+            => jsonElement.ValueKind == JsonValueKind.String ? jsonElement.GetString() : null;
 
         private static T? InvokeDiscriminatorFactory(JsonSerializerOptions options, Utf8JsonReader readerClone,
             (Type FieldType, Delegate Factory) typeFactory)

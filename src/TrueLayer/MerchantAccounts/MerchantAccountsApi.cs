@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
@@ -13,6 +14,7 @@ namespace TrueLayer.MerchantAccounts
         private readonly IApiClient _apiClient;
         private readonly Uri _baseUri;
         private readonly IAuthApi _auth;
+        private const bool UsePagination = true;
 
         public MerchantAccountsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
         {
@@ -42,7 +44,7 @@ namespace TrueLayer.MerchantAccounts
             return await _apiClient.GetAsync<ResourceCollection<MerchantAccount>>(
                 _baseUri,
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
 
@@ -59,11 +61,10 @@ namespace TrueLayer.MerchantAccounts
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            var getUri = new Uri(_baseUri.AbsoluteUri.EndsWith('/') ? _baseUri + id : _baseUri + "/" + id);
             return await _apiClient.GetAsync<MerchantAccount>(
-                getUri,
+                _baseUri.Append(id),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken:cancellationToken
             );
         }
 
@@ -83,8 +84,49 @@ namespace TrueLayer.MerchantAccounts
             }
 
             return await _apiClient.GetAsync<GetPaymentSourcesResponse>(
-                _baseUri.Append($"merchant-accounts/{merchantAccountId}/payment-sources?user_id={userId}"),
+                _baseUri.Append($"{merchantAccountId}/payment-sources?user_id={userId}"),
                 authResponse.Data!.AccessToken,
+                cancellationToken: cancellationToken
+            );
+        }
+
+        /// <inheritdoc />
+        public async Task<ApiResponse<GetTransactionsResponse>> GetTransactions(
+            string merchantAccountId,
+            DateTimeOffset from,
+            DateTimeOffset to,
+            string? cursor = null,
+            string? type = null,
+            CancellationToken cancellationToken = default)
+        {
+            merchantAccountId.NotNullOrWhiteSpace(nameof(merchantAccountId));
+            merchantAccountId.NotAUrl(nameof(merchantAccountId));
+            to.GreaterThan(from, nameof(to), nameof(from));
+            cursor.NotAUrl(nameof(cursor));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            var customHeaders = new Dictionary<string, string>
+            {
+                ["tl-use-pagination"] = UsePagination.ToString()
+            };
+
+            return await _apiClient.GetAsync<GetTransactionsResponse>(
+                _baseUri.Append($"/{merchantAccountId}/transactions")
+                    .AppendQueryParameters(new Dictionary<string, string?>
+                    {
+                        ["from"] = from.ToString("yyyy-MM-ddTHH:MM:ssZ"),
+                        ["to"] = to.ToString("yyyy-MM-ddTHH:MM:ssZ"),
+                        ["cursor"] = cursor,
+                        ["type"] = type
+                    }),
+                authResponse.Data!.AccessToken,
+                customHeaders,
                 cancellationToken
             );
         }

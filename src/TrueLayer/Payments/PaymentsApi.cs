@@ -97,7 +97,7 @@ namespace TrueLayer.Payments
             return await _apiClient.GetAsync<GetPaymentUnion>(
                 _baseUri.Append(id),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
 
@@ -174,7 +174,7 @@ namespace TrueLayer.Payments
             return await _apiClient.GetAsync<ListPaymentRefundsResponse>(
                 _baseUri.Append(paymentId).Append("/refunds"),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
 
@@ -195,7 +195,7 @@ namespace TrueLayer.Payments
             return await _apiClient.GetAsync<RefundUnion>(
                 _baseUri.Append(paymentId).Append("/refunds/").Append(refundId),
                 authResponse.Data!.AccessToken,
-                cancellationToken
+                cancellationToken: cancellationToken
             );
         }
     }

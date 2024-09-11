@@ -79,10 +79,14 @@ namespace TrueLayer
         }
 
         [DebuggerStepThrough]
-        public static T GreaterThan<T>([NotNull] this T value, T greaterThan, string paramName) where T : IComparable
+        public static T GreaterThan<T>([NotNull] this T value, T greaterThan, string paramName, string? comparedParamName = null) where T : IComparable
         {
             if (value.CompareTo(greaterThan) <= 0)
             {
+                if (!string.IsNullOrWhiteSpace(comparedParamName))
+                {
+                    throw new ArgumentOutOfRangeException(paramName, $"Value must be greater than {greaterThan} ({comparedParamName} parameter)");
+                }
                 throw new ArgumentOutOfRangeException(paramName);
             }
 

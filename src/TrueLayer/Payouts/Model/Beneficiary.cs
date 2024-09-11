@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Common;
@@ -15,9 +14,11 @@ namespace TrueLayer.Payouts.Model
         /// <summary>
         /// Represents a TrueLayer beneficiary merchant account
         /// </summary>
-        [JsonDiscriminator("payment_source")]
+        [JsonDiscriminator(Discriminator)]
         public sealed record PaymentSource : IDiscriminated
         {
+            const string Discriminator = "payment_source";
+
             /// <summary>
             /// Creates a new <see cref="PaymentSource"/>.
             /// </summary>
@@ -34,7 +35,7 @@ namespace TrueLayer.Payouts.Model
             /// <summary>
             /// Gets the type of beneficiary
             /// </summary>
-            public string Type => "payment_source";
+            public string Type => Discriminator;
 
             /// <summary>
             /// Gets the ID of the external account which has become a payment source
@@ -55,9 +56,11 @@ namespace TrueLayer.Payouts.Model
         /// <summary>
         /// Represents an external beneficiary account
         /// </summary>
-        [JsonDiscriminator("external_account")]
+        [JsonDiscriminator(Discriminator)]
         public sealed record ExternalAccount : IDiscriminated
         {
+            const string Discriminator = "external_account";
+
             public ExternalAccount(
                 string accountHolderName,
                 string reference,
@@ -75,7 +78,7 @@ namespace TrueLayer.Payouts.Model
             /// <summary>
             /// Gets the type of beneficiary
             /// </summary>
-            public string Type => "external_account";
+            public string Type => Discriminator;
 
             /// <summary>
             /// Gets the name of the external account holder
@@ -105,28 +108,78 @@ namespace TrueLayer.Payouts.Model
         }
 
         /// <summary>
-        /// Represent's a client's preconfigured business account.
+        /// Represents a client's preconfigured business account.
         /// </summary>
+        [JsonDiscriminator(Discriminator)]
         public sealed record BusinessAccount : IDiscriminated
         {
+            const string Discriminator = "business_account";
+
             /// <summary>
             /// Creates a new <see cref="BusinessAccount"/>.
             /// </summary>
             /// <param name="reference">A reference for the payout.</param>
-            public BusinessAccount(string reference)
+            /// <param name="accountHolderName">The business account holder name</param>
+            /// <param name="accountIdentifier">The unique identifier for the business account</param>
+            public BusinessAccount(
+                string reference,
+                string? accountHolderName = null,
+                AccountIdentifierUnion? accountIdentifier = null)
             {
                 Reference = reference.NotNullOrWhiteSpace(nameof(reference));
+                AccountHolderName = accountHolderName;
+                AccountIdentifier = accountIdentifier;
             }
 
             /// <summary>
             /// Gets the type of beneficiary
             /// </summary>
-            public string Type => "business_account";
+            public string Type => Discriminator;
 
             /// <summary>
-            /// Gets a reference for the payout.
+            /// Gets the name of the business account holder
+            /// </summary>
+            public string? AccountHolderName { get; } = "";
+
+            /// <summary>
+            /// Gets the reference for the business bank account holder
             /// </summary>
             public string Reference { get; }
+
+            /// <summary>
+            /// Gets the unique scheme identifier for the business account
+            /// </summary>
+            public AccountIdentifierUnion? AccountIdentifier { get; }
+        }
+
+        [JsonDiscriminator(Discriminator)]
+        public sealed record UserDetermined : IDiscriminated
+        {
+            const string Discriminator = "user_determined";
+
+            public UserDetermined(string reference, string accountHolderName, AccountIdentifierUnion accountIdentifier)
+            {
+                AccountHolderName = accountHolderName;
+                AccountIdentifier = accountIdentifier;
+                Reference = reference.NotNullOrWhiteSpace(nameof(reference));
+            }
+
+            public string Type => Discriminator;
+
+            /// <summary>
+            /// Gets the name of the external account holder
+            /// </summary>
+            public string AccountHolderName { get; } = "";
+
+            /// <summary>
+            /// Gets the reference for the external bank account holder
+            /// </summary>
+            public string Reference { get; }
+
+            /// <summary>
+            /// Gets the unique scheme identifier for the external account
+            /// </summary>
+            public AccountIdentifierUnion AccountIdentifier { get; }
         }
     }
 }
