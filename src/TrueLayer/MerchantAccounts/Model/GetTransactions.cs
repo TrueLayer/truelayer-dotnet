@@ -9,7 +9,7 @@ using static TrueLayer.MerchantAccounts.Model.MerchantAccountTransactions;
 
 namespace TrueLayer.MerchantAccounts.Model;
 
-using ReturnForUnion = OneOf<ReturnFor.Idenfied, ReturnFor.Unknow>;
+using ReturnForUnion = OneOf<ReturnFor.Identified, ReturnFor.Unknown>;
 using MerchantAccountTransactionUnion = OneOf<MerchantAccountPayment, ExternalPayment, PendingPayout, ExecutedPayout, Refund>;
 using PayoutBeneficiaryUnion = OneOf<
         PayoutBeneficiary.PaymentSource,

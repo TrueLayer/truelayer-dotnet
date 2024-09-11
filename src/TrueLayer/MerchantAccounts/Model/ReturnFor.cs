@@ -10,7 +10,7 @@ public static class ReturnFor
     /// </summary>
     /// <param name="ReturnedId">Unique ID for the outbound transaction that returned</param>
     [JsonDiscriminator(Discriminator)]
-    public record Idenfied(string ReturnedId) : IDiscriminated
+    public record Identified(string ReturnedId) : IDiscriminated
     {
         const string Discriminator = "identified";
         public string Type => Discriminator;
@@ -20,7 +20,7 @@ public static class ReturnFor
     /// Defines an unknown outbound transaction.
     /// </summary>
     [JsonDiscriminator(Discriminator)]
-    public record Unknow : IDiscriminated
+    public record Unknown : IDiscriminated
     {
         const string Discriminator = "unknown";
         public string Type => Discriminator;

@@ -14,6 +14,7 @@ namespace TrueLayer.MerchantAccounts
         private readonly IApiClient _apiClient;
         private readonly Uri _baseUri;
         private readonly IAuthApi _auth;
+        private const bool UsePagination = true;
 
         public MerchantAccountsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
         {
@@ -94,7 +95,6 @@ namespace TrueLayer.MerchantAccounts
             string merchantAccountId,
             DateTimeOffset from,
             DateTimeOffset to,
-            bool usePagination = true,
             string? cursor = null,
             string? type = null,
             CancellationToken cancellationToken = default)
@@ -113,7 +113,7 @@ namespace TrueLayer.MerchantAccounts
 
             var customHeaders = new Dictionary<string, string>
             {
-                ["tl-use-pagination"] = usePagination.ToString()
+                ["tl-use-pagination"] = UsePagination.ToString()
             };
 
             return await _apiClient.GetAsync<GetTransactionsResponse>(
