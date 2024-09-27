@@ -198,5 +198,26 @@ namespace TrueLayer.Payments
                 cancellationToken: cancellationToken
             );
         }
+
+        public async Task<ApiResponse> CancelPayment(string paymentId, string idempotencyKey, CancellationToken cancellationToken = default)
+        {
+            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
+                new GetAuthTokenRequest("payments"), cancellationToken);
+
+            if (!authResponse.IsSuccessful)
+            {
+                return new ApiResponse(authResponse.StatusCode, authResponse.TraceId);
+            }
+
+            return await _apiClient.PostAsync(
+                _baseUri.Append(paymentId).Append("/actions/cancel"),
+                idempotencyKey: idempotencyKey,
+                accessToken: authResponse.Data!.AccessToken,
+                signingKey: _options.Payments!.SigningKey,
+                cancellationToken: cancellationToken);
+        }
     }
 }

@@ -120,5 +120,17 @@ namespace TrueLayer.Payments
         Task<ApiResponse<RefundUnion>> GetPaymentRefund(string paymentId,
             string refundId,
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Cancel a payment.
+        /// </summary>
+        /// <param name="paymentId">The payment identifier</param>
+        /// <param name="idempotencyKey">
+        /// An idempotency key to allow safe retrying without the operation being performed multiple times.
+        /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// </param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <returns>HTTP 202 Accepted if successful, otherwise problem details.</returns>
+        Task<ApiResponse> CancelPayment(string paymentId, string idempotencyKey, CancellationToken cancellationToken = default);
     }
 }
