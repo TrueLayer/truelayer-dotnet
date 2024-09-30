@@ -227,6 +227,32 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         listPaymentRefundsResponse.Data!.Items.Count.ShouldBe(1);
     }
 
+    [Fact]
+    public async Task Can_cancel_a_payment()
+    {
+        // arrange
+        var paymentRequest = CreateTestPaymentRequest();
+        var payment = await _fixture.Client.Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        payment.IsSuccessful.ShouldBeTrue();
+        var paymentId = payment.Data.AsT0.Id;
+
+        // act
+        var cancelPaymentResponse = await _fixture.Client.Payments.CancelPayment(
+            paymentId,
+            idempotencyKey: Guid.NewGuid().ToString());
+
+        var getPaymentResponse = await _fixture.Client.Payments.GetPayment(paymentId);
+
+        // assert
+        cancelPaymentResponse.IsSuccessful.ShouldBeTrue();
+        cancelPaymentResponse.StatusCode.ShouldBe(HttpStatusCode.Accepted);
+        getPaymentResponse.IsSuccessful.ShouldBeTrue();
+        getPaymentResponse.Data.AsT5.ShouldNotBeNull();
+        getPaymentResponse.Data.AsT5.FailureReason.ShouldBe("canceled");
+    }
+
     private static void AssertSchemeSelection(
         PaymentsSchemeSelectionUnion? actualSchemeSelection,
         PaymentsSchemeSelectionUnion? expectedSchemeSelection,
