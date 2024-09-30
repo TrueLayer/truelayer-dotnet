@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.14.0] - 2024-09-30
+### Added
+- Added support to `POST /v3/payments/{id}/actions/cancel` endpoint for the `Payments` API
+
 ## [1.13.0] - 2024-09-11
 ### Added
 - Added support to the `Beneficiary` field in the `GetPayoutResponse`
