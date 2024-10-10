@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payouts.Model.Beneficiary;
@@ -55,6 +56,11 @@ namespace TrueLayer.Payouts.Model
             /// </summary>
             /// <value></value>
             public DateTime CreatedAt { get; init; }
+
+            /// <summary>
+            /// Gets the scheme id
+            /// </summary>
+            public string? SchemeId { get; init; } = null;
         }
 
         /// <summary>
