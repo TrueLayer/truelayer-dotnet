@@ -58,6 +58,7 @@ namespace TrueLayer.AcceptanceTests
             details.Beneficiary.AsT1.ShouldNotBeNull();
             details.Status.ShouldBeOneOf("pending", "authorized", "executed", "failed");
             details.CreatedAt.ShouldNotBeOneOf(DateTime.MinValue, DateTime.MaxValue);
+            details.Metadata.ShouldBe(payoutRequest.Metadata);
         }
 
         public Task DisposeAsync() => Task.CompletedTask;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Serialization;
@@ -61,6 +62,11 @@ namespace TrueLayer.Payouts.Model
             /// Gets the scheme id
             /// </summary>
             public string? SchemeId { get; init; } = null;
+
+            /// <summary>
+            /// Gets metadata of the payout
+            /// </summary>
+            public Dictionary<string, string>? Metadata { get; init; }
         }
 
         /// <summary>
