@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.16.0] - 2024-10-10
+### Added
+- Added support to the `Metadata` field in the `GetPayoutResponse`
+
 ## [1.15.0] - 2024-10-10
 ### Added
 - Added support to the `SchemeId` field in the `GetPayoutResponse`
