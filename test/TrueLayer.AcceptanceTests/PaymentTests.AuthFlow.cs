@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using FluentAssertions;
 using OneOf;
-using Shouldly;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
@@ -37,12 +37,12 @@ public partial class PaymentTests
         var response = await _fixture.Client.Payments.StartAuthorizationFlow(
             paymentResponse.Data.AsT0.Id, idempotencyKey: Guid.NewGuid().ToString(), authFlowRequest);
 
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        response.Data.IsT0.ShouldBeTrue();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Data.IsT0.Should().BeTrue();
         AuthorizationFlowResponse.AuthorizationFlowAuthorizing authorizing = response.Data.AsT0;
-        authorizing.Status.ShouldBe("authorizing");
-        authorizing.AuthorizationFlow.ShouldNotBeNull();
-        authorizing.AuthorizationFlow.Actions.Next.Value.ShouldNotBeNull();
+        authorizing.Status.Should().Be("authorizing");
+        authorizing.AuthorizationFlow.Should().NotBeNull();
+        authorizing.AuthorizationFlow.Actions.Next.Value.Should().NotBeNull();
     }
 
     private static IEnumerable<object?[]> CreateTestStartAuthorizationFlowRequests()

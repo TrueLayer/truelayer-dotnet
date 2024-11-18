@@ -1,6 +1,6 @@
 using System.Text.Json;
+using FluentAssertions;
 using OneOf;
-using Shouldly;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
 using Xunit;
@@ -43,8 +43,8 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
-            oneOf.AsT1.BarProp.ShouldBe(10);
-            oneOf.Value.ShouldBeOfType<Bar>();
+            oneOf.AsT1.BarProp.Should().Be(10);
+            oneOf.Value.Should().BeOfType<Bar>();
         }
 
         [Fact]
@@ -57,8 +57,8 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
-            oneOf.AsT1.BarProp.ShouldBe(10);
-            oneOf.Value.ShouldBeOfType<Bar>();
+            oneOf.AsT1.BarProp.Should().Be(10);
+            oneOf.Value.Should().BeOfType<Bar>();
         }
 
         [Fact]
@@ -72,8 +72,8 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
-            oneOf.AsT1.BarProp.ShouldBe(10);
-            oneOf.Value.ShouldBeOfType<Bar>();
+            oneOf.AsT1.BarProp.Should().Be(10);
+            oneOf.Value.Should().BeOfType<Bar>();
         }
 
         [Fact]
@@ -89,12 +89,12 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<RefundPending, RefundAuthorized, RefundExecuted, RefundFailed>>(json, _options);
-            oneOf.Value.ShouldBeOfType<RefundFailed>();
-            oneOf.AsT3.AmountInMinor.ShouldBe<uint>(1000);
-            oneOf.AsT3.Status.ShouldBe("failed");
-            oneOf.AsT3.CreatedAt.ShouldBe(new System.DateTime(2021, 1, 1, 0, 0, 0, System.DateTimeKind.Utc));
-            oneOf.AsT3.FailedAt.ShouldBe(new System.DateTime(2021, 1, 1, 0, 2, 0, System.DateTimeKind.Utc));
-            oneOf.AsT3.FailureReason.ShouldBe("Something bad happened");
+            oneOf.Value.Should().BeOfType<RefundFailed>();
+            oneOf.AsT3.AmountInMinor.Should().Be(1000);
+            oneOf.AsT3.Status.Should().Be("failed");
+            oneOf.AsT3.CreatedAt.Should().Be(new System.DateTime(2021, 1, 1, 0, 0, 0, System.DateTimeKind.Utc));
+            oneOf.AsT3.FailedAt.Should().Be(new System.DateTime(2021, 1, 1, 0, 2, 0, System.DateTimeKind.Utc));
+            oneOf.AsT3.FailureReason.Should().Be("Something bad happened");
         }
 
         [Fact]
@@ -109,10 +109,10 @@ namespace TrueLayer.Tests.Serialization
                 }
             ";
 
-            var wrapper = JsonSerializer.Deserialize<Wrapper>(json, _options)
-                .ShouldNotBeNull();
-            wrapper.Name.ShouldBe("Nested");
-            wrapper.OneOf.AsT0.FooProp.ShouldBe("test");
+            var wrapper = JsonSerializer.Deserialize<Wrapper>(json, _options);
+            wrapper.Should().NotBeNull();
+            wrapper!.Name.Should().Be("Nested");
+            wrapper.OneOf.AsT0.FooProp.Should().Be("test");
         }
 
         [Fact]
@@ -124,7 +124,7 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Other>>(json, _options);
-            oneOf.Value.ShouldBeOfType<Other>();
+            oneOf.Value.Should().BeOfType<Other>();
         }
 
         [Fact]
@@ -135,14 +135,14 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Other>>(json, _options);
-            oneOf.Value.ShouldBe(default);
+            oneOf.Value.Should().Be(default);
         }
 
         [Fact]
         public void Can_write_one_of_type()
         {
             OneOf<Foo, Bar> obj = new Foo();
-            JsonSerializer.Serialize(obj, _options).ShouldNotBeNullOrWhiteSpace();
+            JsonSerializer.Serialize(obj, _options).Should().NotBeNullOrWhiteSpace();
         }
 
         public class Foo

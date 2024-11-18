@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OneOf;
-using Shouldly;
 using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
@@ -60,17 +60,17 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        response.Data.IsT0.ShouldBeTrue();
-        response.Data.AsT0.Id.ShouldNotBeNullOrWhiteSpace();
-        response.Data.AsT0.ResourceToken.ShouldNotBeNullOrWhiteSpace();
-        response.Data.AsT0.User.ShouldNotBeNull();
-        response.Data.AsT0.User.Id.ShouldNotBeNullOrWhiteSpace();
-        response.Data.AsT0.Status.ShouldBe("authorization_required");
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Data.IsT0.Should().BeTrue();
+        response.Data.AsT0.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.User.Should().NotBeNull();
+        response.Data.AsT0.User.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.Status.Should().Be("authorization_required");
 
         string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
             response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.ShouldNotBeNullOrWhiteSpace();
+        hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
@@ -89,22 +89,22 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        response.Data.IsT3.ShouldBeTrue();
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Data.IsT3.Should().BeTrue();
         CreatePaymentResponse.Authorizing authorizing = response.Data.AsT3;
-        authorizing.Id.ShouldNotBeNullOrWhiteSpace();
-        authorizing.ResourceToken.ShouldNotBeNullOrWhiteSpace();
-        authorizing.User.ShouldNotBeNull();
-        authorizing.User.Id.ShouldNotBeNullOrWhiteSpace();
-        authorizing.Status.ShouldBe("authorizing");
-        authorizing.AuthorizationFlow.ShouldNotBeNull();
+        authorizing.Id.Should().NotBeNullOrWhiteSpace();
+        authorizing.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        authorizing.User.Should().NotBeNull();
+        authorizing.User.Id.Should().NotBeNullOrWhiteSpace();
+        authorizing.Status.Should().Be("authorizing");
+        authorizing.AuthorizationFlow.Should().NotBeNull();
         // The next action is a redirect
-        authorizing.AuthorizationFlow.Actions.Next.IsT2.ShouldBeTrue();
-        authorizing.AuthorizationFlow.Actions.Next.AsT2.Uri.ShouldNotBeNull();
+        authorizing.AuthorizationFlow!.Actions.Next.IsT2.Should().BeTrue();
+        authorizing.AuthorizationFlow.Actions.Next.AsT2.Uri.Should().NotBeNull();
 
         string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
             authorizing.Id, authorizing.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.ShouldNotBeNullOrWhiteSpace();
+        hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Theory]
@@ -114,44 +114,44 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        response.IsSuccessful.ShouldBeTrue();
-        response.Data.IsT0.ShouldBeTrue();
+        response.IsSuccessful.Should().BeTrue();
+        response.Data.IsT0.Should().BeTrue();
         var authorizationRequiredResponse = response.Data.AsT0;
 
         var getPaymentResponse
             = await _fixture.Client.Payments.GetPayment(authorizationRequiredResponse.Id);
 
-        getPaymentResponse.IsSuccessful.ShouldBeTrue();
+        getPaymentResponse.IsSuccessful.Should().BeTrue();
 
-        getPaymentResponse.Data.TryPickT0(out var payment, out _).ShouldBeTrue();
-        payment.Status.ShouldBe("authorization_required");
-        payment.AmountInMinor.ShouldBe(paymentRequest.AmountInMinor);
-        payment.Currency.ShouldBe(paymentRequest.Currency);
-        payment.Id.ShouldNotBeNullOrWhiteSpace();
-        payment.CreatedAt.ShouldNotBe(default);
-        payment.PaymentMethod.AsT0.ShouldNotBeNull();
+        getPaymentResponse.Data.TryPickT0(out var payment, out _).Should().BeTrue();
+        payment.Status.Should().Be("authorization_required");
+        payment.AmountInMinor.Should().Be(paymentRequest.AmountInMinor);
+        payment.Currency.Should().Be(paymentRequest.Currency);
+        payment.Id.Should().NotBeNullOrWhiteSpace();
+        payment.CreatedAt.Should().NotBe(default);
+        payment.PaymentMethod.AsT0.Should().NotBeNull();
 
         payment.PaymentMethod.AsT0.ProviderSelection.Switch(
             userSelected =>
             {
                 Provider.UserSelected providerSelectionReq = paymentRequest.PaymentMethod.AsT0.ProviderSelection.AsT0;
-                userSelected.Filter.ShouldBeEquivalentTo(providerSelectionReq.Filter);
+                userSelected.Filter.Should().BeEquivalentTo(providerSelectionReq.Filter);
                 // Provider selection hasn't happened yet
-                userSelected.ProviderId.ShouldBeNullOrEmpty();
-                userSelected.SchemeId.ShouldBeNullOrEmpty();
+                userSelected.ProviderId.Should().BeNullOrEmpty();
+                userSelected.SchemeId.Should().BeNullOrEmpty();
             },
             preselected =>
             {
                 Provider.Preselected providerSelectionReq = paymentRequest.PaymentMethod.AsT0.ProviderSelection.AsT1;
                 AssertSchemeSelection(preselected.SchemeSelection, providerSelectionReq.SchemeSelection, preselected.SchemeId, providerSelectionReq.SchemeId);
-                preselected.ProviderId.ShouldBe(providerSelectionReq.ProviderId);
-                preselected.Remitter.ShouldBe(providerSelectionReq.Remitter);
+                preselected.ProviderId.Should().Be(providerSelectionReq.ProviderId);
+                preselected.Remitter.Should().Be(providerSelectionReq.Remitter);
             });
 
-        payment.PaymentMethod.AsT0.Beneficiary.TryPickT1(out var externalAccount, out _).ShouldBeTrue();
-        payment.PaymentMethod.AsT0.Beneficiary.ShouldBe(paymentRequest.PaymentMethod.AsT0.Beneficiary);
-        payment.User.ShouldNotBeNull();
-        payment.User.Id.ShouldBe(authorizationRequiredResponse.User.Id);
+        payment.PaymentMethod.AsT0.Beneficiary.TryPickT1(out var externalAccount, out _).Should().BeTrue();
+        payment.PaymentMethod.AsT0.Beneficiary.Should().Be(paymentRequest.PaymentMethod.AsT0.Beneficiary);
+        payment.User.Should().NotBeNull();
+        payment.User.Id.Should().Be(authorizationRequiredResponse.User.Id);
     }
 
     [Fact]
@@ -169,8 +169,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             typeof(GetPaymentResponse.AttemptFailed));
 
         // Assert
-        payment.Id.ShouldNotBeNullOrWhiteSpace();
-        payment.Status.ShouldBe("attempt_failed");
+        payment.Id.Should().NotBeNullOrWhiteSpace();
+        payment.Status.Should().Be("attempt_failed");
     }
 
     [Fact]
@@ -187,17 +187,17 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             paymentId: payment.Id,
             idempotencyKey: Guid.NewGuid().ToString(),
             new CreatePaymentRefundRequest(Reference: "a-reference"));
-        createRefundResponse.IsSuccessful.ShouldBeTrue();
-        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
+        createRefundResponse.IsSuccessful.Should().BeTrue();
+        createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
 
         var getPaymentRefundResponse = await _fixture.Client.Payments.GetPaymentRefund(
             paymentId: payment.Id,
             refundId: createRefundResponse.Data!.Id);
 
         // Assert
-        createRefundResponse.IsSuccessful.ShouldBeTrue();
-        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
-        getPaymentRefundResponse.IsSuccessful.ShouldBeTrue();
+        createRefundResponse.IsSuccessful.Should().BeTrue();
+        createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
+        getPaymentRefundResponse.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
@@ -214,17 +214,17 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             paymentId: payment.Id,
             idempotencyKey: Guid.NewGuid().ToString(),
             new CreatePaymentRefundRequest(Reference: "a-reference"));
-        createRefundResponse.IsSuccessful.ShouldBeTrue();
-        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
+        createRefundResponse.IsSuccessful.Should().BeTrue();
+        createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
 
         // Act
         var listPaymentRefundsResponse = await _fixture.Client.Payments.ListPaymentRefunds(payment.Id);
 
         // Assert
-        createRefundResponse.IsSuccessful.ShouldBeTrue();
-        createRefundResponse.Data!.Id.ShouldNotBeNullOrWhiteSpace();
-        listPaymentRefundsResponse.IsSuccessful.ShouldBeTrue();
-        listPaymentRefundsResponse.Data!.Items.Count.ShouldBe(1);
+        createRefundResponse.IsSuccessful.Should().BeTrue();
+        createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
+        listPaymentRefundsResponse.IsSuccessful.Should().BeTrue();
+        listPaymentRefundsResponse.Data!.Items.Count.Should().Be(1);
     }
 
     [Fact]
@@ -235,7 +235,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var payment = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        payment.IsSuccessful.ShouldBeTrue();
+        payment.IsSuccessful.Should().BeTrue();
         var paymentId = payment.Data.AsT0.Id;
 
         // act
@@ -246,11 +246,11 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var getPaymentResponse = await _fixture.Client.Payments.GetPayment(paymentId);
 
         // assert
-        cancelPaymentResponse.IsSuccessful.ShouldBeTrue();
-        cancelPaymentResponse.StatusCode.ShouldBe(HttpStatusCode.Accepted);
-        getPaymentResponse.IsSuccessful.ShouldBeTrue();
-        getPaymentResponse.Data.AsT5.ShouldNotBeNull();
-        getPaymentResponse.Data.AsT5.FailureReason.ShouldBe("canceled");
+        cancelPaymentResponse.IsSuccessful.Should().BeTrue();
+        cancelPaymentResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+        getPaymentResponse.IsSuccessful.Should().BeTrue();
+        getPaymentResponse.Data.AsT5.Should().NotBeNull();
+        getPaymentResponse.Data.AsT5.FailureReason.Should().Be("canceled");
     }
 
     private static void AssertSchemeSelection(
@@ -261,18 +261,18 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     {
         if (actualSchemeSelection is null && expectedSchemeSelection is null)
         {
-            actualSchemeId.ShouldBeEquivalentTo(expectedSchemeId);
+            actualSchemeId.Should().BeEquivalentTo(expectedSchemeId);
             return;
         }
 
-        actualSchemeSelection.ShouldNotBeNull();
-        expectedSchemeSelection.ShouldNotBeNull();
-        var expectedSelection = expectedSchemeSelection.Value;
-        actualSchemeSelection.Value.Switch(
-            instantOnly => { instantOnly.AllowRemitterFee.ShouldBe(expectedSelection.AsT0.AllowRemitterFee); },
-            instantPreferred => { instantPreferred.AllowRemitterFee.ShouldBe(expectedSelection.AsT1.AllowRemitterFee); },
-            preselectedSchemeSelection => { preselectedSchemeSelection.SchemeId.ShouldBe(expectedSelection.AsT2.SchemeId); },
-            userSelected => { expectedSelection.IsT3.ShouldBe(true); });
+        actualSchemeSelection.Should().NotBeNull();
+        expectedSchemeSelection.Should().NotBeNull();
+        var expectedSelection = expectedSchemeSelection!.Value;
+        actualSchemeSelection!.Value.Switch(
+            instantOnly => { instantOnly.AllowRemitterFee.Should().Be(expectedSelection.AsT0.AllowRemitterFee); },
+            instantPreferred => { instantPreferred.AllowRemitterFee.Should().Be(expectedSelection.AsT1.AllowRemitterFee); },
+            preselectedSchemeSelection => { preselectedSchemeSelection.SchemeId.Should().Be(expectedSelection.AsT2.SchemeId); },
+            userSelected => { expectedSelection.IsT3.Should().Be(true); });
     }
 
     private async Task<GetPaymentResponse.PaymentDetails> CreatePaymentAndSetAuthorisationStatusAsync(
@@ -283,7 +283,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var createdPaymentResponse = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        createdPaymentResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        createdPaymentResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
         (Uri redirectUri, string paymentId) = createdPaymentResponse.Data.Value switch
         {
@@ -291,7 +291,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             _ => throw new InvalidOperationException("Unexpected payment status")
         };
 
-        redirectUri.ShouldNotBeNull();
+        redirectUri.Should().NotBeNull();
 
         await TestUtils.RunAndAssertHeadlessResourceAuthorisation(
             _configuration,
@@ -306,11 +306,11 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
     private static (Uri RedirectUri, string PaymentId) HandleAuthorizingPayment(CreatePaymentResponse.Authorizing? authorizing)
     {
-        authorizing.ShouldNotBeNull();
-        authorizing.Status.ShouldBe("authorizing");
-        authorizing.AuthorizationFlow.ShouldNotBeNull();
+        authorizing.Should().NotBeNull();
+        authorizing!.Status.Should().Be("authorizing");
+        authorizing.AuthorizationFlow.Should().NotBeNull();
         // The next action is a redirect
-        return authorizing.AuthorizationFlow.Actions.Next.Value switch
+        return authorizing.AuthorizationFlow!.Actions.Next.Value switch
         {
             Models.AuthorizationFlowAction.Redirect redirect => (redirect.Uri, authorizing.Id),
             _ => throw new InvalidOperationException("Unexpected next action")
@@ -320,7 +320,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     private async Task<BeneficiaryUnion> CreateMerchantBeneficiaryAsync()
     {
         var merchantAccounts = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
-            merchantAccounts.IsSuccessful.ShouldBeTrue();
+            merchantAccounts.IsSuccessful.Should().BeTrue();
             var gbpMerchantAccount = merchantAccounts.Data!.Items.First(m => m.Currency == Currencies.GBP);
         return new Beneficiary.MerchantAccount(gbpMerchantAccount.Id);
     }
@@ -588,7 +588,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 var response = await _fixture.Client.Payments.GetPayment(paymentId);
 
                 // Exit immediately if there's an error
-                response.IsSuccessful.ShouldBeTrue();
+                response.IsSuccessful.Should().BeTrue();
                 payment = response.Data;
 
                 isDone = payment.Value.GetType() == expectedPaymentStatusType;

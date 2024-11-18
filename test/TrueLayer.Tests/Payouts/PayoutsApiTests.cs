@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using OneOf;
-using Shouldly;
 using TrueLayer.Auth;
 using TrueLayer.Common;
 using TrueLayer.Payments;
@@ -64,12 +64,12 @@ namespace TrueLayer.Tests.Payouts
             var response = await _sut.CreatePayout(createPayoutRequest, "idempotency-key", CancellationToken.None);
 
             // Assert
-            response.ShouldNotBeNull();
-            response.IsSuccessful.ShouldBeTrue();
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
-            response.TraceId.ShouldBe("trace-id");
-            response.Data.ShouldNotBeNull();
-            response.Data.Id.ShouldBe("some-id");
+            response.Should().NotBeNull();
+            response.IsSuccessful.Should().BeTrue();
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            response.TraceId.Should().Be("trace-id");
+            response.Data.Should().NotBeNull();
+            response.Data!.Id.Should().Be("some-id");
         }
 
         [Theory]
@@ -84,10 +84,10 @@ namespace TrueLayer.Tests.Payouts
             var actual = await _sut.CreatePayout(createPayoutRequest, "idempotency-key", CancellationToken.None);
 
             //Assert
-            actual.ShouldNotBeNull();
-            actual.IsSuccessful.ShouldBeFalse();
-            actual.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-            actual.TraceId.ShouldBe("trace-id");
+            actual.Should().NotBeNull();
+            actual.IsSuccessful.Should().BeFalse();
+            actual.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            actual.TraceId.Should().Be("trace-id");
         }
 
         [Fact]
@@ -102,10 +102,10 @@ namespace TrueLayer.Tests.Payouts
             var actual = await _sut.GetPayout("payout-id", CancellationToken.None);
 
             //Assert
-            actual.ShouldNotBeNull();
-            actual.IsSuccessful.ShouldBeFalse();
-            actual.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-            actual.TraceId.ShouldBe("trace-id");
+            actual.Should().NotBeNull();
+            actual.IsSuccessful.Should().BeFalse();
+            actual.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            actual.TraceId.Should().Be("trace-id");
         }
 
         private static CreatePayoutRequest CreatePayoutRequest(PayoutBeneficiary beneficiary) =>

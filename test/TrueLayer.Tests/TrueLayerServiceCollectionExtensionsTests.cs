@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
 using Xunit;
 
 namespace TrueLayer.Tests
@@ -32,7 +32,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 .BuildServiceProvider();
 
             var client = services.GetRequiredService<ITrueLayerClient>();
-            client.ShouldNotBeNull();
+            client.Should().NotBeNull();
         }
     }
 }
