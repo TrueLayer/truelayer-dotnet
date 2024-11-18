@@ -1,6 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
-using Shouldly;
+using FluentAssertions;
 using TrueLayer.Auth;
 using Xunit;
 
@@ -21,14 +21,14 @@ namespace TrueLayer.AcceptanceTests
             ApiResponse<GetAuthTokenResponse> apiResponse
                 = await _fixture.Client.Auth.GetAuthToken(new GetAuthTokenRequest());
 
-            apiResponse.IsSuccessful.ShouldBeTrue();
-            apiResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-            apiResponse.Data.ShouldNotBeNull();
+            apiResponse.IsSuccessful.Should().BeTrue();
+            apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            apiResponse.Data.Should().NotBeNull();
 
-            apiResponse.Data.AccessToken.ShouldNotBeNullOrWhiteSpace();
-            apiResponse.Data.TokenType.ShouldBe("Bearer");
-            apiResponse.Data.Scope.ShouldNotBeNullOrWhiteSpace();
-            apiResponse.Data.ExpiresIn.ShouldBeGreaterThan(0);
+            apiResponse.Data!.AccessToken.Should().NotBeNullOrWhiteSpace();
+            apiResponse.Data.TokenType.Should().Be("Bearer");
+            apiResponse.Data.Scope.Should().NotBeNullOrWhiteSpace();
+            apiResponse.Data.ExpiresIn.Should().BeGreaterThan(0);
         }
 
         [Fact]
@@ -37,8 +37,8 @@ namespace TrueLayer.AcceptanceTests
             GetAuthTokenResponse? apiResponse
                 = await _fixture.Client.Auth.GetAuthToken(new GetAuthTokenRequest("payments"));
 
-            apiResponse.ShouldNotBeNull();
-            apiResponse.Scope.ShouldBe("payments");
+            apiResponse.Should().NotBeNull();
+            apiResponse!.Scope.Should().Be("payments");
         }
     }
 }

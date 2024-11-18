@@ -19,6 +19,7 @@
         <PackageReference Include="OneOf" Version="3.0.271" />
         <PackageReference Include="TrueLayer.Signing" Version="0.1.11"/>
         <PackageReference Update="MinVer" Version="6.0.0" />
+        <PackageReference Remove="SecurityCodeScan.VS2019" />
     </ItemGroup>
     <ItemGroup>
         <None Include="..\shared\icon.png" Pack="true" PackagePath="\"/>

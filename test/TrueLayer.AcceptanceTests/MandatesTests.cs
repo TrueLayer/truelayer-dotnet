@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using FluentAssertions;
 using OneOf;
-using Shouldly;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
@@ -61,8 +61,8 @@ namespace TrueLayer.AcceptanceTests
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.Created);
-            response.Data!.User.Id.ShouldBe(mandateRequest.User!.Id);
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            response.Data!.User.Id.Should().Be(mandateRequest.User!.Id);
         }
 
 
@@ -76,15 +76,15 @@ namespace TrueLayer.AcceptanceTests
             // Arrange
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
-            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
             var mandateId = createResponse.Data!.Id;
 
             // Act
             var response = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
-            response.Data.AsT0.User!.Id.ShouldBe(createResponse.Data.User!.Id);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            response.Data.AsT0.User!.Id.Should().Be(createResponse.Data.User!.Id);
         }
 
         [Theory]
@@ -97,14 +97,14 @@ namespace TrueLayer.AcceptanceTests
             // Arrange
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
-            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // Act
             var response = await _fixture.Client.Mandates.ListMandates(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.Sweeping);
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
-            response.Data!.Items.Count().ShouldBeLessThanOrEqualTo(10);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            response.Data!.Items.Count().Should().BeLessThanOrEqualTo(10);
         }
 
         [Theory]
@@ -126,9 +126,9 @@ namespace TrueLayer.AcceptanceTests
             var mandate = await WaitForMandateToBeAuthorized(mandateId);
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
-            mandate.AsT2.Status.ShouldBe("authorized");
-            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            mandate.AsT2.Status.Should().Be("authorized");
+            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         }
 
         [Theory]
@@ -151,8 +151,8 @@ namespace TrueLayer.AcceptanceTests
                 mandateId, request, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
-            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         }
 
         [Theory]
@@ -187,7 +187,7 @@ namespace TrueLayer.AcceptanceTests
                 mandateId, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Theory]
@@ -210,9 +210,9 @@ namespace TrueLayer.AcceptanceTests
             var fundsResponse = await _fixture.Client.Mandates.GetConfirmationOfFunds(mandateId, 1, "GBP", MandateType.Sweeping);
 
             // Assert
-            fundsResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-            fundsResponse.Data!.ConfirmedAt.Date.ShouldBe(DateTime.UtcNow.Date);
-            fundsResponse.Data!.Confirmed.ShouldBeTrue();
+            fundsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            fundsResponse.Data!.ConfirmedAt.Date.Should().Be(DateTime.UtcNow.Date);
+            fundsResponse.Data!.Confirmed.Should().BeTrue();
         }
 
         [Theory]
@@ -230,7 +230,7 @@ namespace TrueLayer.AcceptanceTests
                     sweepingMandate => MandateType.Sweeping));
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Theory]
@@ -249,7 +249,7 @@ namespace TrueLayer.AcceptanceTests
                     sweepingMandate => MandateType.Sweeping));
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Theory]
@@ -267,13 +267,13 @@ namespace TrueLayer.AcceptanceTests
                 idempotencyKey: Guid.NewGuid().ToString());
 
             // Assert
-            response.StatusCode.ShouldBe(HttpStatusCode.Created);
-            response.Data.IsT1.ShouldBeTrue();
-            response.Data.AsT1.Id.ShouldNotBeNullOrWhiteSpace();
-            response.Data.AsT1.ResourceToken.ShouldNotBeNullOrWhiteSpace();
-            response.Data.AsT1.User.ShouldNotBeNull();
-            response.Data.AsT1.User.Id.ShouldNotBeNullOrWhiteSpace();
-            response.Data.AsT1.Status.ShouldBe("authorized");
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            response.Data.IsT1.Should().BeTrue();
+            response.Data.AsT1.Id.Should().NotBeNullOrWhiteSpace();
+            response.Data.AsT1.ResourceToken.Should().NotBeNullOrWhiteSpace();
+            response.Data.AsT1.User.Should().NotBeNull();
+            response.Data.AsT1.User.Id.Should().NotBeNullOrWhiteSpace();
+            response.Data.AsT1.Status.Should().Be("authorized");
         }
 
         private static CreateMandateRequest CreateTestMandateRequest(
@@ -331,7 +331,7 @@ namespace TrueLayer.AcceptanceTests
                     authUri,
                     new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
 
-            submitProviderParamsResponse.IsSuccessStatusCode.ShouldBeTrue();
+            submitProviderParamsResponse.IsSuccessStatusCode.Should().BeTrue();
         }
 
         private async Task<MandateDetailUnion> WaitForMandateToBeAuthorized(string mandateId)
@@ -354,7 +354,7 @@ namespace TrueLayer.AcceptanceTests
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
 
-            createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
