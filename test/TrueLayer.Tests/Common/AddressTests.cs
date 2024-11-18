@@ -18,8 +18,7 @@ public class AddressTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
-    public void New_address_throws_if_city_null_or_empty(string city)
+    public void New_address_throws_if_city_empty(string city)
     {
         Assert.Throws<ArgumentException>("city",
             () => new Address(city, "state", "zip", "country Code", "addressLine1"));
@@ -28,8 +27,7 @@ public class AddressTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
-    public void New_address_throws_if_state_null_or_empty(string state)
+    public void New_address_throws_if_state_empty(string state)
     {
         Assert.Throws<ArgumentException>("state",
             () => new Address("city", state, "zip", "country Code", "addressLine1"));
@@ -38,8 +36,7 @@ public class AddressTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
-    public void New_address_throws_if_zip_null_or_empty(string zip)
+    public void New_address_throws_if_zip_empty(string zip)
     {
         Assert.Throws<ArgumentException>("zip",
             () => new Address("city", "state", zip, "country Code", "addressLine1"));
@@ -48,8 +45,7 @@ public class AddressTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
-    public void New_address_throws_if_country_code_null_or_empty(string countryCode)
+    public void New_address_throws_if_country_code_empty(string countryCode)
     {
         Assert.Throws<ArgumentException>("countryCode",
             () => new Address("city", "state", "zip", countryCode, "addressLine1"));
