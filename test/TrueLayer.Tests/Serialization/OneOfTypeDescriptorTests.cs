@@ -1,5 +1,4 @@
 using System;
-using Moq;
 using OneOf;
 using Shouldly;
 using Xunit;

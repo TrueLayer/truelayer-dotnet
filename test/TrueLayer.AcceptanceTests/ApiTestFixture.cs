@@ -31,7 +31,7 @@ namespace TrueLayer.AcceptanceTests
 
         private static IConfiguration LoadConfiguration()
             => new ConfigurationBuilder()
-                .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
+                .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!)
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile("appsettings.local.json", true)
                 .AddEnvironmentVariables()

@@ -14,27 +14,15 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11.0.x
-      - name: Setup .NET 6.0
+      - name: Setup .NET 8.0
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 6.0.x
-      - name: Setup .NET 3.1
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.x
-      - name: Setup .NET 2.0
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 2.x.x
+          dotnet-version: 8.0.x
       - name: Restore tools
         run: dotnet tool restore
       - name: Run the build script
@@ -47,7 +35,7 @@ jobs:
           TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
-          cake-version: 1.3.0
+          cake-version: 5.0.0
           target: CI
           verbosity: ${{ github.event.inputs.verbosity }}
       - name: Upload pre-release packages

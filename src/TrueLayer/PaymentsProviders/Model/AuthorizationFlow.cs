@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using TrueLayer.Models;
 
 namespace TrueLayer.PaymentsProviders.Model;
 

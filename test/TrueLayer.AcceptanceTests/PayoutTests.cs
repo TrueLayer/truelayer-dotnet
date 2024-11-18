@@ -67,7 +67,7 @@ namespace TrueLayer.AcceptanceTests
         {
             var accounts = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
 
-            if (!accounts.IsSuccessful || !accounts.Data.Items.Any())
+            if (!accounts.IsSuccessful || !accounts.Data!.Items.Any())
             {
                 throw new InvalidOperationException("You must have a merchant account in order to perform a payout");
             }

@@ -1,5 +1,4 @@
 using System;
-using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.SchemeSelection;
