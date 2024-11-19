@@ -63,7 +63,7 @@ Teardown(ctx =>
 Task("Clean")
     .Does(() =>
     {
-        CleanDirectory(artifactsPath);
+        CleanDirectories(artifactsPath);
     });
 
 Task("SonarBegin")
@@ -121,7 +121,6 @@ Task("Test")
             DotNetTest(project.ToString(), testSettings, coverletSettings);
         }
    });
-
 
 Task("Pack")
     .Does(() =>

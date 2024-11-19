@@ -20,31 +20,23 @@ on:
         default: 'false'
 jobs:
   publish:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v4
         with:
-          fetch-depth: 0
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11.0.x
+          dotnet-version: 9.0.x
+          dotnet-quality: 'ga'
       - name: Setup .NET 8.0
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-      - name: Setup .NET 6.0
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.x
-      - name: Setup .NET 2.0
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 2.x.x
+          dotnet-quality: 'ga'
       - name: Restore tools
         run: dotnet tool restore
       - name: Run the build script
-        uses: cake-build/cake-action@v1
+        uses: cake-build/cake-action@v2
         env:
           COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

@@ -16,21 +16,21 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
       - name: Setup .NET 9.0
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
+          dotnet-quality: 'ga'
       - name: Setup .NET 8.0
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+          dotnet-quality: 'ga'
       - name: Restore tools
         run: dotnet tool restore
       - name: Run the build script
-        uses: cake-build/cake-action@v1
+        uses: cake-build/cake-action@v2
         env:
           COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
