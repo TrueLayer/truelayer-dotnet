@@ -40,7 +40,7 @@ namespace TrueLayer.Mandates
                 : TrueLayerBaseUris.ProdApiBaseUri;
 
             _baseUri = (options.Payments.Uri ?? baseUri)
-                .Append("/v3/mandates/");
+                .Append("/mandates/");
         }
 
         /// <inheritdoc />

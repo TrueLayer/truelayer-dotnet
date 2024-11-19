@@ -26,7 +26,7 @@ namespace TrueLayer.PaymentsProviders
                 : TrueLayerBaseUris.ProdApiBaseUri;
 
             _baseUri = (options.Payments.Uri ?? baseUri)
-                .Append("/v3/payments-providers/");
+                .Append("/payments-providers/");
         }
 
         public async Task<ApiResponse<PaymentsProvider>> GetPaymentsProvider(string id)

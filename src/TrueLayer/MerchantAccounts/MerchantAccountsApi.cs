@@ -29,7 +29,7 @@ namespace TrueLayer.MerchantAccounts
                 : TrueLayerBaseUris.ProdApiBaseUri;
 
             _baseUri = (options.Payments.Uri ?? baseUri)
-                .Append("/v3/merchant-accounts");
+                .Append("/merchant-accounts");
         }
 
         /// <inheritdoc />

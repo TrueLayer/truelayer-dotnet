@@ -38,7 +38,7 @@ namespace TrueLayer.Payouts
                 : TrueLayerBaseUris.ProdApiBaseUri;
 
             _baseUri = (options.Payments.Uri ?? baseUri)
-                .Append("/v3/payouts/");
+                .Append("/payouts/");
         }
 
         /// <inheritdoc />
