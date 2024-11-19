@@ -35,13 +35,7 @@ namespace TrueLayer
 
             var key = ECDsa.Create();
 
-#if (NET6_0 || NET6_0_OR_GREATER)
-            // Ref https://www.scottbrady91.com/C-Sharp/PEM-Loading-in-dotnet-core-and-dotnet
             key.ImportFromPem(privateKey);
-#else
-            byte[] decodedPem = ReadPemContents(privateKey);
-            key.ImportECPrivateKey(decodedPem, out _);
-#endif
 
             return key;
         }
