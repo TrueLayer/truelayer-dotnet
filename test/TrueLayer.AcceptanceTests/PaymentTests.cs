@@ -373,7 +373,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         );
     }
 
-    private static IEnumerable<object[]> CreateTestPaymentRequests()
+    public static IEnumerable<object[]> CreateTestPaymentRequests()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
         var providerFilterMockGbRedirect = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } };

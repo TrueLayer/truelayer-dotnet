@@ -367,7 +367,7 @@ namespace TrueLayer.AcceptanceTests
             return mandateId;
         }
 
-        private static IEnumerable<CreateMandateRequest[]> CreateTestSweepingPreselectedMandateRequests()
+        public static IEnumerable<object[]> CreateTestSweepingPreselectedMandateRequests()
         {
             yield return new[]
             {
@@ -381,7 +381,7 @@ namespace TrueLayer.AcceptanceTests
             };
         }
 
-        private static IEnumerable<CreateMandateRequest[]> CreateTestCommercialPreselectedMandateRequests()
+        public static IEnumerable<object[]> CreateTestCommercialPreselectedMandateRequests()
         {
             yield return new[]
             {
@@ -395,7 +395,7 @@ namespace TrueLayer.AcceptanceTests
             };
         }
 
-        private static IEnumerable<CreateMandateRequest[]> CreateTestSweepingUserSelectedMandateRequests()
+        public static IEnumerable<object[]> CreateTestSweepingUserSelectedMandateRequests()
         {
             yield return new[]
             {
@@ -412,7 +412,7 @@ namespace TrueLayer.AcceptanceTests
             };
         }
 
-        private static IEnumerable<CreateMandateRequest[]> CreateTestCommercialUserSelectedMandateRequests()
+        public static IEnumerable<object[]> CreateTestCommercialUserSelectedMandateRequests()
         {
             yield return new[]
             {

@@ -45,7 +45,7 @@ public partial class PaymentTests
         authorizing.AuthorizationFlow.Actions.Next.Value.Should().NotBeNull();
     }
 
-    private static IEnumerable<object?[]> CreateTestStartAuthorizationFlowRequests()
+    public static IEnumerable<object?[]> CreateTestStartAuthorizationFlowRequests()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
         var providerFilterMockGbRedirect = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } };
