@@ -5,8 +5,10 @@ using OneOf;
 using TrueLayer.Auth;
 using TrueLayer.Common;
 using TrueLayer.Extensions;
+using TrueLayer.Models;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
+using StartAuthorizationFlowRequest = TrueLayer.Payments.Model.AuthorizationFlow.StartAuthorizationFlowRequest;
 
 namespace TrueLayer.Payments
 {
@@ -63,7 +65,7 @@ namespace TrueLayer.Payments
             paymentRequest.NotNull(nameof(paymentRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -87,7 +89,7 @@ namespace TrueLayer.Payments
             id.NotNullOrWhiteSpace(nameof(id));
             id.NotAUrl(nameof(id));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -117,7 +119,7 @@ namespace TrueLayer.Payments
             request.NotNull(nameof(request));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest("payments"), cancellationToken);
+                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -141,7 +143,7 @@ namespace TrueLayer.Payments
             request.NotNull(nameof(request));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest("payments"), cancellationToken);
+                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -164,7 +166,7 @@ namespace TrueLayer.Payments
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest("payments"), cancellationToken);
+                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -185,7 +187,7 @@ namespace TrueLayer.Payments
             refundId.NotNullOrWhiteSpace(nameof(refundId));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest("payments"), cancellationToken);
+                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -205,7 +207,7 @@ namespace TrueLayer.Payments
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
             ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest("payments"), cancellationToken);
+                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {

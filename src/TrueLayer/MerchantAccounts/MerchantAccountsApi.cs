@@ -6,6 +6,7 @@ using TrueLayer.Auth;
 using TrueLayer.Common;
 using TrueLayer.Extensions;
 using TrueLayer.MerchantAccounts.Model;
+using TrueLayer.Models;
 
 namespace TrueLayer.MerchantAccounts
 {
@@ -34,7 +35,7 @@ namespace TrueLayer.MerchantAccounts
         /// <inheritdoc />
         public async Task<ApiResponse<ResourceCollection<MerchantAccount>>> ListMerchantAccounts(CancellationToken cancellationToken = default)
         {
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -54,7 +55,7 @@ namespace TrueLayer.MerchantAccounts
             id.NotNullOrWhiteSpace(nameof(id));
             id.NotAUrl(nameof(id));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -76,7 +77,7 @@ namespace TrueLayer.MerchantAccounts
             userId.NotNullOrWhiteSpace(nameof(userId));
             userId.NotAUrl(nameof(userId));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -104,7 +105,7 @@ namespace TrueLayer.MerchantAccounts
             to.GreaterThan(from, nameof(to), nameof(from));
             cursor.NotAUrl(nameof(cursor));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
