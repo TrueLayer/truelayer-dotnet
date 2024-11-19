@@ -7,24 +7,24 @@ using OneOf;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using TrueLayer.Models;
 
 namespace TrueLayer.AcceptanceTests
 {
-    using System.Linq;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Text;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Options;
-    using TrueLayer.Models;
     using AccountIdentifierUnion = OneOf<
         AccountIdentifier.SortCodeAccountNumber,
         AccountIdentifier.Iban,
         AccountIdentifier.Bban,
         AccountIdentifier.Nrb>;
     using AuthorizationResponseUnion = OneOf<
-        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
-        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
+        AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
+        AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
     using MandateDetailUnion = OneOf<
         MandateDetail.AuthorizationRequiredMandateDetail,
         MandateDetail.AuthorizingMandateDetail,
@@ -37,16 +37,16 @@ namespace TrueLayer.AcceptanceTests
     public class MandatesTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
-        private TrueLayerOptions configuration;
-        public string RETURN_URI = "http://localhost:3000/callback";
-        public static string PROVIDER_ID = "ob-uki-mock-bank-sbox"; // Beta provider in closed access, requires a whitelisted ClientId.
-        public static string COMMERCIAL_PROVIDER_ID = "ob-natwest-vrp-sandbox"; // Provider to satisfy commercial mandates creation.
-        public static AccountIdentifier.SortCodeAccountNumber accountIdentifier = new("140662", "10003957");
+        private readonly TrueLayerOptions _configuration;
+        private const string ReturnUri = "http://localhost:3000/callback";
+        private const string ProviderId = "ob-uki-mock-bank-sbox"; // Beta provider in closed access, requires a whitelisted ClientId.
+        private const string CommercialProviderId = "ob-natwest-vrp-sandbox"; // Provider to satisfy commercial mandates creation.
+        private static readonly AccountIdentifier.SortCodeAccountNumber AccountIdentifier = new("140662", "10003957");
 
         public MandatesTests(ApiTestFixture fixture)
         {
             _fixture = fixture;
-            configuration = fixture.ServiceProvider.GetRequiredService<IOptions<TrueLayerOptions>>().Value;
+            _configuration = fixture.ServiceProvider.GetRequiredService<IOptions<TrueLayerOptions>>().Value;
         }
 
         [Theory]
@@ -117,7 +117,7 @@ namespace TrueLayer.AcceptanceTests
             var mandateId = createResponse.Data!.Id;
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)));
+                new Redirect(new Uri(ReturnUri)));
 
             // Act
             var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
@@ -140,10 +140,10 @@ namespace TrueLayer.AcceptanceTests
             var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
-            SubmitProviderSelectionRequest request = new(COMMERCIAL_PROVIDER_ID);
+            SubmitProviderSelectionRequest request = new(CommercialProviderId);
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)));
+                new Redirect(new Uri(ReturnUri)));
             await _fixture.Client.Mandates.StartAuthorizationFlow(
                 mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
             // Act
@@ -169,15 +169,15 @@ namespace TrueLayer.AcceptanceTests
 
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)),
+                new Redirect(new Uri(ReturnUri)),
                 new Consent());
 
             await _fixture.Client.Mandates.StartAuthorizationFlow(
                 mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
 
             SubmitProviderSelectionRequest submitProviderRequest = new(mandateRequest.Mandate.Match(
-                c => COMMERCIAL_PROVIDER_ID,
-                s => PROVIDER_ID));
+                c => CommercialProviderId,
+                s => ProviderId));
 
             await _fixture.Client.Mandates.SubmitProviderSelection(
                 mandateId, submitProviderRequest, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
@@ -200,7 +200,7 @@ namespace TrueLayer.AcceptanceTests
             var mandateId = createResponse.Data!.Id;
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)));
+                new Redirect(new Uri(ReturnUri)));
 
             // Act
             var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
@@ -321,7 +321,7 @@ namespace TrueLayer.AcceptanceTests
                 ? "{\"fragment\":\"" + sanitizedParameters + "\"}"
                 : "{\"query\":\"" + sanitizedParameters + "\"}";
 
-            var authUri = new Uri($"{configuration.Payments?.Uri}spa/payments-provider-return");
+            var authUri = new Uri($"{_configuration.Payments?.Uri}spa/payments-provider-return");
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -358,7 +358,7 @@ namespace TrueLayer.AcceptanceTests
 
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)));
+                new Redirect(new Uri(ReturnUri)));
 
             var startAuthResponse = await _fixture.Client.Mandates.StartAuthorizationFlow(
                 mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
@@ -369,64 +369,64 @@ namespace TrueLayer.AcceptanceTests
 
         public static IEnumerable<object[]> CreateTestSweepingPreselectedMandateRequests()
         {
-            yield return new[]
-            {
+            yield return
+            [
                 CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
                     "sweeping",
-                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", PROVIDER_ID)),
+                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", ProviderId)),
                     new Mandates.Model.Beneficiary.ExternalAccount(
                         "external_account",
                         "Bob NET SDK",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
+                        AccountIdentifierUnion.FromT0(AccountIdentifier)))))
+            ];
         }
 
         public static IEnumerable<object[]> CreateTestCommercialPreselectedMandateRequests()
         {
-            yield return new[]
-            {
+            yield return
+            [
                 CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
                     "commercial",
-                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", COMMERCIAL_PROVIDER_ID)),
+                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", CommercialProviderId)),
                     new Mandates.Model.Beneficiary.ExternalAccount(
                         "external_account",
                         "My Bank Account",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
+                        AccountIdentifierUnion.FromT0(AccountIdentifier)))))
+            ];
         }
 
         public static IEnumerable<object[]> CreateTestSweepingUserSelectedMandateRequests()
         {
-            yield return new[]
-            {
+            yield return
+            [
                 CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
                     "sweeping",
                     ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
                     {
-                        Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "general_availability"},
+                        Filter = new ProviderFilter {Countries = ["GB"], ReleaseChannel = "general_availability"},
                     }),
                     new Mandates.Model.Beneficiary.ExternalAccount(
                         "external_account",
                         "My Bank Account",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
+                        AccountIdentifierUnion.FromT0(AccountIdentifier)))))
+            ];
         }
 
         public static IEnumerable<object[]> CreateTestCommercialUserSelectedMandateRequests()
         {
-            yield return new[]
-            {
+            yield return
+            [
                 CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
                     "commercial",
                     ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
                     {
-                        Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "general_availability"},
+                        Filter = new ProviderFilter {Countries = ["GB"], ReleaseChannel = "general_availability"},
                     }),
                     new Mandates.Model.Beneficiary.ExternalAccount(
                         "external_account",
                         "My Bank Account",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
+                        AccountIdentifierUnion.FromT0(AccountIdentifier)))))
+            ];
         }
     }
 }
