@@ -1,7 +1,5 @@
 using System;
-using System.IO;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace TrueLayer
 {
@@ -38,28 +36,6 @@ namespace TrueLayer
             key.ImportFromPem(privateKey);
 
             return key;
-        }
-
-        /// <summary>
-        /// Reads and decodes the contents of the PEM private key, removing the header/trailer
-        /// Required before .NET 5.0
-        /// </summary>
-        /// <param name="privateKey"></param>
-        /// <returns></returns>
-        private static byte[] ReadPemContents(string privateKey)
-        {
-            var sb = new StringBuilder();
-            using (var reader = new StringReader(privateKey))
-            {
-                string? line = null;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (!line.StartsWith("--"))
-                        sb.Append(line);
-                }
-            }
-
-            return Convert.FromBase64String(sb.ToString());
         }
     }
 }

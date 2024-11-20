@@ -3,11 +3,10 @@ using TrueLayer.MerchantAccounts;
 using TrueLayer.Payments;
 using TrueLayer.PaymentsProviders;
 using TrueLayer.Payouts;
+using TrueLayer.Mandates;
 
 namespace TrueLayer
 {
-    using TrueLayer.Mandates;
-
     /// <summary>
     /// Provides access to TrueLayer APIs
     /// </summary>

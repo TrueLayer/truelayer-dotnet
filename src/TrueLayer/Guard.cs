@@ -129,7 +129,7 @@ namespace TrueLayer
         /// _uri = uri.HasValidBaseUri(nameof(_uri), options);
         /// </code>
         /// </example>
-        internal static Uri? HasValidBaseUri(this Uri? value, string name, TrueLayerOptions options)
+        internal static Uri HasValidBaseUri(this Uri? value, string name, TrueLayerOptions options)
         {
             value.NotNull(name);
             const string errorMsg = "The URI must be a valid TrueLayer API URI one of those configured in the settings.";

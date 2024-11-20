@@ -5,11 +5,10 @@ using TrueLayer.MerchantAccounts;
 using TrueLayer.Payments;
 using TrueLayer.PaymentsProviders;
 using TrueLayer.Payouts;
+using TrueLayer.Mandates;
 
 namespace TrueLayer
 {
-    using TrueLayer.Mandates;
-
     internal class TrueLayerClient : ITrueLayerClient
     {
         // APIs that require specific configuration should be lazily initialised

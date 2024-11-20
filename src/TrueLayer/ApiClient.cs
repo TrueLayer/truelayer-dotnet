@@ -141,7 +141,7 @@ namespace TrueLayer
                 return new ApiResponse<TData>(data, httpResponse.StatusCode, traceId);
             }
 
-            if (httpResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
+            if (httpResponse.Content.Headers.ContentType?.MediaType == MediaTypeNames.Application.ProblemJson)
             {
                 var problemDetails = await DeserializeJsonAsync<ProblemDetails>(httpResponse, traceId, cancellationToken);
                 return new ApiResponse<TData>(problemDetails, httpResponse.StatusCode, traceId);
@@ -155,7 +155,7 @@ namespace TrueLayer
             httpResponse.Headers.TryGetValues(CustomHeaders.TraceId, out var traceIdHeader);
             string? traceId = traceIdHeader?.FirstOrDefault();
 
-            if (httpResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
+            if (httpResponse.Content.Headers.ContentType?.MediaType == MediaTypeNames.Application.ProblemJson)
             {
                 var problemDetails = await DeserializeJsonAsync<ProblemDetails>(httpResponse, traceId, cancellationToken);
                 return new ApiResponse(problemDetails, httpResponse.StatusCode, traceId);
@@ -215,7 +215,7 @@ namespace TrueLayer
 
                 signature = signer.Sign();
             }
-            else if (request is not null) // Otherwise we can serialize directly to stream for .NET 5.0 onwards
+            else if (request is not null)
             {
                 httpContent = JsonContent.Create(request, request.GetType(), options: SerializerOptions.Default);
             }
