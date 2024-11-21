@@ -1,31 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net6.0;netstandard2.1</TargetFrameworks>
-    <RootNamespace>TrueLayer</RootNamespace>
-    <AssemblyName>TrueLayer.Client</AssemblyName>
-    <PackageId>TrueLayer.Client</PackageId>
-    <Description>.NET client for the TrueLayer API</Description>
-    <PackageIcon>icon.png</PackageIcon>
-    <LangVersion>latest</LangVersion>
-    <Authors>TrueLayer</Authors>
-    <Company>TrueLayer</Company>
-    <RepositoryUrl>https://github.com/TrueLayer/truelayer-dotnet</RepositoryUrl>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-    <PackageReference Include="jose-jwt" Version="3.2.0" />
-    <PackageReference Include="OneOf" Version="3.0.201" />
-    <PackageReference Include="TrueLayer.Signing" Version="0.1.11" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-    <PackageReference Include="System.Text.Json" Version="[5.0.2,6.0)" />
-    <PackageReference Include="Microsoft.CSharp" Version="[4.7,5.0)" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="[4.7,6.0]" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\shared\icon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFrameworks>net9.0;net8.0;netstandard2.1</TargetFrameworks>
+        <RootNamespace>TrueLayer</RootNamespace>
+        <AssemblyName>TrueLayer.Client</AssemblyName>
+        <PackageId>TrueLayer.Client</PackageId>
+        <Description>.NET client for the TrueLayer API</Description>
+        <PackageIcon>icon.png</PackageIcon>
+        <LangVersion>latest</LangVersion>
+        <Authors>TrueLayer</Authors>
+        <Company>TrueLayer</Company>
+        <RepositoryUrl>https://github.com/TrueLayer/truelayer-dotnet</RepositoryUrl>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0"/>
+        <PackageReference Include="System.Text.Json" Version="9.0.0"/>
+        <PackageReference Include="OneOf" Version="3.0.271"/>
+        <PackageReference Include="TrueLayer.Signing" Version="0.1.15"/>
+        <PackageReference Update="MinVer" Version="6.0.0" />
+    </ItemGroup>
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
+        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+        <PackageReference Include="System.Text.Json" Version="[5.0.2,6.0)"/>
+        <PackageReference Include="Microsoft.CSharp" Version="[4.7,5.0)"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="..\shared\icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 </Project>

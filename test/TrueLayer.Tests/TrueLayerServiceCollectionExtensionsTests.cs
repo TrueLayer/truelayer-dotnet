@@ -20,12 +20,12 @@ c3VMlcFZw7Y0iLjxAQFPvHqJ9vn3xWp+d3JREU1vQJ9daXswwbcoer88o1oVFmFf
 WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
 -----END EC PRIVATE KEY-----";
             var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(new KeyValuePair<string, string>[] {
-                    new("TrueLayer:ClientId", "client_id"),
-                    new("TrueLayer:ClientSecret", "secret"),
-                    new("TrueLayer:Payments:SigningKey:KeyId", Guid.NewGuid().ToString()),
-                    new("TrueLayer:Payments:SigningKey:PrivateKey", privateKey),
-                })
+                .AddInMemoryCollection([
+                    new KeyValuePair<string, string?>("TrueLayer:ClientId", "client_id"),
+                    new KeyValuePair<string, string?>("TrueLayer:ClientSecret", "secret"),
+                    new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:KeyId", Guid.NewGuid().ToString()),
+                    new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:PrivateKey", privateKey)
+                ])
                 .Build();
             var services = new ServiceCollection()
                 .AddTrueLayer(configuration)
