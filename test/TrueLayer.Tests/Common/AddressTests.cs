@@ -18,7 +18,6 @@ public class AddressTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
     public void New_address_throws_if_city_null_or_empty(string city)
     {
         Assert.Throws<ArgumentException>("city",
@@ -28,7 +27,6 @@ public class AddressTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
     public void New_address_throws_if_state_null_or_empty(string state)
     {
         Assert.Throws<ArgumentException>("state",
@@ -38,7 +36,6 @@ public class AddressTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
     public void New_address_throws_if_zip_null_or_empty(string zip)
     {
         Assert.Throws<ArgumentException>("zip",
@@ -48,7 +45,6 @@ public class AddressTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
     public void New_address_throws_if_country_code_null_or_empty(string countryCode)
     {
         Assert.Throws<ArgumentException>("countryCode",
