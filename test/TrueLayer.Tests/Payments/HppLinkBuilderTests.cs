@@ -46,6 +46,18 @@ public class HppLinkBuilderTests
     }
 
     [Fact]
+    public void Build_Payment_Sandbox_MaxWait_Signup_ReturnsCorrectUri()
+    {
+        var paymentId = new Guid().ToString();
+        const string token = "eyJhbGciOiJSUzUxMiIsImtpZCI6IlBDNHJFVHZycGZTV1dqYW91R2dIbmJHNTBBR184SFBHXzBuU0";
+        var sut = new HppLinkBuilder(null, true);
+
+        var result = sut.Build(paymentId, token, new Uri("https://return.client.com/"), ResourceType.Payment, 60, true);
+
+        result.Should().Be($"https://api.truelayer-sandbox.com/payments#payment_id={paymentId}&resource_token={token}&return_uri=https://return.client.com/&max_wait_seconds=60&signup=true");
+    }
+
+    [Fact]
     public void Build_Mandate_Sandbox_ReturnsCorrectUri()
     {
         var mandateId = new Guid().ToString();

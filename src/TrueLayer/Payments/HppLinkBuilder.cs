@@ -13,7 +13,8 @@ namespace TrueLayer.Payments
             _baseUri = baseUri ?? (useSandbox ? TrueLayerBaseUris.SandboxApiBaseUri : TrueLayerBaseUris.ProdApiBaseUri);
         }
 
-        public string Build(string id, string token, Uri returnUri, ResourceType resourceType = ResourceType.Payment)
+        public string Build(string id, string token, Uri returnUri, ResourceType resourceType = ResourceType.Payment,
+            int? maxWaitForResultSeconds = null, bool? signup = null)
         {
             id.NotNullOrWhiteSpace(nameof(id));
             token.NotNullOrWhiteSpace(nameof(token));
@@ -22,14 +23,28 @@ namespace TrueLayer.Payments
             var builder = new UriBuilder(_baseUri)
             {
                 Path = ToResourcePath(resourceType),
-                Fragment = ToFragment(id, token, returnUri, resourceType)
+                Fragment = ToFragment(id, token, returnUri, resourceType, maxWaitForResultSeconds, signup)
             };
 
             return builder.Uri.AbsoluteUri;
         }
 
-        private static string ToFragment(string id, string token, Uri returnUri, ResourceType resourceType) =>
-            $"{ToResourceFieldId(resourceType)}={id}&resource_token={token}&return_uri={returnUri.AbsoluteUri}";
+        private static string ToFragment(string id, string token, Uri returnUri, ResourceType resourceType, int? maxWaitForResultSeconds, bool? signup)
+        {
+            var fragment = $"{ToResourceFieldId(resourceType)}={id}&resource_token={token}&return_uri={returnUri.AbsoluteUri}";
+
+            if (maxWaitForResultSeconds is not null)
+            {
+                fragment += $"&max_wait_seconds={maxWaitForResultSeconds}";
+            }
+
+            if (signup is not null)
+            {
+                fragment += $"&signup={signup.Value.ToString().ToLowerInvariant()}";
+            }
+
+            return fragment;
+        }
 
         private static string ToResourceFieldId(ResourceType resourceType) =>
             resourceType switch
