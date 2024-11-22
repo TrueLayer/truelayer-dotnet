@@ -1,33 +1,50 @@
 using System;
+using TrueLayer.Common;
+using TrueLayer.Payments.Model;
 
 namespace TrueLayer.Payments
 {
     internal sealed class HppLinkBuilder
     {
-        internal const string SandboxUrl = "https://payment.truelayer-sandbox.com/";
-        internal const string ProdUrl = "https://payment.truelayer.com/";
-
         private readonly Uri _baseUri;
 
         public HppLinkBuilder(Uri? baseUri = null, bool useSandbox = true)
         {
-            _baseUri = baseUri ??
-                new Uri((useSandbox) ? SandboxUrl : ProdUrl);
+            _baseUri = baseUri ?? (useSandbox ? TrueLayerBaseUris.SandboxApiBaseUri : TrueLayerBaseUris.ProdApiBaseUri);
         }
 
-        public string Build(string paymentId, string paymentToken, Uri returnUri)
+        public string Build(string id, string token, Uri returnUri, ResourceType resourceType = ResourceType.Payment)
         {
-            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            paymentToken.NotNullOrWhiteSpace(nameof(paymentToken));
+            id.NotNullOrWhiteSpace(nameof(id));
+            token.NotNullOrWhiteSpace(nameof(token));
             returnUri.NotNull(nameof(returnUri));
 
-            var fragment = $"payment_id={paymentId}&resource_token={paymentToken}&return_uri={returnUri.AbsoluteUri}";
-
-            var builder = new UriBuilder(_baseUri);
-            builder.Path = "payments";
-            builder.Fragment = fragment;
+            var builder = new UriBuilder(_baseUri)
+            {
+                Path = ToResourcePath(resourceType),
+                Fragment = ToFragment(id, token, returnUri, resourceType)
+            };
 
             return builder.Uri.AbsoluteUri;
         }
+
+        private static string ToFragment(string id, string token, Uri returnUri, ResourceType resourceType) =>
+            $"{ToResourceFieldId(resourceType)}={id}&resource_token={token}&return_uri={returnUri.AbsoluteUri}";
+
+        private static string ToResourceFieldId(ResourceType resourceType) =>
+            resourceType switch
+            {
+                ResourceType.Payment => "payment_id",
+                ResourceType.Mandate => "mandate_id",
+                _ => throw new ArgumentOutOfRangeException(nameof(resourceType), resourceType, null)
+            };
+
+        private static string ToResourcePath(ResourceType resourceType) =>
+            resourceType switch
+            {
+                ResourceType.Payment => "payments",
+                ResourceType.Mandate => "mandates",
+                _ => throw new ArgumentOutOfRangeException(nameof(resourceType), resourceType, null)
+            };
     }
 }
