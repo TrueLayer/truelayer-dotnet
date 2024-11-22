@@ -225,7 +225,7 @@ Task("Default")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Pack")
-    .IsDependentOn("GenerateReports")
+    .IsDependentOn("GenerateReports");
 
 Task("CI")
     //.IsDependentOn("SonarBegin")
