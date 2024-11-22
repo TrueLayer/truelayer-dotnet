@@ -10,7 +10,7 @@ namespace TrueLayer.Payments
 
         public HppLinkBuilder(Uri? baseUri = null, bool useSandbox = true)
         {
-            _baseUri = baseUri ?? (useSandbox ? TrueLayerBaseUris.SandboxApiBaseUri : TrueLayerBaseUris.ProdApiBaseUri);
+            _baseUri = baseUri ?? (useSandbox ? TrueLayerBaseUris.SandboxHppBaseUri : TrueLayerBaseUris.ProdHppBaseUri);
         }
 
         public string Build(
