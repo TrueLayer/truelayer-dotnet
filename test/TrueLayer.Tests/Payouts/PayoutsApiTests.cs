@@ -52,13 +52,9 @@ namespace TrueLayer.Tests.Payouts
             // Arrange
             var payoutResponseData = new CreatePayoutResponse("some-id");
             _apiClientMock.SetPostAsync(new ApiResponse<CreatePayoutResponse>(payoutResponseData, HttpStatusCode.OK, "trace-id"));
-                //.Setup(x => x.PostAsync<CreatePayoutResponse>(It.IsAny<Uri>(), It.IsAny<object?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<SigningKey?>(), It.IsAny<CancellationToken>()))
-                //.ReturnsAsync(new ApiResponse<CreatePayoutResponse>(payoutResponseData, HttpStatusCode.OK, "trace-id"));
 
             var authData = new GetAuthTokenResponse("access-token", 1000, "Bearer", "");
             _authApiMock.SetGetAuthToken(new ApiResponse<GetAuthTokenResponse>(authData, HttpStatusCode.OK, "trace-id"));
-                // .Setup(x => x.GetAuthToken(It.IsAny<GetAuthTokenRequest>(), It.IsAny<CancellationToken>()))
-                // .ReturnsAsync();
 
             // Act
             var response = await _sut.CreatePayout(createPayoutRequest, "idempotency-key", CancellationToken.None);
@@ -78,8 +74,6 @@ namespace TrueLayer.Tests.Payouts
         {
             // Arrange
             _authApiMock.SetGetAuthToken(new ApiResponse<GetAuthTokenResponse>(HttpStatusCode.BadRequest, "trace-id"));
-                // .Setup(x => x.GetAuthToken(It.IsNotNull<GetAuthTokenRequest>(), It.IsAny<CancellationToken>()))
-                // .ReturnsAsync();
 
             // Act
             var actual = await _sut.CreatePayout(createPayoutRequest, "idempotency-key", CancellationToken.None);
@@ -96,8 +90,6 @@ namespace TrueLayer.Tests.Payouts
         {
             // Arrange
             _authApiMock.SetGetAuthToken(new ApiResponse<GetAuthTokenResponse>(HttpStatusCode.BadRequest, "trace-id"));
-                // .Setup(x => x.GetAuthToken(It.IsNotNull<GetAuthTokenRequest>(), It.IsAny<CancellationToken>()))
-                // .ReturnsAsync(new ApiResponse<GetAuthTokenResponse>(HttpStatusCode.BadRequest, "trace-id"));
 
             // Act
             var actual = await _sut.GetPayout("payout-id", CancellationToken.None);
