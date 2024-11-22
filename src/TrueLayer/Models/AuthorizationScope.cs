@@ -1,6 +1,6 @@
 namespace TrueLayer.Models;
 
-internal class AuthorizationScope
+internal static class AuthorizationScope
 {
     public const string Payments = "payments";
 }
