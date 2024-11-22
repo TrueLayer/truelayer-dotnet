@@ -12,7 +12,7 @@ using RichardSzalay.MockHttp;
 using TrueLayer.Serialization;
 using Xunit;
 
-namespace TrueLayer.Sdk.Tests
+namespace TrueLayer.Tests
 {
     public class ApiClientTests : IDisposable
     {

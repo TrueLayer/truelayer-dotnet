@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrueLayer.AcceptanceTests
+namespace TrueLayer.Tests
 {
     public class MockBankClient : IDisposable
     {
