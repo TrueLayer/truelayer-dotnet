@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Shouldly;
+using FluentAssertions;
 using TrueLayer.Common;
 using TrueLayer.MerchantAccounts.Model;
 using TrueLayer.Payouts.Model;
@@ -29,9 +29,9 @@ namespace TrueLayer.AcceptanceTests
             var response = await _fixture.Client.Payouts.CreatePayout(
                 payoutRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-            response.StatusCode.ShouldBe(HttpStatusCode.Accepted);
-            response.Data.ShouldNotBeNull();
-            response.Data.Id.ShouldNotBeNullOrWhiteSpace();
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.Data.Should().NotBeNull();
+            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
@@ -42,23 +42,24 @@ namespace TrueLayer.AcceptanceTests
             var response = await _fixture.Client.Payouts.CreatePayout(
                 payoutRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-            response.StatusCode.ShouldBe(HttpStatusCode.Accepted);
-            response.Data.ShouldNotBeNull();
-            response.Data.Id.ShouldNotBeNullOrWhiteSpace();
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.Data.Should().NotBeNull();
+            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
 
             var getPayoutResponse = await _fixture.Client.Payouts.GetPayout(response.Data.Id);
 
-            getPayoutResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-            getPayoutResponse.Data.Value.ShouldNotBeNull();
+            getPayoutResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            getPayoutResponse.Data.Value.Should().NotBeNull();
             PayoutDetails? details = getPayoutResponse.Data.Value as PayoutDetails;
 
-            details.ShouldNotBeNull();
-            details.Id.ShouldBe(response.Data.Id);
-            details.Currency.ShouldBe(payoutRequest.Currency);
-            details.Beneficiary.AsT1.ShouldNotBeNull();
-            details.Status.ShouldBeOneOf("pending", "authorized", "executed", "failed");
-            details.CreatedAt.ShouldNotBeOneOf(DateTime.MinValue, DateTime.MaxValue);
-            details.Metadata.ShouldBe(payoutRequest.Metadata);
+            details.Should().NotBeNull();
+            details!.Id.Should().Be(response.Data.Id);
+            details.Currency.Should().Be(payoutRequest.Currency);
+            details.Beneficiary.AsT1.Should().NotBeNull();
+            details.Status.Should().BeOneOf("pending", "authorized", "executed", "failed");
+            details.CreatedAt.Should().NotBe(DateTime.MinValue);
+            details.CreatedAt.Should().NotBe(DateTime.MaxValue);
+            details.Metadata.Should().BeEquivalentTo(payoutRequest.Metadata);
         }
 
         public Task DisposeAsync() => Task.CompletedTask;

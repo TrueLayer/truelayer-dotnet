@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Shouldly;
+using FluentAssertions;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -50,15 +50,15 @@ public static class TestUtils
     {
         var resourceId = redirectUri.PathAndQuery.Split("/").Last();
         var token = redirectUri.Fragment.Split("=").Last();
-        resourceId.ShouldNotBeEmpty();
-        token.ShouldNotBeEmpty();
+        resourceId.Should().NotBeEmpty();
+        token.Should().NotBeEmpty();
 
         var url = $"{redirectUri.Scheme}://{redirectUri.Host}/api/{authorization.Path}/{resourceId}/action";
         var testClient = new HttpClient();
         testClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         var authResponse = await testClient.PostAsync(url,
             new StringContent(authorization.Payload, System.Text.Encoding.UTF8, "application/json"));
-        authResponse.IsSuccessStatusCode.ShouldBeTrue();
+        authResponse.IsSuccessStatusCode.Should().BeTrue();
 
         var authResponseString = await authResponse.Content.ReadAsStringAsync();
         var authResponseUri = new Uri(authResponseString);
@@ -75,6 +75,6 @@ public static class TestUtils
                 submitParamsUri,
                 new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
 
-        submitProviderParamsResponse.IsSuccessStatusCode.ShouldBeTrue();
+        submitProviderParamsResponse.IsSuccessStatusCode.Should().BeTrue();
     }
 }

@@ -1,5 +1,5 @@
 using System;
-using Shouldly;
+using FluentAssertions;
 using TrueLayer.Payments;
 using Xunit;
 
@@ -14,7 +14,7 @@ namespace TrueLayer.Tests
             var builder = new HppLinkBuilder(baseUri);
 
             var link = builder.Build("payment-id", "payment-token", new Uri("https://localhost.com"));
-            link.ShouldBe("https://payment.truelayer-sandbox.com/payments#payment_id=payment-id&resource_token=payment-token&return_uri=https://localhost.com/");
+            link.Should().Be("https://payment.truelayer-sandbox.com/payments#payment_id=payment-id&resource_token=payment-token&return_uri=https://localhost.com/");
         }
     }
 }

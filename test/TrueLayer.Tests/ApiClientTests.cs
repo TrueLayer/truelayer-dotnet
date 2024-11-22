@@ -6,9 +6,9 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using RichardSzalay.MockHttp;
-using Shouldly;
 using TrueLayer.Serialization;
 using Xunit;
 
@@ -101,9 +101,9 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 "access-token"
             );
 
-            response.ShouldNotBeNull();
-            response.IsSuccessful.ShouldBeTrue();
-            response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+            response.Should().NotBeNull();
+            response.IsSuccessful.Should().BeTrue();
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Fact]
@@ -153,9 +153,9 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 accessToken: "access-token"
             );
 
-            response.ShouldNotBeNull();
-            response.IsSuccessful.ShouldBeTrue();
-            response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+            response.Should().NotBeNull();
+            response.IsSuccessful.Should().BeTrue();
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Theory]
@@ -174,10 +174,11 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 });
 
             ApiResponse<TestResponse> response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/error"));
-            response.IsSuccessful.ShouldBeFalse();
-            response.StatusCode.ShouldBe(statusCode);
-            response.TraceId.ShouldBe("trace-id");
-            response.Data.ShouldBeNull();
+
+            response.IsSuccessful.Should().BeFalse();
+            response.StatusCode.Should().Be(statusCode);
+            response.TraceId.Should().Be("trace-id");
+            response.Data.Should().BeNull();
         }
 
 
@@ -210,16 +211,17 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 });
 
             ApiResponse<TestResponse> response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/bad-request-error-details"));
-            response.IsSuccessful.ShouldBeFalse();
-            response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-            response.TraceId.ShouldBe("trace-id");
-            response.Data.ShouldBeNull();
-            response.Problem.ShouldNotBeNull();
-            response.Problem.Type.ShouldBe("https://docs.truelayer.com/errors#invalid_parameters");
-            response.Problem.Title.ShouldBe("Validation Error");
-            response.Problem.Detail.ShouldBe("Invalid Parameters");
-            response.Problem.Errors.ShouldNotBeNull();
-            response.Problem.Errors["summary"].ShouldContain("summary_required");
+
+            response.IsSuccessful.Should().BeFalse();
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            response.TraceId.Should().Be("trace-id");
+            response.Data.Should().BeNull();
+            response.Problem.Should().NotBeNull();
+            response.Problem!.Type.Should().Be("https://docs.truelayer.com/errors#invalid_parameters");
+            response.Problem.Title.Should().Be("Validation Error");
+            response.Problem.Detail.Should().Be("Invalid Parameters");
+            response.Problem.Errors.Should().NotBeNull();
+            response.Problem.Errors!["summary"].Should().Contain("summary_required");
         }
 
         [Fact]
@@ -231,7 +233,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, "{}");
 
             var response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/user-agent"));
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Fact]
@@ -313,10 +315,10 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
 
         private static void AssertSame(TestResponse? response, TestResponse expected)
         {
-            response.ShouldNotBeNull();
-            response.FirstName.ShouldBe(expected.FirstName);
-            response.LastName.ShouldBe(expected.LastName);
-            response.Age.ShouldBe(expected.Age);
+            response.Should().NotBeNull();
+            response!.FirstName.Should().Be(expected.FirstName);
+            response.LastName.Should().Be(expected.LastName);
+            response.Age.Should().Be(expected.Age);
         }
 
         public void Dispose()

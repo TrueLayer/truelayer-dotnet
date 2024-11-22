@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Shouldly;
+using FluentAssertions;
 using TrueLayer.Serialization;
 using Xunit;
 
@@ -14,23 +14,23 @@ namespace TrueLayer.Tests.Serialization
             string json = JsonSerializer.Serialize(obj, SerializerOptions.Default);
 
             TestRecord? deserialized = JsonSerializer.Deserialize<TestRecord>(json, SerializerOptions.Default);
-            deserialized.ShouldNotBeNull();
-            deserialized.RequiredField.ShouldBe(obj.RequiredField);
-            deserialized.OptionalField.ShouldBe(obj.OptionalField);
+            deserialized.Should().NotBeNull();
+            deserialized!.RequiredField.Should().Be(obj.RequiredField);
+            deserialized.OptionalField.Should().Be(obj.OptionalField);
         }
 
         [Fact]
         public void Can_deserialize_resource_collection()
         {
-            string json = @"{ 
+            string json = @"{
                ""items"": [{
                    ""required_field"": ""foo""
                }]
             }";
 
             var records = JsonSerializer.Deserialize<ResourceCollection<TestRecord>>(json, SerializerOptions.Default);
-            records.ShouldNotBeNull();
-            records.Items.ShouldNotBeEmpty();
+            records.Should().NotBeNull();
+            records!.Items.Should().NotBeEmpty();
         }
 
 
