@@ -13,8 +13,13 @@ namespace TrueLayer.Payments
             _baseUri = baseUri ?? (useSandbox ? TrueLayerBaseUris.SandboxApiBaseUri : TrueLayerBaseUris.ProdApiBaseUri);
         }
 
-        public string Build(string id, string token, Uri returnUri, ResourceType resourceType = ResourceType.Payment,
-            int? maxWaitForResultSeconds = null, bool? signup = null)
+        public string Build(
+            string id,
+            string token,
+            Uri returnUri,
+            ResourceType resourceType = ResourceType.Payment,
+            int? maxWaitForResultSeconds = null,
+            bool? signup = null)
         {
             id.NotNullOrWhiteSpace(nameof(id));
             token.NotNullOrWhiteSpace(nameof(token));
