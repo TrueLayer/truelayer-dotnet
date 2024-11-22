@@ -10,7 +10,6 @@ using static TrueLayer.Mandates.Model.MandateDetail;
 namespace TrueLayer.Mandates.Model
 {
     using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
-    using MandateDetailUnion = OneOf<AuthorizationRequiredMandateDetail, AuthorizingMandateDetail, AuthorizedMandateDetail, FailedMandateDetail, RevokedMandateDetail>;
     using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Provider.Preselected>;
 
     public static class MandateDetail
