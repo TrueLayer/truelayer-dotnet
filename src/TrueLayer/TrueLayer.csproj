@@ -18,12 +18,11 @@
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0"/>
         <PackageReference Include="OneOf" Version="3.0.271"/>
         <PackageReference Include="TrueLayer.Signing" Version="0.1.15"/>
-        <PackageReference Update="MinVer" Version="6.0.0" />
     </ItemGroup>
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Text.Json" Version="[5.0.2,6.0)"/>
         <PackageReference Include="Microsoft.CSharp" Version="[4.7,5.0)"/>
+        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     </ItemGroup>
     <ItemGroup>
         <None Include="..\shared\icon.png" Pack="true" PackagePath="\"/>
