@@ -15,6 +15,6 @@ public class AuthApiMock : IAuthApi
 
     public ValueTask<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default)
     {
-        return ValueTask.FromResult(_response!);
+        return new ValueTask<ApiResponse<GetAuthTokenResponse>>(_response!);
     }
 }
