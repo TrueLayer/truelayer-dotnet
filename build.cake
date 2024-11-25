@@ -21,8 +21,6 @@ var packFiles = "./src/**/*.csproj";
 var testFiles = "./test/**/*.csproj";
 var packages = "./artifacts/*.nupkg";
 
-GitBranch currentBranch = GitBranchCurrent("./");
-
 uint coverageThreshold = 50;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,7 +30,7 @@ uint coverageThreshold = 50;
 Setup(context =>
 {
    BuildContext.Initialize(Context);
-   Information($"Building TrueLayer.NET with configuration {configuration} on branch {currentBranch.FriendlyName}");
+   Information($"Building TrueLayer.NET with configuration {configuration}");
 });
 
 Teardown(ctx =>

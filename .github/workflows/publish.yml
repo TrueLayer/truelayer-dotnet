@@ -20,7 +20,7 @@ on:
         default: 'false'
 jobs:
   publish:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET 9.0
