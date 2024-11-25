@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using TrueLayer.Payments;
-using TrueLayer.Payouts;
 
 namespace TrueLayer
 {

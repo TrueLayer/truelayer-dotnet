@@ -1,16 +1,14 @@
 // Install .NET Core Global tools.
-#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.0.0"
-#tool "dotnet:?package=coveralls.net&version=3.0.0"
-#tool "dotnet:?package=dotnet-sonarscanner&version=5.4.0"
-#tool nuget:?package=docfx.console&version=2.58.9
-#tool nuget:?package=KuduSync.NET&version=1.5.3
+#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.4.1"
+#tool "dotnet:?package=coveralls.net&version=4.0.1"
+#tool "dotnet:?package=dotnet-sonarscanner&version=9.0.2"
+#tool nuget:?package=KuduSync.NET&version=1.5.4
 
 // Install addins
-#addin nuget:?package=Cake.Coverlet&version=2.5.4
-#addin nuget:?package=Cake.Sonar&version=1.1.26
-#addin nuget:?package=Cake.DocFx&version=1.0.0
-#addin nuget:?package=Cake.Git&version=1.1.0
-#addin nuget:?package=Cake.Kudu&version=1.3.0
+#addin nuget:?package=Cake.Coverlet&version=4.0.1
+#addin nuget:?package=Cake.Sonar&version=1.1.33
+#addin nuget:?package=Cake.Git&version=4.0.0
+#addin nuget:?package=Cake.Kudu&version=3.0.0
 
  #r "System.Text.Json"
  #r "System.IO"
@@ -83,7 +81,7 @@ Task("SonarBegin")
             Url = "https://sonarcloud.io",
             Exclusions = "test/**,examples/**",
             OpenCoverReportsPath = $"{coveragePath}/*.xml",
-            Login = sonarToken,
+            Token = sonarToken,
             VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
         });
     });
@@ -91,7 +89,7 @@ Task("SonarBegin")
 Task("Build")
     .Does(() =>
     {
-        DotNetCoreBuild("TrueLayer.sln", new DotNetCoreBuildSettings
+        DotNetBuild("TrueLayer.sln", new DotNetBuildSettings
         {
             Configuration = configuration
         });
@@ -104,7 +102,7 @@ Task("Test")
         {
             var projectName = project.GetFilenameWithoutExtension();
 
-            var testSettings = new DotNetCoreTestSettings
+            var testSettings = new DotNetTestSettings
             {
                 NoBuild = true,
                 Configuration = configuration,
@@ -122,7 +120,7 @@ Task("Test")
                 //Threshold = coverageThreshold
             };
 
-            DotNetCoreTest(project.ToString(), testSettings, coverletSettings);
+            DotNetTest(project.ToString(), testSettings, coverletSettings);
         }
    });
 
@@ -130,7 +128,7 @@ Task("Test")
 Task("Pack")
     .Does(() =>
     {
-        var settings = new DotNetCorePackSettings
+        var settings = new DotNetPackSettings
         {
             Configuration = configuration,
             OutputDirectory = artifactsPath,
@@ -139,7 +137,7 @@ Task("Pack")
 
         foreach (var file in GetFiles(packFiles))
         {
-            DotNetCorePack(file.ToString(), settings);
+            DotNetPack(file.ToString(), settings);
         }
     });
 
@@ -202,7 +200,7 @@ Task("PublishPackages")
     {
         foreach(var package in GetFiles(packages))
         {
-            DotNetCoreNuGetPush(package.ToString(), new DotNetCoreNuGetPushSettings {
+            DotNetNuGetPush(package.ToString(), new DotNetNuGetPushSettings {
                 ApiKey = BuildContext.NugetApiKey,
                 Source = BuildContext.NugetApiUrl,
                 SkipDuplicate = true
@@ -216,75 +214,8 @@ Task("SonarEnd")
     {
         SonarEnd(new SonarEndSettings
         {
-            Login = sonarToken
+            Token = sonarToken
         });
-    });
-
-Task("BuildDocs")
-    .Does(() =>
-    {
-        Information("Extracting API Metadata");
-        DocFxMetadata(docFxConfig);
-
-        Information("Building Docs");
-        DocFxBuild(docFxConfig);
-    });
-
-Task("ServeDocs")
-    .IsDependentOn("BuildDocs")
-    .Does(() =>
-    {
-        using (var process = DocFxServeStart(sitePath))
-        {
-            // Launch browser or other action based on the site
-            process.WaitForExit();
-        }
-    });
-
-Task("PublishDocs")
-    .IsDependentOn("BuildDocs")
-    .WithCriteria(!string.IsNullOrEmpty(gitHubPagesToken))// && currentBranch.FriendlyName == "main")
-    .Does(() =>
-    {
-        // Get the current commit
-        var sourceCommit = currentBranch.Tip;
-        var publishFolder = $"./artifacts/docs-publish-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}";
-        Information("Publishing Folder: {0}", publishFolder);
-        Information("Getting publish branch...");
-        GitClone("https://github.com/TrueLayer/truelayer-dotnet.git",
-            publishFolder,
-            gitHubUser,
-            gitHubPagesToken,
-            new GitCloneSettings { BranchName = "gh-pages" }
-        );
-
-        Information("Sync output files...");
-
-        Kudu.Sync(sitePath, publishFolder, new KuduSyncSettings {
-            ArgumentCustomization = args => args.Append("--ignore").AppendQuoted(".git;CNAME")
-        });
-
-        if (GitHasUncommitedChanges(publishFolder))
-        {
-            GitAddAll(publishFolder);
-            Information("Stage all changes...");
-
-            // Only considers modified files - https://github.com/cake-contrib/Cake_Git/issues/77
-            if (BuildContext.ForcePushDocs || GitHasStagedChanges(publishFolder))
-            {
-                Information("Commit all changes...");
-                GitCommit(
-                    publishFolder,
-                    sourceCommit.Committer.Name,
-                    sourceCommit.Committer.Email,
-                    string.Format("Continuous Integration Publish: {0}\r\n{1}", sourceCommit.Sha, sourceCommit.Message)
-                );
-
-                Information("Pushing all changes...");
-
-                GitPush(publishFolder, gitHubUser, gitHubPagesToken, "gh-pages");
-            }
-        }
     });
 
 Task("Dump").Does(() => BuildContext.PrintParameters(Context));
@@ -294,8 +225,7 @@ Task("Default")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Pack")
-    .IsDependentOn("GenerateReports")
-    .IsDependentOn("BuildDocs");
+    .IsDependentOn("GenerateReports");
 
 Task("CI")
     //.IsDependentOn("SonarBegin")
@@ -306,10 +236,8 @@ Task("CI")
 Task("Publish")
     .IsDependentOn("CI")
     .IsDependentOn("PublishPackages");
-    //.IsDependentOn("PublishDocs");
 
 RunTarget(target);
-
 
 public static class BuildContext
 {

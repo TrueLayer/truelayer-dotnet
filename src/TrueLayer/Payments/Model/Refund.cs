@@ -24,26 +24,26 @@ namespace TrueLayer.Payments.Model
     [JsonDiscriminator("pending")]
     public sealed record RefundPending : RefundBase
     {
-        public string Status => "pending";
+        public new string Status => "pending";
     }
 
     [JsonDiscriminator("authorized")]
     public sealed record RefundAuthorized : RefundBase
     {
-        public string Status => "authorized";
+        public new string Status => "authorized";
     }
 
     [JsonDiscriminator("executed")]
     public sealed record RefundExecuted : RefundBase
     {
-        public string Status => "executed";
+        public new string Status => "executed";
         public DateTime ExecutedAt { get; init; }
     }
 
     [JsonDiscriminator("failed")]
     public sealed record RefundFailed : RefundBase
     {
-        public string Status => "failed";
+        public new string Status => "failed";
         public DateTime FailedAt { get; init; }
         public string FailureReason { get; init; } = null!;
     };

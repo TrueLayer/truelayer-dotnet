@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
 using TrueLayer.Common;
 using TrueLayer.Extensions;
+using TrueLayer.Models;
 using TrueLayer.PaymentsProviders.Model;
 
 namespace TrueLayer.PaymentsProviders
@@ -34,7 +34,7 @@ namespace TrueLayer.PaymentsProviders
             id.NotNullOrWhiteSpace(nameof(id));
             id.NotAUrl(nameof(id));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"));
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments));
 
             if (!authResponse.IsSuccessful)
             {
@@ -53,7 +53,7 @@ namespace TrueLayer.PaymentsProviders
         {
             searchPaymentsProvidersRequest.NotNull(nameof(searchPaymentsProvidersRequest));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"));
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments));
 
             if (!authResponse.IsSuccessful)
             {

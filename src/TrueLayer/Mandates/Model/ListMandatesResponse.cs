@@ -1,11 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OneOf;
-using static System.Net.Mime.MediaTypeNames;
 using static TrueLayer.Mandates.Model.MandateDetail;
 
 namespace TrueLayer.Mandates.Model

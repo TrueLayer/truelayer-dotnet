@@ -1,5 +1,4 @@
 using TrueLayer.Serialization;
-using OneOf;
 
 namespace TrueLayer.MerchantAccounts.Model;
 

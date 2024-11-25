@@ -5,6 +5,7 @@ using OneOf;
 using TrueLayer.Auth;
 using TrueLayer.Common;
 using TrueLayer.Extensions;
+using TrueLayer.Models;
 using TrueLayer.Payouts.Model;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
 
@@ -46,7 +47,7 @@ namespace TrueLayer.Payouts
             payoutRequest.NotNull(nameof(payoutRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -68,7 +69,7 @@ namespace TrueLayer.Payouts
             id.NotNullOrWhiteSpace(nameof(id));
             id.NotAUrl(nameof(id));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest("payments"), cancellationToken);
+            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {

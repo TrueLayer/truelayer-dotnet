@@ -1,13 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OneOf;
-using TrueLayer.Payments.Model;
 using FluentAssertions;
 using TrueLayer.PaymentsProviders.Model;
 using Xunit;
 using AuthorizationFlow = TrueLayer.PaymentsProviders.Model.AuthorizationFlow;
-using Provider = TrueLayer.Payments.Model.Provider;
 
 namespace TrueLayer.AcceptanceTests
 {

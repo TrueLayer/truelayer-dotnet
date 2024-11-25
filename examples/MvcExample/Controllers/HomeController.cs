@@ -38,15 +38,15 @@ namespace MvcExample.Controllers
                 return View("Index");
             }
 
-            OneOf<Provider.UserSelected, Provider.Preselected> filter = donateModel.UserPreSelectedFilter
-                ? new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+            OneOf<Provider.UserSelected, Provider.Preselected> providerSelection = donateModel.UserPreSelectedFilter
+                ? new Provider.Preselected(providerId: "mock-payments-gb-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service"})
                 : new Provider.UserSelected();
 
             var paymentRequest = new CreatePaymentRequest(
                 donateModel.AmountInMajor.ToMinorCurrencyUnit(2),
                 Currencies.GBP,
                 new PaymentMethod.BankTransfer(
-                    filter,
+                    providerSelection,
                     new Beneficiary.ExternalAccount(
                         "TrueLayer",
                         "truelayer-dotnet",
@@ -142,10 +142,10 @@ namespace MvcExample.Controllers
 
             return apiResponse.Data.Match(
                 authRequired => Failed(authRequired.Status, authRequired.PaymentMethod),
-                authorizing => SuccessOrPending(authorizing),
-                authorized => SuccessOrPending(authorized),
-                success => SuccessOrPending(success),
-                settled => SuccessOrPending(settled),
+                SuccessOrPending,
+                SuccessOrPending,
+                SuccessOrPending,
+                SuccessOrPending,
                 failed => Failed(failed.Status, failed.PaymentMethod),
                 attemptFailed => Failed(attemptFailed.Status, attemptFailed.PaymentMethod)
             );

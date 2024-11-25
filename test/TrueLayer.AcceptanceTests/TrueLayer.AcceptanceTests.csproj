@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-      <TargetFramework>net6.0</TargetFramework>
+      <TargetFramework>net9.0</TargetFramework>
       <IsPackable>false</IsPackable>
       <RootNamespace>TrueLayer.AcceptanceTests</RootNamespace>
       <AssemblyName>TrueLayer.AcceptanceTests</AssemblyName>
@@ -19,9 +19,8 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-      <PackageReference Include="Moq" Version="4.16.1" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\src\TrueLayer\TrueLayer.csproj" />
