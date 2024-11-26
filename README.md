@@ -12,7 +12,7 @@
 
 The official [TrueLayer](https://truelayer.com) .NET client provides convenient access to TrueLayer APIs from applications built with .NET.
 
-The library currently supports .NET Standard 2.1, .NET 5.0 and .NET 6.0.
+The library currently supports .NET Standard 2.1, .NET 9.0 and .NET 8.0.
 
 ## Installation
 
@@ -276,16 +276,6 @@ This project uses [Cake](https://cakebuild.net/) to build, test and publish pack
 Run `build.sh` (Mac/Linux) or `build.ps1` (Windows) To build and test the project.
 
 This will output NuGet packages and coverage reports in the `artifacts` directory.
-
-## Library Documentation
-
-The library API documentation is built using [DocFx](https://dotnet.github.io/docfx/). To build and serve the docs locally run:
-
-```
-./build.sh --target ServeDocs
-```
-
-This will serve the docs on http://localhost:8080.
 
 ## Contributing
 

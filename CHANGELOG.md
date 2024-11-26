@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.18.0] - 2024-11-25
+### Added
+- Added support Add support for mandates in `HppLinkBuilder`
+
+## [1.17.0] - 2024-11-25
+### Added
+- Added support for net9/net8
+
 ## [1.16.0] - 2024-11-07
 ### Added
 - Added support to the `Metadata` field in the `GetPayoutResponse`
