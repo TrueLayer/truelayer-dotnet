@@ -5,13 +5,17 @@ using Xunit;
 
 namespace TrueLayer.Tests.Extensions;
 
-public class TrueLayerOptionsExtensionsTest
+public class TrueLayerOptionsExtensionsTests
 {
     [Fact]
     public void GetApiBaseUri_UseCustomUri_ReturnsCustomUri()
     {
         var options = new TrueLayerOptions
         {
+            Auth = new ApiOptions
+            {
+                Uri = new Uri("https://auth.custom.com")
+            },
             Payments = new PaymentsOptions
             {
                 Uri = new Uri("https://api.custom.com")
@@ -30,7 +34,11 @@ public class TrueLayerOptionsExtensionsTest
     {
         var options = new TrueLayerOptions
         {
-            UseSandbox = true
+            UseSandbox = true,
+            Auth = new ApiOptions
+            {
+            Uri = new Uri("https://auth.custom.com")
+        },
         };
 
         var actual = options.GetApiBaseUri();
@@ -44,7 +52,11 @@ public class TrueLayerOptionsExtensionsTest
     {
         var options = new TrueLayerOptions
         {
-            UseSandbox = false
+            UseSandbox = false,
+            Auth = new ApiOptions
+            {
+                Uri = new Uri("https://auth.custom.com")
+            },
         };
 
         var actual = options.GetApiBaseUri();
@@ -60,6 +72,10 @@ public class TrueLayerOptionsExtensionsTest
         {
             Auth = new ApiOptions
             {
+                Uri = new Uri("https://auth.custom.com")
+            },
+            Payments = new PaymentsOptions
+            {
                 Uri = new Uri("https://api.custom.com")
             },
             UseSandbox = true
@@ -68,7 +84,7 @@ public class TrueLayerOptionsExtensionsTest
         var actual = options.GetAuthBaseUri();
 
         // Assert
-        actual.Should().Be("https://api.custom.com");
+        actual.Should().Be("https://auth.custom.com");
     }
 
     [Fact]
@@ -76,7 +92,11 @@ public class TrueLayerOptionsExtensionsTest
     {
         var options = new TrueLayerOptions
         {
-            UseSandbox = true
+            UseSandbox = true,
+            Payments = new PaymentsOptions
+            {
+                Uri = new Uri("https://api.custom.com")
+            }
         };
 
         var actual = options.GetAuthBaseUri();
@@ -90,7 +110,11 @@ public class TrueLayerOptionsExtensionsTest
     {
         var options = new TrueLayerOptions
         {
-            UseSandbox = false
+            UseSandbox = false,
+            Payments = new PaymentsOptions
+            {
+                Uri = new Uri("https://api.custom.com")
+            },
         };
 
         var actual = options.GetAuthBaseUri();
