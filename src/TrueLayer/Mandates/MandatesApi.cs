@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Auth;
-using TrueLayer.Common;
 using TrueLayer.Extensions;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Models;
@@ -35,12 +34,8 @@ namespace TrueLayer.Mandates
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            var baseUri = (options.UseSandbox ?? true)
-                ? TrueLayerBaseUris.SandboxApiBaseUri
-                : TrueLayerBaseUris.ProdApiBaseUri;
-
-            _baseUri = (options.Payments.Uri ?? baseUri)
-                .Append("/v3/mandates/");
+            _baseUri = options.GetApiBaseUri()
+                .Append(MandatesEndpoints.V3Mandates);
         }
 
         /// <inheritdoc />
@@ -49,7 +44,7 @@ namespace TrueLayer.Mandates
             mandateRequest.NotNull(nameof(mandateRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
             var type = mandateRequest.Mandate.Match(t0 => t0.Type, t1 => t1.Type);
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{type}"), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{type}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -73,7 +68,7 @@ namespace TrueLayer.Mandates
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -90,7 +85,7 @@ namespace TrueLayer.Mandates
         /// <inheritdoc />
         public async Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandates(ListMandatesQuery query, MandateType mandateType, CancellationToken cancellationToken = default)
         {
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -117,7 +112,7 @@ namespace TrueLayer.Mandates
             mandateId.NotAUrl(nameof(mandateId));
             request.NotNull(nameof(request));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -125,7 +120,7 @@ namespace TrueLayer.Mandates
             }
 
             return await _apiClient.PostAsync<AuthorizationResponseUnion>(
-                _baseUri.Append($"{mandateId}/authorization-flow"),
+                _baseUri.Append(mandateId).Append(MandatesEndpoints.AuthorizationFlow),
                 request,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
@@ -141,7 +136,7 @@ namespace TrueLayer.Mandates
             mandateId.NotAUrl(nameof(mandateId));
             request.NotNull(nameof(request));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -149,7 +144,7 @@ namespace TrueLayer.Mandates
             }
 
             return await _apiClient.PostAsync<AuthorizationResponseUnion>(
-                _baseUri.Append($"{mandateId}/authorization-flow/actions/provider-selection"),
+                _baseUri.Append(mandateId).Append(MandatesEndpoints.ProviderSelection),
                 request,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
@@ -163,7 +158,7 @@ namespace TrueLayer.Mandates
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -171,7 +166,7 @@ namespace TrueLayer.Mandates
             }
 
             return await _apiClient.PostAsync<AuthorizationResponseUnion>(
-                _baseUri.Append($"{mandateId}/authorization-flow/actions/consent"),
+                _baseUri.Append(mandateId).Append(MandatesEndpoints.Consent),
                 null,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,
@@ -186,7 +181,7 @@ namespace TrueLayer.Mandates
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -194,7 +189,7 @@ namespace TrueLayer.Mandates
             }
 
             return await _apiClient.GetAsync<GetConfirmationOfFundsResponse>(
-                _baseUri.Append($"{mandateId}/funds?amount_in_minor={amountInMinor}&currency={currency}"),
+                _baseUri.Append(mandateId).Append(MandatesEndpoints.Funds).Append($"?amount_in_minor={amountInMinor}&currency={currency}"),
                 authResponse.Data!.AccessToken,
                 cancellationToken: cancellationToken
             );
@@ -206,7 +201,7 @@ namespace TrueLayer.Mandates
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -214,7 +209,7 @@ namespace TrueLayer.Mandates
             }
 
             return await _apiClient.GetAsync<GetConstraintsResponse>(
-                _baseUri.Append($"{mandateId}/constraints"),
+                _baseUri.Append(mandateId).Append(MandatesEndpoints.Constraints),
                 authResponse.Data!.AccessToken,
                 cancellationToken: cancellationToken
             );
@@ -226,7 +221,7 @@ namespace TrueLayer.Mandates
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -234,7 +229,7 @@ namespace TrueLayer.Mandates
             }
 
             return await _apiClient.PostAsync(
-                _baseUri.Append($"{mandateId}/revoke"),
+                _baseUri.Append(mandateId).Append(MandatesEndpoints.Revoke),
                 null,
                 idempotencyKey,
                 authResponse.Data!.AccessToken,

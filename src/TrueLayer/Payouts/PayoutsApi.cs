@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Auth;
-using TrueLayer.Common;
 using TrueLayer.Extensions;
 using TrueLayer.Models;
 using TrueLayer.Payouts.Model;
@@ -33,12 +32,8 @@ namespace TrueLayer.Payouts
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            var baseUri = (options.UseSandbox ?? true)
-                ? TrueLayerBaseUris.SandboxApiBaseUri
-                : TrueLayerBaseUris.ProdApiBaseUri;
-
-            _baseUri = (options.Payments.Uri ?? baseUri)
-                .Append("/v3/payouts/");
+            _baseUri = options.GetApiBaseUri()
+                .Append(PayoutsEndpoints.V3Payouts);
         }
 
         /// <inheritdoc />
@@ -47,7 +42,7 @@ namespace TrueLayer.Payouts
             payoutRequest.NotNull(nameof(payoutRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
@@ -69,7 +64,7 @@ namespace TrueLayer.Payouts
             id.NotNullOrWhiteSpace(nameof(id));
             id.NotAUrl(nameof(id));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {
