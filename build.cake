@@ -1,18 +1,9 @@
 // Install .NET Core Global tools.
 #tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.4.1"
 #tool "dotnet:?package=coveralls.net&version=4.0.1"
-#tool "dotnet:?package=dotnet-sonarscanner&version=9.0.2"
-#tool nuget:?package=KuduSync.NET&version=1.5.4
 
 // Install addins
 #addin nuget:?package=Cake.Coverlet&version=4.0.1
-#addin nuget:?package=Cake.Sonar&version=1.1.33
-#addin nuget:?package=Cake.Git&version=4.0.0
-#addin nuget:?package=Cake.Kudu&version=3.0.0
-
- #r "System.Text.Json"
- #r "System.IO"
- #r "System"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -25,14 +16,6 @@ var coveragePath = "./artifacts/coverage";
 var packFiles = "./src/**/*.csproj";
 var testFiles = "./test/**/*.csproj";
 var packages = "./artifacts/*.nupkg";
-DirectoryPath sitePath = "./artifacts/docs";
-var docFxConfig = "./docs/docfx.json";
-
-var coverallsToken = EnvironmentVariable("COVERALLS_TOKEN");
-var sonarToken = EnvironmentVariable("SONAR_TOKEN");
-var gitHubUser = EnvironmentVariable("GITHUB_ACTOR");
-var gitHubPagesToken = EnvironmentVariable("GITHUB_TOKEN");
-GitBranch currentBranch = GitBranchCurrent("./");
 
 uint coverageThreshold = 50;
 
@@ -43,7 +26,7 @@ uint coverageThreshold = 50;
 Setup(context =>
 {
    BuildContext.Initialize(Context);
-   Information($"Building TrueLayer.NET with configuration {configuration} on branch {currentBranch.FriendlyName}");
+   Information($"Building TrueLayer.NET with configuration {configuration}");
 });
 
 Teardown(ctx =>
@@ -68,22 +51,6 @@ Task("Clean")
     .Does(() =>
     {
         CleanDirectories(artifactsPath);
-    });
-
-Task("SonarBegin")
-    .WithCriteria(!string.IsNullOrEmpty(sonarToken))
-    .Does(() =>
-    {
-        SonarBegin(new SonarBeginSettings
-        {
-            Key = "TrueLayer_truelayer-dotnet",
-            Organization = "truelayer",
-            Url = "https://sonarcloud.io",
-            Exclusions = "test/**,examples/**",
-            OpenCoverReportsPath = $"{coveragePath}/*.xml",
-            Token = sonarToken,
-            VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
-        });
     });
 
 Task("Build")
@@ -124,7 +91,6 @@ Task("Test")
         }
    });
 
-
 Task("Pack")
     .Does(() =>
     {
@@ -150,50 +116,6 @@ Task("GenerateReports")
         });
     });
 
-Task("UploadCoverage")
-    .WithCriteria(!string.IsNullOrEmpty(coverallsToken) && BuildSystem.IsRunningOnGitHubActions)
-    .Does(() =>
-    {
-        var workflow = BuildSystem.GitHubActions.Environment.Workflow;
-
-        Dictionary<string, object> @event = default;
-        if (workflow.EventName == "pull_request")
-        {
-            string eventJson = System.IO.File.ReadAllText(workflow.EventPath.ToString());
-            @event = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(eventJson);
-        }
-
-        var args = new ProcessArgumentBuilder()
-                    .Append($"--repoToken {coverallsToken}")
-                    .Append("--lcov")
-                    .Append("--useRelativePaths")
-                    .Append("-i ./artifacts/lcov.info")
-                    .Append($"--commitId {workflow.Sha}")
-                    .Append($"--commitBranch {workflow.Ref}")
-                    .Append($"--serviceNumber {workflow.RunNumber}")
-                    .Append($"--jobId {workflow.RunId}");
-                    //.Append("--dryrun");
-
-        if (BuildSystem.IsPullRequest)
-        {
-            args.Append($"--pullRequest {@event["number"].ToString()}");
-        }
-
-        var settings = new ProcessSettings { Arguments = args };
-
-        // We have to start the process manually since the cake addin forces us to provide
-        // a format enum which currently doesn't include lcov
-        if (StartProcess(
-            Context.Tools.Resolve("csmacnz.Coveralls")
-                ?? Context.Tools.Resolve("csmacnz.coveralls.exe")
-                ?? throw new Exception("Failed to resolve Coveralls shim."),
-            settings
-            ) != 0)
-        {
-            throw new Exception("Failed to execute Coveralls.");
-        }
-    });
-
 Task("PublishPackages")
     .WithCriteria(() => BuildContext.ShouldPublishToNuget)
     .Does(() =>
@@ -208,16 +130,6 @@ Task("PublishPackages")
         }
     });
 
-Task("SonarEnd")
-    .WithCriteria(!string.IsNullOrEmpty(sonarToken))
-    .Does(() =>
-    {
-        SonarEnd(new SonarEndSettings
-        {
-            Token = sonarToken
-        });
-    });
-
 Task("Dump").Does(() => BuildContext.PrintParameters(Context));
 
 Task("Default")
@@ -228,10 +140,7 @@ Task("Default")
     .IsDependentOn("GenerateReports");
 
 Task("CI")
-    //.IsDependentOn("SonarBegin")
     .IsDependentOn("Default");
-    //.IsDependentOn("UploadCoverage")
-    //.IsDependentOn("SonarEnd");
 
 Task("Publish")
     .IsDependentOn("CI")

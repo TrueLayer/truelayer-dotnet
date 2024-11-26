@@ -20,13 +20,25 @@ on:
         default: 'false'
 jobs:
   publish:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET 9.0
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 9.0.x
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 8.0.x
+      - name: Setup .NET 6.0
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Setup .NET 3.1
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 3.1.x
       - name: Restore tools
         run: dotnet tool restore
       - name: Run the build script
