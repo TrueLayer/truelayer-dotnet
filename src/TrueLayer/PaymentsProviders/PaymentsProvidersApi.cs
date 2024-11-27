@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using TrueLayer.Auth;
-using TrueLayer.Common;
 using TrueLayer.Extensions;
 using TrueLayer.Models;
 using TrueLayer.PaymentsProviders.Model;
@@ -21,12 +20,8 @@ namespace TrueLayer.PaymentsProviders
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
-            var baseUri = (options.UseSandbox ?? true)
-                ? TrueLayerBaseUris.SandboxApiBaseUri
-                : TrueLayerBaseUris.ProdApiBaseUri;
-
-            _baseUri = (options.Payments.Uri ?? baseUri)
-                .Append("/v3/payments-providers/");
+            _baseUri = options.GetApiBaseUri()
+                .Append(PaymentsProvidersEndpoints.V3PaymentsProviders);
         }
 
         public async Task<ApiResponse<PaymentsProvider>> GetPaymentsProvider(string id)
@@ -34,7 +29,7 @@ namespace TrueLayer.PaymentsProviders
             id.NotNullOrWhiteSpace(nameof(id));
             id.NotAUrl(nameof(id));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments));
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments));
 
             if (!authResponse.IsSuccessful)
             {
@@ -53,7 +48,7 @@ namespace TrueLayer.PaymentsProviders
         {
             searchPaymentsProvidersRequest.NotNull(nameof(searchPaymentsProvidersRequest));
 
-            ApiResponse<GetAuthTokenResponse> authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments));
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments));
 
             if (!authResponse.IsSuccessful)
             {
@@ -61,7 +56,7 @@ namespace TrueLayer.PaymentsProviders
             }
 
             return await _apiClient.PostAsync<SearchPaymentsProvidersResponse>(
-                _baseUri.Append("/search"),
+                _baseUri.Append(PaymentsProvidersEndpoints.Search),
                 request: searchPaymentsProvidersRequest,
                 accessToken: authResponse.Data!.AccessToken
             );

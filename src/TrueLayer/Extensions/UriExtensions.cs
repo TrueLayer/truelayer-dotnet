@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
-using TrueLayer.Serialization;
 
 namespace TrueLayer.Extensions
 {
@@ -34,8 +32,5 @@ namespace TrueLayer.Extensions
 
             return uriBuilder.Uri;
         }
-
-        public static string ToJson<T>(this ApiResponse<T> response)
-            => JsonSerializer.Serialize(response, SerializerOptions.Default);
     }
 }

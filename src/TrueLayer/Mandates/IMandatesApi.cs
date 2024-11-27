@@ -4,8 +4,8 @@ using OneOf;
 
 namespace TrueLayer.Mandates
 {
-    using TrueLayer.Mandates.Model;
-    using TrueLayer.Models;
+    using Model;
+    using Models;
     using AuthorizationResponseUnion = OneOf<
         Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
         Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;

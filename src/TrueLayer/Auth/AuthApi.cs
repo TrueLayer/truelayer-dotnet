@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using TrueLayer.Common;
 using TrueLayer.Extensions;
 
 namespace TrueLayer.Auth
@@ -18,12 +17,7 @@ namespace TrueLayer.Auth
         {
             _apiClient = apiClient.NotNull(nameof(apiClient));
             _options = options.NotNull(nameof(options));
-
-            var baseUri = (options.UseSandbox ?? true)
-                ? TrueLayerBaseUris.SandboxAuthBaseUri
-                : TrueLayerBaseUris.ProdAuthBaseUri;
-
-            _baseUri = options.Auth?.Uri ?? baseUri;
+            _baseUri = options.GetAuthBaseUri();
         }
 
         /// <inheritdoc />
@@ -44,7 +38,7 @@ namespace TrueLayer.Auth
             }
 
             return await _apiClient.PostAsync<GetAuthTokenResponse>(
-                _baseUri.Append("connect/token"), new FormUrlEncodedContent(values), null, cancellationToken);
+                _baseUri.Append(AuthEndpoints.Token), new FormUrlEncodedContent(values), null, cancellationToken);
         }
     }
 }
