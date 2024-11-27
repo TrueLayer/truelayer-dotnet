@@ -107,6 +107,37 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
+
+    [Fact]
+    public async Task can_create_merchant_account_gbp_verification_Payment()
+    {
+        var paymentRequest = CreateTestPaymentRequest(
+            new Provider.UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
+                SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
+            },
+            beneficiary: new Beneficiary.MerchantAccount(_gbpMerchantAccountId)
+            {
+                Verification = new Verification.Automated { RemitterName = true }
+            });
+
+        var response = await _fixture.Client.Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Data.IsT0.Should().BeTrue();
+        response.Data.AsT0.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.User.Should().NotBeNull();
+        response.Data.AsT0.User.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.Status.Should().Be("authorization_required");
+
+        string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
+            response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, new Uri("https://redirect.mydomain.com"));
+        hppUri.Should().NotBeNullOrWhiteSpace();
+    }
+
     [Fact]
     public async Task can_create_merchant_account_eur_Payment()
     {
