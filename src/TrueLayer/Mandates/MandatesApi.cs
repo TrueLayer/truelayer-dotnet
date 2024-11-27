@@ -6,6 +6,7 @@ using TrueLayer.Auth;
 using TrueLayer.Extensions;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Models;
+using TrueLayer.Payments;
 
 namespace TrueLayer.Mandates
 {
@@ -25,12 +26,14 @@ namespace TrueLayer.Mandates
         private readonly TrueLayerOptions _options;
         private readonly Uri _baseUri;
         private readonly IAuthApi _auth;
+        private readonly HppLinkBuilder _hppLinkBuilder;
 
         public MandatesApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
         {
             _apiClient = apiClient.NotNull(nameof(apiClient));
             _options = options.NotNull(nameof(options));
             _auth = auth.NotNull(nameof(auth));
+            _hppLinkBuilder = new HppLinkBuilder(options.Payments?.HppUri, options.UseSandbox ?? true);
 
             options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
@@ -39,10 +42,13 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<CreateMandateResponse>> CreateMandate(CreateMandateRequest mandateRequest, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<CreateMandateResponse>> CreateMandate(
+            CreateMandateRequest mandateRequest,
+            string? idempotencyKey = null,
+            CancellationToken cancellationToken = default)
         {
             mandateRequest.NotNull(nameof(mandateRequest));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+
             var type = mandateRequest.Mandate.Match(t0 => t0.Type, t1 => t1.Type);
             var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{type}"), cancellationToken);
 
@@ -54,7 +60,7 @@ namespace TrueLayer.Mandates
             return await _apiClient.PostAsync<CreateMandateResponse>(
                 _baseUri,
                 mandateRequest,
-                idempotencyKey,
+                idempotencyKey ?? Guid.NewGuid().ToString(),
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken
@@ -63,7 +69,10 @@ namespace TrueLayer.Mandates
 
         //TODO: is it correct that this method expects a mandate type?
         /// <inheritdoc />
-        public async Task<ApiResponse<MandateDetailUnion>> GetMandate(string mandateId, MandateType mandateType, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<MandateDetailUnion>> GetMandate(
+            string mandateId,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
@@ -83,7 +92,14 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandates(ListMandatesQuery query, MandateType mandateType, CancellationToken cancellationToken = default)
+        public string CreateHostedPaymentPageLink(string mandateId, string resourceToken, Uri returnUri)
+            => _hppLinkBuilder.Build(mandateId, resourceToken, returnUri);
+
+        /// <inheritdoc />
+        public async Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandates(
+            ListMandatesQuery query,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default)
         {
             var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
@@ -106,12 +122,17 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(string mandateId, StartAuthorizationFlowRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
+            string mandateId,
+            StartAuthorizationFlowRequest request,
+            string? idempotencyKey,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
             request.NotNull(nameof(request));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+
             var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
@@ -122,7 +143,7 @@ namespace TrueLayer.Mandates
             return await _apiClient.PostAsync<AuthorizationResponseUnion>(
                 _baseUri.Append(mandateId).Append(MandatesEndpoints.AuthorizationFlow),
                 request,
-                idempotencyKey,
+                idempotencyKey ?? Guid.NewGuid().ToString(),
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken
@@ -130,12 +151,17 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitProviderSelection(string mandateId, SubmitProviderSelectionRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitProviderSelection(
+            string mandateId,
+            SubmitProviderSelectionRequest request,
+            string? idempotencyKey,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
             request.NotNull(nameof(request));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+
             var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
@@ -146,18 +172,22 @@ namespace TrueLayer.Mandates
             return await _apiClient.PostAsync<AuthorizationResponseUnion>(
                 _baseUri.Append(mandateId).Append(MandatesEndpoints.ProviderSelection),
                 request,
-                idempotencyKey,
+                idempotencyKey ?? Guid.NewGuid().ToString(),
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken
             );
         }
 
-        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(string mandateId, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(
+            string mandateId,
+            string? idempotencyKey,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+
             var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType.AsString()}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
@@ -168,7 +198,7 @@ namespace TrueLayer.Mandates
             return await _apiClient.PostAsync<AuthorizationResponseUnion>(
                 _baseUri.Append(mandateId).Append(MandatesEndpoints.Consent),
                 null,
-                idempotencyKey,
+                idempotencyKey ?? Guid.NewGuid().ToString(),
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken
@@ -176,7 +206,12 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(string mandateId, int amountInMinor, string currency, MandateType mandateType, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(
+            string mandateId,
+            int amountInMinor,
+            string currency,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
@@ -196,7 +231,10 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<GetConstraintsResponse>> GetMandateConstraints(string mandateId, MandateType mandateType, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<GetConstraintsResponse>> GetMandateConstraints(
+            string mandateId,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
@@ -216,7 +254,11 @@ namespace TrueLayer.Mandates
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse> RevokeMandate(string mandateId, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse> RevokeMandate(
+            string mandateId,
+            string? idempotencyKey,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default)
         {
             mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             mandateId.NotAUrl(nameof(mandateId));
@@ -231,7 +273,7 @@ namespace TrueLayer.Mandates
             return await _apiClient.PostAsync(
                 _baseUri.Append(mandateId).Append(MandatesEndpoints.Revoke),
                 null,
-                idempotencyKey,
+                idempotencyKey ?? Guid.NewGuid().ToString(),
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken
