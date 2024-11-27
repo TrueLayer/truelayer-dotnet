@@ -37,10 +37,12 @@ namespace TrueLayer.Payouts
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<CreatePayoutResponse>> CreatePayout(CreatePayoutRequest payoutRequest, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<CreatePayoutResponse>> CreatePayout(
+            CreatePayoutRequest payoutRequest,
+            string? idempotencyKey = null,
+            CancellationToken cancellationToken = default)
         {
             payoutRequest.NotNull(nameof(payoutRequest));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
             var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
@@ -52,14 +54,16 @@ namespace TrueLayer.Payouts
             return await _apiClient.PostAsync<CreatePayoutResponse>(
                 _baseUri,
                 payoutRequest,
-                idempotencyKey,
+                idempotencyKey ?? Guid.NewGuid().ToString(),
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken
             );
         }
 
-        public async Task<ApiResponse<GetPayoutUnion>> GetPayout(string id, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<GetPayoutUnion>> GetPayout(
+            string id,
+            CancellationToken cancellationToken = default)
         {
             id.NotNullOrWhiteSpace(nameof(id));
             id.NotAUrl(nameof(id));

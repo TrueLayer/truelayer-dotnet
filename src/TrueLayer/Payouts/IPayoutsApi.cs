@@ -25,11 +25,14 @@ namespace TrueLayer.Payouts
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// If not provided a idempotency key is automatically generated.
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the created payout if successful, otherwise problem details</returns>
         Task<ApiResponse<CreatePayoutResponse>> CreatePayout(
-            CreatePayoutRequest payoutRequest, string idempotencyKey, CancellationToken cancellationToken = default);
+            CreatePayoutRequest payoutRequest,
+            string? idempotencyKey = null,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the details of an existing payment
@@ -37,6 +40,8 @@ namespace TrueLayer.Payouts
         /// <param name="id">The payout identifier</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes the payout details if successful, otherwise problem details</returns>
-        Task<ApiResponse<GetPayoutUnion>> GetPayout(string id, CancellationToken cancellationToken = default);
+        Task<ApiResponse<GetPayoutUnion>> GetPayout(
+            string id,
+            CancellationToken cancellationToken = default);
     }
 }
