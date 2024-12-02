@@ -49,6 +49,12 @@ namespace TrueLayer.Payments.Model
             /// Gets or inits verification information for the payment.
             /// </summary>
             public VerificationUnion? Verification { get; init; }
+
+            /// <summary>
+            /// Gets or inits A statement reference for a payment reference that should be set on the end user's statement.
+            /// Not all banks support setting such a reference, this value will be used wherever possible.
+            /// </summary>
+            public string? StatementReference { get; init; }
         }
 
         /// <summary>

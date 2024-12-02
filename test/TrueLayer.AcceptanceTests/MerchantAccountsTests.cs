@@ -212,7 +212,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         private static CreatePaymentRequest CreatePaymentRequest(string merchantId)
-            => new CreatePaymentRequest(
+            => new(
                 100,
                 Currencies.GBP,
                 new PaymentMethod.BankTransfer(
@@ -227,7 +227,8 @@ namespace TrueLayer.AcceptanceTests
                         {
                             RemitterName = true,
                             RemitterDateOfBirth = false
-                        }
+                        },
+                        StatementReference = "Statement ref",
                     }),
                 new PaymentUserRequest(
                     name: "Jane Doe",

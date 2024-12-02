@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,6 @@ using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -44,19 +44,114 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 {
     private readonly ApiTestFixture _fixture;
     private readonly TrueLayerOptions _configuration;
-    private readonly ITestOutputHelper _testOutputHelper;
+    private readonly string _gbpMerchantAccountId;
+    private readonly string _eurMerchantSecretKey;
 
-    public PaymentTests(ApiTestFixture fixture, ITestOutputHelper testOutputHelper)
+    public PaymentTests(ApiTestFixture fixture)
     {
         _fixture = fixture;
-        _testOutputHelper = testOutputHelper;
         _configuration = fixture.ServiceProvider.GetRequiredService<IOptions<TrueLayerOptions>>().Value;
+        (string gbpMerchantAccountId, string eurMerchantAccountId) = GetMerchantBeneficiaryAccountsAsync().Result;
+        _gbpMerchantAccountId = gbpMerchantAccountId;
+        _eurMerchantSecretKey = eurMerchantAccountId;
     }
 
     [Theory]
-    [MemberData(nameof(CreateTestPaymentRequests))]
-    public async Task Can_create_payment(CreatePaymentRequest paymentRequest)
+    [MemberData(nameof(ExternalAccountPaymentRequests))]
+    public async Task can_create_external_account_payment(CreatePaymentRequest paymentRequest)
     {
+        var response = await _fixture.Client.Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Data.IsT0.Should().BeTrue();
+        response.Data.AsT0.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.User.Should().NotBeNull();
+        response.Data.AsT0.User.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.Status.Should().Be("authorization_required");
+
+        string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
+            response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, new Uri("https://redirect.mydomain.com"));
+        hppUri.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task can_create_merchant_account_gbp_Payment()
+    {
+        var paymentRequest = CreateTestPaymentRequest(
+            new Provider.UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
+                SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
+            },
+            beneficiary: new Beneficiary.MerchantAccount(_gbpMerchantAccountId)
+            {
+                AccountHolderName = "account holder name",
+                StatementReference = "statement-ref"
+            });
+
+        var response = await _fixture.Client.Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Data.IsT0.Should().BeTrue();
+        response.Data.AsT0.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.User.Should().NotBeNull();
+        response.Data.AsT0.User.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.Status.Should().Be("authorization_required");
+
+        string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
+            response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, new Uri("https://redirect.mydomain.com"));
+        hppUri.Should().NotBeNullOrWhiteSpace();
+    }
+
+
+    [Fact]
+    public async Task can_create_merchant_account_gbp_verification_Payment()
+    {
+        var paymentRequest = CreateTestPaymentRequest(
+            new Provider.UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
+                SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
+            },
+            beneficiary: new Beneficiary.MerchantAccount(_gbpMerchantAccountId)
+            {
+                Verification = new Verification.Automated { RemitterName = true }
+            });
+
+        var response = await _fixture.Client.Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Data.IsT0.Should().BeTrue();
+        response.Data.AsT0.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.User.Should().NotBeNull();
+        response.Data.AsT0.User.Id.Should().NotBeNullOrWhiteSpace();
+        response.Data.AsT0.Status.Should().Be("authorization_required");
+
+        string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
+            response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, new Uri("https://redirect.mydomain.com"));
+        hppUri.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task can_create_merchant_account_eur_Payment()
+    {
+        var paymentRequest = CreateTestPaymentRequest(
+            new Provider.Preselected("mock-payments-fr-redirect",
+                schemeSelection: new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" })
+            {
+                Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606"))
+            },
+            null,
+            Currencies.EUR,
+            new RelatedProducts(new SignupPlus()),
+            new Beneficiary.MerchantAccount(_eurMerchantSecretKey));
+
         var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
@@ -108,7 +203,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Theory]
-    [MemberData(nameof(CreateTestPaymentRequests))]
+    [MemberData(nameof(ExternalAccountPaymentRequests))]
     public async Task Can_get_authorization_required_payment(CreatePaymentRequest paymentRequest)
     {
         var response = await _fixture.Client.Payments.CreatePayment(
@@ -178,7 +273,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     {
         // Arrange
         var paymentRequest = CreateTestPaymentRequest(
-            beneficiary: await CreateMerchantBeneficiaryAsync(),
+            beneficiary: new Beneficiary.MerchantAccount(_gbpMerchantAccountId),
             initAuthorizationFlow: true);
         var payment = await CreatePaymentAndSetAuthorisationStatusAsync(paymentRequest);
 
@@ -205,7 +300,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     {
         // Arrange
         var paymentRequest = CreateTestPaymentRequest(
-            beneficiary: await CreateMerchantBeneficiaryAsync(),
+            beneficiary: new Beneficiary.MerchantAccount(_gbpMerchantAccountId),
             initAuthorizationFlow: true);
         var payment = await CreatePaymentAndSetAuthorisationStatusAsync(paymentRequest);
 
@@ -317,12 +412,14 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         };
     }
 
-    private async Task<BeneficiaryUnion> CreateMerchantBeneficiaryAsync()
+    private async Task<(string gbpMerchantAccountId, string eurMerchantAccountId)> GetMerchantBeneficiaryAccountsAsync()
     {
         var merchantAccounts = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
-            merchantAccounts.IsSuccessful.Should().BeTrue();
-            var gbpMerchantAccount = merchantAccounts.Data!.Items.First(m => m.Currency == Currencies.GBP);
-        return new Beneficiary.MerchantAccount(gbpMerchantAccount.Id);
+        merchantAccounts.IsSuccessful.Should().BeTrue();
+
+        var gbpMerchantAccount = merchantAccounts.Data!.Items.First(m => m.Currency == Currencies.GBP);
+        var eurMerchantAccount = merchantAccounts.Data!.Items.First(m => m.Currency == Currencies.EUR);
+        return (gbpMerchantAccount.Id, eurMerchantAccount.Id);
     }
 
     private static CreatePaymentRequest CreateTestPaymentRequest(
@@ -335,7 +432,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         bool initAuthorizationFlow = false)
     {
         accountIdentifier ??= new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
-        providerSelection ??= new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service");
+        providerSelection ??= new Provider.Preselected("mock-payments-gb-redirect",
+            schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service" });
         beneficiary ??= new Beneficiary.ExternalAccount(
             "TrueLayer",
             "truelayer-dotnet",
@@ -373,199 +471,199 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         );
     }
 
-    public static IEnumerable<object[]> CreateTestPaymentRequests()
+    public static IEnumerable<object[]> ExternalAccountPaymentRequests()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
-        var providerFilterMockGbRedirect = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } };
-        yield return new object[]
-        {
+        var providerFilterMockGbRedirect = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] };
+        yield return
+        [
             CreateTestPaymentRequest(new Provider.UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
-                    SchemeSelection = new SchemeSelection.InstantOnly() { AllowRemitterFee = true },
+                    SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(new Provider.UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
-                    SchemeSelection = new SchemeSelection.InstantOnly() { AllowRemitterFee = false },
+                    SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = false },
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(new Provider.UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
-                    SchemeSelection = new SchemeSelection.InstantPreferred() { AllowRemitterFee = true },
+                    SchemeSelection = new SchemeSelection.InstantPreferred { AllowRemitterFee = true },
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(new Provider.UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
-                    SchemeSelection = new SchemeSelection.InstantPreferred() { AllowRemitterFee = false },
+                    SchemeSelection = new SchemeSelection.InstantPreferred { AllowRemitterFee = false },
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(new Provider.UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
                     SchemeSelection = new SchemeSelection.UserSelected(),
                 },
-                sortCodeAccountNumber),
-        };
+                sortCodeAccountNumber)
+        ];
 
         var remitterSortAccountNumber = new RemitterAccount("John Doe", sortCodeAccountNumber);
-        yield return new object[]
-        {
+        yield return
+        [
             CreateTestPaymentRequest(
                 new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
                 {
                     Remitter = remitterSortAccountNumber,
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
                 new Provider.Preselected(
                     "mock-payments-gb-redirect",
-                    schemeSelection: new SchemeSelection.Preselected() { SchemeId = "faster_payments_service"})
+                    schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service"})
                 {
                     Remitter = remitterSortAccountNumber,
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
                 new Provider.Preselected("mock-payments-gb-redirect", schemeSelection: new SchemeSelection.UserSelected())
                 {
                     Remitter = remitterSortAccountNumber,
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
                 new Provider.Preselected(
                     "mock-payments-gb-redirect",
-                    schemeSelection: new SchemeSelection.InstantOnly() { AllowRemitterFee = true })
+                    schemeSelection: new SchemeSelection.InstantOnly { AllowRemitterFee = true })
                 {
                     Remitter = remitterSortAccountNumber,
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
                 new Provider.Preselected(
                     "mock-payments-gb-redirect",
-                    schemeSelection: new SchemeSelection.InstantOnly() { AllowRemitterFee = false })
+                    schemeSelection: new SchemeSelection.InstantOnly { AllowRemitterFee = false })
                 {
                     Remitter = remitterSortAccountNumber,
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
                 new Provider.Preselected(
                     "mock-payments-gb-redirect",
-                    schemeSelection: new SchemeSelection.InstantPreferred() { AllowRemitterFee = true })
+                    schemeSelection: new SchemeSelection.InstantPreferred { AllowRemitterFee = true })
                 {
                     Remitter = remitterSortAccountNumber,
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
                 new Provider.Preselected(
                     "mock-payments-gb-redirect",
-                    schemeSelection: new SchemeSelection.InstantPreferred() { AllowRemitterFee = false })
+                    schemeSelection: new SchemeSelection.InstantPreferred { AllowRemitterFee = false })
                 {
                     Remitter = remitterSortAccountNumber,
                 },
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-fr-redirect", "sepa_credit_transfer_instant")
+                new Provider.Preselected("mock-payments-fr-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" })
                 {
                     Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606")),
                 },
                 new AccountIdentifier.Iban("IT60X0542811101000000123456"),
                 Currencies.EUR,
-                new RelatedProducts(new SignupPlus())),
-        };
-        yield return new object[]
-        {
+                new RelatedProducts(new SignupPlus()))
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service"),
-                sortCodeAccountNumber),
-        };
-        yield return new object[]
-        {
+                new Provider.Preselected("mock-payments-gb-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service" }),
+                sortCodeAccountNumber)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-fr-redirect", "sepa_credit_transfer_instant"),
+                new Provider.Preselected("mock-payments-fr-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" }),
                 new AccountIdentifier.Iban("IT60X0542811101000000123456"),
-                Currencies.EUR),
-        };
-        yield return new object[]
-        {
+                Currencies.EUR)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-pl-redirect", "polish_domestic_standard")
+                new Provider.Preselected("mock-payments-pl-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "polish_domestic_standard" })
                 {
                     Remitter = new RemitterAccount(
-                        "John Doe", new AccountIdentifier.Nrb("12345678901234567890123456")),
+                        "John Doe", new AccountIdentifier.Nrb("12345678901234567890123456"))
                 },
                 new AccountIdentifier.Nrb("12345678901234567890123456"),
-                Currencies.PLN),
-        };
-        yield return new object[]
-        {
+                Currencies.PLN)
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-no-redirect", "norwegian_domestic_credit_transfer")
+                new Provider.Preselected("mock-payments-no-redirect", schemeSelection:new SchemeSelection.Preselected { SchemeId = "norwegian_domestic_credit_transfer" })
                 {
                     Remitter = new RemitterAccount(
-                        "John Doe", new AccountIdentifier.Bban("12345678901234567890123456")),
+                        "John Doe", new AccountIdentifier.Bban("12345678901234567890123456"))
                 },
                 new AccountIdentifier.Bban("IT60X0542811101000000123456"),
-                Currencies.NOK),
-        };
+                Currencies.NOK)
+        ];
         // Create a payment with retry
-        yield return new object[]
-        {
+        yield return
+        [
             CreateTestPaymentRequest(new Provider.UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
-                    SchemeSelection = new SchemeSelection.InstantOnly() { AllowRemitterFee = true },
+                    SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
                 },
                 sortCodeAccountNumber,
-                retry: new Retry.BaseRetry()),
-        };
-        yield return new object[]
-        {
+                retry: new Retry.BaseRetry())
+        ];
+        yield return
+        [
             CreateTestPaymentRequest(
                 new Provider.Preselected(
                     "mock-payments-gb-redirect",
-                    schemeSelection: new SchemeSelection.InstantPreferred() { AllowRemitterFee = false })
+                    schemeSelection: new SchemeSelection.InstantPreferred { AllowRemitterFee = false })
                 {
                     Remitter = remitterSortAccountNumber,
                 },
                 sortCodeAccountNumber,
-                retry: new Retry.BaseRetry()),
-        };
+                retry: new Retry.BaseRetry())
+        ];
     }
 
     private GetPaymentResponse.PaymentDetails GetPaymentDetailsAndWaitForItToBeDone(
