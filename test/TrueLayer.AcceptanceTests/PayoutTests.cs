@@ -26,8 +26,7 @@ namespace TrueLayer.AcceptanceTests
         {
             CreatePayoutRequest payoutRequest = CreatePayoutRequest();
 
-            var response = await _fixture.Client.Payouts.CreatePayout(
-                payoutRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var response = await _fixture.Client.Payouts.CreatePayout(payoutRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.Accepted);
             response.Data.Should().NotBeNull();
@@ -73,11 +72,11 @@ namespace TrueLayer.AcceptanceTests
                 throw new InvalidOperationException("You must have a merchant account in order to perform a payout");
             }
 
-            _merchantAccount = accounts.Data.Items.Single(x => x.Currency == "GBP");
+            _merchantAccount = accounts.Data.Items.Single(x => x.Currency == Currencies.GBP);
         }
 
         private CreatePayoutRequest CreatePayoutRequest()
-            => new CreatePayoutRequest(
+            => new(
                 _merchantAccount!.Id,
                 100,
                 Currencies.GBP,

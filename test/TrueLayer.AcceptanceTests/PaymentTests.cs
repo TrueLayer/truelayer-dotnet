@@ -60,8 +60,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     [MemberData(nameof(ExternalAccountPaymentRequests))]
     public async Task can_create_external_account_payment(CreatePaymentRequest paymentRequest)
     {
-        var response = await _fixture.Client.Payments.CreatePayment(
-            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+        var response = await _fixture.Client.Payments.CreatePayment(paymentRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         response.Data.IsT0.Should().BeTrue();
@@ -122,8 +121,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 Verification = new Verification.Automated { RemitterName = true }
             });
 
-        var response = await _fixture.Client.Payments.CreatePayment(
-            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+        var response = await _fixture.Client.Payments.CreatePayment(paymentRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         response.Data.IsT0.Should().BeTrue();
@@ -206,8 +204,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     [MemberData(nameof(ExternalAccountPaymentRequests))]
     public async Task Can_get_authorization_required_payment(CreatePaymentRequest paymentRequest)
     {
-        var response = await _fixture.Client.Payments.CreatePayment(
-            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+        var response = await _fixture.Client.Payments.CreatePayment(paymentRequest);
 
         response.IsSuccessful.Should().BeTrue();
         response.Data.IsT0.Should().BeTrue();
@@ -280,7 +277,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         // Act && assert
         var createRefundResponse = await _fixture.Client.Payments.CreatePaymentRefund(
             paymentId: payment.Id,
-            idempotencyKey: Guid.NewGuid().ToString(),
+            null,
             new CreatePaymentRefundRequest(Reference: "a-reference"));
         createRefundResponse.IsSuccessful.Should().BeTrue();
         createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
@@ -334,9 +331,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var paymentId = payment.Data.AsT0.Id;
 
         // act
-        var cancelPaymentResponse = await _fixture.Client.Payments.CancelPayment(
-            paymentId,
-            idempotencyKey: Guid.NewGuid().ToString());
+        var cancelPaymentResponse = await _fixture.Client.Payments.CancelPayment(paymentId);
 
         var getPaymentResponse = await _fixture.Client.Payments.GetPayment(paymentId);
 

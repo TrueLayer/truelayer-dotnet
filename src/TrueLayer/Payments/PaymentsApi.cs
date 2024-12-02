@@ -55,10 +55,9 @@ namespace TrueLayer.Payments
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<CreatePaymentUnion>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<CreatePaymentUnion>> CreatePayment(CreatePaymentRequest paymentRequest, string? idempotencyKey = null, CancellationToken cancellationToken = default)
         {
             paymentRequest.NotNull(nameof(paymentRequest));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
             var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
 
@@ -70,7 +69,7 @@ namespace TrueLayer.Payments
             return await _apiClient.PostAsync<CreatePaymentUnion>(
                 _baseUri,
                 paymentRequest,
-                idempotencyKey,
+                idempotencyKey ?? Guid.NewGuid().ToString(),
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken
@@ -105,12 +104,11 @@ namespace TrueLayer.Payments
         /// <inheritdoc />
         public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
             string paymentId,
-            string idempotencyKey,
+            string? idempotencyKey,
             StartAuthorizationFlowRequest request,
             CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
             request.NotNull(nameof(request));
 
             var authResponse = await _auth.GetAuthToken(
@@ -124,15 +122,18 @@ namespace TrueLayer.Payments
             return await _apiClient.PostAsync<AuthorizationResponseUnion>(
                 _baseUri.Append(paymentId).Append(PaymentsEndpoints.AuthorizationFlow),
                 request,
-                idempotencyKey,
+                idempotencyKey ?? Guid.NewGuid().ToString(),
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken
             );
         }
 
-        public async Task<ApiResponse<CreatePaymentRefundResponse>> CreatePaymentRefund(string paymentId,
-            string idempotencyKey, CreatePaymentRefundRequest request, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<CreatePaymentRefundResponse>> CreatePaymentRefund(
+            string paymentId,
+            string? idempotencyKey,
+            CreatePaymentRefundRequest request,
+            CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
             request.NotNull(nameof(request));
@@ -148,14 +149,15 @@ namespace TrueLayer.Payments
             return await _apiClient.PostAsync<CreatePaymentRefundResponse>(
                 _baseUri.Append(paymentId).Append(PaymentsEndpoints.Refunds),
                 request,
-                idempotencyKey,
+                idempotencyKey ?? Guid.NewGuid().ToString(),
                 authResponse.Data!.AccessToken,
                 _options.Payments!.SigningKey,
                 cancellationToken
             );
         }
 
-        public async Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(string paymentId,
+        public async Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(
+            string paymentId,
             CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
@@ -175,8 +177,10 @@ namespace TrueLayer.Payments
             );
         }
 
-        public async Task<ApiResponse<RefundUnion>> GetPaymentRefund(string paymentId,
-            string refundId, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<RefundUnion>> GetPaymentRefund(
+            string paymentId,
+            string refundId,
+            CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
             refundId.NotNullOrWhiteSpace(nameof(refundId));
@@ -196,10 +200,12 @@ namespace TrueLayer.Payments
             );
         }
 
-        public async Task<ApiResponse> CancelPayment(string paymentId, string idempotencyKey, CancellationToken cancellationToken = default)
+        public async Task<ApiResponse> CancelPayment(
+            string paymentId,
+            string? idempotencyKey = null,
+            CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
             var authResponse = await _auth.GetAuthToken(
                 new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
@@ -211,7 +217,7 @@ namespace TrueLayer.Payments
 
             return await _apiClient.PostAsync(
                 _baseUri.Append(paymentId).Append(PaymentsEndpoints.Cancel),
-                idempotencyKey: idempotencyKey,
+                idempotencyKey: idempotencyKey ?? Guid.NewGuid().ToString(),
                 accessToken: authResponse.Data!.AccessToken,
                 signingKey: _options.Payments!.SigningKey,
                 cancellationToken: cancellationToken);
