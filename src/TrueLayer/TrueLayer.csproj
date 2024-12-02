@@ -6,7 +6,7 @@
         <PackageId>TrueLayer.Client</PackageId>
         <Description>.NET client for the TrueLayer API</Description>
         <PackageIcon>icon.png</PackageIcon>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>10.0</LangVersion>
         <Authors>TrueLayer</Authors>
         <Company>TrueLayer</Company>
         <RepositoryUrl>https://github.com/TrueLayer/truelayer-dotnet</RepositoryUrl>
