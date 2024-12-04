@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using TrueLayer;
 
@@ -38,7 +40,38 @@ namespace Microsoft.Extensions.DependencyInjection
             IHttpClientBuilder httpClientBuilder = services.AddHttpClient<IApiClient, ApiClient>();
             configureBuilder?.Invoke(httpClientBuilder);
 
-            services.AddTransient<ITrueLayerClient, TrueLayerClient>();
+            services.AddSingleton<IAuthTokenCache, NullMemoryCache>();
+            services.AddTransient<TrueLayerClientFactory>();
+            services.AddTransient<ITrueLayerClient>(s => s.GetRequiredService<TrueLayerClientFactory>().Create());
+
+            return services;
+        }
+
+        public static IServiceCollection AddAuthTokenInMemoryCaching(
+            this IServiceCollection services)
+        {
+            var serviceDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IMemoryCache));
+            if (serviceDescriptor != null)
+            {
+                services.Remove(serviceDescriptor);
+            }
+
+            services.AddMemoryCache();
+            services.AddTransient<ITrueLayerClient>(s => s.GetRequiredService<TrueLayerClientFactory>().CreateWithCache());
+
+            return services;
+        }
+
+        public static IServiceCollection AddAuthTokenCaching(
+            this IServiceCollection services)
+        {
+            var serviceDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IMemoryCache));
+            if (serviceDescriptor != null)
+            {
+                services.Remove(serviceDescriptor);
+            }
+
+            services.AddTransient<ITrueLayerClient>(s => s.GetRequiredService<TrueLayerClientFactory>().CreateWithCache());
 
             return services;
         }

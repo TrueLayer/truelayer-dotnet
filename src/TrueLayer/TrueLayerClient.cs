@@ -5,10 +5,52 @@ using TrueLayer.MerchantAccounts;
 using TrueLayer.Payments;
 using TrueLayer.PaymentsProviders;
 using TrueLayer.Payouts;
+using TrueLayer.Mandates;
 
 namespace TrueLayer
 {
-    using TrueLayer.Mandates;
+    internal class TrueLayerClientFactory
+    {
+        private readonly IApiClient _apiClient;
+        private readonly IOptions<TrueLayerOptions> _options;
+        private readonly IAuthTokenCache _authTokenCache;
+
+        public TrueLayerClientFactory(IApiClient apiClient, IOptions<TrueLayerOptions> options, IAuthTokenCache authTokenCache)
+        {
+            apiClient.NotNull(nameof(apiClient));
+            options.NotNull(nameof(options));
+
+            _apiClient = apiClient;
+            _options = options;
+            _authTokenCache = authTokenCache;
+        }
+
+        public ITrueLayerClient Create()
+        {
+            var auth = new AuthApi(_apiClient, _options.Value);
+
+            return new TrueLayerClient(
+                auth,
+                new Lazy<IPaymentsApi>(() => new PaymentsApi(_apiClient, auth, _options.Value)),
+                new Lazy<IPaymentsProvidersApi>(() => new PaymentsProvidersApi(_apiClient, auth, _options.Value)),
+                new Lazy<IPayoutsApi>(() => new PayoutsApi(_apiClient, auth, _options.Value)),
+                new Lazy<IMerchantAccountsApi>(() => new MerchantAccountsApi(_apiClient, auth, _options.Value)),
+                new Lazy<IMandatesApi>(() => new MandatesApi(_apiClient, auth, _options.Value)));
+        }
+
+        public ITrueLayerClient CreateWithCache()
+        {
+            var auth = new AuthApiCacheDecorator(new AuthApi(_apiClient, _options.Value), _authTokenCache);
+
+            return new TrueLayerClient(
+                auth,
+                new Lazy<IPaymentsApi>(() => new PaymentsApi(_apiClient, auth, _options.Value)),
+                new Lazy<IPaymentsProvidersApi>(() => new PaymentsProvidersApi(_apiClient, auth, _options.Value)),
+                new Lazy<IPayoutsApi>(() => new PayoutsApi(_apiClient, auth, _options.Value)),
+                new Lazy<IMerchantAccountsApi>(() => new MerchantAccountsApi(_apiClient, auth, _options.Value)),
+                new Lazy<IMandatesApi>(() => new MandatesApi(_apiClient, auth, _options.Value)));
+        }
+    }
 
     internal class TrueLayerClient : ITrueLayerClient
     {
@@ -19,17 +61,15 @@ namespace TrueLayer
         private readonly Lazy<IMerchantAccountsApi> _merchants;
         private readonly Lazy<IMandatesApi> _mandates;
 
-        public TrueLayerClient(IApiClient apiClient, IOptions<TrueLayerOptions> options)
+        public TrueLayerClient(IAuthApi auth, Lazy<IPaymentsApi> payments, Lazy<IPaymentsProvidersApi> paymentsProviders, Lazy<IPayoutsApi> payouts, Lazy<IMerchantAccountsApi> merchants, Lazy<IMandatesApi> mandates)
         {
-            apiClient.NotNull(nameof(apiClient));
-            options.NotNull(nameof(options));
+            Auth = auth;
+            _payments = payments;
+            _paymentsProviders = paymentsProviders;
+            _payouts = payouts;
+            _merchants = merchants;
+            _mandates = mandates;
 
-            Auth = new AuthApi(apiClient, options.Value);
-            _payments = new Lazy<IPaymentsApi>(() => new PaymentsApi(apiClient, Auth, options.Value));
-            _paymentsProviders = new Lazy<IPaymentsProvidersApi>(() => new PaymentsProvidersApi(apiClient, Auth, options.Value));
-            _payouts = new Lazy<IPayoutsApi>(() => new PayoutsApi(apiClient, Auth, options.Value));
-            _merchants = new Lazy<IMerchantAccountsApi>(() => new MerchantAccountsApi(apiClient, Auth, options.Value));
-            _mandates = new Lazy<IMandatesApi>(() => new MandatesApi(apiClient, Auth, options.Value));
         }
 
         public IAuthApi Auth { get; }
