@@ -9,6 +9,7 @@ namespace TrueLayer.Auth
         private readonly IAuthApi _client;
         private readonly IAuthTokenCache _authTokenCache;
         private readonly TimeSpan _minTimeToRenew = TimeSpan.FromSeconds(30);
+        private const string KeyPrefix = "tl-auth-token-";
 
         public AuthApiCacheDecorator(IAuthApi client, IAuthTokenCache authTokenCache)
         {
@@ -20,7 +21,7 @@ namespace TrueLayer.Auth
             GetAuthTokenRequest authTokenRequest,
             CancellationToken cancellationToken = default)
         {
-            var key = $"auth-token-{authTokenRequest.Scope}";
+            var key = $"{KeyPrefix}{authTokenRequest.Scope}";
             if (_authTokenCache.TryGetValue(key, out ApiResponse<GetAuthTokenResponse>? cachedResponse))
             {
                 return cachedResponse!;
