@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using TrueLayer;
 
@@ -47,25 +46,35 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        /// <summary>
+        /// Registers the default caching mechanism for the auth token<paramref name="services"/>.
+        /// </summary>
+        /// <param name="services">The service collection to add to.</param>
         public static IServiceCollection AddAuthTokenInMemoryCaching(
             this IServiceCollection services)
         {
-            var serviceDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IMemoryCache));
+            var serviceDescriptor = services.FirstOrDefault(descriptor => descriptor.ImplementationType == typeof(NullMemoryCache));
             if (serviceDescriptor != null)
             {
                 services.Remove(serviceDescriptor);
             }
 
             services.AddMemoryCache();
+            services.AddSingleton<IAuthTokenCache, InMemoryAuthTokenCache>();
             services.AddTransient<ITrueLayerClient>(s => s.GetRequiredService<TrueLayerClientFactory>().CreateWithCache());
 
             return services;
         }
 
+        /// <summary>
+        /// Registers a custom caching mechanism for the auth token<paramref name="services"/>.
+        /// You need to register your own implementation of IAuthTokenCache before invoking this method
+        /// </summary>
+        /// <param name="services">The service collection to add to.</param>
         public static IServiceCollection AddAuthTokenCaching(
             this IServiceCollection services)
         {
-            var serviceDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IMemoryCache));
+            var serviceDescriptor = services.FirstOrDefault(descriptor => descriptor.ImplementationType == typeof(NullMemoryCache));
             if (serviceDescriptor != null)
             {
                 services.Remove(serviceDescriptor);
