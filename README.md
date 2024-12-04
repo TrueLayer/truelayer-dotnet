@@ -115,7 +115,9 @@ public void ConfigureServices(IServiceCollection services)
             // For demo purposes only. Private key should be stored securely
             options.Payments.SigningKey.PrivateKey = File.ReadAllText("ec512-private-key.pem");
         }
-    });
+    })
+    // We advice to cache the auth token
+    .AddAuthTokenInMemoryCaching();
 }
 ```
 
