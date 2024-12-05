@@ -19,7 +19,7 @@ namespace TrueLayer.Tests
         private readonly MockHttpMessageHandler _httpMessageHandler;
         private readonly ApiClient _apiClient;
         private readonly TestResponse _stub;
-        private readonly string _privateKey = @"-----BEGIN EC PRIVATE KEY-----
+        private const string PrivateKey = @"-----BEGIN EC PRIVATE KEY-----
 MIHcAgEBBEIALJ2sKM+8mVDfTIlk50rqB5lkxaLBt+OECvhXq3nEaB+V0nqljZ9c
 5aHRN3qqxMzNLvxFQ+4twifa4ezkMK2/j5WgBwYFK4EEACOhgYkDgYYABADmhZbj
 i8bgJRfMTdtzy+5VbS5ScMaKC1LQfhII+PTzGzOr+Ts7Qv8My5cmYU5qarGK3tWF
@@ -185,7 +185,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
         [Fact]
         public async Task Given_request_fails_returns_problem_details()
         {
-            string json = @"
+            const string json = @"
                 {
                     ""type"": ""https://docs.truelayer.com/errors#invalid_parameters"",
                     ""title"": ""Validation Error"",
@@ -244,7 +244,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 key = "value"
             };
 
-            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = _privateKey };
+            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = PrivateKey };
 
             var requestUri = new Uri("http://localhost/signing");
             var idempotencyKey = Guid.NewGuid().ToString();
@@ -265,12 +265,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
         [Fact]
         public async Task Generates_request_signature_when_signing_key_and_no_content_provided()
         {
-            var obj = new
-            {
-                key = "value"
-            };
-
-            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = _privateKey };
+            var signingKey = new SigningKey { KeyId = Guid.NewGuid().ToString(), PrivateKey = PrivateKey };
 
             var requestUri = new Uri("http://localhost/signing");
             var idempotencyKey = Guid.NewGuid().ToString();
@@ -281,7 +276,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 .WithHeaders(CustomHeaders.IdempotencyKey, idempotencyKey)
                 .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, "{}");
 
-            var response = await _apiClient.PostAsync<TestResponse>(
+            await _apiClient.PostAsync<TestResponse>(
                 requestUri,
                 null,
                 idempotencyKey: idempotencyKey,
@@ -310,8 +305,6 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 obj,
                 idempotencyKey: idempotencyKey);
         }
-
-        public record UserAgentResponse(string Value);
 
         private static void AssertSame(TestResponse? response, TestResponse expected)
         {
