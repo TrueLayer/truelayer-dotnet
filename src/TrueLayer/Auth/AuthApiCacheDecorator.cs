@@ -8,7 +8,7 @@ namespace TrueLayer.Auth
     {
         private readonly IAuthApi _client;
         private readonly IAuthTokenCache _authTokenCache;
-        private readonly TimeSpan _minTimeToRenew = TimeSpan.FromSeconds(30);
+        private readonly TimeSpan _minTimeToRenew = TimeSpan.FromMinutes(1);
         private const string KeyPrefix = "tl-auth-token-";
 
         public AuthApiCacheDecorator(IAuthApi client, IAuthTokenCache authTokenCache)
