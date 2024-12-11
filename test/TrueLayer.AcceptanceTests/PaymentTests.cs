@@ -58,7 +58,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
     [Theory]
     [MemberData(nameof(ExternalAccountPaymentRequests))]
-    public async Task can_create_external_account_payment(CreatePaymentRequest paymentRequest)
+    public async Task Can_Create_External_Account_Payment(CreatePaymentRequest paymentRequest)
     {
         var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
@@ -139,7 +139,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
-    public async Task can_create_merchant_account_eur_Payment()
+    public async Task Can_Create_Merchant_Account_Eur_Payment()
     {
         var paymentRequest = CreateTestPaymentRequest(
             new Provider.Preselected("mock-payments-fr-redirect",
@@ -169,7 +169,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
-    public async Task Can_create_payment_with_auth_flow()
+    public async Task Can_Create_payment_with_auth_flow()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
         var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
@@ -204,7 +204,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
     [Theory]
     [MemberData(nameof(ExternalAccountPaymentRequests))]
-    public async Task Can_get_authorization_required_payment(CreatePaymentRequest paymentRequest)
+    public async Task Can_Get_Authorization_Required_Payment(CreatePaymentRequest paymentRequest)
     {
         var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
@@ -250,7 +250,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
-    public async Task Can_create_payment_with_retry_option_and_get_attemptFailed_error()
+    public async Task Can_Create_Payment_With_Retry_Option_And_Get_AttemptFailed_Error()
     {
         // Arrange
         var paymentRequest = CreateTestPaymentRequest(

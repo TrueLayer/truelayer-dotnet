@@ -76,19 +76,21 @@ namespace TrueLayer.Payments.Model
 
         /// <summary>
         /// Represents a payment that has been authorized by the end user
+        /// <param name="CreditableAt">The date and time that TrueLayer determined that the payment was ready to be credited</param>
         /// </summary>
         /// <returns></returns>
         [JsonDiscriminator("authorized")]
-        public record Authorized : PaymentDetails;
+        public record Authorized(DateTime? CreditableAt) : PaymentDetails;
 
         /// <summary>
         /// Represents a payment that has been executed
         /// For open loop payments this state is terminal. For closed-loop payments, wait for Settled.
         /// </summary>
         /// <param name="ExecutedAt">The date and time the payment executed</param>
+        /// <param name="CreditableAt">The date and time that TrueLayer determined that the payment was ready to be credited</param>
         /// <returns></returns>
         [JsonDiscriminator("executed")]
-        public record Executed(DateTime ExecutedAt) : PaymentDetails;
+        public record Executed(DateTime ExecutedAt, DateTime? CreditableAt) : PaymentDetails;
 
         /// <summary>
         /// Represents a payment that has settled
@@ -97,9 +99,10 @@ namespace TrueLayer.Payments.Model
         /// <param name="ExecutedAt">The date and time the payment executed</param>
         /// <param name="SettledAt">The date and time the payment was settled</param>
         /// <param name="PaymentSource">Details of the source of funds for the payment</param>
+        /// <param name="CreditableAt">The date and time that TrueLayer determined that the payment was ready to be credited</param>
         /// <returns></returns>
         [JsonDiscriminator("settled")]
-        public record Settled(DateTime ExecutedAt, DateTime SettledAt, PaymentSource PaymentSource) : PaymentDetails;
+        public record Settled(DateTime ExecutedAt, DateTime SettledAt, PaymentSource PaymentSource, DateTime? CreditableAt) : PaymentDetails;
 
         /// <summary>
         /// Represents a payment that failed to complete. This is a terminal state.
