@@ -9,6 +9,8 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OneOf;
+using TrueLayer.AcceptanceTests.Helpers;
+using TrueLayer.AcceptanceTests.MockBank;
 using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
@@ -46,6 +48,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     private readonly TrueLayerOptions _configuration;
     private readonly string _gbpMerchantAccountId;
     private readonly string _eurMerchantSecretKey;
+    private readonly MockBankClient _mockBankClient;
+    private readonly PayApiClient _payApiClient;
 
     public PaymentTests(ApiTestFixture fixture)
     {
@@ -54,11 +58,19 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         (string gbpMerchantAccountId, string eurMerchantAccountId) = GetMerchantBeneficiaryAccountsAsync().Result;
         _gbpMerchantAccountId = gbpMerchantAccountId;
         _eurMerchantSecretKey = eurMerchantAccountId;
+        _mockBankClient = new MockBankClient(new HttpClient
+        {
+            BaseAddress = new Uri("https://pay-mock-connect.truelayer-sandbox.com/")
+        });
+        _payApiClient = new PayApiClient(new HttpClient
+        {
+            BaseAddress = new Uri("https://pay-api.truelayer-sandbox.com")
+        });
     }
 
     [Theory]
     [MemberData(nameof(ExternalAccountPaymentRequests))]
-    public async Task can_create_external_account_payment(CreatePaymentRequest paymentRequest)
+    public async Task Can_Create_External_Account_Payment(CreatePaymentRequest paymentRequest)
     {
         var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
@@ -77,7 +89,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
-    public async Task can_create_merchant_account_gbp_Payment()
+    public async Task Can_Create_Merchant_Account_Gbp_Payment()
     {
         var paymentRequest = CreateTestPaymentRequest(
             new Provider.UserSelected
@@ -139,7 +151,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
-    public async Task can_create_merchant_account_eur_Payment()
+    public async Task Can_Create_Merchant_Account_Eur_Payment()
     {
         var paymentRequest = CreateTestPaymentRequest(
             new Provider.Preselected("mock-payments-fr-redirect",
@@ -169,7 +181,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
-    public async Task Can_create_payment_with_auth_flow()
+    public async Task Can_Create_Payment_With_Auth_Flow()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
         var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
@@ -202,9 +214,42 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Fact]
+    public async Task GetPayment_Should_Return_Settled_Payment()
+    {
+        var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service");
+
+        var paymentRequest = CreateTestPaymentRequest(
+            beneficiary: new Beneficiary.MerchantAccount(_gbpMerchantAccountId),
+            providerSelection: providerSelection,
+            initAuthorizationFlow: true);
+
+        var response = await _fixture.Client.Payments.CreatePayment(paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var authorizing = response.Data.AsT3;
+        var paymentId = authorizing.Id;
+
+        var providerReturnUri = await _mockBankClient.AuthorisePaymentAsync(
+            authorizing.AuthorizationFlow!.Actions.Next.AsT2.Uri,
+            MockBankAction.Execute);
+
+        await _payApiClient.SubmitProviderReturnParametersAsync(providerReturnUri.Query, providerReturnUri.Fragment);
+
+        var getPaymentResponse = await PollPaymentForTerminalStatusAsync(paymentId,  typeof(GetPaymentResponse.Settled));
+
+        var executed = getPaymentResponse.AsT4;
+        executed.AmountInMinor.Should().Be(paymentRequest.AmountInMinor);
+        executed.Currency.Should().Be(paymentRequest.Currency);
+        executed.Id.Should().NotBeNullOrWhiteSpace();
+        executed.CreatedAt.Should().NotBe(default);
+        executed.PaymentMethod.AsT0.Should().NotBeNull();
+        executed.CreditableAt.Should().NotBeNull();
+    }
+
     [Theory]
     [MemberData(nameof(ExternalAccountPaymentRequests))]
-    public async Task Can_get_authorization_required_payment(CreatePaymentRequest paymentRequest)
+    public async Task Can_Get_Authorization_Required_Payment(CreatePaymentRequest paymentRequest)
     {
         var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
@@ -250,7 +295,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
-    public async Task Can_create_payment_with_retry_option_and_get_attemptFailed_error()
+    public async Task Can_Create_Payment_With_Retry_Option_And_Get_AttemptFailed_Error()
     {
         // Arrange
         var paymentRequest = CreateTestPaymentRequest(
@@ -701,5 +746,17 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         }
 
         return (payment.Value as GetPaymentResponse.PaymentDetails)!;
+    }
+
+    private async Task<GetPaymentUnion> PollPaymentForTerminalStatusAsync(
+        string paymentId,
+        Type expectedStatus)
+    {
+        var getPaymentResponseBody = await Waiter.WaitAsync(
+            () => _fixture.Client.Payments.GetPayment(paymentId),
+            r => r.Data.GetType() == expectedStatus);
+
+        getPaymentResponseBody.IsSuccessful.Should().BeTrue();
+        return getPaymentResponseBody.Data;
     }
 }
