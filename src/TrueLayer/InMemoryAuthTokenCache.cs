@@ -18,5 +18,8 @@ namespace TrueLayer
 
         public void Set(string key, ApiResponse<GetAuthTokenResponse> value, TimeSpan absoluteExpirationRelativeToNow)=>
             _memoryCache.Set(key, value, absoluteExpirationRelativeToNow);
+
+        public void Remove(string key) =>
+            _memoryCache.Remove(key);
     }
 }

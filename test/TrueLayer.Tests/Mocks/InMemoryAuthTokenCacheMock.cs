@@ -18,7 +18,10 @@ public class InMemoryAuthTokenCacheMock : IAuthTokenCache
         _dictionary.Add(key, value);
     }
 
+    public void Remove(string key)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool IsEmpty => _dictionary.Count == 0;
 }
-
-

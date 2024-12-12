@@ -14,5 +14,9 @@ namespace TrueLayer
         public void Set(string key, ApiResponse<GetAuthTokenResponse> value, TimeSpan absoluteExpirationRelativeToNow)
         {
         }
+
+        public void Remove(string key)
+        {
+        }
     }
 }
