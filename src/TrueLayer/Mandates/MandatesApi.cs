@@ -43,8 +43,10 @@ namespace TrueLayer.Mandates
         {
             mandateRequest.NotNull(nameof(mandateRequest));
             idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-            var type = mandateRequest.Mandate.Match(t0 => t0.Type, t1 => t1.Type);
-            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{type}"), cancellationToken);
+            var mandateType = mandateRequest.Mandate.Match(
+                vrpCommercial => vrpCommercial.Type,
+                vrpSweeping => vrpSweeping.Type);
+            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest($"recurring_payments:{mandateType}"), cancellationToken);
 
             if (!authResponse.IsSuccessful)
             {

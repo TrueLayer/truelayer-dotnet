@@ -31,8 +31,7 @@ public interface IAuthTokenCache
         TimeSpan absoluteExpirationRelativeToNow);
 
     /// <summary>
-    /// Removes the GetAuthTokenResponse associated with the given key.
+    /// Removes all entries in the cache.
     /// </summary>
-    /// <param name="key">A string identifying the entry.</param>
-    void Remove(string key);
+    void Clear();
 }

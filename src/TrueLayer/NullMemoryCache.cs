@@ -15,7 +15,7 @@ namespace TrueLayer
         {
         }
 
-        public void Remove(string key)
+        public void Clear()
         {
         }
     }

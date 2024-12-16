@@ -8,20 +8,15 @@ public class InMemoryAuthTokenCacheMock : IAuthTokenCache
 {
     private readonly Dictionary<string, ApiResponse<GetAuthTokenResponse>?> _dictionary = new();
 
-    public bool TryGetValue(string key, out ApiResponse<GetAuthTokenResponse>? value)
-    {
-       return _dictionary.TryGetValue(key, out value);
-    }
+    public bool TryGetValue(string key, out ApiResponse<GetAuthTokenResponse>? value) =>
+        _dictionary.TryGetValue(key, out value);
 
-    public void Set(string key, ApiResponse<GetAuthTokenResponse> value, TimeSpan absoluteExpirationRelativeToNow)
-    {
+    public void Set(string key, ApiResponse<GetAuthTokenResponse> value, TimeSpan absoluteExpirationRelativeToNow) =>
         _dictionary.Add(key, value);
-    }
 
-    public void Remove(string key)
-    {
-        throw new NotImplementedException();
-    }
+    public void Clear() =>
+        _dictionary.Clear();
 
-    public bool IsEmpty => _dictionary.Count == 0;
+    public bool IsEmpty =>
+        _dictionary.Count == 0;
 }
