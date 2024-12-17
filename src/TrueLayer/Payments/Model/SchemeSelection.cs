@@ -25,6 +25,18 @@ public static class SchemeSelection
         /// Unless explicitly set, will default to false.
         /// </summary>
         public bool AllowRemitterFee { get; init; } = false;
+
+        /// <summary>
+        /// An array of provider ids. If the user selects one of the providers specified in this list,
+        /// the payment always goes through an instant scheme. This ignores any settings you specify for allow_remitter_fee.
+        /// </summary>
+        public string[]? InstantOverrideProviderIds { get; init; }
+
+        /// <summary>
+        /// An array of provider ids. If the user selects one of the providers specified in this list,
+        /// the payment always goes through a non instant scheme. This ignores any settings you specify for allow_remitter_fee.
+        /// </summary>
+        public string[]? NonInstantOverrideProviderIds { get; init; }
     }
 
     /// <summary>
@@ -45,6 +57,18 @@ public static class SchemeSelection
         /// Unless explicitly set, will default to false.
         /// </summary>
         public bool AllowRemitterFee { get; init; } = false;
+
+        /// <summary>
+        /// An array of provider ids. If the user selects one of the providers specified in this list,
+        /// the payment always goes through an instant scheme. This ignores any settings you specify for allow_remitter_fee.
+        /// </summary>
+        public string[]? InstantOverrideProviderIds { get; init; }
+
+        /// <summary>
+        /// An array of provider ids. If the user selects one of the providers specified in this list,
+        /// the payment always goes through a non instant scheme. This ignores any settings you specify for allow_remitter_fee.
+        /// </summary>
+        public string[]? NonInstantOverrideProviderIds { get; init; }
     }
 
     /// <summary>
