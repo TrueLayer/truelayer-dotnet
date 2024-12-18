@@ -42,7 +42,7 @@ namespace TrueLayer.Payments
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
-        /// If not provided a idempotency key is automatically generated.
+        /// If not provided an idempotency key is automatically generated.
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the created payment if successful, otherwise problem details</returns>
@@ -83,7 +83,7 @@ namespace TrueLayer.Payments
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
-        /// If not provided a idempotency key is automatically generated.
+        /// If not provided an idempotency key is automatically generated.
         /// </param>
         /// <param name="request">The start authorization request details</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
@@ -101,7 +101,7 @@ namespace TrueLayer.Payments
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
-        /// If not provided a idempotency key is automatically generated.
+        /// If not provided an idempotency key is automatically generated.
         /// </param>
         /// <param name="request">The create payment refund request</param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
@@ -141,7 +141,7 @@ namespace TrueLayer.Payments
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
-        /// If not provided a idempotency key is automatically generated.
+        /// If not provided an idempotency key is automatically generated.
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>HTTP 202 Accepted if successful, otherwise problem details.</returns>
