@@ -479,7 +479,12 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             CreateTestPaymentRequest(new Provider.UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
-                    SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = false },
+                    SchemeSelection = new SchemeSelection.InstantOnly
+                    {
+                        AllowRemitterFee = false,
+                        InstantOverrideProviderIds = ["mock-payments-gb-redirect"],
+                        NonInstantOverrideProviderIds = ["mock-payments-de-redirect"]
+                    },
                 },
                 sortCodeAccountNumber)
         ];
@@ -488,7 +493,12 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             CreateTestPaymentRequest(new Provider.UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
-                    SchemeSelection = new SchemeSelection.InstantPreferred { AllowRemitterFee = true },
+                    SchemeSelection = new SchemeSelection.InstantPreferred
+                    {
+                        AllowRemitterFee = true,
+                        InstantOverrideProviderIds = ["mock-payments-de-embedded"],
+                        NonInstantOverrideProviderIds = ["mock-payments-de-redirect"]
+                    },
                 },
                 sortCodeAccountNumber)
         ];
