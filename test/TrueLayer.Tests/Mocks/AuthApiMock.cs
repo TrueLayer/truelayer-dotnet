@@ -13,6 +13,11 @@ public class AuthApiMock : IAuthApi
         _response = response;
     }
 
+    public void ResetGetAuthToken()
+    {
+        _response = null;
+    }
+
     public ValueTask<ApiResponse<GetAuthTokenResponse>> GetAuthToken(GetAuthTokenRequest authTokenRequest, CancellationToken cancellationToken = default)
     {
         return new ValueTask<ApiResponse<GetAuthTokenResponse>>(_response!);

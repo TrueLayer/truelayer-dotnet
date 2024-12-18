@@ -28,16 +28,18 @@ namespace TrueLayer
 
         private readonly HttpClient _httpClient;
         private readonly TrueLayerOptions _options;
+        private readonly IAuthTokenCache _authTokenCache;
 
         /// <summary>
         /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
         /// </summary>
         /// <param name="httpClient">The client used to make HTTP requests.</param>
         /// <param name="options"></param>
-        public ApiClient(HttpClient httpClient, IOptions<TrueLayerOptions> options)
+        public ApiClient(HttpClient httpClient, IOptions<TrueLayerOptions> options, IAuthTokenCache authTokenCache)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _authTokenCache = authTokenCache;
         }
 
         /// <inheritdoc />
@@ -138,6 +140,11 @@ namespace TrueLayer
             httpResponse.Headers.TryGetValues(CustomHeaders.TraceId, out var traceIdHeader);
             string? traceId = traceIdHeader?.FirstOrDefault();
 
+            if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _authTokenCache.Clear();
+            }
+
             if (httpResponse.IsSuccessStatusCode && httpResponse.StatusCode != HttpStatusCode.NoContent)
             {
                 var data = await DeserializeJsonAsync<TData>(httpResponse, traceId, cancellationToken);
@@ -158,6 +165,11 @@ namespace TrueLayer
         {
             httpResponse.Headers.TryGetValues(CustomHeaders.TraceId, out var traceIdHeader);
             string? traceId = traceIdHeader?.FirstOrDefault();
+
+            if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _authTokenCache.Clear();
+            }
 
             // In .NET Standard 2.1 HttpResponse.Content can be null
             if (httpResponse.Content?.Headers.ContentType?.MediaType == "application/problem+json")
@@ -296,7 +308,7 @@ namespace TrueLayer
                 }
             }
 
-            // HttpCompletionOption.ResponseHeadersRead reduces allocations by by avoiding the pre-buffering of the response content
+            // HttpCompletionOption.ResponseHeadersRead reduces allocations by avoiding the pre-buffering of the response content
             // and allows us to access the content stream faster.
             // Doing so requires that always dispose of HttpResponseMessage to free up the connection
             // Ref: https://www.stevejgordon.co.uk/using-httpcompletionoption-responseheadersread-to-improve-httpclient-performance-dotnet

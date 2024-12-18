@@ -10,7 +10,7 @@ namespace TrueLayer.Tests
     public class TrueLayerClientTests
     {
         [Fact]
-        public void Can_create_truelayer_client_from_options()
+        public void Can_Create_TrueLayer_Client_From_Options()
         {
             var options = new TrueLayerOptions
             {
@@ -33,7 +33,10 @@ namespace TrueLayer.Tests
                 }
             };
 
-            var client = new TrueLayerClient(new ApiClient(new HttpClient(), Options.Create(options)), Options.Create(options));
+            var factory = new TrueLayerClientFactory(new ApiClient(new HttpClient(), Options.Create(options), new NullMemoryCache()), Options.Create(options), new NullMemoryCache());
+            var client = factory.Create();
+
+
             client.Auth.Should().NotBeNull();
             client.Payments.Should().NotBeNull();
             client.MerchantAccounts.Should().NotBeNull();

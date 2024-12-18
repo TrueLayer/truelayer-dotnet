@@ -21,6 +21,7 @@ namespace TrueLayer.AcceptanceTests
                         options.Payments.SigningKey.PrivateKey = privateKey;
                     }
                 })
+                .AddAuthTokenInMemoryCaching()
                 .BuildServiceProvider();
 
             Client = ServiceProvider.GetRequiredService<ITrueLayerClient>();
