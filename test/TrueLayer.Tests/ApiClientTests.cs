@@ -35,9 +35,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             _httpMessageHandler = new MockHttpMessageHandler();
             _authTokenCache = new InMemoryAuthTokenCacheMock();
 ;            _apiClient = new ApiClient(
-                _httpMessageHandler.ToHttpClient(),
-                Options.Create(new TrueLayerOptions()),
-                _authTokenCache);
+                _httpMessageHandler.ToHttpClient());
 
             _stub = new TestResponse
             {
@@ -185,39 +183,6 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             response.TraceId.Should().Be("trace-id");
             response.Data.Should().BeNull();
         }
-
-        [Fact]
-        public async Task Given_request_unauthorized_clear_auth_token_cache()
-        {
-            var obj = new
-            {
-                data = "object"
-            };
-
-            _httpMessageHandler
-                .Expect(HttpMethod.Post, "http://localhost/post-object")
-                .Respond(() =>
-                {
-                    var response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-                    response.Headers.TryAddWithoutValidation(CustomHeaders.TraceId, "trace-id");
-                    return Task.FromResult(response);
-                });
-
-            var authData = new GetAuthTokenResponse("access-token", 3600, "Bearer", "scope");
-            _authTokenCache.Set("test", new ApiResponse<GetAuthTokenResponse>(authData, HttpStatusCode.OK, "trace-id"), TimeSpan.FromMinutes(5));
-
-            var response = await _apiClient.PostAsync(
-                new Uri("http://localhost/post-object"),
-                obj,
-                accessToken: authData.AccessToken
-            );
-
-            _authTokenCache.IsEmpty.Should().BeTrue();
-            response.IsSuccessful.Should().BeFalse();
-            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-            response.TraceId.Should().Be("trace-id");
-        }
-
 
         [Fact]
         public async Task Given_request_fails_returns_problem_details()
