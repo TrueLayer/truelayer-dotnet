@@ -67,7 +67,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     [MemberData(nameof(ExternalAccountPaymentRequests))]
     public async Task Can_Create_External_Account_Payment(CreatePaymentRequest paymentRequest)
     {
-        var response = await _fixture.Client.Payments.CreatePayment(
+        var response = await _fixture.Client2.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -79,7 +79,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
         authorizationRequired.Status.Should().Be("authorization_required");
 
-        string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
+        string hppUri = _fixture.Client2.Payments.CreateHostedPaymentPageLink(
             authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
         hppUri.Should().NotBeNullOrWhiteSpace();
     }
@@ -131,7 +131,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 Verification = new Verification.Automated { RemitterName = true }
             });
 
-        var response = await _fixture.Client2.Payments.CreatePayment(
+        var response = await _fixture.Client.Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -174,7 +174,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
         authorizationRequired.Status.Should().Be("authorization_required");
 
-        string hppUri = _fixture.Client2.Payments.CreateHostedPaymentPageLink(
+        string hppUri = _fixture.Client.Payments.CreateHostedPaymentPageLink(
             authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
         hppUri.Should().NotBeNullOrWhiteSpace();
     }
@@ -246,7 +246,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         response.Data.IsT0.Should().BeTrue();
         var authorizationRequiredResponse = response.Data.AsT0;
 
-        var getPaymentResponse = await _fixture.Client.Payments.GetPayment(authorizationRequiredResponse.Id);
+        var getPaymentResponse = await _fixture.Client2.Payments.GetPayment(authorizationRequiredResponse.Id);
 
         getPaymentResponse.IsSuccessful.Should().BeTrue();
 

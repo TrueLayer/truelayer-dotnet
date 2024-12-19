@@ -70,7 +70,7 @@ namespace TrueLayer.AcceptanceTests
         public async Task Can_get_mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange
-            var createResponse = await _fixture.Client2.Mandates.CreateMandate(
+            var createResponse = await _fixture.Client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
             var mandateId = createResponse.Data!.Id;
@@ -116,7 +116,7 @@ namespace TrueLayer.AcceptanceTests
                 new Redirect(new Uri(ReturnUri)));
 
             // Act
-            var response = await _fixture.Client2.Mandates.StartAuthorizationFlow(
+            var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
                 mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
             await AuthorizeMandate(response);
             var mandate = await WaitForMandateToBeAuthorized(mandateId);

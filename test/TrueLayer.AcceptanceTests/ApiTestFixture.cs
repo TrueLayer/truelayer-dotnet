@@ -13,7 +13,7 @@ namespace TrueLayer.AcceptanceTests
             IConfiguration configuration = LoadConfiguration();
 
             var configName1 = "TrueLayer";
-            var configName2 = "TrueLayerClient2";
+            var configName2 = "TrueLayer2";
             ServiceProvider = new ServiceCollection()
                 .AddTrueLayer(configuration, options =>
                 {
@@ -25,7 +25,7 @@ namespace TrueLayer.AcceptanceTests
                 })
                 .AddTrueLayer(configuration, options =>
                 {
-                    string privateKey = File.ReadAllText("ec512-private-key-sbx.pem");
+                    string privateKey = File.ReadAllText("ec512-private-key.pem");
                     if (options.Payments?.SigningKey != null)
                     {
                         options.Payments.SigningKey.PrivateKey = privateKey;
