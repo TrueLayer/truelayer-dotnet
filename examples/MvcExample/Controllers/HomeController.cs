@@ -20,7 +20,7 @@ namespace MvcExample.Controllers
         private readonly ITrueLayerClient _trueLayerClient;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController([FromKeyedServices("TrueLayerClient")]ITrueLayerClient trueLayerClient, ILogger<HomeController> logger)
+        public HomeController(ITrueLayerClient trueLayerClient, ILogger<HomeController> logger)
         {
             _trueLayerClient = trueLayerClient;
             _logger = logger;

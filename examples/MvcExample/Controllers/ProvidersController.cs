@@ -11,7 +11,7 @@ namespace MvcExample.Controllers
     {
         private readonly ITrueLayerClient _trueLayerClient;
 
-        public ProvidersController([FromKeyedServices("TrueLayerClient")]ITrueLayerClient trueLayerClient)
+        public ProvidersController(ITrueLayerClient trueLayerClient)
         {
             _trueLayerClient = trueLayerClient;
         }

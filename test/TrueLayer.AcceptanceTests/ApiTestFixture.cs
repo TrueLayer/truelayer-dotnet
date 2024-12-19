@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TrueLayer.Auth;
 
 namespace TrueLayer.AcceptanceTests
 {
@@ -18,7 +19,7 @@ namespace TrueLayer.AcceptanceTests
             const string serviceKey2 = "TrueLayerClient2";
 
             ServiceProvider = new ServiceCollection()
-                .AddTrueLayer(configuration, options =>
+                .AddKeyedTrueLayer(configuration, options =>
                     {
                         var privateKey = File.ReadAllText("ec512-private-key.pem");
                         if (options.Payments?.SigningKey != null)
@@ -28,7 +29,7 @@ namespace TrueLayer.AcceptanceTests
                     },
                     configurationSectionName: configName1,
                     serviceKey: serviceKey1)
-                .AddTrueLayer(configuration, options =>
+                .AddKeyedTrueLayer(configuration, options =>
                     {
                         var privateKey = File.ReadAllText("ec512-private-key.pem");
                         if (options.Payments?.SigningKey != null)
@@ -37,8 +38,8 @@ namespace TrueLayer.AcceptanceTests
                         }
                     },
                     configurationSectionName: configName2,
-                    serviceKey: serviceKey2)
-                .AddAuthTokenInMemoryCaching(configName2)
+                    serviceKey: serviceKey2,
+                    authCachingStrategy: AuthCachingStrategy.InMemory)
                 .BuildServiceProvider();
 
             Client = ServiceProvider.GetRequiredKeyedService<ITrueLayerClient>(serviceKey1);

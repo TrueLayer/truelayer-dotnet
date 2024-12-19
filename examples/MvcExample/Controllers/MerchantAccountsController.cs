@@ -11,7 +11,7 @@ namespace MvcExample.Controllers
         private readonly ITrueLayerClient _trueLayerClient;
         private readonly ILogger<MerchantAccountsController> _logger;
 
-        public MerchantAccountsController([FromKeyedServices("TrueLayerClient")]ITrueLayerClient trueLayerClient, ILogger<MerchantAccountsController> logger)
+        public MerchantAccountsController(ITrueLayerClient trueLayerClient, ILogger<MerchantAccountsController> logger)
         {
             _trueLayerClient = trueLayerClient;
             _logger = logger;

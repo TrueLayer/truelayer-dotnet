@@ -18,7 +18,7 @@ namespace MvcExample.Controllers
         private readonly ITrueLayerClient _trueLayerClient;
         private readonly ILogger<PayoutController> _logger;
 
-        public PayoutController([FromKeyedServices("TrueLayerClient")]ITrueLayerClient trueLayerClient, ILogger<PayoutController> logger)
+        public PayoutController(ITrueLayerClient trueLayerClient, ILogger<PayoutController> logger)
         {
             _trueLayerClient = trueLayerClient;
             _logger = logger;
