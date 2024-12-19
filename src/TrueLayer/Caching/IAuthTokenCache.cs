@@ -1,7 +1,7 @@
 using System;
 using TrueLayer.Auth;
 
-namespace TrueLayer;
+namespace TrueLayer.Caching;
 
 /// <summary>
 /// IAuthTokenCache can be used to provide custom implementation of Auth token caching

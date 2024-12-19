@@ -101,7 +101,7 @@ Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other
 
 ### Initialize TrueLayer.NET
 
-Register the TrueLayer client in `Startup.cs` or `Program.cs` (.NET 6.0):
+Register the TrueLayer client in `Startup.cs` or `Program.cs` (.NET 9.0/.NET 8.0/.NET 6.0):
 
 ```c#
 public IConfiguration Configuration { get; }
@@ -115,13 +115,57 @@ public void ConfigureServices(IServiceCollection services)
             // For demo purposes only. Private key should be stored securely
             options.Payments.SigningKey.PrivateKey = File.ReadAllText("ec512-private-key.pem");
         }
-    })
-    // We advice to cache the auth token
-    .AddAuthTokenInMemoryCaching();
+    },
+    // For best performance and reliability we advice to cache the auth token
+    authCachingStrategy: AuthCachingStrategy.InMemory)
+
 }
 ```
 
-Alternatively you can create a class that implements `IConfigureOptions<TrueLayerOptions>` if you have more complex configuration requirements.
+### Multiple TrueLayer Clients
+
+Use keyed version of TruLayer client (.NET 9.0/.NET 8.0):
+
+```c#
+.AddKeyedTrueLayer(configuration, options =>
+    {
+        // For demo purposes only. Private key should be stored securely
+        var privateKey = File.ReadAllText("ec512-private-key.pem");
+        if (options.Payments?.SigningKey != null)
+        {
+            options.Payments.SigningKey.PrivateKey = privateKey;
+        }
+    },
+    configurationSectionName: "TrueLayerGbp",
+    serviceKey: "TrueLayerGbp",
+    authTokenCachingStrategy: AuthTokenCachingStrategies.InMemory)
+.AddKeyedTrueLayer(configuration, options =>
+    {
+        // For demo purposes only. Private key should be stored securely
+        var privateKey = File.ReadAllText("ec512-private-key.pem");
+        if (options.Payments?.SigningKey != null)
+        {
+            options.Payments.SigningKey.PrivateKey = privateKey;
+        }
+    },
+    configurationSectionName: "TrueLayerEur",
+    serviceKey: "TrueLayerEur",
+    authTokenCachingStrategy: AuthTokenCachingStrategies.InMemory)
+```
+
+Use `[FromKeyedServices()]` attribute to retrieve keyed client
+
+```c#
+public GbpController([FromKeyedServices("TrueLayerGbp")]ITrueLayerClient trueLayerClient, ...
+public EurController([FromKeyedServices("TrueLayerEur")]ITrueLayerClient trueLayerClient, ...
+```
+
+Or `GetRequiredKeyedService`
+
+```c#
+var GbpClient = ServiceProvider.GetRequiredKeyedService<ITrueLayerClient>("TrueLayerGbp");
+var EurClient = ServiceProvider.GetRequiredKeyedService<ITrueLayerClient>("TrueLayerEur");
+```
 
 ### Make a payment
 

@@ -1,7 +1,7 @@
 using System;
 using TrueLayer.Auth;
 
-namespace TrueLayer
+namespace TrueLayer.Caching
 {
     internal class NullMemoryCache : IAuthTokenCache
     {

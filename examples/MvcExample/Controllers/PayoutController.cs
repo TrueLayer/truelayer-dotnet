@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MvcExample.Models;
 using TrueLayer;
@@ -18,7 +17,7 @@ namespace MvcExample.Controllers
         private readonly ITrueLayerClient _trueLayerClient;
         private readonly ILogger<PayoutController> _logger;
 
-        public PayoutController([FromKeyedServices("TrueLayerClient")]ITrueLayerClient trueLayerClient, ILogger<PayoutController> logger)
+        public PayoutController(ITrueLayerClient trueLayerClient, ILogger<PayoutController> logger)
         {
             _trueLayerClient = trueLayerClient;
             _logger = logger;

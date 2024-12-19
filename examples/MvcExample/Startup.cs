@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TrueLayer.Auth;
+using TrueLayer.Caching;
 
 namespace MvcExample
 {
@@ -21,17 +23,15 @@ namespace MvcExample
         {
             services.AddControllersWithViews();
 
-            const string serviceKey = "TrueLayerClient";
             services.AddTrueLayer(Configuration, options =>
+                {
+                    var privateKey = File.ReadAllText("ec512-private-key.pem");
+                    if (options.Payments?.SigningKey != null)
                     {
-                        var privateKey = File.ReadAllText("ec512-private-key.pem");
-                        if (options.Payments?.SigningKey != null)
-                        {
-                            options.Payments.SigningKey.PrivateKey = privateKey;
-                        }
-                    },
-                    serviceKey: serviceKey)
-            .AddAuthTokenInMemoryCaching(serviceKey);
+                        options.Payments.SigningKey.PrivateKey = privateKey;
+                    }
+                },
+                authTokenCachingStrategy: AuthTokenCachingStrategies.InMemory);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

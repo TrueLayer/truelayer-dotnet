@@ -1,7 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using TrueLayer;
 using TrueLayer.PaymentsProviders.Model;
 
@@ -11,7 +10,7 @@ namespace MvcExample.Controllers
     {
         private readonly ITrueLayerClient _trueLayerClient;
 
-        public ProvidersController([FromKeyedServices("TrueLayerClient")]ITrueLayerClient trueLayerClient)
+        public ProvidersController(ITrueLayerClient trueLayerClient)
         {
             _trueLayerClient = trueLayerClient;
         }
