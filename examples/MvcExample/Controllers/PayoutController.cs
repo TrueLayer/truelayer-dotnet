@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MvcExample.Models;
 using TrueLayer;
@@ -14,12 +15,12 @@ namespace MvcExample.Controllers
 {
     public class PayoutController : Controller
     {
-        private readonly ITrueLayerClient _truelayer;
+        private readonly ITrueLayerClient _trueLayerClient;
         private readonly ILogger<PayoutController> _logger;
 
-        public PayoutController(ITrueLayerClient truelayer, ILogger<PayoutController> logger)
+        public PayoutController([FromKeyedServices("TrueLayerClient")]ITrueLayerClient trueLayerClient, ILogger<PayoutController> logger)
         {
-            _truelayer = truelayer;
+            _trueLayerClient = trueLayerClient;
             _logger = logger;
         }
 
@@ -51,7 +52,7 @@ namespace MvcExample.Controllers
                 externalAccount,
                  metadata: new() { { "a", "b" } });
 
-            var apiResponse = await _truelayer.Payouts.CreatePayout(
+            var apiResponse = await _trueLayerClient.Payouts.CreatePayout(
                 payoutRequest,
                 idempotencyKey: Guid.NewGuid().ToString()
             );
@@ -88,7 +89,7 @@ namespace MvcExample.Controllers
                 return View();
             }
 
-            var apiResponse = await _truelayer.Payouts.GetPayout(payoutId);
+            var apiResponse = await _trueLayerClient.Payouts.GetPayout(payoutId);
 
             IActionResult Failed(string status)
             {
