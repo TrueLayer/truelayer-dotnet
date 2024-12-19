@@ -12,9 +12,9 @@ namespace TrueLayer
 {
     internal class TrueLayerClientFactory
     {
+        private readonly IApiClient _apiClient;
         private readonly IOptionsSnapshot<TrueLayerOptions> _options;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IApiClient _apiClient;
 
         public TrueLayerClientFactory(IApiClient apiClient, IOptionsSnapshot<TrueLayerOptions> options, IServiceProvider serviceProvider)
         {
