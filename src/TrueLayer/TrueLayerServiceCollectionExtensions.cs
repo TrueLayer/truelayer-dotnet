@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using TrueLayer;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -18,7 +19,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration">The Microsoft configuration used to obtain the TrueLayer SDK configuration.</param>
         /// <param name="configureOptions">Action to customise the TrueLayer options created from configuration.</param>
         /// <param name="configureBuilder">Action to override the HttpClientBuilder.</param>
+        /// <param name="configurationSectionName">Name of configuration section used to build the TrueLayer client</param>
         /// <returns>The service collection with registered TrueLayer SDK services.</returns>
+
         public static IServiceCollection AddTrueLayer(
             this IServiceCollection services,
             IConfiguration configuration,
@@ -29,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-            services.Configure<TrueLayerOptions>(options =>
+            services.Configure<TrueLayerOptions>(configurationSectionName, options =>
             {
                 configuration.GetSection(configurationSectionName).Bind(options);
                 configureOptions?.Invoke(options);
@@ -39,9 +42,10 @@ namespace Microsoft.Extensions.DependencyInjection
             IHttpClientBuilder httpClientBuilder = services.AddHttpClient<IApiClient, ApiClient>();
             configureBuilder?.Invoke(httpClientBuilder);
 
-            services.AddSingleton<IAuthTokenCache, NullMemoryCache>();
-            services.AddTransient<TrueLayerClientFactory>();
-            services.AddTransient<ITrueLayerClient>(s => s.GetRequiredService<TrueLayerClientFactory>().Create());
+            services.AddKeyedSingleton<IAuthTokenCache, NullMemoryCache>(configurationSectionName);
+            services.AddKeyedTransient<TrueLayerClientFactory>(configurationSectionName);
+            services.AddKeyedTransient<ITrueLayerClient>(configurationSectionName,
+                (x, _) => x.GetRequiredKeyedService<TrueLayerClientFactory>(configurationSectionName).Create(configurationSectionName));
 
             return services;
         }
@@ -51,7 +55,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The service collection to add to.</param>
         public static IServiceCollection AddAuthTokenInMemoryCaching(
-            this IServiceCollection services)
+            this IServiceCollection services,
+            string configurationSectionName)
         {
             var serviceDescriptor = services.FirstOrDefault(descriptor => descriptor.ImplementationType == typeof(NullMemoryCache));
             if (serviceDescriptor != null)
@@ -59,9 +64,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.Remove(serviceDescriptor);
             }
 
+            services.RemoveAllKeyed<IAuthTokenCache>(configurationSectionName);
+            services.RemoveAllKeyed<ITrueLayerClient>(configurationSectionName);
+
             services.AddMemoryCache();
-            services.AddSingleton<IAuthTokenCache, InMemoryAuthTokenCache>();
-            services.AddTransient<ITrueLayerClient>(s => s.GetRequiredService<TrueLayerClientFactory>().CreateWithCache());
+            services.AddKeyedSingleton<IAuthTokenCache, InMemoryAuthTokenCache>(configurationSectionName);
+            services.AddKeyedTransient<ITrueLayerClient>(configurationSectionName,
+                (x, _) => x.GetRequiredKeyedService<TrueLayerClientFactory>(configurationSectionName).CreateWithCache(configurationSectionName));
 
             return services;
         }
@@ -72,7 +81,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The service collection to add to.</param>
         public static IServiceCollection AddAuthTokenCaching(
-            this IServiceCollection services)
+            this IServiceCollection services,
+            string configurationSectionName)
         {
             var serviceDescriptor = services.FirstOrDefault(descriptor => descriptor.ImplementationType == typeof(NullMemoryCache));
             if (serviceDescriptor != null)
@@ -80,7 +90,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.Remove(serviceDescriptor);
             }
 
-            services.AddTransient<ITrueLayerClient>(s => s.GetRequiredService<TrueLayerClientFactory>().CreateWithCache());
+            services.AddKeyedSingleton<ITrueLayerClient>(configurationSectionName,
+                 (s, _) => s.GetRequiredService<TrueLayerClientFactory>().CreateWithCache(configurationSectionName));
 
             return services;
         }

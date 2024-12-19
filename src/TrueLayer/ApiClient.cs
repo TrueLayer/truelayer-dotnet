@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
 using TrueLayer.Signing;
 #if NET6_0 || NET6_0_OR_GREATER
 using System.Net.Http.Json;
@@ -27,19 +26,15 @@ namespace TrueLayer
             = $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>()}";
 
         private readonly HttpClient _httpClient;
-        private readonly TrueLayerOptions _options;
-        private readonly IAuthTokenCache _authTokenCache;
 
         /// <summary>
         /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
         /// </summary>
         /// <param name="httpClient">The client used to make HTTP requests.</param>
         /// <param name="options"></param>
-        public ApiClient(HttpClient httpClient, IOptions<TrueLayerOptions> options, IAuthTokenCache authTokenCache)
+        public ApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
-            _authTokenCache = authTokenCache;
         }
 
         /// <inheritdoc />
@@ -49,7 +44,6 @@ namespace TrueLayer
             IDictionary<string, string>? customHeaders = null,
             CancellationToken cancellationToken = default)
         {
-            uri.HasValidBaseUri(nameof(uri), _options);
 
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Get,
@@ -68,8 +62,6 @@ namespace TrueLayer
         /// <inheritdoc />
         public async Task<ApiResponse<TData>> PostAsync<TData>(Uri uri, HttpContent? httpContent = null, string? accessToken = null, CancellationToken cancellationToken = default)
         {
-            uri.HasValidBaseUri(nameof(uri), _options);
-
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Post,
                 uri: uri,
@@ -86,7 +78,6 @@ namespace TrueLayer
         /// <inheritdoc />
         public async Task<ApiResponse<TData>> PostAsync<TData>(Uri uri, object? request = null, string? idempotencyKey = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default)
         {
-            uri.HasValidBaseUri(nameof(uri), _options);
 
             using var httpResponse = await SendJsonRequestAsync(
                 httpMethod: HttpMethod.Post,
@@ -103,8 +94,6 @@ namespace TrueLayer
 
         public async Task<ApiResponse> PostAsync(Uri uri, HttpContent? httpContent = null, string? accessToken = null, CancellationToken cancellationToken = default)
         {
-            uri.HasValidBaseUri(nameof(uri), _options);
-
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Post,
                 uri: uri,
@@ -120,7 +109,6 @@ namespace TrueLayer
 
         public async Task<ApiResponse> PostAsync(Uri uri, object? request = null, string? idempotencyKey = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default)
         {
-            uri.HasValidBaseUri(nameof(uri), _options);
 
             using var httpResponse = await SendJsonRequestAsync(
                 httpMethod: HttpMethod.Post,
@@ -139,11 +127,6 @@ namespace TrueLayer
         {
             httpResponse.Headers.TryGetValues(CustomHeaders.TraceId, out var traceIdHeader);
             string? traceId = traceIdHeader?.FirstOrDefault();
-
-            if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                _authTokenCache.Clear();
-            }
 
             if (httpResponse.IsSuccessStatusCode && httpResponse.StatusCode != HttpStatusCode.NoContent)
             {
@@ -165,11 +148,6 @@ namespace TrueLayer
         {
             httpResponse.Headers.TryGetValues(CustomHeaders.TraceId, out var traceIdHeader);
             string? traceId = traceIdHeader?.FirstOrDefault();
-
-            if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                _authTokenCache.Clear();
-            }
 
             // In .NET Standard 2.1 HttpResponse.Content can be null
             if (httpResponse.Content?.Headers.ContentType?.MediaType == "application/problem+json")

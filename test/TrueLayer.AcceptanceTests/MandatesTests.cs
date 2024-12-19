@@ -14,8 +14,6 @@ namespace TrueLayer.AcceptanceTests
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Text;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Options;
     using TrueLayer.Models;
     using AccountIdentifierUnion = OneOf<
         AccountIdentifier.SortCodeAccountNumber,
@@ -37,7 +35,6 @@ namespace TrueLayer.AcceptanceTests
     public class MandatesTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
-        private TrueLayerOptions configuration;
         public string RETURN_URI = "http://localhost:3000/callback";
         public static string PROVIDER_ID = "ob-uki-mock-bank-sbox"; // Beta provider in closed access, requires a whitelisted ClientId.
         public static string COMMERCIAL_PROVIDER_ID = "ob-natwest-vrp-sandbox"; // Provider to satisfy commercial mandates creation.
@@ -46,7 +43,6 @@ namespace TrueLayer.AcceptanceTests
         public MandatesTests(ApiTestFixture fixture)
         {
             _fixture = fixture;
-            configuration = fixture.ServiceProvider.GetRequiredService<IOptions<TrueLayerOptions>>().Value;
         }
 
         [Theory]
@@ -74,7 +70,7 @@ namespace TrueLayer.AcceptanceTests
         public async Task Can_get_mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+            var createResponse = await _fixture.Client2.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
             var mandateId = createResponse.Data!.Id;
@@ -120,7 +116,7 @@ namespace TrueLayer.AcceptanceTests
                 new Redirect(new Uri(RETURN_URI)));
 
             // Act
-            var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
+            var response = await _fixture.Client2.Mandates.StartAuthorizationFlow(
                 mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
             await AuthorizeMandate(response);
             var mandate = await WaitForMandateToBeAuthorized(mandateId);
@@ -321,7 +317,7 @@ namespace TrueLayer.AcceptanceTests
                 ? "{\"fragment\":\"" + sanitizedParameters + "\"}"
                 : "{\"query\":\"" + sanitizedParameters + "\"}";
 
-            var authUri = new Uri($"{configuration.Payments?.Uri}spa/payments-provider-return");
+            var authUri = new Uri($"https://api.truelayer-sandbox.com/spa/payments-provider-return");
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

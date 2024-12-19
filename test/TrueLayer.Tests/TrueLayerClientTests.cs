@@ -1,8 +1,9 @@
 using System;
 using System.Net.Http;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
 using TrueLayer.Payments;
+using TrueLayer.Tests.Mocks;
 using Xunit;
 
 namespace TrueLayer.Tests
@@ -12,6 +13,7 @@ namespace TrueLayer.Tests
         [Fact]
         public void Can_Create_TrueLayer_Client_From_Options()
         {
+            var configName = "TrueLayer";
             var options = new TrueLayerOptions
             {
                 ClientId = "clientid",
@@ -32,9 +34,15 @@ namespace TrueLayer.Tests
                     }
                 }
             };
+            var services = new ServiceCollection();
+            var provider = services.BuildServiceProvider();
 
-            var factory = new TrueLayerClientFactory(new ApiClient(new HttpClient(), Options.Create(options), new NullMemoryCache()), Options.Create(options), new NullMemoryCache());
-            var client = factory.Create();
+            var optionsMock = new OptionSnapshotMock(options);
+            var factory = new TrueLayerClientFactory(
+                new ApiClient(new HttpClient()),
+                optionsMock,
+                provider);
+            var client = factory.Create(configName);
 
 
             client.Auth.Should().NotBeNull();

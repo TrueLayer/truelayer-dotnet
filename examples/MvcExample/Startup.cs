@@ -29,7 +29,7 @@ namespace MvcExample
                     options.Payments.SigningKey.PrivateKey = privateKey;
                 }
             })
-            .AddAuthTokenInMemoryCaching();
+            .AddAuthTokenInMemoryCaching("Truelayer");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

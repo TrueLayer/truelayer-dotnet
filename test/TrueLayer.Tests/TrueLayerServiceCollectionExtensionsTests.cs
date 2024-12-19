@@ -32,7 +32,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 .AddTrueLayer(configuration)
                 .BuildServiceProvider();
 
-            var client = services.GetRequiredService<ITrueLayerClient>();
+            var client = services.GetRequiredKeyedService<ITrueLayerClient>("TrueLayer");
             client.Should().NotBeNull();
         }
     }
