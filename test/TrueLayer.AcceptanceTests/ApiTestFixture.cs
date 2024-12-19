@@ -12,30 +12,37 @@ namespace TrueLayer.AcceptanceTests
         {
             IConfiguration configuration = LoadConfiguration();
 
-            var configName1 = "TrueLayer";
-            var configName2 = "TrueLayer2";
+            const string configName1 = "TrueLayer";
+            const string configName2 = "TrueLayer2";
+            const string serviceKey1 = "TrueLayerClient";
+            const string serviceKey2 = "TrueLayerClient2";
+
             ServiceProvider = new ServiceCollection()
                 .AddTrueLayer(configuration, options =>
-                {
-                    string privateKey = File.ReadAllText("ec512-private-key.pem");
-                    if (options.Payments?.SigningKey != null)
                     {
-                        options.Payments.SigningKey.PrivateKey = privateKey;
-                    }
-                })
+                        var privateKey = File.ReadAllText("ec512-private-key.pem");
+                        if (options.Payments?.SigningKey != null)
+                        {
+                            options.Payments.SigningKey.PrivateKey = privateKey;
+                        }
+                    },
+                    configurationSectionName: configName1,
+                    serviceKey: serviceKey1)
                 .AddTrueLayer(configuration, options =>
-                {
-                    string privateKey = File.ReadAllText("ec512-private-key.pem");
-                    if (options.Payments?.SigningKey != null)
                     {
-                        options.Payments.SigningKey.PrivateKey = privateKey;
-                    }
-                }, configurationSectionName: configName2)
+                        var privateKey = File.ReadAllText("ec512-private-key.pem");
+                        if (options.Payments?.SigningKey != null)
+                        {
+                            options.Payments.SigningKey.PrivateKey = privateKey;
+                        }
+                    },
+                    configurationSectionName: configName2,
+                    serviceKey: serviceKey2)
                 .AddAuthTokenInMemoryCaching(configName2)
                 .BuildServiceProvider();
 
-            Client = ServiceProvider.GetRequiredKeyedService<ITrueLayerClient>(configName1);
-            Client2 = ServiceProvider.GetRequiredKeyedService<ITrueLayerClient>(configName2);
+            Client = ServiceProvider.GetRequiredKeyedService<ITrueLayerClient>(serviceKey1);
+            Client2 = ServiceProvider.GetRequiredKeyedService<ITrueLayerClient>(serviceKey2);
         }
 
         public IServiceProvider ServiceProvider { get; }

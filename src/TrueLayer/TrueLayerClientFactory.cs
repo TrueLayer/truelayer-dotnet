@@ -12,9 +12,9 @@ namespace TrueLayer
 {
     internal class TrueLayerClientFactory
     {
+        private readonly IApiClient _apiClient;
         private readonly IOptionsSnapshot<TrueLayerOptions> _options;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IApiClient _apiClient;
 
         public TrueLayerClientFactory(IApiClient apiClient, IOptionsSnapshot<TrueLayerOptions> options, IServiceProvider serviceProvider)
         {
@@ -24,9 +24,9 @@ namespace TrueLayer
             _serviceProvider = serviceProvider;
         }
 
-        public ITrueLayerClient Create(string configName)
+        public ITrueLayerClient Create(string serviceKey)
         {
-            var options = _options.Get(configName);
+            var options = _options.Get(serviceKey);
             var auth = new AuthApi(_apiClient, options);
 
             return new TrueLayerClient(
@@ -38,10 +38,10 @@ namespace TrueLayer
                 new Lazy<IMandatesApi>(() => new MandatesApi(_apiClient, auth, options)));
         }
 
-        public ITrueLayerClient CreateWithCache(string configName)
+        public ITrueLayerClient CreateWithCache(string serviceKey)
         {
-            var options = _options.Get(configName);
-            var authTokenCache = _serviceProvider.GetRequiredKeyedService<IAuthTokenCache>(configName);
+            var options = _options.Get(serviceKey);
+            var authTokenCache = _serviceProvider.GetRequiredKeyedService<IAuthTokenCache>(serviceKey);
             var decoratedAuthApi = new AuthApiCacheDecorator(new AuthApi(_apiClient, options), authTokenCache);
 
             return new TrueLayerClient(

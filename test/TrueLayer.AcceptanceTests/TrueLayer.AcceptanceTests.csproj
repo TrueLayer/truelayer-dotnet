@@ -28,9 +28,6 @@
     <ItemGroup Label="Output Files">
       <None Update="appsettings.*" CopyToOutputDirectory="Always" />
       <None Update="*.pem" CopyToOutputDirectory="Always" />
-      <None Update="ec512-private-key_2.pem">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
     <ItemGroup>
       <Content Update="ec512-private-key.pem">
