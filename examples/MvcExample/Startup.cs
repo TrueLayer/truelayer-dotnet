@@ -21,15 +21,17 @@ namespace MvcExample
         {
             services.AddControllersWithViews();
 
+            const string serviceKey = "TrueLayerClient";
             services.AddTrueLayer(Configuration, options =>
-            {
-                string privateKey = File.ReadAllText("ec512-private-key.pem");
-                if (options.Payments?.SigningKey != null)
-                {
-                    options.Payments.SigningKey.PrivateKey = privateKey;
-                }
-            })
-            .AddAuthTokenInMemoryCaching("Truelayer");
+                    {
+                        var privateKey = File.ReadAllText("ec512-private-key.pem");
+                        if (options.Payments?.SigningKey != null)
+                        {
+                            options.Payments.SigningKey.PrivateKey = privateKey;
+                        }
+                    },
+                    serviceKey: serviceKey)
+            .AddAuthTokenInMemoryCaching(serviceKey);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

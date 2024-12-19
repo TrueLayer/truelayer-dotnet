@@ -28,7 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Action<TrueLayerOptions>? configureOptions = null,
             Action<IHttpClientBuilder>? configureBuilder = null,
             string configurationSectionName = "TrueLayer",
-            string serviceKey = "TrueLayer")
+            string serviceKey = "TrueLayerClient")
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
