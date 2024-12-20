@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using TrueLayer;
-using TrueLayer.Auth;
 using TrueLayer.Caching;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -14,6 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         /// <summary>
         /// Registers the default TrueLayer SDK services to the provided <paramref name="services"/>.
+        /// Support for single client only.
         /// </summary>
         /// <param name="services">The service collection to add to.</param>
         /// <param name="configuration">The Microsoft configuration used to obtain the TrueLayer SDK configuration.</param>
@@ -65,7 +65,8 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Registers the default TrueLayer SDK services to the provided <paramref name="services"/>.
+        /// Registers the keyed TrueLayer SDK services to the provided <paramref name="services"/>.
+        /// Required for multi client support.
         /// </summary>
         /// <param name="services">The service collection to add to.</param>
         /// <param name="configuration">The Microsoft configuration used to obtain the TrueLayer SDK configuration.</param>
