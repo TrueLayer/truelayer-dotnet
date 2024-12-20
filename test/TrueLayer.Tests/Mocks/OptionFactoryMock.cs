@@ -2,14 +2,14 @@ using Microsoft.Extensions.Options;
 
 namespace TrueLayer.Tests.Mocks;
 
-public class OptionSnapshotMock : IOptionsSnapshot<TrueLayerOptions>
+public class OptionFactoryMock : IOptionsFactory<TrueLayerOptions>
 {
-    public OptionSnapshotMock(TrueLayerOptions options)
+    public OptionFactoryMock(TrueLayerOptions options)
     {
         Value = options;
     }
     public TrueLayerOptions Value { get; }
-    public TrueLayerOptions Get(string? name)
+    public TrueLayerOptions Create(string name)
     {
         return Value;
     }

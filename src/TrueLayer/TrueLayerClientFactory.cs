@@ -14,10 +14,10 @@ namespace TrueLayer
     internal class TrueLayerClientFactory
     {
         private readonly IApiClient _apiClient;
-        private readonly IOptionsSnapshot<TrueLayerOptions> _options;
+        private readonly IOptions<TrueLayerOptions> _options;
         private readonly IServiceProvider _serviceProvider;
 
-        public TrueLayerClientFactory(IApiClient apiClient, IOptionsSnapshot<TrueLayerOptions> options, IServiceProvider serviceProvider)
+        public TrueLayerClientFactory(IApiClient apiClient, IOptions<TrueLayerOptions> options, IServiceProvider serviceProvider)
         {
             options.NotNull(nameof(options));
             _apiClient = apiClient;
@@ -53,10 +53,25 @@ namespace TrueLayer
                 new Lazy<IMerchantAccountsApi>(() => new MerchantAccountsApi(_apiClient, decoratedAuthApi, options)),
                 new Lazy<IMandatesApi>(() => new MandatesApi(_apiClient, decoratedAuthApi, options)));
         }
+    }
+
+    internal class TrueLayerKeyedClientFactory
+    {
+        private readonly IApiClient _apiClient;
+        private readonly IOptionsFactory<TrueLayerOptions> _options;
+        private readonly IServiceProvider _serviceProvider;
+
+        public TrueLayerKeyedClientFactory(IApiClient apiClient, IOptionsFactory<TrueLayerOptions> options, IServiceProvider serviceProvider)
+        {
+            options.NotNull(nameof(options));
+            _apiClient = apiClient;
+            _options = options;
+            _serviceProvider = serviceProvider;
+        }
 
         public ITrueLayerClient CreateKeyed(string serviceKey)
         {
-            var options = _options.Get(serviceKey);
+            var options = _options.Create(serviceKey);
             var auth = new AuthApi(_apiClient, options);
 
             return new TrueLayerClient(
@@ -70,7 +85,7 @@ namespace TrueLayer
 
         public ITrueLayerClient CreateWithCacheKeyed(string serviceKey)
         {
-            var options = _options.Get(serviceKey);
+            var options = _options.Create(serviceKey);
             var authTokenCache = _serviceProvider.GetRequiredKeyedService<IAuthTokenCache>(serviceKey);
             var decoratedAuthApi = new AuthApiCacheDecorator(new AuthApi(_apiClient, options), authTokenCache);
 

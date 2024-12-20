@@ -108,7 +108,6 @@ namespace TrueLayer
 
         public async Task<ApiResponse> PostAsync(Uri uri, object? request = null, string? idempotencyKey = null, string? accessToken = null, SigningKey? signingKey = null, CancellationToken cancellationToken = default)
         {
-
             using var httpResponse = await SendJsonRequestAsync(
                 httpMethod: HttpMethod.Post,
                 uri: uri,

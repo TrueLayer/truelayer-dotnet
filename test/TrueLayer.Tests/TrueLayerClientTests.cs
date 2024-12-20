@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using TrueLayer.Payments;
 using TrueLayer.Tests.Mocks;
 using Xunit;
@@ -36,10 +37,10 @@ namespace TrueLayer.Tests
             var services = new ServiceCollection();
             var provider = services.BuildServiceProvider();
 
-            var optionsMock = new OptionSnapshotMock(options);
+            var tlOptions = Options.Create(options);
             var factory = new TrueLayerClientFactory(
                 new ApiClient(new HttpClient()),
-                optionsMock,
+                tlOptions,
                 provider);
             var client = factory.Create();
 
@@ -77,8 +78,8 @@ namespace TrueLayer.Tests
             var services = new ServiceCollection();
             var provider = services.BuildServiceProvider();
 
-            var optionsMock = new OptionSnapshotMock(options);
-            var factory = new TrueLayerClientFactory(
+            var optionsMock = new OptionFactoryMock(options);
+            var factory = new TrueLayerKeyedClientFactory(
                 new ApiClient(new HttpClient()),
                 optionsMock,
                 provider);

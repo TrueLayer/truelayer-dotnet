@@ -14,12 +14,12 @@ using static TrueLayer.Payments.Model.GetPaymentResponse;
 
 namespace MvcExample.Controllers
 {
-    public class HomeController : Controller
+    public class PaymentsController : Controller
     {
         private readonly ITrueLayerClient _trueLayerClient;
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<PaymentsController> _logger;
 
-        public HomeController(ITrueLayerClient trueLayerClient, ILogger<HomeController> logger)
+        public PaymentsController(ITrueLayerClient trueLayerClient, ILogger<PaymentsController> logger)
         {
             _trueLayerClient = trueLayerClient;
             _logger = logger;
@@ -39,7 +39,9 @@ namespace MvcExample.Controllers
             }
 
             OneOf<Provider.UserSelected, Provider.Preselected> providerSelection = donateModel.UserPreSelectedFilter
-                ? new Provider.Preselected(providerId: "mock-payments-gb-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service"})
+                ? new Provider.Preselected(
+                    providerId: "mock-payments-gb-redirect",
+                    schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service"})
                 : new Provider.UserSelected();
 
             var paymentRequest = new CreatePaymentRequest(
@@ -80,26 +82,29 @@ namespace MvcExample.Controllers
             return apiResponse.Data.Match<IActionResult>(
                 authorizationRequired =>
                 {
+                    // Return Uri must be whitelisted in TrueLayer console
+                    var returnUri = new Uri(Url.ActionLink("Success"));
+
                     var hppLink = _trueLayerClient.Payments.CreateHostedPaymentPageLink(
                         authorizationRequired.Id,
                         authorizationRequired.ResourceToken,
-                        new Uri("https://console.truelayer.com/redirect-page"));
+                        returnUri);
                     return Redirect(hppLink);
                 },
                 authorized =>
                 {
                     ViewData["Status"] = authorized.Status;
-                    return View("Success");
+                    return View("Pending");
                 },
                 failed =>
                 {
                     ViewData["Status"] = failed.Status;
-                    return View("Success");
+                    return View("Failed");
                 },
                 authorizing =>
                 {
                     ViewData["Status"] = authorizing.Status;
-                    return View("Failed");
+                    return View("Pending");
                 });
         }
 

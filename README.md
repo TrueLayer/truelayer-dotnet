@@ -124,7 +124,7 @@ public void ConfigureServices(IServiceCollection services)
 
 ### Multiple TrueLayer Clients
 
-Use keyed version of TruLayer client (.NET 9.0/.NET 8.0):
+Use keyed version of TrueLayer client (.NET 9.0/.NET 8.0):
 
 ```c#
 .AddKeyedTrueLayer(configuration, options =>
