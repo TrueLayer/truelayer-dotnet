@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Net.Mime;
 using TrueLayer.Serialization;
 using System.Text.Json;
+using TrueLayer.Caching;
 using TrueLayer.Signing;
 #if NET6_0 || NET6_0_OR_GREATER
 using System.Net.Http.Json;
@@ -26,14 +27,16 @@ namespace TrueLayer
             = $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>()}";
 
         private readonly HttpClient _httpClient;
+        private readonly IAuthTokenCache _authTokenCache;
 
         /// <summary>
         /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
         /// </summary>
         /// <param name="httpClient">The client used to make HTTP requests.</param>
-        public ApiClient(HttpClient httpClient)
+        public ApiClient(HttpClient httpClient, IAuthTokenCache authTokenCache)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _authTokenCache = authTokenCache;
         }
 
         /// <inheritdoc />
@@ -126,6 +129,11 @@ namespace TrueLayer
             httpResponse.Headers.TryGetValues(CustomHeaders.TraceId, out var traceIdHeader);
             string? traceId = traceIdHeader?.FirstOrDefault();
 
+            if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _authTokenCache.Clear();
+            }
+
             if (httpResponse.IsSuccessStatusCode && httpResponse.StatusCode != HttpStatusCode.NoContent)
             {
                 var data = await DeserializeJsonAsync<TData>(httpResponse, traceId, cancellationToken);
@@ -146,6 +154,11 @@ namespace TrueLayer
         {
             httpResponse.Headers.TryGetValues(CustomHeaders.TraceId, out var traceIdHeader);
             string? traceId = traceIdHeader?.FirstOrDefault();
+
+            if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _authTokenCache.Clear();
+            }
 
             // In .NET Standard 2.1 HttpResponse.Content can be null
             if (httpResponse.Content?.Headers.ContentType?.MediaType == "application/problem+json")

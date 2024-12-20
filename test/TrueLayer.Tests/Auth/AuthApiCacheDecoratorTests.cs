@@ -13,10 +13,14 @@ public class AuthApiCacheDecoratorTests
     private readonly InMemoryAuthTokenCacheMock _authTokenCache = new();
     private readonly AuthApiMock _authApiMock = new();
     private readonly AuthApiCacheDecorator _authClient;
+    private const string ClientId = "clientId";
 
     public AuthApiCacheDecoratorTests()
     {
-        _authClient = new AuthApiCacheDecorator(_authApiMock ,_authTokenCache);
+        _authClient = new AuthApiCacheDecorator(
+            _authApiMock,
+            _authTokenCache,
+            new TrueLayerOptions { ClientId = ClientId});
     }
 
     [Fact]
@@ -54,7 +58,7 @@ public class AuthApiCacheDecoratorTests
         //Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Data.Should().BeEquivalentTo(expectedResponse);
-        _authTokenCache.TryGetValue($"tl-auth-token-{scope}", out var cachedResponse);
+        _authTokenCache.TryGetValue($"tl-auth-token-{ClientId}-{scope}", out var cachedResponse);
         cachedResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
         cachedResponse.Data.Should().BeEquivalentTo(expectedResponse);
     }

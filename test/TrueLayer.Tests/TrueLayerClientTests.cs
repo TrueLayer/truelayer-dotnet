@@ -34,14 +34,13 @@ namespace TrueLayer.Tests
                     }
                 }
             };
-            var services = new ServiceCollection();
-            var provider = services.BuildServiceProvider();
+            var mockCache = new InMemoryAuthTokenCacheMock();
 
             var tlOptions = Options.Create(options);
             var factory = new TrueLayerClientFactory(
-                new ApiClient(new HttpClient()),
+                new ApiClient(new HttpClient(), mockCache),
                 tlOptions,
-                provider);
+                mockCache);
             var client = factory.Create();
 
 
@@ -75,14 +74,13 @@ namespace TrueLayer.Tests
                     }
                 }
             };
-            var services = new ServiceCollection();
-            var provider = services.BuildServiceProvider();
+            var mockCache = new InMemoryAuthTokenCacheMock();
 
             var optionsMock = new OptionFactoryMock(options);
             var factory = new TrueLayerKeyedClientFactory(
-                new ApiClient(new HttpClient()),
+                new ApiClient(new HttpClient(), mockCache),
                 optionsMock,
-                provider);
+                mockCache);
             var client = factory.CreateKeyed(serviceKey);
 
 

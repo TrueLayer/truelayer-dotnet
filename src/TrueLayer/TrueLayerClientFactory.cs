@@ -15,14 +15,14 @@ namespace TrueLayer
     {
         private readonly IApiClient _apiClient;
         private readonly IOptions<TrueLayerOptions> _options;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IAuthTokenCache _authTokenCache;
 
-        public TrueLayerClientFactory(IApiClient apiClient, IOptions<TrueLayerOptions> options, IServiceProvider serviceProvider)
+        public TrueLayerClientFactory(IApiClient apiClient, IOptions<TrueLayerOptions> options, IAuthTokenCache authTokenCache)
         {
             options.NotNull(nameof(options));
             _apiClient = apiClient;
             _options = options;
-            _serviceProvider = serviceProvider;
+            _authTokenCache = authTokenCache;
         }
 
         public ITrueLayerClient Create()
@@ -42,8 +42,7 @@ namespace TrueLayer
         public ITrueLayerClient CreateWithCache()
         {
             var options = _options.Value;
-            var authTokenCache = _serviceProvider.GetRequiredService<IAuthTokenCache>();
-            var decoratedAuthApi = new AuthApiCacheDecorator(new AuthApi(_apiClient, options), authTokenCache);
+            var decoratedAuthApi = new AuthApiCacheDecorator(new AuthApi(_apiClient, options), _authTokenCache, options);
 
             return new TrueLayerClient(
                 decoratedAuthApi,
@@ -59,14 +58,14 @@ namespace TrueLayer
     {
         private readonly IApiClient _apiClient;
         private readonly IOptionsFactory<TrueLayerOptions> _options;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IAuthTokenCache _authTokenCache;
 
-        public TrueLayerKeyedClientFactory(IApiClient apiClient, IOptionsFactory<TrueLayerOptions> options, IServiceProvider serviceProvider)
+        public TrueLayerKeyedClientFactory(IApiClient apiClient, IOptionsFactory<TrueLayerOptions> options, IAuthTokenCache authTokenCache)
         {
             options.NotNull(nameof(options));
             _apiClient = apiClient;
             _options = options;
-            _serviceProvider = serviceProvider;
+            _authTokenCache = authTokenCache;
         }
 
         public ITrueLayerClient CreateKeyed(string serviceKey)
@@ -86,8 +85,7 @@ namespace TrueLayer
         public ITrueLayerClient CreateWithCacheKeyed(string serviceKey)
         {
             var options = _options.Create(serviceKey);
-            var authTokenCache = _serviceProvider.GetRequiredKeyedService<IAuthTokenCache>(serviceKey);
-            var decoratedAuthApi = new AuthApiCacheDecorator(new AuthApi(_apiClient, options), authTokenCache);
+            var decoratedAuthApi = new AuthApiCacheDecorator(new AuthApi(_apiClient, options), _authTokenCache, options);
 
             return new TrueLayerClient(
                 decoratedAuthApi,

@@ -103,14 +103,14 @@ namespace Microsoft.Extensions.DependencyInjection
             switch (authTokenCachingStrategy)
             {
                 case AuthTokenCachingStrategies.None:
-                    services.AddKeyedSingleton<IAuthTokenCache, NullMemoryCache>(serviceKey);
+                    services.AddSingleton<IAuthTokenCache, NullMemoryCache>();
                     services.AddKeyedTransient<ITrueLayerClient>(serviceKey,
                         (x, _) => x.GetRequiredKeyedService<TrueLayerKeyedClientFactory>(serviceKey)
                             .CreateKeyed(serviceKey));
                     break;
                 case AuthTokenCachingStrategies.InMemory:
                     services.AddMemoryCache();
-                    services.AddKeyedSingleton<IAuthTokenCache, InMemoryAuthTokenCache>(serviceKey);
+                    services.AddSingleton<IAuthTokenCache, InMemoryAuthTokenCache>();
                     services.AddKeyedTransient<ITrueLayerClient>(serviceKey,
                         (x, _) => x.GetRequiredKeyedService<TrueLayerKeyedClientFactory>(serviceKey)
                             .CreateWithCacheKeyed(serviceKey));
