@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TrueLayer.Auth;
 using Xunit;
 
 namespace TrueLayer.Tests
@@ -37,7 +39,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
         }
 
         [Fact]
-        public void Should_register_keyed_truelayer_clients()
+        public async Task Should_register_keyed_truelayer_clients()
         {
             const string gbpServiceKey = "GbpClient";
             const string eurServiceKey = "EurClient";
@@ -48,18 +50,27 @@ i8bgJRfMTdtzy+5VbS5ScMaKC1LQfhII+PTzGzOr+Ts7Qv8My5cmYU5qarGK3tWF
 c3VMlcFZw7Y0iLjxAQFPvHqJ9vn3xWp+d3JREU1vQJ9daXswwbcoer88o1oVFmFf
 WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
 -----END EC PRIVATE KEY-----";
-            var configuration = new ConfigurationBuilder()
+            var gbpConfiguration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new[]
                 {
-                    new KeyValuePair<string, string?>("TrueLayer:ClientId", "client_id"),
-                    new KeyValuePair<string, string?>("TrueLayer:ClientSecret", "secret"),
+                    new KeyValuePair<string, string?>("TrueLayer:ClientId", "client_gbp"),
+                    new KeyValuePair<string, string?>("TrueLayer:ClientSecret", "secret_gbp"),
+                    new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:KeyId", Guid.NewGuid().ToString()),
+                    new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:PrivateKey", privateKey)
+                })
+                .Build();
+            var eurConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new[]
+                {
+                    new KeyValuePair<string, string?>("TrueLayer:ClientId", "client_eur"),
+                    new KeyValuePair<string, string?>("TrueLayer:ClientSecret", "secret_eur"),
                     new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:KeyId", Guid.NewGuid().ToString()),
                     new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:PrivateKey", privateKey)
                 })
                 .Build();
             var services = new ServiceCollection()
-                .AddKeyedTrueLayer(configuration, serviceKey: gbpServiceKey)
-                .AddKeyedTrueLayer(configuration, serviceKey: eurServiceKey)
+                .AddKeyedTrueLayer(gbpConfiguration, serviceKey: gbpServiceKey)
+                .AddKeyedTrueLayer(eurConfiguration, serviceKey: eurServiceKey)
                 .BuildServiceProvider();
 
             var gbpClient = services.GetRequiredKeyedService<ITrueLayerClient>(gbpServiceKey);
