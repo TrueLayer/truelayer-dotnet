@@ -44,7 +44,7 @@ namespace TrueLayer.AcceptanceTests
                     "sweeping",
                     ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
                     {
-                        Filter = new ProviderFilter { Countries = ["GB"], ReleaseChannel = "alpha" },
+                        Filter = new ProviderFilter { Countries = ["GB"], ReleaseChannel = ReleaseChannels.PrivateBeta },
                     }),
                     new Mandates.Model.Beneficiary.ExternalAccount(
                         "external_account",
@@ -57,7 +57,7 @@ namespace TrueLayer.AcceptanceTests
                     "commercial",
                     ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
                     {
-                        Filter = new ProviderFilter { Countries = ["GB"], ReleaseChannel = "alpha" },
+                        Filter = new ProviderFilter { Countries = ["GB"], ReleaseChannel = ReleaseChannels.PrivateBeta },
                     }),
                     new Mandates.Model.Beneficiary.ExternalAccount(
                         "external_account",
