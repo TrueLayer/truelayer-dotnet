@@ -262,7 +262,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
         {
             _httpMessageHandler
                 .Expect(HttpMethod.Get, "http://localhost/user-agent")
-                .WithHeaders(CustomHeaders.Agent, $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ApiClient>()}")
+                .WithHeaders(CustomHeaders.Agent, $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ApiClient>()} ({System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription})")
                 .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, "{}");
 
             var response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/user-agent"));

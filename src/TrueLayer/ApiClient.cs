@@ -24,8 +24,7 @@ namespace TrueLayer
     internal class ApiClient : IApiClient
     {
         private static readonly string TlAgentHeader
-            = $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>()}";
-
+            = $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ITrueLayerClient>()} ({System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription})";
         private readonly HttpClient _httpClient;
         private readonly IAuthTokenCache _authTokenCache;
 
@@ -46,7 +45,6 @@ namespace TrueLayer
             IDictionary<string, string>? customHeaders = null,
             CancellationToken cancellationToken = default)
         {
-
             using var httpResponse = await SendRequestAsync(
                 httpMethod: HttpMethod.Get,
                 uri: uri,
