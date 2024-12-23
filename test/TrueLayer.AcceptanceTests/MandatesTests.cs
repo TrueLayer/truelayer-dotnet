@@ -30,11 +30,11 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandateTestCases))]
-        [MemberData(nameof(MandateTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandateTestCases),
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases),
             Skip = "It returns forbidden. Need to investigate.")]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
-        [MemberData(nameof(MandateTestCases.CreateTestCommercialPreselectedMandateRequests), MemberType = typeof(MandateTestCases),
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialPreselectedMandateRequests), MemberType = typeof(MandatesTestCases),
             Skip = "It returns forbidden. Need to investigate.")]
         public async Task Can_Get_Mandate(CreateMandateRequest mandateRequest)
         {
@@ -54,10 +54,10 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandateTestCases))]
-        [MemberData(nameof(MandateTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandateTestCases))]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
-        [MemberData(nameof(MandateTestCases.CreateTestCommercialPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
         public async Task Can_List_Mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange
@@ -76,7 +76,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
         public async Task Can_Start_Preselected_Authorization(CreateMandateRequest mandateRequest)
         {
             // Arrange
@@ -111,8 +111,8 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandateTestCases))]
-        [MemberData(nameof(MandateTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandateTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
         public async Task Can_Complete_UserSelected_Full_Auth_Flow(CreateMandateRequest mandateRequest)
         {
             // Arrange
@@ -146,7 +146,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
         public async Task Can_Get_Funds(CreateMandateRequest createMandateRequest)
         {
             //Arrange
@@ -166,7 +166,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
         public async Task Can_Get_Mandate_Constraints(CreateMandateRequest createMandateRequest)
         {
             //Arrange
@@ -182,7 +182,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
         public async Task Can_Revoke_Mandate(CreateMandateRequest mandateRequest)
         {
             //Arrange
@@ -199,7 +199,7 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(MandateTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
         public async Task Can_Create_Mandate_Payment(CreateMandateRequest mandateRequest)
         {
             // Arrange

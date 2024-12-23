@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using OneOf;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Payments.Model;
@@ -14,7 +13,7 @@ namespace TrueLayer.AcceptanceTests
     using MandateUnion = OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>;
     using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
 
-    public static class MandateTestCases
+    public static class MandatesTestCases
     {
         private static readonly AccountIdentifier.SortCodeAccountNumber AccountIdentifier = new("140662", "10003957");
         private const string ProviderId = "mock-payments-gb-redirect";
