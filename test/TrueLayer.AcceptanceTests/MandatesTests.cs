@@ -204,7 +204,7 @@ namespace TrueLayer.AcceptanceTests
         {
             // Arrange
             string mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
-            var paymentRequest = MandateTestCases.CreateTestMandatePaymentRequest(mandateRequest, mandateId, false);
+            var paymentRequest = RequestBuilders.CreateTestMandatePaymentRequest(mandateRequest, mandateId, false);
 
             // Act
             var response = await _fixture.TlClients[0].Payments.CreatePayment(
