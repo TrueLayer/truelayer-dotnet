@@ -23,12 +23,10 @@ namespace TrueLayer.AcceptanceTests
     {
         private readonly ApiTestFixture _fixture;
         private const string ReturnUri = "http://localhost:3000/callback";
-        private readonly string _authorizedSweepingMandateId;
 
         public MandatesTests(ApiTestFixture fixture)
         {
             _fixture = fixture;
-            _authorizedSweepingMandateId = CreateAuthorizedSweepingMandate(MandateTestCases.CreateTestMandateRequests()).Result;
         }
 
         [Theory]
@@ -147,12 +145,16 @@ namespace TrueLayer.AcceptanceTests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
-        [Fact]
-        public async Task Can_Get_Funds()
+        [Theory]
+        [MemberData(nameof(MandateTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
+        public async Task Can_Get_Funds(CreateMandateRequest createMandateRequest)
         {
+            //Arrange
+            var mandateId = await CreateAuthorizedSweepingMandate(createMandateRequest);
+
             // Act
             var fundsResponse = await _fixture.TlClients[0].Mandates.GetConfirmationOfFunds(
-                _authorizedSweepingMandateId,
+                mandateId,
                 1,
                 "GBP",
                 MandateType.Sweeping);
@@ -163,12 +165,16 @@ namespace TrueLayer.AcceptanceTests
             fundsResponse.Data!.Confirmed.Should().BeTrue();
         }
 
-        [Fact]
-        public async Task Can_Get_Mandate_Constraints()
+        [Theory]
+        [MemberData(nameof(MandateTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandateTestCases))]
+        public async Task Can_Get_Mandate_Constraints(CreateMandateRequest createMandateRequest)
         {
+            //Arrange
+            var mandateId = await CreateAuthorizedSweepingMandate(createMandateRequest);
+
             // Act
             var response = await _fixture.TlClients[0].Mandates.GetMandateConstraints(
-                _authorizedSweepingMandateId,
+                mandateId,
                 MandateType.Sweeping);
 
             // Assert
@@ -197,7 +203,8 @@ namespace TrueLayer.AcceptanceTests
         public async Task Can_Create_Mandate_Payment(CreateMandateRequest mandateRequest)
         {
             // Arrange
-            var paymentRequest = MandateTestCases.CreateTestMandatePaymentRequest(mandateRequest, _authorizedSweepingMandateId, false);
+            string mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
+            var paymentRequest = MandateTestCases.CreateTestMandatePaymentRequest(mandateRequest, mandateId, false);
 
             // Act
             var response = await _fixture.TlClients[0].Payments.CreatePayment(

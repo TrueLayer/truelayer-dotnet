@@ -45,15 +45,6 @@ namespace TrueLayer.AcceptanceTests
                 mandateRequest.User,
                 setRelatedProducts ? new RelatedProducts(new SignupPlus()) : null);
 
-        public static CreateMandateRequest CreateTestMandateRequests()
-            => CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
-                "sweeping",
-                ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", ProviderId)),
-                new Mandates.Model.Beneficiary.ExternalAccount(
-                    "external_account",
-                    "Bob NET SDK",
-                    AccountIdentifierUnion.FromT0(accountIdentifier)))));
-
         public static IEnumerable<object[]> CreateTestSweepingPreselectedMandateRequests()
         {
             yield return
