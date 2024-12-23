@@ -31,11 +31,9 @@ namespace TrueLayer.AcceptanceTests
 
         [Theory]
         [MemberData(nameof(MandatesTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
-        [MemberData(nameof(MandatesTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases),
-            Skip = "It returns forbidden. Need to investigate.")]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
         [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
-        [MemberData(nameof(MandatesTestCases.CreateTestCommercialPreselectedMandateRequests), MemberType = typeof(MandatesTestCases),
-            Skip = "It returns forbidden. Need to investigate.")]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
         public async Task Can_Get_Mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange
@@ -44,9 +42,12 @@ namespace TrueLayer.AcceptanceTests
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
             var mandateId = createResponse.Data!.Id;
+            var mandateType = mandateRequest.Mandate.Match(
+                commercial => MandateType.Commercial,
+                sweeping => MandateType.Sweeping);
 
             // Act
-            var response = await client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
+            var response = await client.Mandates.GetMandate(mandateId, mandateType);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -122,7 +123,9 @@ namespace TrueLayer.AcceptanceTests
                 .CreateMandate(mandateRequest, Guid.NewGuid().ToString());
 
             var mandateId = createResponse.Data!.Id;
-            var mandateType = mandateRequest.Mandate.IsT0 ? MandateType.Commercial : MandateType.Sweeping;
+            var mandateType = mandateRequest.Mandate.Match(
+                commercial => MandateType.Commercial,
+                sweeping => MandateType.Sweeping);
 
             var authorizationRequest = new StartAuthorizationFlowRequest(
                 new ProviderSelectionRequest(),
