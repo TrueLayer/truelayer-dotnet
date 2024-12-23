@@ -38,8 +38,9 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             client.Should().NotBeNull();
         }
 
+#if NET8_0_OR_GREATER
         [Fact]
-        public async Task Should_register_keyed_truelayer_clients()
+        public void Should_register_keyed_truelayer_clients()
         {
             const string gbpServiceKey = "GbpClient";
             const string eurServiceKey = "EurClient";
@@ -53,24 +54,24 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             var gbpConfiguration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new[]
                 {
-                    new KeyValuePair<string, string?>("TrueLayer:ClientId", "client_gbp"),
-                    new KeyValuePair<string, string?>("TrueLayer:ClientSecret", "secret_gbp"),
-                    new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:KeyId", Guid.NewGuid().ToString()),
-                    new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:PrivateKey", privateKey)
+                    new KeyValuePair<string, string?>("GbpClient:ClientId", "client_gbp"),
+                    new KeyValuePair<string, string?>("GbpClient:ClientSecret", "secret_gbp"),
+                    new KeyValuePair<string, string?>("GbpClient:Payments:SigningKey:KeyId", Guid.NewGuid().ToString()),
+                    new KeyValuePair<string, string?>("GbpClient:Payments:SigningKey:PrivateKey", privateKey)
                 })
                 .Build();
             var eurConfiguration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new[]
                 {
-                    new KeyValuePair<string, string?>("TrueLayer:ClientId", "client_eur"),
-                    new KeyValuePair<string, string?>("TrueLayer:ClientSecret", "secret_eur"),
-                    new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:KeyId", Guid.NewGuid().ToString()),
-                    new KeyValuePair<string, string?>("TrueLayer:Payments:SigningKey:PrivateKey", privateKey)
+                    new KeyValuePair<string, string?>("EurClient:ClientId", "client_eur"),
+                    new KeyValuePair<string, string?>("EurClient:ClientSecret", "secret_eur"),
+                    new KeyValuePair<string, string?>("EurClient:Payments:SigningKey:KeyId", Guid.NewGuid().ToString()),
+                    new KeyValuePair<string, string?>("EurClient:Payments:SigningKey:PrivateKey", privateKey)
                 })
                 .Build();
             var services = new ServiceCollection()
-                .AddKeyedTrueLayer(gbpConfiguration, serviceKey: gbpServiceKey)
-                .AddKeyedTrueLayer(eurConfiguration, serviceKey: eurServiceKey)
+                .AddKeyedTrueLayer(gbpServiceKey, gbpConfiguration)
+                .AddKeyedTrueLayer(eurServiceKey, eurConfiguration)
                 .BuildServiceProvider();
 
             var gbpClient = services.GetRequiredKeyedService<ITrueLayerClient>(gbpServiceKey);
@@ -79,5 +80,6 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             gbpClient.Should().NotBeNull();
             eurClient.Should().NotBeNull();
         }
+#endif
     }
 }

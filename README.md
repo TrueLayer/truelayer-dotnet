@@ -127,7 +127,9 @@ public void ConfigureServices(IServiceCollection services)
 Use keyed version of TrueLayer client (.NET 9.0/.NET 8.0):
 
 ```c#
-.AddKeyedTrueLayer(configuration, options =>
+.AddKeyedTrueLayer("TrueLayerGbp",
+    configuration,
+    options =>
     {
         // For demo purposes only. Private key should be stored securely
         var privateKey = File.ReadAllText("ec512-private-key.pem");
@@ -136,10 +138,10 @@ Use keyed version of TrueLayer client (.NET 9.0/.NET 8.0):
             options.Payments.SigningKey.PrivateKey = privateKey;
         }
     },
-    configurationSectionName: "TrueLayerGbp",
-    serviceKey: "TrueLayerGbp",
     authTokenCachingStrategy: AuthTokenCachingStrategies.InMemory)
-.AddKeyedTrueLayer(configuration, options =>
+.AddKeyedTrueLayer("TrueLayerEur",
+    configuration,
+    options =>
     {
         // For demo purposes only. Private key should be stored securely
         var privateKey = File.ReadAllText("ec512-private-key.pem");
@@ -148,8 +150,6 @@ Use keyed version of TrueLayer client (.NET 9.0/.NET 8.0):
             options.Payments.SigningKey.PrivateKey = privateKey;
         }
     },
-    configurationSectionName: "TrueLayerEur",
-    serviceKey: "TrueLayerEur",
     authTokenCachingStrategy: AuthTokenCachingStrategies.InMemory)
 ```
 
