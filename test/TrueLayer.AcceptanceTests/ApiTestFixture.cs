@@ -1,10 +1,12 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TrueLayer.AcceptanceTests.Clients;
 using TrueLayer.Caching;
 
 namespace TrueLayer.AcceptanceTests
@@ -19,7 +21,7 @@ namespace TrueLayer.AcceptanceTests
             const string serviceKey2 = "TrueLayerClient2";
             const string configName2 = "TrueLayer2";
 
-            ServiceProvider = new ServiceCollection()
+            var serviceProvider = new ServiceCollection()
                 .AddKeyedTrueLayer(serviceKey1,
                     configuration,
                     options =>
@@ -47,8 +49,8 @@ namespace TrueLayer.AcceptanceTests
 
             TlClients =
             [
-                ServiceProvider.GetRequiredKeyedService<ITrueLayerClient>(serviceKey1),
-                ServiceProvider.GetRequiredKeyedService<ITrueLayerClient>(serviceKey2)
+                serviceProvider.GetRequiredKeyedService<ITrueLayerClient>(serviceKey1),
+                serviceProvider.GetRequiredKeyedService<ITrueLayerClient>(serviceKey2)
             ];
 
             ClientMerchantAccounts =
@@ -56,11 +58,26 @@ namespace TrueLayer.AcceptanceTests
                 GetMerchantBeneficiaryAccountsAsync(TlClients[0]).Result,
                 GetMerchantBeneficiaryAccountsAsync(TlClients[1]).Result,
             ];
+
+            MockBankClient = new MockBankClient(new HttpClient
+            {
+                BaseAddress = new Uri("https://pay-mock-connect.truelayer-sandbox.com/")
+            });
+            PayApiClient = new PayApiClient(new HttpClient
+            {
+                BaseAddress = new Uri("https://pay-api.truelayer-sandbox.com")
+            });
+            ApiClient = new ApiClient(new HttpClient
+            {
+                BaseAddress = new Uri("https://api.truelayer-sandbox.com")
+            });
         }
 
-        public IServiceProvider ServiceProvider { get; }
-        public ITrueLayerClient[] TlClients { get; }
-        public (string GbpMerchantAccountId, string EurMerchantAccountId)[] ClientMerchantAccounts { get; }
+        public readonly ITrueLayerClient[] TlClients;
+        public readonly (string GbpMerchantAccountId, string EurMerchantAccountId)[] ClientMerchantAccounts;
+        public readonly MockBankClient MockBankClient;
+        public readonly PayApiClient PayApiClient;
+        public readonly ApiClient ApiClient;
 
         private static IConfiguration LoadConfiguration()
             => new ConfigurationBuilder()

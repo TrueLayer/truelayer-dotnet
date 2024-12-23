@@ -6,8 +6,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using OneOf;
+using TrueLayer.AcceptanceTests.Clients;
 using TrueLayer.AcceptanceTests.Helpers;
-using TrueLayer.AcceptanceTests.MockBank;
 using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
@@ -42,20 +42,10 @@ using GetPaymentUnion = OneOf<
 public partial class PaymentTests : IClassFixture<ApiTestFixture>
 {
     private readonly ApiTestFixture _fixture;
-    private readonly MockBankClient _mockBankClient;
-    private readonly PayApiClient _payApiClient;
 
     public PaymentTests(ApiTestFixture fixture)
     {
         _fixture = fixture;
-        _mockBankClient = new MockBankClient(new HttpClient
-        {
-            BaseAddress = new Uri("https://pay-mock-connect.truelayer-sandbox.com/")
-        });
-        _payApiClient = new PayApiClient(new HttpClient
-        {
-            BaseAddress = new Uri("https://pay-api.truelayer-sandbox.com")
-        });
     }
 
     [Theory]
@@ -114,7 +104,6 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
         hppUri.Should().NotBeNullOrWhiteSpace();
     }
-
 
     [Fact]
     public async Task Can_Create_Merchant_Account_Gbp_Verification_Payment()
@@ -224,7 +213,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             providerSelection: providerSelection,
             initAuthorizationFlow: true);
 
-        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankAction.Execute, typeof(GetPaymentResponse.Settled));
+        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
 
         var settled = payment.AsT4;
         settled.AmountInMinor.Should().Be(paymentRequest.AmountInMinor);
@@ -294,7 +283,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var payment = await CreatePaymentAndSetAuthorisationStatusAsync(
             client,
             paymentRequest,
-            MockBankAction.RejectAuthorisation,
+            MockBankPaymentAction.RejectAuthorisation,
             typeof(GetPaymentResponse.AttemptFailed));
 
         // Assert
@@ -310,7 +299,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var paymentRequest = CreateTestPaymentRequest(
             beneficiary: new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].GbpMerchantAccountId),
             initAuthorizationFlow: true);
-        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankAction.Execute, typeof(GetPaymentResponse.Settled));
+        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
         var paymentId = payment.AsT4.Id;
         // Act && assert
         var createRefundResponse = await client.Payments.CreatePaymentRefund(
@@ -338,7 +327,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var paymentRequest = CreateTestPaymentRequest(
             beneficiary: new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].GbpMerchantAccountId),
             initAuthorizationFlow: true);
-        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankAction.Execute, typeof(GetPaymentResponse.Settled));
+        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
         var paymentId = payment.AsT4.Id;
         // Act && assert
         var createRefundResponse = await client.Payments.CreatePaymentRefund(
@@ -663,7 +652,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     private async Task<GetPaymentUnion> CreatePaymentAndSetAuthorisationStatusAsync(
         ITrueLayerClient trueLayerClient,
         CreatePaymentRequest paymentRequest,
-        MockBankAction mockBankAction,
+        MockBankPaymentAction mockBankPaymentAction,
         Type expectedPaymentStatus)
     {
         var response = await trueLayerClient.Payments.CreatePayment(paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
@@ -672,11 +661,11 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var authorizing = response.Data.AsT3;
         var paymentId = authorizing.Id;
 
-        var providerReturnUri = await _mockBankClient.AuthorisePaymentAsync(
+        var providerReturnUri = await _fixture.MockBankClient.AuthorisePaymentAsync(
             authorizing.AuthorizationFlow!.Actions.Next.AsT2.Uri,
-            mockBankAction);
+            mockBankPaymentAction);
 
-        await _payApiClient.SubmitProviderReturnParametersAsync(providerReturnUri.Query, providerReturnUri.Fragment);
+        await _fixture.PayApiClient.SubmitProviderReturnParametersAsync(providerReturnUri.Query, providerReturnUri.Fragment);
 
         return await PollPaymentForTerminalStatusAsync(trueLayerClient, paymentId, expectedPaymentStatus);
     }
