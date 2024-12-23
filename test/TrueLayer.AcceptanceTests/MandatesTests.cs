@@ -224,6 +224,85 @@ namespace TrueLayer.AcceptanceTests
             response.Data.AsT1.Status.Should().Be("authorized");
         }
 
+        [Fact]
+        public async Task GetMandate_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.GetMandate(mandateId, MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task StartAuthFlow_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.StartAuthorizationFlow(mandateId,
+                    new StartAuthorizationFlowRequest(new ProviderSelectionRequest(), new Redirect(new Uri("https://api.com"))),
+                    Guid.NewGuid().ToString(), MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task SubmitProviderSelection_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.SubmitProviderSelection(mandateId, new SubmitProviderSelectionRequest("provider"), Guid.NewGuid().ToString(), MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task SubmitConsent_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.SubmitConsent(mandateId, Guid.NewGuid().ToString(), MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task GetConfirmationOfFunds_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.GetConfirmationOfFunds(mandateId, 100, Currencies.GBP, MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task GetMandateConstraints_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.GetMandateConstraints(mandateId, MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task RevokeMandate_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.RevokeMandate(mandateId, Guid.NewGuid().ToString(), MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
         private async Task<string> CreateAuthorizedSweepingMandate(CreateMandateRequest mandateRequest)
         {
             var client = _fixture.TlClients[0];

@@ -59,6 +59,17 @@ namespace TrueLayer.AcceptanceTests
             details.Metadata.Should().BeEquivalentTo(payoutRequest.Metadata);
         }
 
+        [Fact]
+        public async Task GetPayout_Url_As_PayoutId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string payoutId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Payouts.GetPayout(payoutId));
+            result.Message.Should().Be("Value is malformed (Parameter 'id')");
+        }
+
         private CreatePayoutRequest CreatePayoutRequest()
             => new(
                 _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId,

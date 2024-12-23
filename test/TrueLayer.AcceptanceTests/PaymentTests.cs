@@ -395,6 +395,84 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             userSelected => { expectedSelection.IsT3.Should().Be(true); });
     }
 
+    [Fact]
+    public async Task GetPayment_Url_As_PaymentId_Should_Throw_Exception()
+    {
+        var client = _fixture.TlClients[0];
+        const string paymentId = "https://test.com";
+
+        var result = await Assert.ThrowsAsync<ArgumentException>(() => client.Payments.GetPayment(paymentId));
+        result.Message.Should().Be("Value is malformed (Parameter 'id')");
+    }
+
+    [Fact]
+    public async Task StartAuthFlow_Url_As_PaymentId_Should_Throw_Exception()
+    {
+        var client = _fixture.TlClients[0];
+        const string paymentId = "https://test.com";
+
+        var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.Payments.StartAuthorizationFlow(paymentId, Guid.NewGuid().ToString(),
+                new StartAuthorizationFlowRequest()));
+        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+    }
+
+    [Fact]
+    public async Task CreateRefund_Url_As_PaymentId_Should_Throw_Exception()
+    {
+        var client = _fixture.TlClients[0];
+        const string paymentId = "https://test.com";
+
+        var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.Payments.CreatePaymentRefund(paymentId, Guid.NewGuid().ToString(),
+                new CreatePaymentRefundRequest("reference")));
+        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+    }
+
+    [Fact]
+    public async Task ListPaymentRefunds_Url_As_PaymentId_Should_Throw_Exception()
+    {
+        var client = _fixture.TlClients[0];
+        const string paymentId = "https://test.com";
+
+        var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.Payments.ListPaymentRefunds(paymentId));
+        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+    }
+
+    [Fact]
+    public async Task GetPaymentRefund_Url_As_PaymentId_Should_Throw_Exception()
+    {
+        var client = _fixture.TlClients[0];
+        const string paymentId = "https://test.com";
+
+        var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.Payments.GetPaymentRefund(paymentId, Guid.NewGuid().ToString()));
+        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+    }
+
+    [Fact]
+    public async Task GetPaymentRefund_Url_As_RefundId_Should_Throw_Exception()
+    {
+        var client = _fixture.TlClients[0];
+        const string refundId = "https://test.com";
+
+        var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.Payments.GetPaymentRefund(Guid.NewGuid().ToString(), refundId));
+        result.Message.Should().Be("Value is malformed (Parameter 'refundId')");
+    }
+
+    [Fact]
+    public async Task CancelPayment_Url_As_PaymentId_Should_Throw_Exception()
+    {
+        var client = _fixture.TlClients[0];
+        const string paymentId = "https://test.com";
+
+        var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.Payments.CancelPayment(paymentId, Guid.NewGuid().ToString()));
+        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+    }
+
     private static CreatePaymentRequest CreateTestPaymentRequest(
         ProviderUnion? providerSelection = null,
         AccountIdentifierUnion? accountIdentifier = null,
