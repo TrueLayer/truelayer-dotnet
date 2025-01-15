@@ -24,7 +24,7 @@ namespace TrueLayer.Auth
             GetAuthTokenRequest authTokenRequest,
             CancellationToken cancellationToken = default)
         {
-            var key = $"{KeyPrefix}-{_options.ClientId}-{authTokenRequest.Scope}";
+            var key = $"{KeyPrefix}:{_options.ClientId}:{authTokenRequest.Scope}";
             if (_authTokenCache.TryGetValue(key, out ApiResponse<GetAuthTokenResponse>? cachedResponse))
             {
                 return cachedResponse!;

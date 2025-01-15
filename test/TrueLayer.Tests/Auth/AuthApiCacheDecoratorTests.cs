@@ -58,7 +58,7 @@ public class AuthApiCacheDecoratorTests
         //Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Data.Should().BeEquivalentTo(expectedResponse);
-        _authTokenCache.TryGetValue($"tl-auth-token-{ClientId}-{scope}", out var cachedResponse);
+        _authTokenCache.TryGetValue($"tl-auth-token:{ClientId}:{scope}", out var cachedResponse);
         cachedResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
         cachedResponse.Data.Should().BeEquivalentTo(expectedResponse);
     }
