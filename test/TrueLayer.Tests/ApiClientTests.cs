@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
 using RichardSzalay.MockHttp;
 using TrueLayer.Auth;
 using TrueLayer.Serialization;
@@ -36,9 +35,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             _authTokenCache = new InMemoryAuthTokenCacheMock();
 ;            _apiClient = new ApiClient(
                 _httpMessageHandler.ToHttpClient(),
-                Options.Create(new TrueLayerOptions()),
                 _authTokenCache);
-
             _stub = new TestResponse
             {
                 FirstName = "Jane",
@@ -218,7 +215,6 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             response.TraceId.Should().Be("trace-id");
         }
 
-
         [Fact]
         public async Task Given_request_fails_returns_problem_details()
         {
@@ -266,7 +262,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
         {
             _httpMessageHandler
                 .Expect(HttpMethod.Get, "http://localhost/user-agent")
-                .WithHeaders(CustomHeaders.Agent, $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ApiClient>()}")
+                .WithHeaders(CustomHeaders.Agent, $"truelayer-dotnet/{ReflectionUtils.GetAssemblyVersion<ApiClient>()} ({System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription})")
                 .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, "{}");
 
             var response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/user-agent"));

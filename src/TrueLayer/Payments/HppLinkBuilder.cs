@@ -22,6 +22,7 @@ namespace TrueLayer.Payments
             bool? signup = null)
         {
             id.NotNullOrWhiteSpace(nameof(id));
+            id.NotAUrl(nameof(id));
             token.NotNullOrWhiteSpace(nameof(token));
             returnUri.NotNull(nameof(returnUri));
 

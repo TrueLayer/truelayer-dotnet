@@ -1,106 +1,75 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using OneOf;
+using TrueLayer.AcceptanceTests.Clients;
+using TrueLayer.AcceptanceTests.Helpers;
 using TrueLayer.Mandates.Model;
-using TrueLayer.Payments.Model;
 using Xunit;
 
 namespace TrueLayer.AcceptanceTests
 {
-    using System.Linq;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Text;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Options;
-    using TrueLayer.Models;
-    using AccountIdentifierUnion = OneOf<
-        AccountIdentifier.SortCodeAccountNumber,
-        AccountIdentifier.Iban,
-        AccountIdentifier.Bban,
-        AccountIdentifier.Nrb>;
-    using AuthorizationResponseUnion = OneOf<
-        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizing,
-        Models.AuthorisationFlowResponse.AuthorizationFlowAuthorizationFailed>;
+    using Models;
     using MandateDetailUnion = OneOf<
         MandateDetail.AuthorizationRequiredMandateDetail,
         MandateDetail.AuthorizingMandateDetail,
         MandateDetail.AuthorizedMandateDetail,
         MandateDetail.FailedMandateDetail,
         MandateDetail.RevokedMandateDetail>;
-    using MandateUnion = OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>;
-    using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
 
     public class MandatesTests : IClassFixture<ApiTestFixture>
     {
         private readonly ApiTestFixture _fixture;
-        private TrueLayerOptions configuration;
-        public string RETURN_URI = "http://localhost:3000/callback";
-        public static string PROVIDER_ID = "ob-uki-mock-bank-sbox"; // Beta provider in closed access, requires a whitelisted ClientId.
-        public static string COMMERCIAL_PROVIDER_ID = "ob-natwest-vrp-sandbox"; // Provider to satisfy commercial mandates creation.
-        public static AccountIdentifier.SortCodeAccountNumber accountIdentifier = new("140662", "10003957");
+        private const string ReturnUri = "http://localhost:3000/callback";
 
         public MandatesTests(ApiTestFixture fixture)
         {
             _fixture = fixture;
-            configuration = fixture.ServiceProvider.GetRequiredService<IOptions<TrueLayerOptions>>().Value;
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialPreselectedMandateRequests))]
-        public async Task Can_create_mandate(CreateMandateRequest mandateRequest)
-        {
-            // Act
-            var response = await _fixture.Client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.Created);
-            response.Data!.User.Id.Should().Be(mandateRequest.User!.Id);
-        }
-
-
-        [Theory]
-        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests), Skip = "It returns forbidden. Need to investigate.")]
-        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialPreselectedMandateRequests), Skip = "It returns forbidden. Need to investigate.")]
-        public async Task Can_get_mandate(CreateMandateRequest mandateRequest)
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        public async Task Can_Get_Mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+            var client = _fixture.TlClients[0];
+            var createResponse = await client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
             var mandateId = createResponse.Data!.Id;
+            var mandateType = mandateRequest.Mandate.Match(
+                commercial => MandateType.Commercial,
+                sweeping => MandateType.Sweeping);
 
             // Act
-            var response = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
+            var response = await client.Mandates.GetMandate(mandateId, mandateType);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            response.Data.AsT0.User!.Id.Should().Be(createResponse.Data.User!.Id);
+            response.Data.AsT0.User!.Id.Should().Be(createResponse.Data.User.Id);
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialPreselectedMandateRequests))]
-        public async Task Can_list_mandate(CreateMandateRequest mandateRequest)
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        public async Task Can_List_Mandate(CreateMandateRequest mandateRequest)
         {
             // Arrange
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+            var client = _fixture.TlClients[0];
+            var createResponse = await client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // Act
-            var response = await _fixture.Client.Mandates.ListMandates(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.Sweeping);
+            var response = await client.Mandates
+                .ListMandates(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.Sweeping);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -108,22 +77,33 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
-        public async Task Can_start_authorization(CreateMandateRequest mandateRequest)
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        public async Task Can_Start_Preselected_Authorization(CreateMandateRequest mandateRequest)
         {
             // Arrange
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+            var client = _fixture.TlClients[0];
+            var createResponse = await client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)));
+                new Redirect(new Uri(ReturnUri)));
 
             // Act
-            var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
+            var response = await client.Mandates.StartAuthorizationFlow(
                 mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
-            await AuthorizeMandate(response);
-            var mandate = await WaitForMandateToBeAuthorized(mandateId);
+
+            var providerReturnUri= await _fixture.MockBankClient.AuthoriseMandateAsync(
+                response.Data.AsT0.AuthorizationFlow.Actions.Next.AsT4.Uri, MockBankMandateAction.Authorise);
+
+            var query = providerReturnUri.Query.Replace("mandate-", string.Empty);
+            await _fixture.ApiClient.SubmitPaymentsProviderReturnAsync(query, providerReturnUri.Fragment);
+
+            var mandate = await PollMandateForTerminalStatusAsync(
+                client,
+                mandateId,
+                MandateType.Sweeping,
+                typeof(MandateDetail.AuthorizedMandateDetail));
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -132,58 +112,36 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
-        public async Task Can_submit_provider_selection(CreateMandateRequest mandateRequest)
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        [MemberData(nameof(MandatesTestCases.CreateTestCommercialUserSelectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        public async Task Can_Complete_UserSelected_Full_Auth_Flow(CreateMandateRequest mandateRequest)
         {
             // Arrange
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
-            var mandateId = createResponse.Data!.Id;
-            SubmitProviderSelectionRequest request = new(COMMERCIAL_PROVIDER_ID);
-            StartAuthorizationFlowRequest authorizationRequest = new(
-                new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)));
-            await _fixture.Client.Mandates.StartAuthorizationFlow(
-                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
-            // Act
-            var response = await _fixture.Client.Mandates.SubmitProviderSelection(
-                mandateId, request, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-        }
-
-        [Theory]
-        [MemberData(nameof(CreateTestSweepingUserSelectedMandateRequests))]
-        [MemberData(nameof(CreateTestCommercialUserSelectedMandateRequests))]
-        public async Task Can_submit_consent(CreateMandateRequest mandateRequest)
-        {
-            // Arrange
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var client = _fixture.TlClients[0];
+            const string providerId = "mock-payments-gb-redirect";
+            var createResponse = await client.Mandates
+                .CreateMandate(mandateRequest, Guid.NewGuid().ToString());
 
             var mandateId = createResponse.Data!.Id;
-            var mandateType = mandateRequest.Mandate.IsT0 ? MandateType.Commercial : MandateType.Sweeping;
+            var mandateType = mandateRequest.Mandate.Match(
+                commercial => MandateType.Commercial,
+                sweeping => MandateType.Sweeping);
 
-            StartAuthorizationFlowRequest authorizationRequest = new(
+            var authorizationRequest = new StartAuthorizationFlowRequest(
                 new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)),
+                new Redirect(new Uri(ReturnUri)),
                 new Consent());
 
-            await _fixture.Client.Mandates.StartAuthorizationFlow(
+            await client.Mandates.StartAuthorizationFlow(
                 mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
 
-            SubmitProviderSelectionRequest submitProviderRequest = new(mandateRequest.Mandate.Match(
-                c => COMMERCIAL_PROVIDER_ID,
-                s => PROVIDER_ID));
+            var submitProviderRequest = new SubmitProviderSelectionRequest(providerId);
 
-            await _fixture.Client.Mandates.SubmitProviderSelection(
+            await client.Mandates.SubmitProviderSelection(
                 mandateId, submitProviderRequest, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
 
             // Act
-            var response = await _fixture.Client.Mandates.SubmitConsent(
+            var response = await client.Mandates.SubmitConsent(
                 mandateId, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
 
             // Assert
@@ -191,23 +149,18 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
-        public async Task Can_Get_Funds(CreateMandateRequest mandateRequest)
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        public async Task Can_Get_Funds(CreateMandateRequest createMandateRequest)
         {
-            // Arrange
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
-            var mandateId = createResponse.Data!.Id;
-            StartAuthorizationFlowRequest authorizationRequest = new(
-                new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)));
+            //Arrange
+            var mandateId = await CreateAuthorizedSweepingMandate(createMandateRequest);
 
             // Act
-            var response = await _fixture.Client.Mandates.StartAuthorizationFlow(
-                mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
-            await AuthorizeMandate(response);
-            await WaitForMandateToBeAuthorized(mandateId);
-            var fundsResponse = await _fixture.Client.Mandates.GetConfirmationOfFunds(mandateId, 1, "GBP", MandateType.Sweeping);
+            var fundsResponse = await _fixture.TlClients[0].Mandates.GetConfirmationOfFunds(
+                mandateId,
+                1,
+                "GBP",
+                MandateType.Sweeping);
 
             // Assert
             fundsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -216,53 +169,48 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
-        public async Task Can_get_mandate_constraints(CreateMandateRequest mandateRequest)
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        public async Task Can_Get_Mandate_Constraints(CreateMandateRequest createMandateRequest)
         {
-            // Arrange
-            string mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
+            //Arrange
+            var mandateId = await CreateAuthorizedSweepingMandate(createMandateRequest);
 
             // Act
-            var response = await _fixture.Client.Mandates.GetMandateConstraints(
+            var response = await _fixture.TlClients[0].Mandates.GetMandateConstraints(
                 mandateId,
-                mandateRequest.Mandate.Match(
-                    commercialMandate => MandateType.Commercial,
-                    sweepingMandate => MandateType.Sweeping));
+                MandateType.Sweeping);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
-        public async Task Can_revoke_mandate(CreateMandateRequest mandateRequest)
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        public async Task Can_Revoke_Mandate(CreateMandateRequest mandateRequest)
         {
-            // Arrange
+            //Arrange
             string mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
 
             // Act
-            var response = await _fixture.Client.Mandates.RevokeMandate(
+            var response = await _fixture.TlClients[0].Mandates.RevokeMandate(
                 mandateId,
                 idempotencyKey: Guid.NewGuid().ToString(),
-                mandateRequest.Mandate.Match(
-                    commercialMandate => MandateType.Commercial,
-                    sweepingMandate => MandateType.Sweeping));
+                MandateType.Sweeping);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Theory]
-        [MemberData(nameof(CreateTestSweepingPreselectedMandateRequests))]
-        public async Task Can_create_mandate_payment(CreateMandateRequest mandateRequest)
+        [MemberData(nameof(MandatesTestCases.CreateTestSweepingPreselectedMandateRequests), MemberType = typeof(MandatesTestCases))]
+        public async Task Can_Create_Mandate_Payment(CreateMandateRequest mandateRequest)
         {
             // Arrange
-            var mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
-
-            var paymentRequest = CreateTestMandatePaymentRequest(mandateRequest, mandateId, false);
+            string mandateId = await CreateAuthorizedSweepingMandate(mandateRequest);
+            var paymentRequest = RequestBuilders.CreateTestMandatePaymentRequest(mandateRequest, mandateId, false);
 
             // Act
-            var response = await _fixture.Client.Payments.CreatePayment(
+            var response = await _fixture.TlClients[0].Payments.CreatePayment(
                 paymentRequest,
                 idempotencyKey: Guid.NewGuid().ToString());
 
@@ -276,157 +224,127 @@ namespace TrueLayer.AcceptanceTests
             response.Data.AsT1.Status.Should().Be("authorized");
         }
 
-        private static CreateMandateRequest CreateTestMandateRequest(
-            MandateUnion mandate,
-            string currency = Currencies.GBP)
-            => new(
-                mandate,
-                currency,
-                new Constraints(
-                    MaximumIndividualAmount: 1000,
-                    new PeriodicLimits(Month: new Limit(2000, PeriodAlignment.Calendar))),
-                new PaymentUserRequest(
-                    id: "f9b48c9d-176b-46dd-b2da-fe1a2b77350c",
-                    name: "Remi Terr",
-                    email: "remi.terr@example.com",
-                    phone: "+44777777777"),
-                Metadata: new Dictionary<string, string> { { "a_custom_key", "a-custom-value" } });
-
-        private static CreatePaymentRequest CreateTestMandatePaymentRequest(
-            CreateMandateRequest mandateRequest,
-            string mandateId,
-            bool setRelatedProducts = true)
-            => new(
-                mandateRequest.Constraints.MaximumIndividualAmount,
-                mandateRequest.Currency,
-                new PaymentMethod.Mandate(mandateId, "reference", null),
-                mandateRequest.User,
-                setRelatedProducts ? new RelatedProducts(new SignupPlus()) : null);
-
-        //TODO: replace with new common utility to authorize resources
-        private async Task AuthorizeMandate(AuthorizationResponseUnion authorizationFlowResponse)
+        [Fact]
+        public async Task GetMandate_Url_As_MandateId_Should_Throw_Exception()
         {
-            var handler = new HttpClientHandler { AllowAutoRedirect = false };
-            var client = new HttpClient(handler);
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
 
-            var redirectUri = authorizationFlowResponse.AsT0.AuthorizationFlow.Actions.Next.AsT4.Uri;
-            var redirectResponse = await client.GetAsync(redirectUri);
-            var paymentsSpaRedirectUrl = redirectResponse.Headers.Location;
-
-            var isFragment = paymentsSpaRedirectUrl?.Fragment is not null;
-            var rawParameters = isFragment ? paymentsSpaRedirectUrl?.Fragment : paymentsSpaRedirectUrl?.Query;
-            var sanitizedParameters = rawParameters?.Replace("state=mandate-", "state=");
-
-            var jsonPayload = isFragment
-                ? "{\"fragment\":\"" + sanitizedParameters + "\"}"
-                : "{\"query\":\"" + sanitizedParameters + "\"}";
-
-            var authUri = new Uri($"{configuration.Payments?.Uri}spa/payments-provider-return");
-
-            client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            var submitProviderParamsResponse =
-                await client.PostAsync(
-                    authUri,
-                    new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
-
-            submitProviderParamsResponse.IsSuccessStatusCode.Should().BeTrue();
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.GetMandate(mandateId, MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
         }
 
-        private async Task<MandateDetailUnion> WaitForMandateToBeAuthorized(string mandateId)
+        [Fact]
+        public async Task StartAuthFlow_Url_As_MandateId_Should_Throw_Exception()
         {
-            for (int i = 0; i < 5; i++)
-            {
-                await Task.Delay(1000);
-                var mandate = await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
-                if (mandate.Data.IsT2 && mandate.Data.AsT2.Status == "authorized")
-                {
-                    return mandate;
-                }
-            }
-            return await _fixture.Client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.StartAuthorizationFlow(mandateId,
+                    new StartAuthorizationFlowRequest(new ProviderSelectionRequest(), new Redirect(new Uri("https://api.com"))),
+                    Guid.NewGuid().ToString(), MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task SubmitProviderSelection_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.SubmitProviderSelection(mandateId, new SubmitProviderSelectionRequest("provider"), Guid.NewGuid().ToString(), MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task SubmitConsent_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.SubmitConsent(mandateId, Guid.NewGuid().ToString(), MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task GetConfirmationOfFunds_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.GetConfirmationOfFunds(mandateId, 100, Currencies.GBP, MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task GetMandateConstraints_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.GetMandateConstraints(mandateId, MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+        }
+
+        [Fact]
+        public async Task RevokeMandate_Url_As_MandateId_Should_Throw_Exception()
+        {
+            var client = _fixture.TlClients[0];
+            const string mandateId = "https://test.com";
+
+            var result = await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.Mandates.RevokeMandate(mandateId, Guid.NewGuid().ToString(), MandateType.Sweeping));
+            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
         }
 
         private async Task<string> CreateAuthorizedSweepingMandate(CreateMandateRequest mandateRequest)
         {
-            var createResponse = await _fixture.Client.Mandates.CreateMandate(
+            var client = _fixture.TlClients[0];
+            var createResponse = await client.Mandates.CreateMandate(
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
 
             createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
-            StartAuthorizationFlowRequest authorizationRequest = new(
+            var authorizationRequest = new StartAuthorizationFlowRequest(
                 new ProviderSelectionRequest(),
-                new Redirect(new Uri(RETURN_URI)));
+                new Redirect(new Uri(ReturnUri)));
 
-            var startAuthResponse = await _fixture.Client.Mandates.StartAuthorizationFlow(
+            var startAuthResponse = await client.Mandates.StartAuthorizationFlow(
                 mandateId, authorizationRequest, idempotencyKey: Guid.NewGuid().ToString(), MandateType.Sweeping);
-            await AuthorizeMandate(startAuthResponse);
-            await WaitForMandateToBeAuthorized(mandateId);
+
+            var providerReturnUri = await _fixture.MockBankClient.AuthoriseMandateAsync(
+                startAuthResponse.Data.AsT0.AuthorizationFlow.Actions.Next.AsT4.Uri, MockBankMandateAction.Authorise);
+            var query = providerReturnUri.Query.Replace("mandate-", string.Empty);
+            await _fixture.ApiClient.SubmitPaymentsProviderReturnAsync(query, providerReturnUri.Fragment);
+
+            await PollMandateForTerminalStatusAsync(
+                client,
+                mandateId,
+                MandateType.Sweeping,
+                typeof(MandateDetail.AuthorizedMandateDetail));
+
             return mandateId;
         }
 
-        public static IEnumerable<object[]> CreateTestSweepingPreselectedMandateRequests()
+        private static async Task<MandateDetailUnion> PollMandateForTerminalStatusAsync(
+            ITrueLayerClient trueLayerClient,
+            string mandateId,
+            MandateType mandateType,
+            Type expectedStatus)
         {
-            yield return new[]
-            {
-                CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
-                    "sweeping",
-                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", PROVIDER_ID)),
-                    new Mandates.Model.Beneficiary.ExternalAccount(
-                        "external_account",
-                        "Bob NET SDK",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
-        }
+            var getMandateResponse = await Waiter.WaitAsync(
+                () => trueLayerClient.Mandates.GetMandate(mandateId, mandateType),
+                r => r.Data.GetType() == expectedStatus);
 
-        public static IEnumerable<object[]> CreateTestCommercialPreselectedMandateRequests()
-        {
-            yield return new[]
-            {
-                CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
-                    "commercial",
-                    ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", COMMERCIAL_PROVIDER_ID)),
-                    new Mandates.Model.Beneficiary.ExternalAccount(
-                        "external_account",
-                        "My Bank Account",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
-        }
-
-        public static IEnumerable<object[]> CreateTestSweepingUserSelectedMandateRequests()
-        {
-            yield return new[]
-            {
-                CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
-                    "sweeping",
-                    ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
-                    {
-                        Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "general_availability"},
-                    }),
-                    new Mandates.Model.Beneficiary.ExternalAccount(
-                        "external_account",
-                        "My Bank Account",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
-        }
-
-        public static IEnumerable<object[]> CreateTestCommercialUserSelectedMandateRequests()
-        {
-            yield return new[]
-            {
-                CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
-                    "commercial",
-                    ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
-                    {
-                        Filter = new ProviderFilter {Countries = new[] {"GB"}, ReleaseChannel = "general_availability"},
-                    }),
-                    new Mandates.Model.Beneficiary.ExternalAccount(
-                        "external_account",
-                        "My Bank Account",
-                        AccountIdentifierUnion.FromT0(accountIdentifier))))),
-            };
+            getMandateResponse.IsSuccessful.Should().BeTrue();
+            return getMandateResponse.Data;
         }
     }
 }

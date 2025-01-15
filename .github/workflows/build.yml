@@ -29,10 +29,6 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.x
-      - name: Setup .NET 3.1
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 3.1.x
       - name: Restore tools
         run: dotnet tool restore
       - name: Run the build script
@@ -44,6 +40,9 @@ jobs:
           TrueLayer__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
           TrueLayer__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
+          TrueLayer2__ClientId: ${{ secrets.TRUELAYER__CLIENTID }}
+          TrueLayer2__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
+          TrueLayer2__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
           cake-version: 5.0.0
           target: CI

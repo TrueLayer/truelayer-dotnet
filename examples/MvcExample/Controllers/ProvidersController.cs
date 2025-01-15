@@ -8,11 +8,11 @@ namespace MvcExample.Controllers
 {
     public class ProvidersController : Controller
     {
-        private readonly ITrueLayerClient _truelayer;
+        private readonly ITrueLayerClient _trueLayerClient;
 
-        public ProvidersController(ITrueLayerClient truelayer)
+        public ProvidersController(ITrueLayerClient trueLayerClient)
         {
-            _truelayer = truelayer;
+            _trueLayerClient = trueLayerClient;
         }
 
         public IActionResult Index()
@@ -29,15 +29,11 @@ namespace MvcExample.Controllers
                 return StatusCode((int)HttpStatusCode.BadRequest);
             }
 
-            var apiResponse = await _truelayer.PaymentsProviders.GetPaymentsProvider(providerId);
+            var apiResponse = await _trueLayerClient.PaymentsProviders.GetPaymentsProvider(providerId);
 
-            IActionResult Failed(string status)
-            {
-                ViewData["Status"] = status;
-                ViewData["ProviderId"] = providerId;
-
-                return View("Failed");
-            }
+            return apiResponse.IsSuccessful
+                ? Success(apiResponse.Data)
+                : Failed(apiResponse.StatusCode.ToString());
 
             IActionResult Success(PaymentsProvider provider)
             {
@@ -46,9 +42,13 @@ namespace MvcExample.Controllers
                 return View("Success");
             }
 
-            return apiResponse.IsSuccessful
-                ? Success(apiResponse.Data)
-                : Failed(apiResponse.StatusCode.ToString());
+            IActionResult Failed(string status)
+            {
+                ViewData["Status"] = status;
+                ViewData["ProviderId"] = providerId;
+
+                return View("Failed");
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ public partial class PaymentTests
         CreatePaymentRequest paymentRequest,
         SchemeSelectionUnion? schemeSelection)
     {
-        var paymentResponse = await _fixture.Client.Payments.CreatePayment(
+        var paymentResponse = await _fixture.TlClients[0].Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
         PaymentMethod.BankTransfer bankTransfer = paymentRequest.PaymentMethod.AsT0;
@@ -34,7 +34,7 @@ public partial class PaymentTests
             schemeSelection,
             new Redirect(new Uri("http://localhost:3000/callback")));
 
-        var response = await _fixture.Client.Payments.StartAuthorizationFlow(
+        var response = await _fixture.TlClients[0].Payments.StartAuthorizationFlow(
             paymentResponse.Data.AsT0.Id, idempotencyKey: Guid.NewGuid().ToString(), authFlowRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);

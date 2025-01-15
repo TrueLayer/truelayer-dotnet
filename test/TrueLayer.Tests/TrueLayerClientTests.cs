@@ -1,8 +1,10 @@
 using System;
 using System.Net.Http;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TrueLayer.Payments;
+using TrueLayer.Tests.Mocks;
 using Xunit;
 
 namespace TrueLayer.Tests
@@ -32,10 +34,14 @@ namespace TrueLayer.Tests
                     }
                 }
             };
+            var mockCache = new InMemoryAuthTokenCacheMock();
+            var optionsMock = new OptionFactoryMock(options);
 
-            var factory = new TrueLayerClientFactory(new ApiClient(new HttpClient(), Options.Create(options), new NullMemoryCache()), Options.Create(options), new NullMemoryCache());
-            var client = factory.Create();
-
+            var factory = new TrueLayerClientFactory(
+                new ApiClient(new HttpClient(), mockCache),
+                optionsMock,
+                mockCache);
+            var client = factory.Create("TrueLayer");
 
             client.Auth.Should().NotBeNull();
             client.Payments.Should().NotBeNull();

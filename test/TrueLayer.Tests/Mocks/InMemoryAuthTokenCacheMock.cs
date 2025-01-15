@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TrueLayer.Auth;
+using TrueLayer.Caching;
 
 namespace TrueLayer.Tests.Mocks;
 
