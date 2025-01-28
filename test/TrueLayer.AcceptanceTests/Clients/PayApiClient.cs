@@ -1,9 +1,8 @@
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace TrueLayer.AcceptanceTests;
+namespace TrueLayer.AcceptanceTests.Clients;
 
 public class PayApiClient
 {
@@ -33,10 +32,3 @@ public class PayApiClient
         return response;
     }
 }
-
-public class SubmitProviderReturnParametersRequest
-{
-    [JsonPropertyName("query")] public string? Query { get; set; }
-    [JsonPropertyName("fragment")] public string? Fragment { get; set; }
-}
-

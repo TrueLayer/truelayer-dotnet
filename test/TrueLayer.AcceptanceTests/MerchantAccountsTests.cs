@@ -24,14 +24,11 @@ namespace TrueLayer.AcceptanceTests
         [Fact]
         public async Task Can_get_merchant_accounts()
         {
-            // Arrange
-            var cancellationToken = new CancellationTokenSource(5000).Token;
-
             // Act
-            var response = await _fixture.Client.MerchantAccounts.ListMerchantAccounts(cancellationToken);
+            var response = await _fixture.TlClients[1].MerchantAccounts.ListMerchantAccounts();
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK, $"TraceId: {response.TraceId}");
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
             response.Data.Should().NotBeNull();
             response.Data!.Items.Should().BeOfType<List<MerchantAccount>>();
         }
@@ -40,15 +37,13 @@ namespace TrueLayer.AcceptanceTests
         public async Task Can_get_specific_merchant_account()
         {
             // Arrange
-            var cancellationToken = new CancellationTokenSource(5000).Token;
-
-            (string merchantId, string? traceId) = await GetMerchantAccountId(cancellationToken);
+            var merchantId = _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId;
 
             // Act
-            var merchantResponse = await _fixture.Client.MerchantAccounts.GetMerchantAccount(merchantId, cancellationToken);
+            var merchantResponse = await _fixture.TlClients[0].MerchantAccounts.GetMerchantAccount(merchantId);
 
             // Assert
-            merchantResponse.StatusCode.Should().Be(HttpStatusCode.OK, $"TraceId: {traceId}");
+            merchantResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             merchantResponse.Data.Should().NotBeNull();
             merchantResponse.Data!.Id.Should().Be(merchantId);
             merchantResponse.Data.AccountHolderName.Should().NotBeNullOrWhiteSpace();
@@ -59,19 +54,17 @@ namespace TrueLayer.AcceptanceTests
         public async Task Can_get_merchant_account_transactions()
         {
             // Arrange
-            var cancellationToken = new CancellationTokenSource().Token;
-
-            (string merchantId, string? traceId) = await GetMerchantAccountId(cancellationToken);
+            var merchantId = _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId;
 
             // Act
-            var merchantResponse = await _fixture.Client.MerchantAccounts.GetTransactions(
+            var merchantResponse = await _fixture.TlClients[0].MerchantAccounts.GetTransactions(
                 merchantId,
-                DateTimeOffset.UtcNow.AddYears(-1),
+                DateTimeOffset.UtcNow.AddDays(-7),
                 DateTimeOffset.UtcNow,
                 cancellationToken: CancellationToken.None);
 
             // Assert
-            merchantResponse.StatusCode.Should().Be(HttpStatusCode.OK, $"TraceId: {traceId}");
+            merchantResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             merchantResponse.Data.Should().NotBeNull();
             merchantResponse.Data!.Items.Should().NotBeEmpty();
             foreach (var item in merchantResponse.Data.Items)
@@ -98,7 +91,7 @@ namespace TrueLayer.AcceptanceTests
 
         private static bool AssertTransaction(MerchantAccountTransactions.MerchantAccountPayment payment)
         {
-            AssertBaseTransaction(payment, new [] { "settled" });
+            AssertBaseTransaction(payment, ["settled"]);
             payment.SettledAt.Should().NotBe(DateTimeOffset.MinValue);
             payment.SettledAt.Should().NotBe(DateTimeOffset.MaxValue);
             payment.PaymentSource.Should().NotBeNull();
@@ -108,7 +101,7 @@ namespace TrueLayer.AcceptanceTests
 
         private static bool AssertTransaction(MerchantAccountTransactions.ExternalPayment externalPayment)
         {
-            AssertBaseTransaction(externalPayment, new []{ "settled" });
+            AssertBaseTransaction(externalPayment, ["settled"]);
             externalPayment.SettledAt.Should().NotBe(DateTimeOffset.MinValue);
             externalPayment.SettledAt.Should().NotBe(DateTimeOffset.MaxValue);
             externalPayment.Remitter.Should().NotBeNull();
@@ -124,7 +117,7 @@ namespace TrueLayer.AcceptanceTests
 
         private static void AssertBaseTransactionPayout(MerchantAccountTransactions.BaseTransactionPayout baseTransaction)
         {
-           AssertBaseTransaction(baseTransaction, new [] { "executed", "pending" });
+           AssertBaseTransaction(baseTransaction, ["executed", "pending"]);
             baseTransaction.CreatedAt.Should().NotBe(DateTimeOffset.MinValue);
             baseTransaction.CreatedAt.Should().NotBe(DateTimeOffset.MaxValue);
             baseTransaction.Beneficiary.Match(
@@ -166,43 +159,29 @@ namespace TrueLayer.AcceptanceTests
 
         private static bool AssertTransaction(MerchantAccountTransactions.Refund refund)
         {
-            AssertBaseTransaction(refund, new []{ "executed", "pending" });
+            AssertBaseTransaction(refund, ["executed", "pending"]);
             refund.PaymentId.Should().NotBeNullOrWhiteSpace();
             refund.RefundId.Should().NotBeNull();
             return true;
-        }
-
-        private async Task<(string merchantId, string? traceId)> GetMerchantAccountId(CancellationToken cancellationToken)
-        {
-            var listMerchants = await _fixture.Client.MerchantAccounts.ListMerchantAccounts(cancellationToken);
-            listMerchants.StatusCode.Should().Be(HttpStatusCode.OK, $"TraceId: {listMerchants.TraceId}");
-            listMerchants.Data.Should().NotBeNull();
-            listMerchants.Data!.Items.Should().NotBeEmpty();
-            var merchantId = listMerchants.Data.Items
-                .First(m => string.Equals(m.Currency, Currencies.GBP, StringComparison.OrdinalIgnoreCase)).Id;
-            return (merchantId, listMerchants.TraceId);
         }
 
         [Fact]
         public async Task Can_get_payment_sources()
         {
             // Arrange
-            var listMerchants = await _fixture.Client.MerchantAccounts.ListMerchantAccounts();
-            listMerchants.Data.Should().NotBeNull();
-            listMerchants.Data!.Items.Should().NotBeEmpty();
-            var merchantId = listMerchants.Data!.Items.First(x => x.Currency == "GBP").Id;
+            var merchantId = _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId;
+            var paymentRequest = CreatePaymentRequest(merchantId);
 
-            CreatePaymentRequest paymentRequest = CreatePaymentRequest(merchantId);
-
-            var createPaymentResponse = await _fixture.Client.Payments.CreatePayment(
-                paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var createPaymentResponse = await _fixture.TlClients[0].Payments.CreatePayment(
+                paymentRequest,
+                idempotencyKey: Guid.NewGuid().ToString());
 
             createPaymentResponse.IsSuccessful.Should().BeTrue();
-            var createPaymentUser = createPaymentResponse.Data!.AsT0.User;
+            var createPaymentUser = createPaymentResponse.Data.AsT0.User;
 
             // Act
             var getPaymentSourcesResponse
-                = await _fixture.Client.MerchantAccounts.GetPaymentSources(merchantId, createPaymentUser.Id);
+                = await _fixture.TlClients[0].MerchantAccounts.GetPaymentSources(merchantId, createPaymentUser.Id);
 
             // Assert
             getPaymentSourcesResponse.IsSuccessful.Should().BeTrue();
@@ -218,7 +197,7 @@ namespace TrueLayer.AcceptanceTests
                 new PaymentMethod.BankTransfer(
                     new Provider.UserSelected
                     {
-                        Filter = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } }
+                        Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] }
                     },
                     new Beneficiary.MerchantAccount(merchantId)
                     {

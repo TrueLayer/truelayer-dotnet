@@ -2,7 +2,7 @@ using System;
 using Microsoft.Extensions.Caching.Memory;
 using TrueLayer.Auth;
 
-namespace TrueLayer
+namespace TrueLayer.Caching
 {
     internal class InMemoryAuthTokenCache : IAuthTokenCache
     {

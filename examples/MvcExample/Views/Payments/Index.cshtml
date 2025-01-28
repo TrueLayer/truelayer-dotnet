@@ -6,7 +6,7 @@
 <h1 class="display-4 mb-4 text-center">Make a donation</h1>
 
 <div class="row justify-content-center">
-  <form class="needs-validation col-sm-10" asp-action="Donate" asp-controller="Home" method="post" novalidate>
+  <form class="needs-validation col-sm-10" asp-action="Donate" asp-controller="Payments" method="post" novalidate>
     @Html.ValidationSummary(true)
     <div class="form-row">
       <div class="form-group col-md-6">
@@ -22,7 +22,7 @@
     </div>
     <div class="form-row">
       <div class="form-group col-md-12">
-        <label asp-for="UserPreSelectedFilter">Use preselected filter (mock-uk-bank) </label>
+        <label asp-for="UserPreSelectedFilter">Use preselected filter (mock-payments-gb-redirect) </label>
         <input type="checkbox" asp-for="UserPreSelectedFilter">
       </div>
     </div>

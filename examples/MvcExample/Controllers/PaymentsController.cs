@@ -14,14 +14,14 @@ using static TrueLayer.Payments.Model.GetPaymentResponse;
 
 namespace MvcExample.Controllers
 {
-    public class HomeController : Controller
+    public class PaymentsController : Controller
     {
-        private readonly ITrueLayerClient _truelayer;
-        private readonly ILogger<HomeController> _logger;
+        private readonly ITrueLayerClient _trueLayerClient;
+        private readonly ILogger<PaymentsController> _logger;
 
-        public HomeController(ITrueLayerClient truelayer, ILogger<HomeController> logger)
+        public PaymentsController(ITrueLayerClient trueLayerClient, ILogger<PaymentsController> logger)
         {
-            _truelayer = truelayer;
+            _trueLayerClient = trueLayerClient;
             _logger = logger;
         }
 
@@ -39,7 +39,9 @@ namespace MvcExample.Controllers
             }
 
             OneOf<Provider.UserSelected, Provider.Preselected> providerSelection = donateModel.UserPreSelectedFilter
-                ? new Provider.Preselected(providerId: "mock-payments-gb-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service"})
+                ? new Provider.Preselected(
+                    providerId: "mock-payments-gb-redirect",
+                    schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service"})
                 : new Provider.UserSelected();
 
             var paymentRequest = new CreatePaymentRequest(
@@ -56,7 +58,7 @@ namespace MvcExample.Controllers
                 null
             );
 
-            var apiResponse = await _truelayer.Payments.CreatePayment(
+            var apiResponse = await _trueLayerClient.Payments.CreatePayment(
                 paymentRequest,
                 idempotencyKey: Guid.NewGuid().ToString()
             );
@@ -78,26 +80,31 @@ namespace MvcExample.Controllers
             }
 
             return apiResponse.Data.Match<IActionResult>(
-                authorizing =>
-                {
-                    ViewData["Status"] = authorizing.Status;
-                    return View("Success");
-                },
                 authorizationRequired =>
                 {
-                    var hppLink = _truelayer.Payments.CreateHostedPaymentPageLink(authorizationRequired.Id,
-                        authorizationRequired.ResourceToken, new Uri(Url.ActionLink("Complete")));
+                    // Return Uri must be whitelisted in TrueLayer console
+                    var returnUri = new Uri(Url.ActionLink("Success"));
+
+                    var hppLink = _trueLayerClient.Payments.CreateHostedPaymentPageLink(
+                        authorizationRequired.Id,
+                        authorizationRequired.ResourceToken,
+                        returnUri);
                     return Redirect(hppLink);
                 },
                 authorized =>
                 {
                     ViewData["Status"] = authorized.Status;
-                    return View("Success");
+                    return View("Pending");
                 },
                 failed =>
                 {
                     ViewData["Status"] = failed.Status;
                     return View("Failed");
+                },
+                authorizing =>
+                {
+                    ViewData["Status"] = authorizing.Status;
+                    return View("Pending");
                 });
         }
 
@@ -107,15 +114,20 @@ namespace MvcExample.Controllers
             if (string.IsNullOrWhiteSpace(paymentId))
                 return StatusCode((int)HttpStatusCode.BadRequest);
 
-            var apiResponse = await _truelayer.Payments.GetPayment(paymentId);
+            var apiResponse = await _trueLayerClient.Payments.GetPayment(paymentId);
 
-            IActionResult Failed(string status, OneOf<PaymentMethod.BankTransfer, PaymentMethod.Mandate>? paymentMethod)
-            {
-                ViewData["Status"] = status;
+            if (!apiResponse.IsSuccessful)
+                return Failed(apiResponse.StatusCode.ToString(), null!);
 
-                SetProviderAndSchemeId(paymentMethod);
-                return View("Failed");
-            }
+            return apiResponse.Data.Match(
+                authRequired => Failed(authRequired.Status, authRequired.PaymentMethod),
+                SuccessOrPending,
+                SuccessOrPending,
+                SuccessOrPending,
+                SuccessOrPending,
+                failed => Failed(failed.Status, failed.PaymentMethod),
+                attemptFailed => Failed(attemptFailed.Status, attemptFailed.PaymentMethod)
+            );
 
             IActionResult SuccessOrPending(PaymentDetails payment)
             {
@@ -137,18 +149,13 @@ namespace MvcExample.Controllers
                 ViewData["SchemeId"] = schemeId;
             }
 
-            if (!apiResponse.IsSuccessful)
-                return Failed(apiResponse.StatusCode.ToString(), null!);
+            IActionResult Failed(string status, OneOf<PaymentMethod.BankTransfer, PaymentMethod.Mandate>? paymentMethod)
+            {
+                ViewData["Status"] = status;
 
-            return apiResponse.Data.Match(
-                authRequired => Failed(authRequired.Status, authRequired.PaymentMethod),
-                SuccessOrPending,
-                SuccessOrPending,
-                SuccessOrPending,
-                SuccessOrPending,
-                failed => Failed(failed.Status, failed.PaymentMethod),
-                attemptFailed => Failed(attemptFailed.Status, attemptFailed.PaymentMethod)
-            );
+                SetProviderAndSchemeId(paymentMethod);
+                return View("Failed");
+            }
         }
 
         public IActionResult Privacy()

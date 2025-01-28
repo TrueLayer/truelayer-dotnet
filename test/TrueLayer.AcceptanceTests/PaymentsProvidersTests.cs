@@ -22,7 +22,7 @@ namespace TrueLayer.AcceptanceTests
         {
             const string providerId = "mock-payments-gb-redirect";
 
-            var response = await _fixture.Client.PaymentsProviders.GetPaymentsProvider(providerId);
+            var response = await _fixture.TlClients[0].PaymentsProviders.GetPaymentsProvider(providerId);
 
             response.IsSuccessful.Should().BeTrue();
             response.Data.Should().NotBeNull();
@@ -42,7 +42,7 @@ namespace TrueLayer.AcceptanceTests
         {
             const string providerId = "ob-uki-mock-bank-sbox";
 
-            var response = await _fixture.Client.PaymentsProviders.GetPaymentsProvider(providerId);
+            var response = await _fixture.TlClients[0].PaymentsProviders.GetPaymentsProvider(providerId);
 
             response.IsSuccessful.Should().BeTrue();
             response.Data.Should().NotBeNull();
@@ -69,7 +69,7 @@ namespace TrueLayer.AcceptanceTests
                 customerSegments
             );
 
-            var response = await _fixture.Client.PaymentsProviders.SearchPaymentsProviders(searchRequest);
+            var response = await _fixture.TlClients[0].PaymentsProviders.SearchPaymentsProviders(searchRequest);
 
             response.IsSuccessful.Should().BeTrue();
             response.Data.Should().NotBeNull();

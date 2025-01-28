@@ -7,18 +7,18 @@ namespace MvcExample.Controllers
 {
     public class MerchantAccountsController : Controller
     {
-        private readonly ITrueLayerClient _truelayer;
+        private readonly ITrueLayerClient _trueLayerClient;
         private readonly ILogger<MerchantAccountsController> _logger;
 
-        public MerchantAccountsController(ITrueLayerClient truelayer, ILogger<MerchantAccountsController> logger)
+        public MerchantAccountsController(ITrueLayerClient trueLayerClient, ILogger<MerchantAccountsController> logger)
         {
-            _truelayer = truelayer;
+            _trueLayerClient = trueLayerClient;
             _logger = logger;
         }
 
         public async Task<IActionResult> Index()
         {
-            var apiResponse = await _truelayer.MerchantAccounts.ListMerchantAccounts();
+            var apiResponse = await _trueLayerClient.MerchantAccounts.ListMerchantAccounts();
 
             if (apiResponse.IsSuccessful)
             {
@@ -42,7 +42,7 @@ namespace MvcExample.Controllers
 
         public async Task<IActionResult> Details(string id)
         {
-            var apiResponse = await _truelayer.MerchantAccounts.GetMerchantAccount(id);
+            var apiResponse = await _trueLayerClient.MerchantAccounts.GetMerchantAccount(id);
 
             if (apiResponse.IsSuccessful)
             {

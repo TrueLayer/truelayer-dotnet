@@ -109,6 +109,10 @@ namespace TrueLayer.Payments
             CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+
+            paymentId.NotAUrl(nameof(paymentId));
+            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
+            
             request.NotNull(nameof(request));
 
             var authResponse = await _auth.GetAuthToken(
@@ -136,6 +140,7 @@ namespace TrueLayer.Payments
             CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+            paymentId.NotAUrl(nameof(paymentId));
             request.NotNull(nameof(request));
 
             var authResponse = await _auth.GetAuthToken(
@@ -161,6 +166,7 @@ namespace TrueLayer.Payments
             CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+            paymentId.NotAUrl(nameof(paymentId));
 
             var authResponse = await _auth.GetAuthToken(
                 new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
@@ -183,7 +189,9 @@ namespace TrueLayer.Payments
             CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+            paymentId.NotAUrl(nameof(paymentId));
             refundId.NotNullOrWhiteSpace(nameof(refundId));
+            refundId.NotAUrl(nameof(refundId));
 
             var authResponse = await _auth.GetAuthToken(
                 new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
@@ -206,6 +214,9 @@ namespace TrueLayer.Payments
             CancellationToken cancellationToken = default)
         {
             paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+
+            paymentId.NotAUrl(nameof(paymentId));
+            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
             var authResponse = await _auth.GetAuthToken(
                 new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
