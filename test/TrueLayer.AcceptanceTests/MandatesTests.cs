@@ -63,8 +63,7 @@ namespace TrueLayer.AcceptanceTests
         {
             // Arrange
             var client = _fixture.TlClients[0];
-            var createResponse = await client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var createResponse = await client.Mandates.CreateMandate(mandateRequest);
             createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // Act
@@ -82,8 +81,7 @@ namespace TrueLayer.AcceptanceTests
         {
             // Arrange
             var client = _fixture.TlClients[0];
-            var createResponse = await client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var createResponse = await client.Mandates.CreateMandate(mandateRequest);
             var mandateId = createResponse.Data!.Id;
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
@@ -210,9 +208,7 @@ namespace TrueLayer.AcceptanceTests
             var paymentRequest = RequestBuilders.CreateTestMandatePaymentRequest(mandateRequest, mandateId, false);
 
             // Act
-            var response = await _fixture.TlClients[0].Payments.CreatePayment(
-                paymentRequest,
-                idempotencyKey: Guid.NewGuid().ToString());
+            var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest));
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Created);
