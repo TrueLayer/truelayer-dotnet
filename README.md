@@ -293,7 +293,7 @@ public class MyService
             )
         );
 
-        var apiResponse = await _client.Payments.CreatePayout(
+        var apiResponse = await _client.Payouts.CreatePayout(
             payoutRequest,
             idempotencyKey: Guid.NewGuid().ToString()
         );
