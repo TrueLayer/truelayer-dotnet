@@ -38,8 +38,7 @@ namespace TrueLayer.AcceptanceTests
         {
             // Arrange
             var client = _fixture.TlClients[0];
-            var createResponse = await client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var createResponse = await client.Mandates.CreateMandate(mandateRequest);
             createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
             var mandateId = createResponse.Data!.Id;
             var mandateType = mandateRequest.Mandate.Match(
@@ -63,8 +62,7 @@ namespace TrueLayer.AcceptanceTests
         {
             // Arrange
             var client = _fixture.TlClients[0];
-            var createResponse = await client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var createResponse = await client.Mandates.CreateMandate(mandateRequest);
             createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
             // Act
@@ -82,8 +80,7 @@ namespace TrueLayer.AcceptanceTests
         {
             // Arrange
             var client = _fixture.TlClients[0];
-            var createResponse = await client.Mandates.CreateMandate(
-                mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var createResponse = await client.Mandates.CreateMandate(mandateRequest);
             var mandateId = createResponse.Data!.Id;
             StartAuthorizationFlowRequest authorizationRequest = new(
                 new ProviderSelectionRequest(),
@@ -119,8 +116,7 @@ namespace TrueLayer.AcceptanceTests
             // Arrange
             var client = _fixture.TlClients[0];
             const string providerId = "mock-payments-gb-redirect";
-            var createResponse = await client.Mandates
-                .CreateMandate(mandateRequest, Guid.NewGuid().ToString());
+            var createResponse = await client.Mandates.CreateMandate(mandateRequest);
 
             var mandateId = createResponse.Data!.Id;
             var mandateType = mandateRequest.Mandate.Match(
@@ -210,9 +206,7 @@ namespace TrueLayer.AcceptanceTests
             var paymentRequest = RequestBuilders.CreateTestMandatePaymentRequest(mandateRequest, mandateId, false);
 
             // Act
-            var response = await _fixture.TlClients[0].Payments.CreatePayment(
-                paymentRequest,
-                idempotencyKey: Guid.NewGuid().ToString());
+            var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Created);

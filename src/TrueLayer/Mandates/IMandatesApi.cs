@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
@@ -28,11 +29,15 @@ namespace TrueLayer.Mandates
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// If not provided an idempotency key is automatically generated.
         /// </param>
-        /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation
+        /// </param>
         /// <returns>An API response that includes details of the created mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<CreateMandateResponse>> CreateMandate(
-            CreateMandateRequest mandateRequest, string idempotencyKey, CancellationToken cancellationToken = default);
+            CreateMandateRequest mandateRequest,
+            string? idempotencyKey = null,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets a mandate
@@ -42,7 +47,24 @@ namespace TrueLayer.Mandates
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<MandateDetailUnion>> GetMandate(
-            string mandateId, MandateType mandateType, CancellationToken cancellationToken = default);
+            string mandateId,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Generates a link to the TrueLayer hosted payment page
+        /// </summary>
+        /// <param name="mandateId">The mandate identifier</param>
+        /// <param name="resourceToken">The resource token, returned from <see cref="CreateMandate"/></param>
+        /// <param name="returnUri">
+        /// Your return URI to which the end user will be redirected after the mandate is completed.
+        /// Note this should be configured in the TrueLayer console under your application settings.
+        /// </param>
+        /// <returns>The HPP link you can redirect the end user to</returns>
+        string CreateHostedPaymentPageLink(
+            string mandateId,
+            string resourceToken,
+            Uri returnUri);
 
         /// <summary>
         /// Lists mandates for a user
@@ -52,7 +74,9 @@ namespace TrueLayer.Mandates
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<ResourceCollection<MandateDetailUnion>>> ListMandates(
-            ListMandatesQuery query, MandateType mandateType, CancellationToken cancellationToken = default);
+            ListMandatesQuery query,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Start the authorization flow for a mandate.
@@ -63,11 +87,16 @@ namespace TrueLayer.Mandates
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// If not provided an idempotency key is automatically generated.
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
-            string mandateId, StartAuthorizationFlowRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
+            string mandateId,
+            StartAuthorizationFlowRequest request,
+            string? idempotencyKey,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Submit the provider details selected by the PSU.
@@ -78,11 +107,16 @@ namespace TrueLayer.Mandates
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// If not provided an idempotency key is automatically generated.
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<AuthorizationResponseUnion>> SubmitProviderSelection(
-            string mandateId, SubmitProviderSelectionRequest request, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
+            string mandateId,
+            SubmitProviderSelectionRequest request,
+            string? idempotencyKey,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Submit the consent given by the user
@@ -95,7 +129,11 @@ namespace TrueLayer.Mandates
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes the authorization flow action details if successful, otherwise problem details</returns>
-        Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(string mandateId, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
+        Task<ApiResponse<AuthorizationResponseUnion>> SubmitConsent(
+            string mandateId,
+            string? idempotencyKey,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get Confirmation Of Funds
@@ -107,7 +145,11 @@ namespace TrueLayer.Mandates
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<GetConfirmationOfFundsResponse>> GetConfirmationOfFunds(
-            string mandateId, int amountInMinor, string currency, MandateType mandateType, CancellationToken cancellationToken = default);
+            string mandateId,
+            int amountInMinor,
+            string currency,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets a mandates constraints
@@ -117,18 +159,26 @@ namespace TrueLayer.Mandates
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the mandate if successful, otherwise problem details</returns>
         Task<ApiResponse<GetConstraintsResponse>> GetMandateConstraints(
-            string mandateId, MandateType mandateType, CancellationToken cancellationToken = default);
+            string mandateId,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Revoke mandate
         /// </summary>
         /// <param name="mandateId">The id of the mandate</param>
+        /// <param name="mandateType">The type of the mandate. Either sweeping or commercial</param>
         /// <param name="idempotencyKey">
         /// An idempotency key to allow safe retrying without the operation being performed multiple times.
         /// The value should be unique for each operation, e.g. a UUID, with the same key being sent on a retry of the same request.
+        /// If not provided an idempotency key is automatically generated.
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes the payment details if successful, otherwise problem details</returns>
-        Task<ApiResponse> RevokeMandate(string mandateId, string idempotencyKey, MandateType mandateType, CancellationToken cancellationToken = default);
+        Task<ApiResponse> RevokeMandate(
+            string mandateId,
+            string? idempotencyKey,
+            MandateType mandateType,
+            CancellationToken cancellationToken = default);
     }
 }

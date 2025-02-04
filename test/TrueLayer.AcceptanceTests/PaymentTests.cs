@@ -54,8 +54,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     {
         foreach (var client in _fixture.TlClients)
         {
-            var response = await client.Payments.CreatePayment(
-                paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var response = await client.Payments.CreatePayment(paymentRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
             var authorizationRequired = response.Data.AsT0;
@@ -119,8 +118,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 Verification = new Verification.Automated { RemitterName = true }
             });
 
-        var response = await _fixture.TlClients[0].Payments.CreatePayment(
-            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var authorizationRequired = response.Data.AsT0;
@@ -150,8 +148,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             new RelatedProducts(new SignupPlus()),
             new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].EurMerchantAccountId));
 
-        var response = await _fixture.TlClients[0].Payments.CreatePayment(
-            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var authorizationRequired = response.Data.AsT0;
@@ -180,8 +177,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             providerSelection,
             sortCodeAccountNumber,
             initAuthorizationFlow: true);
-        var response = await _fixture.TlClients[0].Payments.CreatePayment(
-            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         response.Data.IsT3.Should().BeTrue();
