@@ -5,6 +5,7 @@ using static TrueLayer.Payouts.Model.Beneficiary;
 namespace TrueLayer.Payouts.Model
 {
     using BeneficiaryUnion = OneOf<PaymentSource, ExternalAccount, BusinessAccount>;
+    using SchemeSelectionUnion = OneOf<SchemeSelection.InstantPreferred, SchemeSelection.InstantOnly, SchemeSelection.Preselected>;
 
     /// <summary>
     /// Represents a request for payout
@@ -19,18 +20,21 @@ namespace TrueLayer.Payouts.Model
         /// <param name="currency">The three-letter ISO alpha currency code</param>
         /// <param name="beneficiary">The payout beneficiary details</param>
         /// <param name="metadata">Metadata</param>
+        /// <param name="schemeSelection">Metadata</param>
         public CreatePayoutRequest(
             string merchantAccountId,
             long amountInMinor,
             string currency,
             BeneficiaryUnion beneficiary,
-            Dictionary<string, string>? metadata = null)
+            Dictionary<string, string>? metadata = null,
+            SchemeSelectionUnion? schemeSelection = null)
         {
             MerchantAccountId = merchantAccountId;
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
             Currency = currency.NotNullOrWhiteSpace(nameof(currency));
             Beneficiary = beneficiary;
             Metadata = metadata;
+            SchemeSelection = schemeSelection;
         }
 
         /// <summary>
@@ -54,6 +58,14 @@ namespace TrueLayer.Payouts.Model
         /// </summary>
         public BeneficiaryUnion Beneficiary { get; }
 
+        /// <summary>
+        /// Gets the metadata
+        /// </summary>
         public Dictionary<string, string>? Metadata { get; }
+
+        /// <summary>
+        /// Gets the scheme selection
+        /// </summary>
+        public SchemeSelectionUnion? SchemeSelection { get; }
     }
 }

@@ -107,7 +107,8 @@ namespace TrueLayer.Tests.Payouts
                 100,
                 Currencies.GBP,
                 beneficiary,
-                metadata: new() { { "a", "b" } });
+                metadata: new() { { "a", "b" } },
+                schemeSelection: new SchemeSelection.InstantPreferred());
 
         public static IEnumerable<object[]> TestData =>
             new List<object[]>
