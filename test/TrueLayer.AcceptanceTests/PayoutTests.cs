@@ -23,8 +23,7 @@ namespace TrueLayer.AcceptanceTests
         {
             CreatePayoutRequest payoutRequest = CreatePayoutRequest();
 
-            var response = await _fixture.TlClients[0].Payouts.CreatePayout(
-                payoutRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var response = await _fixture.TlClients[0].Payouts.CreatePayout(payoutRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.Accepted);
             response.Data.Should().NotBeNull();
@@ -81,8 +80,8 @@ namespace TrueLayer.AcceptanceTests
                     new AccountIdentifier.Iban("GB33BUKB20201555555555"),
                     dateOfBirth: new DateTime(1970, 12, 31),
                     address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
-                metadata: new() { { "a", "b" } }
+                metadata: new() { { "a", "b" } },
+                schemeSelection: new SchemeSelection.InstantOnly()
             );
-
     }
 }
