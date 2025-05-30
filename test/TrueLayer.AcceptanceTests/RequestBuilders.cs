@@ -44,7 +44,7 @@ public static class RequestBuilders
             amountInMinor,
             currency,
             new PaymentMethod.BankTransfer(
-                new TrueLayer.Payments.Model.Provider.Preselected("mock-payments-gb-redirect"),
+                new TrueLayer.Payments.Model.Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service"),
                 new TrueLayer.Payments.Model.Beneficiary.MerchantAccount(merchantAccountId)),
             new PaymentUserRequest(
                 id: "f9b48c9d-176b-46dd-b2da-fe1a2b77350c",
