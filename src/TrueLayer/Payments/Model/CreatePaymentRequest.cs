@@ -24,6 +24,7 @@ namespace TrueLayer.Payments.Model
         /// If provided, the start authorization flow endpoint does not need to be called</param>
         /// <param name="metadata">Add to the payment a list of custom key-value pairs as metadata</param>
         /// <param name="riskAssessment">The risk assessment and the payment_creditable webhook configuration.</param>
+        /// <param name="subMerchants">Sub-merchant information for marketplace and platform payments.</param>
         public CreatePaymentRequest(
             long amountInMinor,
             string currency,
@@ -32,7 +33,8 @@ namespace TrueLayer.Payments.Model
             RelatedProducts? relatedProducts = null,
             StartAuthorizationFlowRequest? authorizationFlow = null,
             Dictionary<string, string>? metadata = null,
-            RiskAssessment? riskAssessment = null)
+            RiskAssessment? riskAssessment = null,
+            SubMerchants? subMerchants = null)
         {
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
             Currency = currency.NotNullOrWhiteSpace(nameof(currency));
@@ -42,6 +44,7 @@ namespace TrueLayer.Payments.Model
             AuthorizationFlow = authorizationFlow;
             Metadata = metadata;
             RiskAssessment = riskAssessment;
+            SubMerchants = subMerchants;
         }
 
         /// <summary>
@@ -84,5 +87,10 @@ namespace TrueLayer.Payments.Model
         /// Gets the risk assessment configuration
         /// </summary>
         public RiskAssessment? RiskAssessment { get; }
+
+        /// <summary>
+        /// Gets the sub-merchant information for marketplace and platform payments
+        /// </summary>
+        public SubMerchants? SubMerchants { get; }
     }
 }
