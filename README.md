@@ -315,6 +315,26 @@ public class MyService
 
 For more examples see the [API documentation](https://docs.truelayer.com). Advanced customization options and documentation for contributors can be found in the [Wiki](https://github.com/TrueLayer/truelayer-sdk-net/wiki).
 
+## Testing
+
+This project includes two types of tests:
+
+**Unit Tests** - Run standalone without external dependencies:
+```shell
+dotnet test test/TrueLayer.Tests/
+```
+
+**Acceptance Tests** - End-to-end integration tests that require TrueLayer sandbox credentials:
+```shell
+# Set credentials via environment variables
+TrueLayer__ClientId=your_client_id TrueLayer__ClientSecret=your_client_secret dotnet test
+
+# Or run all tests (will fail without credentials)
+dotnet test
+```
+
+The acceptance tests make real HTTP calls to TrueLayer's sandbox APIs to validate the entire SDK against live services. See `test/TrueLayer.AcceptanceTests/README.md` for credential setup instructions.
+
 ## Building locally
 
 This project uses [Cake](https://cakebuild.net/) to build, test and publish packages.
