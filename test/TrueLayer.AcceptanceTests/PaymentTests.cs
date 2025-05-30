@@ -165,6 +165,35 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
+    public async Task Can_Create_Payment_With_SubMerchants()
+    {
+        // Arrange
+        var paymentRequest = RequestBuilders.CreateTestPaymentRequestWithSubMerchants(
+            _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId);
+
+        // Act
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var authorizationRequired = response.Data.AsT0;
+
+        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.User.Should().NotBeNull();
+        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.Status.Should().Be("authorization_required");
+
+        // Verify the created payment includes SubMerchants data
+        var getPaymentResponse = await _fixture.TlClients[0].Payments.GetPayment(authorizationRequired.Id);
+        getPaymentResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        
+        string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
+            authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
+        hppUri.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
     public async Task Can_Create_Payment_With_Auth_Flow()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
