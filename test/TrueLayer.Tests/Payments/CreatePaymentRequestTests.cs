@@ -7,6 +7,7 @@ using Xunit;
 using static TrueLayer.Payments.Model.Beneficiary;
 using static TrueLayer.Payments.Model.PaymentMethod;
 using static TrueLayer.Payments.Model.Provider;
+using static TrueLayer.Payments.Model.UltimateCounterparty;
 using static TrueLayer.Payments.Model.AccountIdentifier;
 
 namespace TrueLayer.Tests.Payments
@@ -47,8 +48,8 @@ namespace TrueLayer.Tests.Payments
         public void CreatePaymentRequest_Can_Be_Created_With_SubMerchants()
         {
             // Arrange
-            var ultimateCounterparty = new UltimateCounterparty();
-            var subMerchants = new SubMerchants(ultimateCounterparty);
+            var businessDivision = new BusinessDivision("div-123", "Marketing Division");
+            var subMerchants = new SubMerchants(businessDivision);
 
             // Act
             var request = new CreatePaymentRequest(
@@ -59,7 +60,7 @@ namespace TrueLayer.Tests.Payments
 
             // Assert
             request.SubMerchants.Should().Be(subMerchants);
-            request.SubMerchants!.UltimateCounterparty.Should().Be(ultimateCounterparty);
+            request.SubMerchants!.UltimateCounterparty.AsT0.Should().Be(businessDivision);
         }
 
         [Fact]
@@ -74,8 +75,8 @@ namespace TrueLayer.Tests.Payments
                 new DateTime(1990, 1, 1),
                 new Address("London", "London", "EC1A 1BB", "GB", "123 Test St"));
             
-            var ultimateCounterparty = new UltimateCounterparty();
-            var subMerchants = new SubMerchants(ultimateCounterparty);
+            var businessDivision = new BusinessDivision("div-456", "Sales Division");
+            var subMerchants = new SubMerchants(businessDivision);
             var metadata = new Dictionary<string, string> { ["key"] = "value" };
 
             // Act
@@ -98,7 +99,7 @@ namespace TrueLayer.Tests.Payments
             request.User.Should().Be(user);
             request.Metadata.Should().BeEquivalentTo(metadata);
             request.SubMerchants.Should().Be(subMerchants);
-            request.SubMerchants!.UltimateCounterparty.Should().Be(ultimateCounterparty);
+            request.SubMerchants!.UltimateCounterparty.AsT0.Should().Be(businessDivision);
         }
 
         [Theory]

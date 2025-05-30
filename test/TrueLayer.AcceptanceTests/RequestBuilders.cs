@@ -44,14 +44,14 @@ public static class RequestBuilders
             amountInMinor,
             currency,
             new PaymentMethod.BankTransfer(
-                new Provider.Preselected("mock-payments-gb-redirect"),
-                new Beneficiary.MerchantAccount(merchantAccountId)),
+                new TrueLayer.Payments.Model.Provider.Preselected("mock-payments-gb-redirect"),
+                new TrueLayer.Payments.Model.Beneficiary.MerchantAccount(merchantAccountId)),
             new PaymentUserRequest(
                 id: "f9b48c9d-176b-46dd-b2da-fe1a2b77350c",
                 name: "John Test",
                 email: "john.test@example.com",
                 phone: "+44123456789"),
             metadata: new Dictionary<string, string> { { "test-key", "test-value" } },
-            subMerchants: new SubMerchants(new UltimateCounterparty()));
+            subMerchants: new SubMerchants(new UltimateCounterparty.BusinessDivision("div-test-123", "Test Division")));
 
 }
