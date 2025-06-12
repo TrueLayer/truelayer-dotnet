@@ -21,13 +21,15 @@ namespace TrueLayer.Payouts.Model
         /// <param name="beneficiary">The payout beneficiary details</param>
         /// <param name="metadata">Metadata</param>
         /// <param name="schemeSelection">Metadata</param>
+        /// <param name="subMerchants">The details related to any applicable sub-merchants</param>
         public CreatePayoutRequest(
             string merchantAccountId,
             long amountInMinor,
             string currency,
             BeneficiaryUnion beneficiary,
             Dictionary<string, string>? metadata = null,
-            SchemeSelectionUnion? schemeSelection = null)
+            SchemeSelectionUnion? schemeSelection = null,
+            PayoutSubMerchants? subMerchants = null)
         {
             MerchantAccountId = merchantAccountId;
             AmountInMinor = amountInMinor.GreaterThan(0, nameof(amountInMinor));
@@ -35,6 +37,7 @@ namespace TrueLayer.Payouts.Model
             Beneficiary = beneficiary;
             Metadata = metadata;
             SchemeSelection = schemeSelection;
+            SubMerchants = subMerchants;
         }
 
         /// <summary>
@@ -67,5 +70,10 @@ namespace TrueLayer.Payouts.Model
         /// Gets the scheme selection
         /// </summary>
         public SchemeSelectionUnion? SchemeSelection { get; }
+
+        /// <summary>
+        /// Gets the sub-merchants details
+        /// </summary>
+        public PayoutSubMerchants? SubMerchants { get; }
     }
 }
