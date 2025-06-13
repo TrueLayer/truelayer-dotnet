@@ -66,6 +66,11 @@ namespace TrueLayer.Payouts.Model
             /// Gets metadata of the payout
             /// </summary>
             public Dictionary<string, string>? Metadata { get; init; }
+
+            /// <summary>
+            /// Gets the sub-merchants details
+            /// </summary>
+            public PayoutSubMerchants? SubMerchants { get; init; }
         }
 
         /// <summary>

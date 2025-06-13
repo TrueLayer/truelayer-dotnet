@@ -369,6 +369,84 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         getPaymentResponse.Data.AsT5.FailureReason.Should().Be("canceled");
     }
 
+    [Fact]
+    public async Task Can_Create_Payment_With_BusinessClient_SubMerchant()
+    {
+        // arrange
+        var subMerchants = new PaymentSubMerchants(
+            new UltimateCounterpartyBusinessClient(
+                commercialName: "Test Business Ltd",
+                mcc: "1234", 
+                address: new Address("London", "England", "EC1R 4RB", "GB", "123 Test Street"),
+                registrationNumber: "12345678"));
+
+        var paymentRequest = CreateTestPaymentRequest(
+            initAuthorizationFlow: true,
+            subMerchants: subMerchants);
+
+        // act
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        // assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Data.IsT3.Should().BeTrue();
+        var authorizing = response.Data.AsT3;
+        
+        authorizing.Id.Should().NotBeNullOrWhiteSpace();
+        authorizing.Status.Should().Be("authorizing");
+
+        // Verify sub-merchants in GetPayment response
+        var getPaymentResponse = await _fixture.TlClients[0].Payments.GetPayment(authorizing.Id);
+        getPaymentResponse.IsSuccessful.Should().BeTrue();
+        
+        var payment = getPaymentResponse.Data.AsT1;
+        payment.SubMerchants.Should().NotBeNull();
+        payment.SubMerchants!.UltimateCounterparty.IsT0.Should().BeTrue();
+        var businessClient = payment.SubMerchants.UltimateCounterparty.AsT0;
+        businessClient.CommercialName.Should().Be("Test Business Ltd");
+        businessClient.Mcc.Should().Be("1234");
+        businessClient.Type.Should().Be("business_client");
+    }
+
+    [Fact]
+    public async Task Can_Create_Payment_With_BusinessDivision_SubMerchant()
+    {
+        // arrange
+        var subMerchants = new PaymentSubMerchants(
+            new UltimateCounterpartyBusinessDivision(
+                id: "division-123",
+                name: "Test Division"));
+
+        var paymentRequest = CreateTestPaymentRequest(
+            initAuthorizationFlow: true,
+            subMerchants: subMerchants);
+
+        // act
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        // assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Data.IsT3.Should().BeTrue();
+        var authorizing = response.Data.AsT3;
+        
+        authorizing.Id.Should().NotBeNullOrWhiteSpace();
+        authorizing.Status.Should().Be("authorizing");
+
+        // Verify sub-merchants in GetPayment response
+        var getPaymentResponse = await _fixture.TlClients[0].Payments.GetPayment(authorizing.Id);
+        getPaymentResponse.IsSuccessful.Should().BeTrue();
+        
+        var payment = getPaymentResponse.Data.AsT1;
+        payment.SubMerchants.Should().NotBeNull();
+        payment.SubMerchants!.UltimateCounterparty.IsT1.Should().BeTrue();
+        var businessDivision = payment.SubMerchants.UltimateCounterparty.AsT1;
+        businessDivision.Id.Should().Be("division-123");
+        businessDivision.Name.Should().Be("Test Division");
+        businessDivision.Type.Should().Be("business_division");
+    }
+
     private static void AssertSchemeSelection(
         PaymentsSchemeSelectionUnion? actualSchemeSelection,
         PaymentsSchemeSelectionUnion? expectedSchemeSelection,
@@ -476,7 +554,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         RelatedProducts? relatedProducts = null,
         BeneficiaryUnion? beneficiary = null,
         Retry.BaseRetry? retry = null,
-        bool initAuthorizationFlow = false)
+        bool initAuthorizationFlow = false,
+        PaymentSubMerchants? subMerchants = null)
     {
         accountIdentifier ??= new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
         providerSelection ??= new Provider.Preselected("mock-payments-gb-redirect",
@@ -514,7 +593,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 ["test-key-1"] = "test-value-1",
                 ["test-key-2"] = "test-value-2",
             },
-            riskAssessment: new RiskAssessment("test")
+            riskAssessment: new RiskAssessment("test"),
+            subMerchants: subMerchants
         );
     }
 
