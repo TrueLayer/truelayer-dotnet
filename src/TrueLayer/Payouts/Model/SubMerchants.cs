@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using TrueLayer.Common;
 
 namespace TrueLayer.Payouts.Model
@@ -19,6 +20,7 @@ namespace TrueLayer.Payouts.Model
         /// <summary>
         /// Gets the ultimate counterparty details (only business_client is supported for payouts)
         /// </summary>
+        [JsonPropertyName("ultimate_counterparty")]
         public UltimateCounterpartyBusinessClient? UltimateCounterparty { get; }
     }
 }

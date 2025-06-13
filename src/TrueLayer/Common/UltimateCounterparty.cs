@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using TrueLayer.Serialization;
 
 namespace TrueLayer.Common
@@ -10,6 +11,7 @@ namespace TrueLayer.Common
         /// <summary>
         /// Gets the type of the ultimate counterparty
         /// </summary>
+        [JsonPropertyName("type")]
         public abstract string Type { get; }
     }
 
@@ -44,21 +46,25 @@ namespace TrueLayer.Common
         /// <summary>
         /// Gets the commercial name of the business
         /// </summary>
+        [JsonPropertyName("commercial_name")]
         public string CommercialName { get; }
 
         /// <summary>
         /// Gets the merchant category code of the business
         /// </summary>
+        [JsonPropertyName("mcc")]
         public string? Mcc { get; }
 
         /// <summary>
         /// Gets the address of the business
         /// </summary>
+        [JsonPropertyName("address")]
         public Address? Address { get; }
 
         /// <summary>
         /// Gets the registration number of the business
         /// </summary>
+        [JsonPropertyName("registration_number")]
         public string? RegistrationNumber { get; }
     }
 
@@ -85,11 +91,13 @@ namespace TrueLayer.Common
         /// <summary>
         /// Gets the identifier of the business division
         /// </summary>
+        [JsonPropertyName("id")]
         public string Id { get; }
 
         /// <summary>
         /// Gets the name of the business division
         /// </summary>
+        [JsonPropertyName("name")]
         public string Name { get; }
     }
 }

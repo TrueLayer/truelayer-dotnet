@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Common;
 
@@ -22,6 +23,7 @@ namespace TrueLayer.Payments.Model
         /// <summary>
         /// Gets the ultimate counterparty details
         /// </summary>
+        [JsonPropertyName("ultimate_counterparty")]
         public PaymentUltimateCounterpartyUnion UltimateCounterparty { get; }
     }
 }

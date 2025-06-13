@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.PaymentMethod;
@@ -64,6 +65,7 @@ namespace TrueLayer.Payments.Model
             /// <summary>
             /// Gets the sub-merchants details
             /// </summary>
+            [JsonPropertyName("sub_merchants")]
             public PaymentSubMerchants? SubMerchants { get; init; } = null;
         }
 
