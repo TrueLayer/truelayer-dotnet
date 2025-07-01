@@ -69,7 +69,68 @@ namespace TrueLayer.AcceptanceTests
             result.Message.Should().Be("Value is malformed (Parameter 'id')");
         }
 
-        private CreatePayoutRequest CreatePayoutRequest()
+        [Fact]
+        public async Task Can_Create_Payout_With_BusinessClient_SubMerchant()
+        {
+            // arrange
+            var subMerchants = new PayoutSubMerchants(
+                new UltimateCounterpartyBusinessClient(
+                    commercialName: "Test Payout Business Ltd",
+                    mcc: "5678",
+                    address: new Address("Manchester", "England", "M1 1AA", "GB", "456 Payout Street"),
+                    registrationNumber: "87654321"));
+
+            CreatePayoutRequest payoutRequest = CreatePayoutRequest(subMerchants);
+
+            // act
+            var response = await _fixture.TlClients[0].Payouts.CreatePayout(
+                payoutRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+            // assert
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.Data.Should().NotBeNull();
+            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
+
+            // Verify sub-merchants are included in the response
+            var getPayoutResponse = await _fixture.TlClients[0].Payouts.GetPayout(response.Data.Id);
+            getPayoutResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            getPayoutResponse.Data.Value.Should().NotBeNull();
+
+            PayoutDetails? details = getPayoutResponse.Data.Value as PayoutDetails;
+            details.Should().NotBeNull();
+            details!.SubMerchants.Should().NotBeNull();
+            details.SubMerchants!.UltimateCounterparty.Should().NotBeNull();
+            details.SubMerchants.UltimateCounterparty!.CommercialName.Should().Be("Test Payout Business Ltd");
+            details.SubMerchants.UltimateCounterparty.Mcc.Should().Be("5678");
+            details.SubMerchants.UltimateCounterparty.Type.Should().Be("business_client");
+        }
+
+        [Fact]
+        public async Task Can_Create_Payout_Without_SubMerchant()
+        {
+            // arrange
+            CreatePayoutRequest payoutRequest = CreatePayoutRequest(subMerchants: null);
+
+            // act
+            var response = await _fixture.TlClients[0].Payouts.CreatePayout(
+                payoutRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+            // assert
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.Data.Should().NotBeNull();
+            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
+
+            // Verify no sub-merchants in the response
+            var getPayoutResponse = await _fixture.TlClients[0].Payouts.GetPayout(response.Data.Id);
+            getPayoutResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            getPayoutResponse.Data.Value.Should().NotBeNull();
+
+            PayoutDetails? details = getPayoutResponse.Data.Value as PayoutDetails;
+            details.Should().NotBeNull();
+            details!.SubMerchants.Should().BeNull();
+        }
+
+        private CreatePayoutRequest CreatePayoutRequest(PayoutSubMerchants? subMerchants = null)
             => new(
                 _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId,
                 100,
@@ -81,7 +142,8 @@ namespace TrueLayer.AcceptanceTests
                     dateOfBirth: new DateTime(1970, 12, 31),
                     address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
                 metadata: new() { { "a", "b" } },
-                schemeSelection: new SchemeSelection.InstantOnly()
+                schemeSelection: new SchemeSelection.InstantOnly(),
+                subMerchants: subMerchants
             );
     }
 }

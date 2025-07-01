@@ -442,3 +442,7 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 appsettings.local*.json
+
+# Claude Code configuration
+CLAUDE.local.md
+.claude

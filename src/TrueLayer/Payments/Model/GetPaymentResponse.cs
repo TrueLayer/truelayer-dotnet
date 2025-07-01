@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.PaymentMethod;
@@ -60,6 +61,12 @@ namespace TrueLayer.Payments.Model
             /// Gets the metadata added to the payment.
             /// </summary>
             public Dictionary<string, string>? Metadata { get; init; } = null;
+
+            /// <summary>
+            /// Gets the sub-merchants details
+            /// </summary>
+            [JsonPropertyName("sub_merchants")]
+            public PaymentSubMerchants? SubMerchants { get; init; } = null;
         }
 
         /// <summary>
