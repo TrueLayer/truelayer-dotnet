@@ -27,7 +27,7 @@ namespace TrueLayer.Payments
         GetPaymentResponse.AttemptFailed
     >;
 
-    using RefundUnion = OneOf<RefundPending, RefundAuthorized>;
+    using RefundUnion = OneOf<RefundPending, RefundAuthorized, RefundExecuted, RefundFailed>;
 
 
     /// <summary>
