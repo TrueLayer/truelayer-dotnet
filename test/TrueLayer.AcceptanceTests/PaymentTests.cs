@@ -353,7 +353,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             initAuthorizationFlow: true);
         var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
         var paymentId = payment.AsT4.Id;
-        
+
         // Create refund and wait for it to be executed
         var createRefundResponse = await client.Payments.CreatePaymentRefund(
             paymentId: paymentId,
@@ -380,7 +380,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             initAuthorizationFlow: true);
         var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
         var paymentId = payment.AsT4.Id;
-        
+
         // Create refund with specific reference that may trigger failure
         var createRefundResponse = await client.Payments.CreatePaymentRefund(
             paymentId: paymentId,
@@ -793,7 +793,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             authorizing.AuthorizationFlow!.Actions.Next.AsT2.Uri,
             mockBankPaymentAction);
 
-        await _fixture.PayApiClient.SubmitProviderReturnParametersAsync(providerReturnUri.Query, providerReturnUri.Fragment);
+        await _fixture.ApiClient.SubmitPaymentsProviderReturnAsync(providerReturnUri.Query, providerReturnUri.Fragment);
 
         return await PollPaymentForTerminalStatusAsync(trueLayerClient, paymentId, expectedPaymentStatus);
     }
