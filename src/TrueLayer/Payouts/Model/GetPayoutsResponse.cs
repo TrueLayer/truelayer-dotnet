@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payouts.Model.Beneficiary;
@@ -66,6 +67,12 @@ namespace TrueLayer.Payouts.Model
             /// Gets metadata of the payout
             /// </summary>
             public Dictionary<string, string>? Metadata { get; init; }
+
+            /// <summary>
+            /// Gets the sub-merchants details
+            /// </summary>
+            [JsonPropertyName("sub_merchants")]
+            public PayoutSubMerchants? SubMerchants { get; init; }
         }
 
         /// <summary>

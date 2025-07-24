@@ -313,6 +313,41 @@ public class MyService
 }
 ```
 
+### Retrieve merchant account transactions
+
+Inject `ITrueLayerClient` into your classes:
+
+```c#
+public async Task<ActionResult> GetMerchantAccountTransactions(string merchantAccountId)
+{
+    var apiResponse = await _client.MerchantAccounts.GetTransactions(merchantAccountId);
+    
+    if (!apiResponse.IsSuccessful)
+    {
+        return HandleFailure(apiResponse.StatusCode, apiResponse.Problem);
+    }
+    
+    // Access transaction data including scheme_id field
+    foreach (var transaction in apiResponse.Data.Items)
+    {
+        if (transaction.IsT3) // ExecutedPayout
+        {
+            var executedPayout = transaction.AsT3;
+            var schemeId = executedPayout.SchemeId; // Payment scheme identifier
+        }
+        else if (transaction.IsT4) // Refund
+        {
+            var refund = transaction.AsT4;
+            var schemeId = refund.SchemeId; // Payment scheme identifier
+        }
+    }
+    
+    return Ok(apiResponse.Data);
+}
+```
+
+The `SchemeId` field identifies the payment scheme used for outbound transactions (payouts and refunds), such as "faster_payments_service" or "sepa_credit_transfer".
+
 For more examples see the [API documentation](https://docs.truelayer.com). Advanced customization options and documentation for contributors can be found in the [Wiki](https://github.com/TrueLayer/truelayer-sdk-net/wiki).
 
 ## Building locally

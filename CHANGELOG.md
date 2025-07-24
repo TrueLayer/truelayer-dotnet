@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- Added support for `SchemeId` field in merchant account transactions (`ExecutedPayout` and `Refund`)
+
+### Changed
+
+- Updated `RefundUnion` in `ListPaymentRefundsResponse` to include all refund statuses (`RefundExecuted` and `RefundFailed`), ensuring consistency with `GetPaymentRefund` response
+
 ## [1.20.0] - 2024-12-11
 ### Added
 - Added support for `CreditableAt` in `GetPaymentResult`

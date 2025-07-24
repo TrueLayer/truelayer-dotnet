@@ -154,6 +154,24 @@ namespace TrueLayer.AcceptanceTests
         private static bool AssertTransaction(MerchantAccountTransactions.ExecutedPayout executedPayout)
         {
             AssertBaseTransactionPayout(executedPayout);
+            
+            // Validate SchemeId if provided
+            if (executedPayout.SchemeId != null)
+            {
+                executedPayout.SchemeId.Should().NotBeNullOrWhiteSpace();
+                // Validate it matches expected payment scheme enum values
+                var validSchemes = new[] 
+                {
+                    "faster_payments_service",
+                    "sepa_credit_transfer",
+                    "sepa_credit_transfer_instant",
+                    "polish_domestic_standard",
+                    "polish_domestic_express",
+                    "norwegian_domestic_credit_transfer"
+                };
+                validSchemes.Should().Contain(executedPayout.SchemeId);
+            }
+            
             return true;
         }
 
@@ -162,6 +180,24 @@ namespace TrueLayer.AcceptanceTests
             AssertBaseTransaction(refund, ["executed", "pending"]);
             refund.PaymentId.Should().NotBeNullOrWhiteSpace();
             refund.RefundId.Should().NotBeNull();
+            
+            // Validate SchemeId if provided
+            if (refund.SchemeId != null)
+            {
+                refund.SchemeId.Should().NotBeNullOrWhiteSpace();
+                // Validate it matches expected payment scheme enum values
+                var validSchemes = new[] 
+                {
+                    "faster_payments_service",
+                    "sepa_credit_transfer",
+                    "sepa_credit_transfer_instant",
+                    "polish_domestic_standard",
+                    "polish_domestic_express",
+                    "norwegian_domestic_credit_transfer"
+                };
+                validSchemes.Should().Contain(refund.SchemeId);
+            }
+            
             return true;
         }
 
