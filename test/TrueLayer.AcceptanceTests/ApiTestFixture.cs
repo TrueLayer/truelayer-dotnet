@@ -63,10 +63,6 @@ namespace TrueLayer.AcceptanceTests
             {
                 BaseAddress = new Uri("https://pay-mock-connect.truelayer-sandbox.com/")
             });
-            PayApiClient = new PayApiClient(new HttpClient
-            {
-                BaseAddress = new Uri("https://pay-api.truelayer-sandbox.com")
-            });
             ApiClient = new ApiClient(new HttpClient
             {
                 BaseAddress = new Uri("https://api.truelayer-sandbox.com")
@@ -76,7 +72,6 @@ namespace TrueLayer.AcceptanceTests
         public readonly ITrueLayerClient[] TlClients;
         public readonly (string GbpMerchantAccountId, string EurMerchantAccountId)[] ClientMerchantAccounts;
         public readonly MockBankClient MockBankClient;
-        public readonly PayApiClient PayApiClient;
         public readonly ApiClient ApiClient;
 
         private static IConfiguration LoadConfiguration()
