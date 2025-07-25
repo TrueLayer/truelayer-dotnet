@@ -94,7 +94,7 @@ namespace TrueLayer.AcceptanceTests
                 response.Data.AsT0.AuthorizationFlow.Actions.Next.AsT4.Uri, MockBankMandateAction.Authorise);
 
             var query = providerReturnUri.Query.Replace("mandate-", string.Empty);
-            await _fixture.ApiClient.SubmitPaymentsProviderReturnAsync(query, providerReturnUri.Fragment);
+            await _fixture.ApiClient.trSubmitPaymentsProviderReturnAsync(query, providerReturnUri.Fragment);
 
             var mandate = await PollMandateForTerminalStatusAsync(
                 client,

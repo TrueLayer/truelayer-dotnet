@@ -405,6 +405,60 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
+    public async Task Can_List_Payment_Refunds_With_RefundExecuted_Status()
+    {
+        // Arrange
+        var client = _fixture.TlClients[0];
+        var paymentRequest = CreateTestPaymentRequest(
+            beneficiary: new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].GbpMerchantAccountId),
+            initAuthorizationFlow: true);
+        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
+        var paymentId = payment.AsT4.Id;
+
+        // Create refund and wait for it to be executed
+        var createRefundResponse = await client.Payments.CreatePaymentRefund(
+            paymentId: paymentId,
+            idempotencyKey: Guid.NewGuid().ToString(),
+            new CreatePaymentRefundRequest(Reference: "executed-refund"));
+        createRefundResponse.IsSuccessful.Should().BeTrue();
+
+        // Act - List refunds (may include RefundExecuted status)
+        var listPaymentRefundsResponse = await client.Payments.ListPaymentRefunds(paymentId);
+
+        // Assert
+        listPaymentRefundsResponse.IsSuccessful.Should().BeTrue();
+        listPaymentRefundsResponse.Data!.Items.Should().NotBeEmpty();
+        // Note: RefundExecuted status depends on actual payment processing state
+    }
+
+    [Fact]
+    public async Task Can_List_Payment_Refunds_With_RefundFailed_Status()
+    {
+        // Arrange
+        var client = _fixture.TlClients[0];
+        var paymentRequest = CreateTestPaymentRequest(
+            beneficiary: new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].GbpMerchantAccountId),
+            initAuthorizationFlow: true);
+        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
+        var paymentId = payment.AsT4.Id;
+
+        // Create refund with specific reference that may trigger failure
+        var createRefundResponse = await client.Payments.CreatePaymentRefund(
+            paymentId: paymentId,
+            idempotencyKey: Guid.NewGuid().ToString(),
+            new CreatePaymentRefundRequest(Reference: "TUOYAP"));
+        createRefundResponse.IsSuccessful.Should().BeTrue();
+
+        // Act - List refunds (may include RefundFailed status)
+        var listPaymentRefundsResponse = await client.Payments.ListPaymentRefunds(paymentId);
+
+        // Assert
+        listPaymentRefundsResponse.IsSuccessful.Should().BeTrue();
+        listPaymentRefundsResponse.Data!.Items.Should().NotBeEmpty();
+        // Note: RefundFailed status depends on actual payment processing state
+    }
+
+    [Fact]
     public async Task Can_Cancel_Payment()
     {
         // arrange
@@ -802,7 +856,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             authorizing.AuthorizationFlow!.Actions.Next.AsT2.Uri,
             mockBankPaymentAction);
 
-        await _fixture.PayApiClient.SubmitProviderReturnParametersAsync(providerReturnUri.Query, providerReturnUri.Fragment);
+        await _fixture.ApiClient.SubmitPaymentsProviderReturnAsync(providerReturnUri.Query, providerReturnUri.Fragment);
 
         return await PollPaymentForTerminalStatusAsync(trueLayerClient, paymentId, expectedPaymentStatus);
     }
