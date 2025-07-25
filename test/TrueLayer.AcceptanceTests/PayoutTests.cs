@@ -31,6 +31,18 @@ namespace TrueLayer.AcceptanceTests
         }
 
         [Fact]
+        public async Task Can_create_pln_payout()
+        {
+            CreatePayoutRequest payoutRequest = CreatePlnPayoutRequest();
+
+            var response = await _fixture.TlClients[0].Payouts.CreatePayout(payoutRequest);
+
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.Data.Should().NotBeNull();
+            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
         public async Task Can_get_payout()
         {
             CreatePayoutRequest payoutRequest = CreatePayoutRequest();
@@ -78,6 +90,21 @@ namespace TrueLayer.AcceptanceTests
                     "Ms. Lucky",
                     "truelayer-dotnet",
                     new AccountIdentifier.Iban("GB33BUKB20201555555555"),
+                    dateOfBirth: new DateTime(1970, 12, 31),
+                    address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
+                metadata: new() { { "a", "b" } },
+                schemeSelection: new SchemeSelection.InstantOnly()
+            );
+
+        private static CreatePayoutRequest CreatePlnPayoutRequest()
+            => new(
+                "fdb6007b-78c0-dbc0-60dd-d4c6f6908e3b", //pln merchant account
+                100,
+                Currencies.PLN,
+                new Beneficiary.ExternalAccount(
+                    "Ms. Lucky",
+                    "truelayer-dotnet",
+                    new AccountIdentifier.Iban("GB25CLRB04066800046876"),
                     dateOfBirth: new DateTime(1970, 12, 31),
                     address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
                 metadata: new() { { "a", "b" } },
