@@ -165,6 +165,67 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     [Fact]
+    public async Task Can_Create_Payment_With_SubMerchants_BusinessDivision()
+    {
+        var subMerchants = new SubMerchants(new SubMerchants.BusinessDivision(
+            id: Guid.NewGuid().ToString(),
+            name: "Test Division"));
+
+        var paymentRequest = CreateTestPaymentRequest(
+            new Provider.UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
+                SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
+            },
+            subMerchants: subMerchants);
+
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var authorizationRequired = response.Data.AsT0;
+
+        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.User.Should().NotBeNull();
+        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.Status.Should().Be("authorization_required");
+    }
+
+    [Fact]
+    public async Task Can_Create_Payment_With_SubMerchants_BusinessClient()
+    {
+        var address = new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St");
+        var subMerchants = new SubMerchants(new SubMerchants.BusinessClient(
+            tradingName: "Test Trading Company",
+            commercialName: "Test Commercial Name",
+            url: "https://example.com",
+            mcc: "1234",
+            registrationNumber: "REG123456",
+            address: address));
+
+        var paymentRequest = CreateTestPaymentRequest(
+            new Provider.UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
+                SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
+            },
+            subMerchants: subMerchants);
+
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var authorizationRequired = response.Data.AsT0;
+
+        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.User.Should().NotBeNull();
+        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.Status.Should().Be("authorization_required");
+    }
+
+    [Fact]
     public async Task Can_Create_Payment_With_Auth_Flow()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
@@ -530,7 +591,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         RelatedProducts? relatedProducts = null,
         BeneficiaryUnion? beneficiary = null,
         Retry.BaseRetry? retry = null,
-        bool initAuthorizationFlow = false)
+        bool initAuthorizationFlow = false,
+        SubMerchants? subMerchants = null)
     {
         accountIdentifier ??= new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
         providerSelection ??= new Provider.Preselected("mock-payments-gb-redirect",
@@ -568,7 +630,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 ["test-key-1"] = "test-value-1",
                 ["test-key-2"] = "test-value-2",
             },
-            riskAssessment: new RiskAssessment("test")
+            riskAssessment: new RiskAssessment("test"),
+            subMerchants: subMerchants
         );
     }
 

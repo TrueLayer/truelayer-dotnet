@@ -73,5 +73,39 @@ namespace TrueLayer.Payouts.Model
             public string AccountNumber { get; }
 
         }
+
+        /// <summary>
+        /// Defines a bank account identified by a Polish NRB
+        /// </summary>
+        /// <value></value>
+        [JsonDiscriminator(Discriminator)]
+        public record Nrb : IDiscriminated
+        {
+            public const string Discriminator = "nrb";
+
+            /// <summary>
+            /// Creates a new <see cref="Nrb"/> instance
+            /// </summary>
+            /// <param name="value">
+            /// Valid Polish NRB (no spaces).
+            /// Consists of 2 check digits, followed by an 8 digit bank branch number, and then by a 16 digit bank account number.
+            /// Equivalent to a Polish IBAN with the country code removed.
+            /// </param>
+            public Nrb(string value)
+            {
+                Value = value.NotNullOrWhiteSpace(nameof(value));
+            }
+
+            /// <summary>
+            /// Gets the scheme identifier type
+            /// </summary>
+            public string Type => Discriminator;
+
+            /// <summary>
+            /// Gets the NRB value
+            /// </summary>
+            [JsonPropertyName(Discriminator)]
+            public string Value { get; }
+        }
     }
 }

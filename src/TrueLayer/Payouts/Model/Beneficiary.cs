@@ -7,7 +7,7 @@ using static TrueLayer.Payouts.Model.AccountIdentifier;
 
 namespace TrueLayer.Payouts.Model
 {
-    using AccountIdentifierUnion = OneOf<Iban, SortCodeAccountNumber>;
+    using AccountIdentifierUnion = OneOf<Iban, SortCodeAccountNumber, Nrb>;
 
     public static class Beneficiary
     {
