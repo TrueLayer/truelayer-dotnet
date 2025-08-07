@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [1.24.0] - 2025-01-24
+## [1.24.0] - 2025-07-24
 ### Added
 - Enhanced RefundUnion to include all refund statuses: `RefundExecuted` and `RefundFailed` in addition to existing `RefundPending` and `RefundAuthorized`
 - Updated `ListPaymentRefunds` and `GetPaymentRefund` methods to support returning refunds in all possible states
