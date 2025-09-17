@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using TrueLayer.PaymentsProviders.Model;
 using Xunit;
 using AuthorizationFlow = TrueLayer.PaymentsProviders.Model.AuthorizationFlow;
@@ -24,17 +23,17 @@ namespace TrueLayer.AcceptanceTests
 
             var response = await _fixture.TlClients[0].PaymentsProviders.GetPaymentsProvider(providerId);
 
-            response.IsSuccessful.Should().BeTrue();
-            response.Data.Should().NotBeNull();
-            response.Data!.Id.Should().Be(providerId);
-            response.Data.DisplayName.Should().NotBeNullOrWhiteSpace();
-            response.Data.IconUri.Should().NotBeNullOrWhiteSpace();
-            response.Data.LogoUri.Should().NotBeNullOrWhiteSpace();
-            response.Data.BgColor.Should().NotBeNullOrWhiteSpace();
-            response.Data.CountryCode.Should().NotBeNullOrWhiteSpace();
-            response.Data.Capabilities.Payments?.BankTransfer.Should().NotBeNull();
-            response.Data.Capabilities.Payments?.BankTransfer?.ReleaseChannel.Should().NotBeNullOrWhiteSpace();
-            response.Data.Capabilities.Payments?.BankTransfer?.Schemes.Count().Should().BeGreaterOrEqualTo(1);
+            Assert.True(response.IsSuccessful);
+            Assert.NotNull(response.Data);
+            Assert.Equal(providerId, response.Data!.Id);
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.DisplayName));
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.IconUri));
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.LogoUri));
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.BgColor));
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.CountryCode));
+            Assert.NotNull(response.Data.Capabilities.Payments?.BankTransfer);
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.Capabilities.Payments?.BankTransfer?.ReleaseChannel));
+            Assert.True(response.Data.Capabilities.Payments?.BankTransfer?.Schemes.Count() >= 1);
         }
 
         [Fact]
@@ -44,13 +43,13 @@ namespace TrueLayer.AcceptanceTests
 
             var response = await _fixture.TlClients[0].PaymentsProviders.GetPaymentsProvider(providerId);
 
-            response.IsSuccessful.Should().BeTrue();
-            response.Data.Should().NotBeNull();
-            response.Data!.Id.Should().Be(providerId);
-            response.Data.DisplayName.Should().NotBeNullOrWhiteSpace();
-            response.Data.CountryCode.Should().NotBeNullOrWhiteSpace();
-            response.Data.Capabilities.Mandates?.VrpSweeping.Should().NotBeNull();
-            response.Data.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel.Should().NotBeNullOrWhiteSpace();
+            Assert.True(response.IsSuccessful);
+            Assert.NotNull(response.Data);
+            Assert.Equal(providerId, response.Data!.Id);
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.DisplayName));
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.CountryCode));
+            Assert.NotNull(response.Data.Capabilities.Mandates?.VrpSweeping);
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel));
         }
 
         [Theory]
@@ -71,22 +70,22 @@ namespace TrueLayer.AcceptanceTests
 
             var response = await _fixture.TlClients[0].PaymentsProviders.SearchPaymentsProviders(searchRequest);
 
-            response.IsSuccessful.Should().BeTrue();
-            response.Data.Should().NotBeNull();
-            response.Data!.Items.Should().NotBeNull();
-            response.Data.Items.Should().NotBeEmpty();
+            Assert.True(response.IsSuccessful);
+            Assert.NotNull(response.Data);
+            Assert.NotNull(response.Data!.Items);
+            Assert.NotEmpty(response.Data.Items);
             response.Data.Items.ForEach(pp =>
             {
-                pp.Id.Should().NotBeEmpty();
-                pp.DisplayName.Should().NotBeNullOrWhiteSpace();
-                pp.CountryCode.Should().NotBeNullOrWhiteSpace();
-                pp.CountryCode.Should().NotBeNullOrWhiteSpace();
+                Assert.NotEmpty(pp.Id);
+                Assert.False(string.IsNullOrWhiteSpace(pp.DisplayName));
+                Assert.False(string.IsNullOrWhiteSpace(pp.CountryCode));
+                Assert.False(string.IsNullOrWhiteSpace(pp.CountryCode));
                 if (countries != null && countries.Any())
                 {
-                    countries.Should().Contain(pp.CountryCode);
+                    Assert.Contains(pp.CountryCode, countries);
                 }
-                pp.Capabilities.Mandates?.VrpSweeping.Should().NotBeNull();
-                pp.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel.Should().NotBeNullOrWhiteSpace();
+                Assert.NotNull(pp.Capabilities.Mandates?.VrpSweeping);
+                Assert.False(string.IsNullOrWhiteSpace(pp.Capabilities.Mandates?.VrpSweeping?.ReleaseChannel));
             });
         }
 

@@ -1,5 +1,4 @@
 using System;
-using FluentAssertions;
 using TrueLayer.Payments.Model;
 using Xunit;
 
@@ -71,9 +70,9 @@ namespace TrueLayer.Tests.Payments
             var dob = new DateTime(1969, 12, 28, 12, 33, 55);
             var user = new PaymentUserRequest(id: "id", dateOfBirth: dob);
 
-            user.DateOfBirth.HasValue.Should().BeTrue();
-            user.DateOfBirth!.Value.Should().Be(new DateTime(1969, 12, 28));
-            user.DateOfBirth!.Value.TimeOfDay.Should().Be(TimeSpan.Zero);
+            Assert.True(user.DateOfBirth.HasValue);
+            Assert.Equal(new DateTime(1969, 12, 28), user.DateOfBirth!.Value);
+            Assert.Equal(TimeSpan.Zero, user.DateOfBirth!.Value.TimeOfDay);
         }
     }
 }

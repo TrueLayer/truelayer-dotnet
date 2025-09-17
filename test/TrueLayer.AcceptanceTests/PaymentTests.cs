@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using FluentAssertions;
 using OneOf;
 using TrueLayer.AcceptanceTests.Clients;
 using TrueLayer.AcceptanceTests.Helpers;
@@ -56,19 +55,19 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         {
             var response = await client.Payments.CreatePayment(paymentRequest);
 
-            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             var authorizationRequired = response.Data.AsT0;
 
-            authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
-            authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
-            authorizationRequired.User.Should().NotBeNull();
-            authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
-            authorizationRequired.Status.Should().Be("authorization_required");
+            Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.Id));
+            Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.ResourceToken));
+            Assert.NotNull(authorizationRequired.User);
+            Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.User.Id));
+            Assert.Equal("authorization_required", authorizationRequired.Status);
 
             string hppUri = client.Payments.CreateHostedPaymentPageLink(
                 authorizationRequired.Id, authorizationRequired.ResourceToken,
                 new Uri("https://redirect.mydomain.com"));
-            hppUri.Should().NotBeNullOrWhiteSpace();
+            Assert.False(string.IsNullOrWhiteSpace(hppUri));
         }
     }
 
@@ -90,18 +89,18 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var response = await _fixture.TlClients[0].Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var authorizationRequired = response.Data.AsT0;
 
-        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.User.Should().NotBeNull();
-        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.Status.Should().Be("authorization_required");
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.Id));
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.ResourceToken));
+        Assert.NotNull(authorizationRequired.User);
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.User.Id));
+        Assert.Equal("authorization_required", authorizationRequired.Status);
 
         string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
             authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
+        Assert.False(string.IsNullOrWhiteSpace(hppUri));
     }
 
     [Fact]
@@ -120,18 +119,18 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
         var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var authorizationRequired = response.Data.AsT0;
 
-        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.User.Should().NotBeNull();
-        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.Status.Should().Be("authorization_required");
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.Id));
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.ResourceToken));
+        Assert.NotNull(authorizationRequired.User);
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.User.Id));
+        Assert.Equal("authorization_required", authorizationRequired.Status);
 
         string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
             authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
+        Assert.False(string.IsNullOrWhiteSpace(hppUri));
     }
 
     [Fact]
@@ -150,18 +149,18 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
         var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var authorizationRequired = response.Data.AsT0;
 
-        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.User.Should().NotBeNull();
-        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.Status.Should().Be("authorization_required");
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.Id));
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.ResourceToken));
+        Assert.NotNull(authorizationRequired.User);
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.User.Id));
+        Assert.Equal("authorization_required", authorizationRequired.Status);
 
         string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
             authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
+        Assert.False(string.IsNullOrWhiteSpace(hppUri));
     }
 
     [Fact]
@@ -182,14 +181,14 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var response = await _fixture.TlClients[0].Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var authorizationRequired = response.Data.AsT0;
 
-        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.User.Should().NotBeNull();
-        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.Status.Should().Be("authorization_required");
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.Id));
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.ResourceToken));
+        Assert.NotNull(authorizationRequired.User);
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.User.Id));
+        Assert.Equal("authorization_required", authorizationRequired.Status);
     }
 
     [Fact]
@@ -215,14 +214,14 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var response = await _fixture.TlClients[0].Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var authorizationRequired = response.Data.AsT0;
 
-        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.User.Should().NotBeNull();
-        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
-        authorizationRequired.Status.Should().Be("authorization_required");
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.Id));
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.ResourceToken));
+        Assert.NotNull(authorizationRequired.User);
+        Assert.False(string.IsNullOrWhiteSpace(authorizationRequired.User.Id));
+        Assert.Equal("authorization_required", authorizationRequired.Status);
     }
 
     [Fact]
@@ -240,23 +239,23 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             initAuthorizationFlow: true);
         var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
-        response.Data.IsT3.Should().BeTrue();
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.True(response.Data.IsT3);
         var authorizing = response.Data.AsT3;
 
-        authorizing.Id.Should().NotBeNullOrWhiteSpace();
-        authorizing.ResourceToken.Should().NotBeNullOrWhiteSpace();
-        authorizing.User.Should().NotBeNull();
-        authorizing.User.Id.Should().NotBeNullOrWhiteSpace();
-        authorizing.Status.Should().Be("authorizing");
-        authorizing.AuthorizationFlow.Should().NotBeNull();
+        Assert.False(string.IsNullOrWhiteSpace(authorizing.Id));
+        Assert.False(string.IsNullOrWhiteSpace(authorizing.ResourceToken));
+        Assert.NotNull(authorizing.User);
+        Assert.False(string.IsNullOrWhiteSpace(authorizing.User.Id));
+        Assert.Equal("authorizing", authorizing.Status);
+        Assert.NotNull(authorizing.AuthorizationFlow);
         // The next action is a redirect
-        authorizing.AuthorizationFlow!.Actions.Next.IsT2.Should().BeTrue();
-        authorizing.AuthorizationFlow.Actions.Next.AsT2.Uri.Should().NotBeNull();
+        Assert.True(authorizing.AuthorizationFlow!.Actions.Next.IsT2);
+        Assert.NotNull(authorizing.AuthorizationFlow.Actions.Next.AsT2.Uri);
 
         string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
             authorizing.Id, authorizing.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
+        Assert.False(string.IsNullOrWhiteSpace(hppUri));
     }
 
     [Fact]
@@ -273,12 +272,12 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
 
         var settled = payment.AsT4;
-        settled.AmountInMinor.Should().Be(paymentRequest.AmountInMinor);
-        settled.Currency.Should().Be(paymentRequest.Currency);
-        settled.Id.Should().NotBeNullOrWhiteSpace();
-        settled.CreatedAt.Should().NotBe(default);
-        settled.PaymentMethod.AsT0.Should().NotBeNull();
-        settled.CreditableAt.Should().NotBeNull();
+        Assert.Equal(paymentRequest.AmountInMinor, settled.AmountInMinor);
+        Assert.Equal(paymentRequest.Currency, settled.Currency);
+        Assert.False(string.IsNullOrWhiteSpace(settled.Id));
+        Assert.NotEqual(default, settled.CreatedAt);
+        Assert.NotNull(settled.PaymentMethod.AsT0);
+        Assert.NotNull(settled.CreditableAt);
     }
 
     [Theory]
@@ -288,43 +287,43 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var response = await _fixture.TlClients[1].Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        response.IsSuccessful.Should().BeTrue();
-        response.Data.IsT0.Should().BeTrue();
+        Assert.True(response.IsSuccessful);
+        Assert.True(response.Data.IsT0);
         var authorizationRequiredResponse = response.Data.AsT0;
 
         var getPaymentResponse = await _fixture.TlClients[1].Payments.GetPayment(authorizationRequiredResponse.Id);
 
-        getPaymentResponse.IsSuccessful.Should().BeTrue();
+        Assert.True(getPaymentResponse.IsSuccessful);
 
-        getPaymentResponse.Data.TryPickT0(out var payment, out _).Should().BeTrue();
-        payment.Status.Should().Be("authorization_required");
-        payment.AmountInMinor.Should().Be(paymentRequest.AmountInMinor);
-        payment.Currency.Should().Be(paymentRequest.Currency);
-        payment.Id.Should().NotBeNullOrWhiteSpace();
-        payment.CreatedAt.Should().NotBe(default);
+        Assert.True(getPaymentResponse.Data.TryPickT0(out var payment, out _));
+        Assert.Equal("authorization_required", payment.Status);
+        Assert.Equal(paymentRequest.AmountInMinor, payment.AmountInMinor);
+        Assert.Equal(paymentRequest.Currency, payment.Currency);
+        Assert.False(string.IsNullOrWhiteSpace(payment.Id));
+        Assert.NotEqual(default, payment.CreatedAt);
         var bankTransfer = payment.PaymentMethod.AsT0;
 
         bankTransfer.ProviderSelection.Switch(
             userSelected =>
             {
                 Provider.UserSelected providerSelectionReq = bankTransfer.ProviderSelection.AsT0;
-                userSelected.Filter.Should().BeEquivalentTo(providerSelectionReq.Filter);
+                Assert.Equal(providerSelectionReq.Filter!.ProviderIds, userSelected.Filter!.ProviderIds);
                 // Provider selection hasn't happened yet
-                userSelected.ProviderId.Should().BeNullOrEmpty();
-                userSelected.SchemeId.Should().BeNullOrEmpty();
+                Assert.True(string.IsNullOrEmpty(userSelected.ProviderId));
+                Assert.True(string.IsNullOrEmpty(userSelected.SchemeId));
             },
             preselected =>
             {
                 Provider.Preselected providerSelectionReq = bankTransfer.ProviderSelection.AsT1;
                 AssertSchemeSelection(preselected.SchemeSelection, providerSelectionReq.SchemeSelection, preselected.SchemeId, providerSelectionReq.SchemeId);
-                preselected.ProviderId.Should().Be(providerSelectionReq.ProviderId);
-                preselected.Remitter.Should().Be(providerSelectionReq.Remitter);
+                Assert.Equal(providerSelectionReq.ProviderId, preselected.ProviderId);
+                Assert.Equal(providerSelectionReq.Remitter, preselected.Remitter);
             });
 
-        bankTransfer.Beneficiary.TryPickT1(out var externalAccount, out _).Should().BeTrue();
-        bankTransfer.Beneficiary.Should().Be(bankTransfer.Beneficiary);
-        payment.User.Should().NotBeNull();
-        payment.User.Id.Should().Be(authorizationRequiredResponse.User.Id);
+        Assert.True(bankTransfer.Beneficiary.TryPickT1(out var externalAccount, out _));
+        Assert.Equal(bankTransfer.Beneficiary, bankTransfer.Beneficiary);
+        Assert.NotNull(payment.User);
+        Assert.Equal(authorizationRequiredResponse.User.Id, payment.User.Id);
     }
 
     [Fact]
@@ -344,8 +343,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             typeof(GetPaymentResponse.AttemptFailed));
 
         // Assert
-        payment.AsT6.Id.Should().NotBeNullOrWhiteSpace();
-        payment.AsT6.Status.Should().Be("attempt_failed");
+        Assert.False(string.IsNullOrWhiteSpace(payment.AsT6.Id));
+        Assert.Equal("attempt_failed", payment.AsT6.Status);
     }
 
     [Fact]
@@ -363,17 +362,17 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             paymentId: paymentId,
             idempotencyKey: Guid.NewGuid().ToString(),
             new CreatePaymentRefundRequest(Reference: "a-reference"));
-        createRefundResponse.IsSuccessful.Should().BeTrue();
-        createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
+        Assert.True(createRefundResponse.IsSuccessful);
+        Assert.False(string.IsNullOrWhiteSpace(createRefundResponse.Data!.Id));
 
         var getPaymentRefundResponse = await client.Payments.GetPaymentRefund(
             paymentId: paymentId,
             refundId: createRefundResponse.Data!.Id);
 
         // Assert
-        createRefundResponse.IsSuccessful.Should().BeTrue();
-        createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
-        getPaymentRefundResponse.IsSuccessful.Should().BeTrue();
+        Assert.True(createRefundResponse.IsSuccessful);
+        Assert.False(string.IsNullOrWhiteSpace(createRefundResponse.Data!.Id));
+        Assert.True(getPaymentRefundResponse.IsSuccessful);
     }
 
     [Fact]
@@ -391,17 +390,17 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             paymentId: paymentId,
             idempotencyKey: Guid.NewGuid().ToString(),
             new CreatePaymentRefundRequest(Reference: "a-reference"));
-        createRefundResponse.IsSuccessful.Should().BeTrue();
-        createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
+        Assert.True(createRefundResponse.IsSuccessful);
+        Assert.False(string.IsNullOrWhiteSpace(createRefundResponse.Data!.Id));
 
         // Act
         var listPaymentRefundsResponse = await client.Payments.ListPaymentRefunds(paymentId);
 
         // Assert
-        createRefundResponse.IsSuccessful.Should().BeTrue();
-        createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
-        listPaymentRefundsResponse.IsSuccessful.Should().BeTrue();
-        listPaymentRefundsResponse.Data!.Items.Count.Should().Be(1);
+        Assert.True(createRefundResponse.IsSuccessful);
+        Assert.False(string.IsNullOrWhiteSpace(createRefundResponse.Data!.Id));
+        Assert.True(listPaymentRefundsResponse.IsSuccessful);
+        Assert.Equal(1, listPaymentRefundsResponse.Data!.Items.Count);
     }
 
     [Fact]
@@ -420,14 +419,14 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             paymentId: paymentId,
             idempotencyKey: Guid.NewGuid().ToString(),
             new CreatePaymentRefundRequest(Reference: "executed-refund"));
-        createRefundResponse.IsSuccessful.Should().BeTrue();
+        Assert.True(createRefundResponse.IsSuccessful);
 
         // Act - List refunds (may include RefundExecuted status)
         var listPaymentRefundsResponse = await client.Payments.ListPaymentRefunds(paymentId);
 
         // Assert
-        listPaymentRefundsResponse.IsSuccessful.Should().BeTrue();
-        listPaymentRefundsResponse.Data!.Items.Should().NotBeEmpty();
+        Assert.True(listPaymentRefundsResponse.IsSuccessful);
+        Assert.NotEmpty(listPaymentRefundsResponse.Data!.Items);
         // Note: RefundExecuted status depends on actual payment processing state
     }
 
@@ -447,14 +446,14 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             paymentId: paymentId,
             idempotencyKey: Guid.NewGuid().ToString(),
             new CreatePaymentRefundRequest(Reference: "TUOYAP"));
-        createRefundResponse.IsSuccessful.Should().BeTrue();
+        Assert.True(createRefundResponse.IsSuccessful);
 
         // Act - List refunds (may include RefundFailed status)
         var listPaymentRefundsResponse = await client.Payments.ListPaymentRefunds(paymentId);
 
         // Assert
-        listPaymentRefundsResponse.IsSuccessful.Should().BeTrue();
-        listPaymentRefundsResponse.Data!.Items.Should().NotBeEmpty();
+        Assert.True(listPaymentRefundsResponse.IsSuccessful);
+        Assert.NotEmpty(listPaymentRefundsResponse.Data!.Items);
         // Note: RefundFailed status depends on actual payment processing state
     }
 
@@ -466,7 +465,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var payment = await _fixture.TlClients[0].Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        payment.IsSuccessful.Should().BeTrue();
+        Assert.True(payment.IsSuccessful);
         var paymentId = payment.Data.AsT0.Id;
 
         // act
@@ -477,11 +476,11 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var getPaymentResponse = await _fixture.TlClients[0].Payments.GetPayment(paymentId);
 
         // assert
-        cancelPaymentResponse.IsSuccessful.Should().BeTrue();
-        cancelPaymentResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        getPaymentResponse.IsSuccessful.Should().BeTrue();
-        getPaymentResponse.Data.AsT5.Should().NotBeNull();
-        getPaymentResponse.Data.AsT5.FailureReason.Should().Be("canceled");
+        Assert.True(cancelPaymentResponse.IsSuccessful);
+        Assert.Equal(HttpStatusCode.Accepted, cancelPaymentResponse.StatusCode);
+        Assert.True(getPaymentResponse.IsSuccessful);
+        Assert.NotNull(getPaymentResponse.Data.AsT5);
+        Assert.Equal("canceled", getPaymentResponse.Data.AsT5.FailureReason);
     }
 
     private static void AssertSchemeSelection(
@@ -492,18 +491,18 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     {
         if (actualSchemeSelection is null && expectedSchemeSelection is null)
         {
-            actualSchemeId.Should().BeEquivalentTo(expectedSchemeId);
+            Assert.Equal(expectedSchemeId, actualSchemeId);
             return;
         }
 
-        actualSchemeSelection.Should().NotBeNull();
-        expectedSchemeSelection.Should().NotBeNull();
+        Assert.NotNull(actualSchemeSelection);
+        Assert.NotNull(expectedSchemeSelection);
         var expectedSelection = expectedSchemeSelection!.Value;
         actualSchemeSelection!.Value.Switch(
-            instantOnly => { instantOnly.AllowRemitterFee.Should().Be(expectedSelection.AsT0.AllowRemitterFee); },
-            instantPreferred => { instantPreferred.AllowRemitterFee.Should().Be(expectedSelection.AsT1.AllowRemitterFee); },
-            preselectedSchemeSelection => { preselectedSchemeSelection.SchemeId.Should().Be(expectedSelection.AsT2.SchemeId); },
-            userSelected => { expectedSelection.IsT3.Should().Be(true); });
+            instantOnly => { Assert.Equal(expectedSelection.AsT0.AllowRemitterFee, instantOnly.AllowRemitterFee); },
+            instantPreferred => { Assert.Equal(expectedSelection.AsT1.AllowRemitterFee, instantPreferred.AllowRemitterFee); },
+            preselectedSchemeSelection => { Assert.Equal(expectedSelection.AsT2.SchemeId, preselectedSchemeSelection.SchemeId); },
+            userSelected => { Assert.True(expectedSelection.IsT3); });
     }
 
     [Fact]
@@ -513,7 +512,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         const string paymentId = "https://test.com";
 
         var result = await Assert.ThrowsAsync<ArgumentException>(() => client.Payments.GetPayment(paymentId));
-        result.Message.Should().Be("Value is malformed (Parameter 'id')");
+        Assert.Equal("Value is malformed (Parameter 'id')", result.Message);
     }
 
     [Fact]
@@ -525,7 +524,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var result = await Assert.ThrowsAsync<ArgumentException>(() =>
             client.Payments.StartAuthorizationFlow(paymentId, Guid.NewGuid().ToString(),
                 new StartAuthorizationFlowRequest()));
-        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+        Assert.Equal("Value is malformed (Parameter 'paymentId')", result.Message);
     }
 
     [Fact]
@@ -537,7 +536,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var result = await Assert.ThrowsAsync<ArgumentException>(() =>
             client.Payments.CreatePaymentRefund(paymentId, Guid.NewGuid().ToString(),
                 new CreatePaymentRefundRequest("reference")));
-        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+        Assert.Equal("Value is malformed (Parameter 'paymentId')", result.Message);
     }
 
     [Fact]
@@ -548,7 +547,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
         var result = await Assert.ThrowsAsync<ArgumentException>(() =>
             client.Payments.ListPaymentRefunds(paymentId));
-        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+        Assert.Equal("Value is malformed (Parameter 'paymentId')", result.Message);
     }
 
     [Fact]
@@ -559,7 +558,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
         var result = await Assert.ThrowsAsync<ArgumentException>(() =>
             client.Payments.GetPaymentRefund(paymentId, Guid.NewGuid().ToString()));
-        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+        Assert.Equal("Value is malformed (Parameter 'paymentId')", result.Message);
     }
 
     [Fact]
@@ -570,7 +569,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
         var result = await Assert.ThrowsAsync<ArgumentException>(() =>
             client.Payments.GetPaymentRefund(Guid.NewGuid().ToString(), refundId));
-        result.Message.Should().Be("Value is malformed (Parameter 'refundId')");
+        Assert.Equal("Value is malformed (Parameter 'refundId')", result.Message);
     }
 
     [Fact]
@@ -581,7 +580,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
 
         var result = await Assert.ThrowsAsync<ArgumentException>(() =>
             client.Payments.CancelPayment(paymentId, Guid.NewGuid().ToString()));
-        result.Message.Should().Be("Value is malformed (Parameter 'paymentId')");
+        Assert.Equal("Value is malformed (Parameter 'paymentId')", result.Message);
     }
 
     private static CreatePaymentRequest CreateTestPaymentRequest(
@@ -848,7 +847,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     {
         var response = await trueLayerClient.Payments.CreatePayment(paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var authorizing = response.Data.AsT3;
         var paymentId = authorizing.Id;
 
@@ -870,7 +869,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             () => trueLayerClient.Payments.GetPayment(paymentId),
             r => r.Data.GetType() == expectedStatus);
 
-        getPaymentResponse.IsSuccessful.Should().BeTrue();
+        Assert.True(getPaymentResponse.IsSuccessful);
         return getPaymentResponse.Data;
     }
 }

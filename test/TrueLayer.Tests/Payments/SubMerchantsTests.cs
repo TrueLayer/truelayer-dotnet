@@ -1,5 +1,4 @@
 using System;
-using FluentAssertions;
 using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using Xunit;
@@ -19,9 +18,9 @@ namespace TrueLayer.Tests.Payments
             var businessDivision = new SubMerchants.BusinessDivision(id, name);
 
             // Assert
-            businessDivision.Type.Should().Be("business_division");
-            businessDivision.Id.Should().Be(id);
-            businessDivision.Name.Should().Be(name);
+            Assert.Equal("business_division", businessDivision.Type);
+            Assert.Equal(id, businessDivision.Id);
+            Assert.Equal(name, businessDivision.Name);
         }
 
         [Theory]
@@ -32,7 +31,7 @@ namespace TrueLayer.Tests.Payments
         {
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new SubMerchants.BusinessDivision(id!, "Test Division"));
-            exception.ParamName.Should().Be("id");
+            Assert.Equal("id", exception.ParamName);
         }
 
         [Theory]
@@ -43,7 +42,7 @@ namespace TrueLayer.Tests.Payments
         {
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new SubMerchants.BusinessDivision("test-id", name!));
-            exception.ParamName.Should().Be("name");
+            Assert.Equal("name", exception.ParamName);
         }
 
         [Fact]
@@ -56,13 +55,13 @@ namespace TrueLayer.Tests.Payments
             var businessClient = new SubMerchants.BusinessClient(tradingName);
 
             // Assert
-            businessClient.Type.Should().Be("business_client");
-            businessClient.TradingName.Should().Be(tradingName);
-            businessClient.CommercialName.Should().BeNull();
-            businessClient.Url.Should().BeNull();
-            businessClient.Mcc.Should().BeNull();
-            businessClient.RegistrationNumber.Should().BeNull();
-            businessClient.Address.Should().BeNull();
+            Assert.Equal("business_client", businessClient.Type);
+            Assert.Equal(tradingName, businessClient.TradingName);
+            Assert.Null(businessClient.CommercialName);
+            Assert.Null(businessClient.Url);
+            Assert.Null(businessClient.Mcc);
+            Assert.Null(businessClient.RegistrationNumber);
+            Assert.Null(businessClient.Address);
         }
 
         [Fact]
@@ -81,13 +80,13 @@ namespace TrueLayer.Tests.Payments
                 tradingName, commercialName, url, mcc, registrationNumber, address);
 
             // Assert
-            businessClient.Type.Should().Be("business_client");
-            businessClient.TradingName.Should().Be(tradingName);
-            businessClient.CommercialName.Should().Be(commercialName);
-            businessClient.Url.Should().Be(url);
-            businessClient.Mcc.Should().Be(mcc);
-            businessClient.RegistrationNumber.Should().Be(registrationNumber);
-            businessClient.Address.Should().Be(address);
+            Assert.Equal("business_client", businessClient.Type);
+            Assert.Equal(tradingName, businessClient.TradingName);
+            Assert.Equal(commercialName, businessClient.CommercialName);
+            Assert.Equal(url, businessClient.Url);
+            Assert.Equal(mcc, businessClient.Mcc);
+            Assert.Equal(registrationNumber, businessClient.RegistrationNumber);
+            Assert.Equal(address, businessClient.Address);
         }
 
         [Theory]
@@ -98,7 +97,7 @@ namespace TrueLayer.Tests.Payments
         {
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new SubMerchants.BusinessClient(tradingName!));
-            exception.ParamName.Should().Be("tradingName");
+            Assert.Equal("tradingName", exception.ParamName);
         }
 
         [Theory]
@@ -109,7 +108,7 @@ namespace TrueLayer.Tests.Payments
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new SubMerchants.BusinessClient(
                 "Trading Name", emptyValue, emptyValue, emptyValue, emptyValue));
-            exception.ParamName.Should().Be("commercialName");
+            Assert.Equal("commercialName", exception.ParamName);
         }
 
         [Fact]
@@ -122,11 +121,11 @@ namespace TrueLayer.Tests.Payments
             var subMerchants = new SubMerchants(businessDivision);
 
             // Assert
-            subMerchants.UltimateCounterparty.IsT0.Should().BeTrue(); // BusinessDivision
+            Assert.True(subMerchants.UltimateCounterparty.IsT0); // BusinessDivision
             var result = subMerchants.UltimateCounterparty.AsT0;
-            result.Type.Should().Be("business_division");
-            result.Id.Should().Be("test-id");
-            result.Name.Should().Be("Test Division");
+            Assert.Equal("business_division", result.Type);
+            Assert.Equal("test-id", result.Id);
+            Assert.Equal("Test Division", result.Name);
         }
 
         [Fact]
@@ -139,15 +138,15 @@ namespace TrueLayer.Tests.Payments
             var subMerchants = new SubMerchants(businessClient);
 
             // Assert
-            subMerchants.UltimateCounterparty.IsT1.Should().BeTrue(); // BusinessClient
+            Assert.True(subMerchants.UltimateCounterparty.IsT1); // BusinessClient
             var result = subMerchants.UltimateCounterparty.AsT1;
-            result.Type.Should().Be("business_client");
-            result.TradingName.Should().Be("Test Trading Name");
-            result.CommercialName.Should().BeNull();
-            result.Url.Should().BeNull();
-            result.Mcc.Should().BeNull();
-            result.RegistrationNumber.Should().BeNull();
-            result.Address.Should().BeNull();
+            Assert.Equal("business_client", result.Type);
+            Assert.Equal("Test Trading Name", result.TradingName);
+            Assert.Null(result.CommercialName);
+            Assert.Null(result.Url);
+            Assert.Null(result.Mcc);
+            Assert.Null(result.RegistrationNumber);
+            Assert.Null(result.Address);
         }
     }
 }

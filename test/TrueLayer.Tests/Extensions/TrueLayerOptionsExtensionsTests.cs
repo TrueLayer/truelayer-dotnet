@@ -1,5 +1,4 @@
 using System;
-using FluentAssertions;
 using TrueLayer.Payments;
 using Xunit;
 
@@ -26,7 +25,7 @@ public class TrueLayerOptionsExtensionsTests
         var actual = options.GetApiBaseUri();
 
         // Assert
-        actual.Should().Be("https://api.custom.com");
+        Assert.Equal("https://api.custom.com/", actual.ToString());
     }
 
     [Fact]
@@ -44,7 +43,7 @@ public class TrueLayerOptionsExtensionsTests
         var actual = options.GetApiBaseUri();
 
         // Assert
-        actual.Should().Be("https://api.truelayer-sandbox.com/");
+        Assert.Equal("https://api.truelayer-sandbox.com/", actual.ToString());
     }
 
     [Fact]
@@ -62,7 +61,7 @@ public class TrueLayerOptionsExtensionsTests
         var actual = options.GetApiBaseUri();
 
         // Assert
-        actual.Should().Be("https://api.truelayer.com/");
+        Assert.Equal("https://api.truelayer.com/", actual.ToString());
     }
 
     [Fact]
@@ -84,7 +83,7 @@ public class TrueLayerOptionsExtensionsTests
         var actual = options.GetAuthBaseUri();
 
         // Assert
-        actual.Should().Be("https://auth.custom.com");
+        Assert.Equal("https://auth.custom.com/", actual.ToString());
     }
 
     [Fact]
@@ -102,7 +101,7 @@ public class TrueLayerOptionsExtensionsTests
         var actual = options.GetAuthBaseUri();
 
         // Assert
-        actual.Should().Be("https://auth.truelayer-sandbox.com/");
+        Assert.Equal("https://auth.truelayer-sandbox.com/", actual.ToString());
     }
 
     [Fact]
@@ -120,6 +119,6 @@ public class TrueLayerOptionsExtensionsTests
         var actual = options.GetAuthBaseUri();
 
         // Assert
-        actual.Should().Be("https://auth.truelayer.com/");
+        Assert.Equal("https://auth.truelayer.com/", actual.ToString());
     }
 }

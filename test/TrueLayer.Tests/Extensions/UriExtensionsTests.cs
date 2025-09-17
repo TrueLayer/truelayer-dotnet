@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using FluentAssertions;
 using TrueLayer.Extensions;
 using Xunit;
 
@@ -19,7 +18,7 @@ namespace TrueLayer.Tests.Extensions
             var actual = baseUri.Append(segments);
 
             // Assert
-            actual.Should().Be(expectedUri);
+            Assert.Equal(expectedUri, actual);
         }
 
         [Theory]
@@ -33,7 +32,7 @@ namespace TrueLayer.Tests.Extensions
             var actual = baseUri.AppendQueryParameters(queryParams);
 
             // Assert
-            actual.Should().Be(expectedUri);
+            Assert.Equal(expectedUri, actual);
         }
 
         public static IEnumerable<object?[]> QueryParametersTestData()

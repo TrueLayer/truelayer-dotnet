@@ -1,7 +1,6 @@
 using System;
 using System.Net.Http;
 using System.Text.Json;
-using FluentAssertions;
 using TrueLayer.Signing;
 using Xunit;
 
@@ -40,7 +39,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 .Header(CustomHeaders.IdempotencyKey, Guid.NewGuid().ToString())
                 .Sign();
 
-            signature.Should().NotBeNullOrWhiteSpace();
+            Assert.False(string.IsNullOrWhiteSpace(signature));
         }
     }
 }

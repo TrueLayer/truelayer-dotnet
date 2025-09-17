@@ -1,5 +1,4 @@
 using System;
-using FluentAssertions;
 using OneOf;
 using TrueLayer.Serialization;
 using Xunit;
@@ -10,8 +9,11 @@ namespace TrueLayer.Tests.Serialization
     {
         [Fact]
         public void Can_create_one_of_converter()
-            => new OneOfJsonConverterFactory()
-                .CreateConverter(typeof(OneOf<string, int>), new()).Should().NotBeNull();
+        {
+            var converter = new OneOfJsonConverterFactory()
+                .CreateConverter(typeof(OneOf<string, int>), new());
+            Assert.NotNull(converter);
+        }
 
         [Fact]
         public void Throws_if_invalid_oneof_type()
@@ -22,6 +24,6 @@ namespace TrueLayer.Tests.Serialization
         [InlineData(typeof(IOneOf), true)]
         [InlineData(typeof(OneOf<string, int>), true)]
         public void Can_convert_only_one_of_types(Type type, bool expected)
-            => new OneOfJsonConverterFactory().CanConvert(type).Should().Be(expected);
+            => Assert.Equal(expected, new OneOfJsonConverterFactory().CanConvert(type));
     }
 }

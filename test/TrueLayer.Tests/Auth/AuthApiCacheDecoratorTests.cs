@@ -1,6 +1,5 @@
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
 using TrueLayer.Auth;
 using TrueLayer.Models;
 using TrueLayer.Tests.Mocks;
@@ -38,8 +37,8 @@ public class AuthApiCacheDecoratorTests
         var response = await _authClient.GetAuthToken(request);
 
         //Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.Data.Should().BeEquivalentTo(expectedResponse);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(expectedResponse, response.Data);
     }
 
     [Fact]
@@ -56,11 +55,11 @@ public class AuthApiCacheDecoratorTests
         var response = await _authClient.GetAuthToken(request);
 
         //Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.Data.Should().BeEquivalentTo(expectedResponse);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(expectedResponse, response.Data);
         _authTokenCache.TryGetValue($"tl-auth-token:{ClientId}:{scope}", out var cachedResponse);
-        cachedResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
-        cachedResponse.Data.Should().BeEquivalentTo(expectedResponse);
+        Assert.Equal(HttpStatusCode.OK, cachedResponse!.StatusCode);
+        Assert.Equal(expectedResponse, cachedResponse.Data);
     }
 
     [Fact]
@@ -77,8 +76,8 @@ public class AuthApiCacheDecoratorTests
         var response = await _authClient.GetAuthToken(request);
 
         //Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        response.Problem.Should().BeEquivalentTo(expectedResponse);
-        _authTokenCache.IsEmpty.Should().BeTrue();
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(expectedResponse, response.Problem);
+        Assert.True(_authTokenCache.IsEmpty);
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
 using TrueLayer.Common;
 using TrueLayer.Payouts.Model;
 using Xunit;
@@ -25,9 +24,9 @@ namespace TrueLayer.AcceptanceTests
 
             var response = await _fixture.TlClients[0].Payouts.CreatePayout(payoutRequest);
 
-            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
-            response.Data.Should().NotBeNull();
-            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
+            Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
+            Assert.NotNull(response.Data);
+            Assert.False(string.IsNullOrWhiteSpace(response.Data!.Id));
         }
 
         [Fact]
@@ -37,9 +36,9 @@ namespace TrueLayer.AcceptanceTests
 
             var response = await _fixture.TlClients[0].Payouts.CreatePayout(payoutRequest);
 
-            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
-            response.Data.Should().NotBeNull();
-            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
+            Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
+            Assert.NotNull(response.Data);
+            Assert.False(string.IsNullOrWhiteSpace(response.Data!.Id));
         }
 
         [Fact]
@@ -50,24 +49,29 @@ namespace TrueLayer.AcceptanceTests
             var response = await _fixture.TlClients[0].Payouts.CreatePayout(
                 payoutRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
-            response.Data.Should().NotBeNull();
-            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
+            Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
+            Assert.NotNull(response.Data);
+            Assert.False(string.IsNullOrWhiteSpace(response.Data!.Id));
 
             var getPayoutResponse = await _fixture.TlClients[0].Payouts.GetPayout(response.Data.Id);
 
-            getPayoutResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            getPayoutResponse.Data.Value.Should().NotBeNull();
+            Assert.Equal(HttpStatusCode.OK, getPayoutResponse.StatusCode);
+            Assert.NotNull(getPayoutResponse.Data.Value);
             PayoutDetails? details = getPayoutResponse.Data.Value as PayoutDetails;
 
-            details.Should().NotBeNull();
-            details!.Id.Should().Be(response.Data.Id);
-            details.Currency.Should().Be(payoutRequest.Currency);
-            details.Beneficiary.AsT1.Should().NotBeNull();
-            details.Status.Should().BeOneOf("pending", "authorized", "executed", "failed");
-            details.CreatedAt.Should().NotBe(DateTime.MinValue);
-            details.CreatedAt.Should().NotBe(DateTime.MaxValue);
-            details.Metadata.Should().BeEquivalentTo(payoutRequest.Metadata);
+            Assert.NotNull(details);
+            Assert.Equal(response.Data.Id, details!.Id);
+            Assert.Equal(payoutRequest.Currency, details.Currency);
+            Assert.NotNull(details.Beneficiary.AsT1);
+            Assert.Contains(details.Status, new[] { "pending", "authorized", "executed", "failed" });
+            Assert.NotEqual(DateTime.MinValue, details.CreatedAt);
+            Assert.NotEqual(DateTime.MaxValue, details.CreatedAt);
+            Assert.Equal(payoutRequest.Metadata!.Count, details.Metadata!.Count);
+            foreach (var kvp in payoutRequest.Metadata!)
+            {
+                Assert.True(details.Metadata!.ContainsKey(kvp.Key));
+                Assert.Equal(kvp.Value, details.Metadata![kvp.Key]);
+            }
         }
 
         [Fact]
@@ -78,7 +82,7 @@ namespace TrueLayer.AcceptanceTests
 
             var result = await Assert.ThrowsAsync<ArgumentException>(() =>
                 client.Payouts.GetPayout(payoutId));
-            result.Message.Should().Be("Value is malformed (Parameter 'id')");
+            Assert.Equal("Value is malformed (Parameter 'id')", result.Message);
         }
 
         private CreatePayoutRequest CreatePayoutRequest()

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
 using OneOf;
 using TrueLayer.Auth;
 using TrueLayer.Common;
@@ -60,12 +59,12 @@ namespace TrueLayer.Tests.Payouts
             var response = await _sut.CreatePayout(createPayoutRequest, "idempotency-key", CancellationToken.None);
 
             // Assert
-            response.Should().NotBeNull();
-            response.IsSuccessful.Should().BeTrue();
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            response.TraceId.Should().Be("trace-id");
-            response.Data.Should().NotBeNull();
-            response.Data!.Id.Should().Be("some-id");
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessful);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("trace-id", response.TraceId);
+            Assert.NotNull(response.Data);
+            Assert.Equal("some-id", response.Data!.Id);
         }
 
         [Theory]
@@ -79,10 +78,10 @@ namespace TrueLayer.Tests.Payouts
             var actual = await _sut.CreatePayout(createPayoutRequest, "idempotency-key", CancellationToken.None);
 
             //Assert
-            actual.Should().NotBeNull();
-            actual.IsSuccessful.Should().BeFalse();
-            actual.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            actual.TraceId.Should().Be("trace-id");
+            Assert.NotNull(actual);
+            Assert.False(actual.IsSuccessful);
+            Assert.Equal(HttpStatusCode.BadRequest, actual.StatusCode);
+            Assert.Equal("trace-id", actual.TraceId);
         }
 
         [Fact]
@@ -95,10 +94,10 @@ namespace TrueLayer.Tests.Payouts
             var actual = await _sut.GetPayout("payout-id", CancellationToken.None);
 
             //Assert
-            actual.Should().NotBeNull();
-            actual.IsSuccessful.Should().BeFalse();
-            actual.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            actual.TraceId.Should().Be("trace-id");
+            Assert.NotNull(actual);
+            Assert.False(actual.IsSuccessful);
+            Assert.Equal(HttpStatusCode.BadRequest, actual.StatusCode);
+            Assert.Equal("trace-id", actual.TraceId);
         }
 
         private static CreatePayoutRequest CreatePayoutRequest(PayoutBeneficiary beneficiary) =>

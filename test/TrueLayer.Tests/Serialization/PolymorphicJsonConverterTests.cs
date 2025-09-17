@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FluentAssertions;
 using TrueLayer.Serialization;
 using Xunit;
 
@@ -24,11 +23,11 @@ namespace TrueLayer.Tests.Serialization
             };
 
             var sut = JsonSerializer.Deserialize<Sut>(json, options);
-            sut.Should().NotBeNull();
-            sut!.Vehicle.Should().NotBeNull();
-            sut.Vehicle!.Type.Should().Be("car");
-            sut.Vehicle.Should().BeOfType<Car>().Which
-                .Doors.Should().Be(3);
+            Assert.NotNull(sut);
+            Assert.NotNull(sut!.Vehicle);
+            Assert.Equal("car", sut.Vehicle!.Type);
+            var car = Assert.IsType<Car>(sut.Vehicle);
+            Assert.Equal(3, car.Doors);
         }
 
         class Sut
