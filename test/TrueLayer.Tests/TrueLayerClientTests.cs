@@ -1,6 +1,5 @@
 using System;
 using System.Net.Http;
-using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TrueLayer.Payments;
@@ -43,10 +42,10 @@ namespace TrueLayer.Tests
                 mockCache);
             var client = factory.Create("TrueLayer");
 
-            client.Auth.Should().NotBeNull();
-            client.Payments.Should().NotBeNull();
-            client.MerchantAccounts.Should().NotBeNull();
-            client.Mandates.Should().NotBeNull();
+            Assert.NotNull(client.Auth);
+            Assert.NotNull(client.Payments);
+            Assert.NotNull(client.MerchantAccounts);
+            Assert.NotNull(client.Mandates);
         }
     }
 }

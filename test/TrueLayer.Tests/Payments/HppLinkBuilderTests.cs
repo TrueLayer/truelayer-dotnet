@@ -1,5 +1,4 @@
 using System;
-using FluentAssertions;
 using TrueLayer.Payments;
 using TrueLayer.Payments.Model;
 using Xunit;
@@ -17,7 +16,7 @@ public class HppLinkBuilderTests
 
         var result = sut.Build(paymentId, token, new Uri("https://return.client.com/"), ResourceType.Payment);
 
-        result.Should().Be($"https://payment.truelayer-sandbox.com/payments#payment_id={paymentId}&resource_token={token}&return_uri=https://return.client.com/");
+        Assert.Equal($"https://payment.truelayer-sandbox.com/payments#payment_id={paymentId}&resource_token={token}&return_uri=https://return.client.com/", result);
     }
 
     [Fact]
@@ -29,7 +28,7 @@ public class HppLinkBuilderTests
 
         var result = sut.Build(paymentId, token, new Uri("https://return.client.com/"), ResourceType.Payment);
 
-        result.Should().Be($"https://payment.truelayer.com/payments#payment_id={paymentId}&resource_token={token}&return_uri=https://return.client.com/");
+        Assert.Equal($"https://payment.truelayer.com/payments#payment_id={paymentId}&resource_token={token}&return_uri=https://return.client.com/", result);
     }
 
     [Fact]
@@ -42,7 +41,7 @@ public class HppLinkBuilderTests
 
         var result = sut.Build(paymentId, token, new Uri("https://return.client.com/"), ResourceType.Payment);
 
-        result.Should().Be($"https://api.custom.com/payments#payment_id={paymentId}&resource_token={token}&return_uri=https://return.client.com/");
+        Assert.Equal($"https://api.custom.com/payments#payment_id={paymentId}&resource_token={token}&return_uri=https://return.client.com/", result);
     }
 
     [Fact]
@@ -54,7 +53,7 @@ public class HppLinkBuilderTests
 
         var result = sut.Build(paymentId, token, new Uri("https://return.client.com/"), ResourceType.Payment, 60, true);
 
-        result.Should().Be($"https://payment.truelayer-sandbox.com/payments#payment_id={paymentId}&resource_token={token}&return_uri=https://return.client.com/&max_wait_seconds=60&signup=true");
+        Assert.Equal($"https://payment.truelayer-sandbox.com/payments#payment_id={paymentId}&resource_token={token}&return_uri=https://return.client.com/&max_wait_seconds=60&signup=true", result);
     }
 
     [Fact]
@@ -66,7 +65,7 @@ public class HppLinkBuilderTests
 
         var result = sut.Build(mandateId, token, new Uri("https://return.client.com/"), ResourceType.Mandate);
 
-        result.Should().Be($"https://payment.truelayer-sandbox.com/mandates#mandate_id={mandateId}&resource_token={token}&return_uri=https://return.client.com/");
+        Assert.Equal($"https://payment.truelayer-sandbox.com/mandates#mandate_id={mandateId}&resource_token={token}&return_uri=https://return.client.com/", result);
     }
 
     [Fact]
@@ -78,6 +77,6 @@ public class HppLinkBuilderTests
 
         var result = sut.Build(mandateId, token, new Uri("https://return.client.com/"), ResourceType.Mandate);
 
-        result.Should().Be($"https://payment.truelayer.com/mandates#mandate_id={mandateId}&resource_token={token}&return_uri=https://return.client.com/");
+        Assert.Equal($"https://payment.truelayer.com/mandates#mandate_id={mandateId}&resource_token={token}&return_uri=https://return.client.com/", result);
     }
 }

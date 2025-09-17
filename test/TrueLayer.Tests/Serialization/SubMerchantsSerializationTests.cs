@@ -1,5 +1,4 @@
 using System.Text.Json;
-using FluentAssertions;
 using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
@@ -21,12 +20,12 @@ namespace TrueLayer.Tests.Serialization
             var deserialized = JsonSerializer.Deserialize<SubMerchants>(json, SerializerOptions.Default);
 
             // Assert
-            deserialized.Should().NotBeNull();
-            deserialized!.UltimateCounterparty.IsT0.Should().BeTrue();
+            Assert.NotNull(deserialized);
+            Assert.True(deserialized!.UltimateCounterparty.IsT0);
             var deserializedBusinessDivision = deserialized.UltimateCounterparty.AsT0;
-            deserializedBusinessDivision.Type.Should().Be("business_division");
-            deserializedBusinessDivision.Id.Should().Be("test-id-123");
-            deserializedBusinessDivision.Name.Should().Be("Test Division Name");
+            Assert.Equal("business_division", deserializedBusinessDivision.Type);
+            Assert.Equal("test-id-123", deserializedBusinessDivision.Id);
+            Assert.Equal("Test Division Name", deserializedBusinessDivision.Name);
         }
 
         [Fact]
@@ -48,21 +47,21 @@ namespace TrueLayer.Tests.Serialization
             var deserialized = JsonSerializer.Deserialize<SubMerchants>(json, SerializerOptions.Default);
 
             // Assert
-            deserialized.Should().NotBeNull();
-            deserialized!.UltimateCounterparty.IsT1.Should().BeTrue();
+            Assert.NotNull(deserialized);
+            Assert.True(deserialized!.UltimateCounterparty.IsT1);
             var deserializedBusinessClient = deserialized.UltimateCounterparty.AsT1;
-            deserializedBusinessClient.Type.Should().Be("business_client");
-            deserializedBusinessClient.TradingName.Should().Be("Test Trading Company");
-            deserializedBusinessClient.CommercialName.Should().Be("Test Commercial Name");
-            deserializedBusinessClient.Url.Should().Be("https://example.com");
-            deserializedBusinessClient.Mcc.Should().Be("1234");
-            deserializedBusinessClient.RegistrationNumber.Should().Be("REG123456");
-            deserializedBusinessClient.Address.Should().NotBeNull();
-            deserializedBusinessClient.Address!.AddressLine1.Should().Be("1 Hardwick St");
-            deserializedBusinessClient.Address.City.Should().Be("London");
-            deserializedBusinessClient.Address.State.Should().Be("England");
-            deserializedBusinessClient.Address.Zip.Should().Be("EC1R 4RB");
-            deserializedBusinessClient.Address.CountryCode.Should().Be("GB");
+            Assert.Equal("business_client", deserializedBusinessClient.Type);
+            Assert.Equal("Test Trading Company", deserializedBusinessClient.TradingName);
+            Assert.Equal("Test Commercial Name", deserializedBusinessClient.CommercialName);
+            Assert.Equal("https://example.com", deserializedBusinessClient.Url);
+            Assert.Equal("1234", deserializedBusinessClient.Mcc);
+            Assert.Equal("REG123456", deserializedBusinessClient.RegistrationNumber);
+            Assert.NotNull(deserializedBusinessClient.Address);
+            Assert.Equal("1 Hardwick St", deserializedBusinessClient.Address!.AddressLine1);
+            Assert.Equal("London", deserializedBusinessClient.Address.City);
+            Assert.Equal("England", deserializedBusinessClient.Address.State);
+            Assert.Equal("EC1R 4RB", deserializedBusinessClient.Address.Zip);
+            Assert.Equal("GB", deserializedBusinessClient.Address.CountryCode);
         }
 
         [Fact]
@@ -77,16 +76,16 @@ namespace TrueLayer.Tests.Serialization
             var deserialized = JsonSerializer.Deserialize<SubMerchants>(json, SerializerOptions.Default);
 
             // Assert
-            deserialized.Should().NotBeNull();
-            deserialized!.UltimateCounterparty.IsT1.Should().BeTrue();
+            Assert.NotNull(deserialized);
+            Assert.True(deserialized!.UltimateCounterparty.IsT1);
             var deserializedBusinessClient = deserialized.UltimateCounterparty.AsT1;
-            deserializedBusinessClient.Type.Should().Be("business_client");
-            deserializedBusinessClient.TradingName.Should().Be("Test Trading Company");
-            deserializedBusinessClient.CommercialName.Should().BeNull();
-            deserializedBusinessClient.Url.Should().BeNull();
-            deserializedBusinessClient.Mcc.Should().BeNull();
-            deserializedBusinessClient.RegistrationNumber.Should().BeNull();
-            deserializedBusinessClient.Address.Should().BeNull();
+            Assert.Equal("business_client", deserializedBusinessClient.Type);
+            Assert.Equal("Test Trading Company", deserializedBusinessClient.TradingName);
+            Assert.Null(deserializedBusinessClient.CommercialName);
+            Assert.Null(deserializedBusinessClient.Url);
+            Assert.Null(deserializedBusinessClient.Mcc);
+            Assert.Null(deserializedBusinessClient.RegistrationNumber);
+            Assert.Null(deserializedBusinessClient.Address);
         }
 
         [Fact]
@@ -100,10 +99,10 @@ namespace TrueLayer.Tests.Serialization
             string json = JsonSerializer.Serialize(subMerchants, SerializerOptions.Default);
 
             // Assert
-            json.Should().Contain("\"ultimate_counterparty\"");
-            json.Should().Contain("\"type\":\"business_division\"");
-            json.Should().Contain("\"id\":\"test-id-123\"");
-            json.Should().Contain("\"name\":\"Test Division Name\"");
+            Assert.Contains("\"ultimate_counterparty\"", json);
+            Assert.Contains("\"type\":\"business_division\"", json);
+            Assert.Contains("\"id\":\"test-id-123\"", json);
+            Assert.Contains("\"name\":\"Test Division Name\"", json);
         }
 
         [Fact]
@@ -122,11 +121,11 @@ namespace TrueLayer.Tests.Serialization
             string json = JsonSerializer.Serialize(subMerchants, SerializerOptions.Default);
 
             // Assert
-            json.Should().Contain("\"ultimate_counterparty\"");
-            json.Should().Contain("\"type\":\"business_client\"");
-            json.Should().Contain("\"trading_name\":\"Test Trading Company\"");
-            json.Should().Contain("\"commercial_name\":\"Test Commercial Name\"");
-            json.Should().Contain("\"registration_number\":\"REG123456\"");
+            Assert.Contains("\"ultimate_counterparty\"", json);
+            Assert.Contains("\"type\":\"business_client\"", json);
+            Assert.Contains("\"trading_name\":\"Test Trading Company\"", json);
+            Assert.Contains("\"commercial_name\":\"Test Commercial Name\"", json);
+            Assert.Contains("\"registration_number\":\"REG123456\"", json);
         }
     }
 }

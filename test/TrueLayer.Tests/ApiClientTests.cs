@@ -6,7 +6,6 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using FluentAssertions;
 using RichardSzalay.MockHttp;
 using TrueLayer.Auth;
 using TrueLayer.Serialization;
@@ -103,9 +102,9 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 "access-token"
             );
 
-            response.Should().NotBeNull();
-            response.IsSuccessful.Should().BeTrue();
-            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessful);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
         [Fact]
@@ -155,9 +154,9 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 accessToken: "access-token"
             );
 
-            response.Should().NotBeNull();
-            response.IsSuccessful.Should().BeTrue();
-            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessful);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
         [Theory]
@@ -177,10 +176,10 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
 
             ApiResponse<TestResponse> response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/error"));
 
-            response.IsSuccessful.Should().BeFalse();
-            response.StatusCode.Should().Be(statusCode);
-            response.TraceId.Should().Be("trace-id");
-            response.Data.Should().BeNull();
+            Assert.False(response.IsSuccessful);
+            Assert.Equal(statusCode, response.StatusCode);
+            Assert.Equal("trace-id", response.TraceId);
+            Assert.Null(response.Data);
         }
 
         [Fact]
@@ -209,10 +208,10 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 accessToken: authData.AccessToken
             );
 
-            _authTokenCache.IsEmpty.Should().BeTrue();
-            response.IsSuccessful.Should().BeFalse();
-            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-            response.TraceId.Should().Be("trace-id");
+            Assert.True(_authTokenCache.IsEmpty);
+            Assert.False(response.IsSuccessful);
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Equal("trace-id", response.TraceId);
         }
 
         [Fact]
@@ -245,16 +244,16 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
 
             ApiResponse<TestResponse> response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/bad-request-error-details"));
 
-            response.IsSuccessful.Should().BeFalse();
-            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            response.TraceId.Should().Be("trace-id");
-            response.Data.Should().BeNull();
-            response.Problem.Should().NotBeNull();
-            response.Problem!.Type.Should().Be("https://docs.truelayer.com/errors#invalid_parameters");
-            response.Problem.Title.Should().Be("Validation Error");
-            response.Problem.Detail.Should().Be("Invalid Parameters");
-            response.Problem.Errors.Should().NotBeNull();
-            response.Problem.Errors!["summary"].Should().Contain("summary_required");
+            Assert.False(response.IsSuccessful);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal("trace-id", response.TraceId);
+            Assert.Null(response.Data);
+            Assert.NotNull(response.Problem);
+            Assert.Equal("https://docs.truelayer.com/errors#invalid_parameters", response.Problem!.Type);
+            Assert.Equal("Validation Error", response.Problem.Title);
+            Assert.Equal("Invalid Parameters", response.Problem.Detail);
+            Assert.NotNull(response.Problem.Errors);
+            Assert.Contains("summary_required", response.Problem.Errors!["summary"]);
         }
 
         [Fact]
@@ -266,7 +265,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 .Respond(HttpStatusCode.OK, MediaTypeNames.Application.Json, "{}");
 
             var response = await _apiClient.GetAsync<TestResponse>(new Uri("http://localhost/user-agent"));
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]
@@ -341,10 +340,10 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
 
         private static void AssertSame(TestResponse? response, TestResponse expected)
         {
-            response.Should().NotBeNull();
-            response!.FirstName.Should().Be(expected.FirstName);
-            response.LastName.Should().Be(expected.LastName);
-            response.Age.Should().Be(expected.Age);
+            Assert.NotNull(response);
+            Assert.Equal(expected.FirstName, response!.FirstName);
+            Assert.Equal(expected.LastName, response.LastName);
+            Assert.Equal(expected.Age, response.Age);
         }
 
         public void Dispose()

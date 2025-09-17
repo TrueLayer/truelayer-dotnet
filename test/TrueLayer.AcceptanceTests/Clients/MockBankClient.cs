@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
-using FluentAssertions;
+using Xunit;
 
 namespace TrueLayer.AcceptanceTests.Clients;
 
@@ -35,7 +35,7 @@ public class MockBankClient
         };
         var response = await _httpClient.SendAsync(request);
         var responseBody = await response.Content.ReadAsStringAsync();
-        response.StatusCode.Should().Be(HttpStatusCode.Accepted, "submit mock payment response should be 202");
+        Assert.True(response.StatusCode == HttpStatusCode.Accepted, "submit mock payment response should be 202");
         return new Uri(responseBody);
     }
 
@@ -56,7 +56,7 @@ public class MockBankClient
         };
         var response = await _httpClient.SendAsync(request);
         var responseBody = await response.Content.ReadAsStringAsync();
-        response.StatusCode.Should().Be(HttpStatusCode.Accepted, "submit mock mandate response should be 202");
+        Assert.True(response.StatusCode == HttpStatusCode.Accepted, "submit mock mandate response should be 202");
         return new Uri(responseBody);
     }
 }

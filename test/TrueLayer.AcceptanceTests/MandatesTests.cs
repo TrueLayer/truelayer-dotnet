@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
 using OneOf;
 using TrueLayer.AcceptanceTests.Clients;
 using TrueLayer.AcceptanceTests.Helpers;
@@ -39,7 +38,7 @@ namespace TrueLayer.AcceptanceTests
             // Arrange
             var client = _fixture.TlClients[0];
             var createResponse = await client.Mandates.CreateMandate(mandateRequest);
-            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
             var mandateId = createResponse.Data!.Id;
             var mandateType = mandateRequest.Mandate.Match(
                 commercial => MandateType.Commercial,
@@ -49,8 +48,8 @@ namespace TrueLayer.AcceptanceTests
             var response = await client.Mandates.GetMandate(mandateId, mandateType);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            response.Data.AsT0.User!.Id.Should().Be(createResponse.Data.User.Id);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(createResponse.Data.User.Id, response.Data.AsT0.User!.Id);
         }
 
         [Theory]
@@ -63,15 +62,15 @@ namespace TrueLayer.AcceptanceTests
             // Arrange
             var client = _fixture.TlClients[0];
             var createResponse = await client.Mandates.CreateMandate(mandateRequest);
-            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
 
             // Act
             var response = await client.Mandates
                 .ListMandates(new ListMandatesQuery(createResponse.Data!.User.Id, null, 10), MandateType.Sweeping);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            response.Data!.Items.Count().Should().BeLessThanOrEqualTo(10);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.True(response.Data!.Items.Count() <= 10);
         }
 
         [Theory]
@@ -103,9 +102,9 @@ namespace TrueLayer.AcceptanceTests
                 typeof(MandateDetail.AuthorizedMandateDetail));
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            mandate.AsT2.Status.Should().Be("authorized");
-            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("authorized", mandate.AsT2.Status);
+            Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
         }
 
         [Theory]
@@ -141,7 +140,7 @@ namespace TrueLayer.AcceptanceTests
                 mandateId, idempotencyKey: Guid.NewGuid().ToString(), mandateType);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Theory]
@@ -159,9 +158,9 @@ namespace TrueLayer.AcceptanceTests
                 MandateType.Sweeping);
 
             // Assert
-            fundsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            fundsResponse.Data!.ConfirmedAt.Date.Should().Be(DateTime.UtcNow.Date);
-            fundsResponse.Data!.Confirmed.Should().BeTrue();
+            Assert.Equal(HttpStatusCode.OK, fundsResponse.StatusCode);
+            Assert.Equal(DateTime.UtcNow.Date, fundsResponse.Data!.ConfirmedAt.Date);
+            Assert.True(fundsResponse.Data!.Confirmed);
         }
 
         [Theory]
@@ -177,7 +176,7 @@ namespace TrueLayer.AcceptanceTests
                 MandateType.Sweeping);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Theory]
@@ -194,7 +193,7 @@ namespace TrueLayer.AcceptanceTests
                 MandateType.Sweeping);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
         [Theory]
@@ -209,13 +208,13 @@ namespace TrueLayer.AcceptanceTests
             var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.Created);
-            response.Data.IsT1.Should().BeTrue();
-            response.Data.AsT1.Id.Should().NotBeNullOrWhiteSpace();
-            response.Data.AsT1.ResourceToken.Should().NotBeNullOrWhiteSpace();
-            response.Data.AsT1.User.Should().NotBeNull();
-            response.Data.AsT1.User.Id.Should().NotBeNullOrWhiteSpace();
-            response.Data.AsT1.Status.Should().Be("authorized");
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.True(response.Data.IsT1);
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.AsT1.Id));
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.AsT1.ResourceToken));
+            Assert.NotNull(response.Data.AsT1.User);
+            Assert.False(string.IsNullOrWhiteSpace(response.Data.AsT1.User.Id));
+            Assert.Equal("authorized", response.Data.AsT1.Status);
         }
 
         [Fact]
@@ -226,7 +225,7 @@ namespace TrueLayer.AcceptanceTests
 
             var result = await Assert.ThrowsAsync<ArgumentException>(() =>
                 client.Mandates.GetMandate(mandateId, MandateType.Sweeping));
-            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+            Assert.Equal("Value is malformed (Parameter 'mandateId')", result.Message);
         }
 
         [Fact]
@@ -239,7 +238,7 @@ namespace TrueLayer.AcceptanceTests
                 client.Mandates.StartAuthorizationFlow(mandateId,
                     new StartAuthorizationFlowRequest(new ProviderSelectionRequest(), new Redirect(new Uri("https://api.com"))),
                     Guid.NewGuid().ToString(), MandateType.Sweeping));
-            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+            Assert.Equal("Value is malformed (Parameter 'mandateId')", result.Message);
         }
 
         [Fact]
@@ -250,7 +249,7 @@ namespace TrueLayer.AcceptanceTests
 
             var result = await Assert.ThrowsAsync<ArgumentException>(() =>
                 client.Mandates.SubmitProviderSelection(mandateId, new SubmitProviderSelectionRequest("provider"), Guid.NewGuid().ToString(), MandateType.Sweeping));
-            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+            Assert.Equal("Value is malformed (Parameter 'mandateId')", result.Message);
         }
 
         [Fact]
@@ -261,7 +260,7 @@ namespace TrueLayer.AcceptanceTests
 
             var result = await Assert.ThrowsAsync<ArgumentException>(() =>
                 client.Mandates.SubmitConsent(mandateId, Guid.NewGuid().ToString(), MandateType.Sweeping));
-            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+            Assert.Equal("Value is malformed (Parameter 'mandateId')", result.Message);
         }
 
         [Fact]
@@ -272,7 +271,7 @@ namespace TrueLayer.AcceptanceTests
 
             var result = await Assert.ThrowsAsync<ArgumentException>(() =>
                 client.Mandates.GetConfirmationOfFunds(mandateId, 100, Currencies.GBP, MandateType.Sweeping));
-            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+            Assert.Equal("Value is malformed (Parameter 'mandateId')", result.Message);
         }
 
         [Fact]
@@ -283,7 +282,7 @@ namespace TrueLayer.AcceptanceTests
 
             var result = await Assert.ThrowsAsync<ArgumentException>(() =>
                 client.Mandates.GetMandateConstraints(mandateId, MandateType.Sweeping));
-            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+            Assert.Equal("Value is malformed (Parameter 'mandateId')", result.Message);
         }
 
         [Fact]
@@ -294,7 +293,7 @@ namespace TrueLayer.AcceptanceTests
 
             var result = await Assert.ThrowsAsync<ArgumentException>(() =>
                 client.Mandates.RevokeMandate(mandateId, Guid.NewGuid().ToString(), MandateType.Sweeping));
-            result.Message.Should().Be("Value is malformed (Parameter 'mandateId')");
+            Assert.Equal("Value is malformed (Parameter 'mandateId')", result.Message);
         }
 
         private async Task<string> CreateAuthorizedSweepingMandate(CreateMandateRequest mandateRequest)
@@ -304,7 +303,7 @@ namespace TrueLayer.AcceptanceTests
                 mandateRequest, idempotencyKey: Guid.NewGuid().ToString());
             var mandateId = createResponse.Data!.Id;
 
-            createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
 
             var authorizationRequest = new StartAuthorizationFlowRequest(
                 new ProviderSelectionRequest(),
@@ -337,7 +336,7 @@ namespace TrueLayer.AcceptanceTests
                 () => trueLayerClient.Mandates.GetMandate(mandateId, mandateType),
                 r => r.Data.GetType() == expectedStatus);
 
-            getMandateResponse.IsSuccessful.Should().BeTrue();
+            Assert.True(getMandateResponse.IsSuccessful);
             return getMandateResponse.Data;
         }
     }

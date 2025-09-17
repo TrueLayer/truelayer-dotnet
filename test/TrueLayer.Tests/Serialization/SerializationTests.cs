@@ -1,5 +1,4 @@
 using System.Text.Json;
-using FluentAssertions;
 using TrueLayer.Serialization;
 using Xunit;
 
@@ -14,9 +13,9 @@ namespace TrueLayer.Tests.Serialization
             string json = JsonSerializer.Serialize(obj, SerializerOptions.Default);
 
             TestRecord? deserialized = JsonSerializer.Deserialize<TestRecord>(json, SerializerOptions.Default);
-            deserialized.Should().NotBeNull();
-            deserialized!.RequiredField.Should().Be(obj.RequiredField);
-            deserialized.OptionalField.Should().Be(obj.OptionalField);
+            Assert.NotNull(deserialized);
+            Assert.Equal(obj.RequiredField, deserialized!.RequiredField);
+            Assert.Equal(obj.OptionalField, deserialized.OptionalField);
         }
 
         [Fact]
@@ -29,8 +28,8 @@ namespace TrueLayer.Tests.Serialization
             }";
 
             var records = JsonSerializer.Deserialize<ResourceCollection<TestRecord>>(json, SerializerOptions.Default);
-            records.Should().NotBeNull();
-            records!.Items.Should().NotBeEmpty();
+            Assert.NotNull(records);
+            Assert.NotEmpty(records!.Items);
         }
 
 

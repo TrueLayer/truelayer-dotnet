@@ -1,5 +1,4 @@
 using System.Text.Json;
-using FluentAssertions;
 using OneOf;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
@@ -43,8 +42,8 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
-            oneOf.AsT1.BarProp.Should().Be(10);
-            oneOf.Value.Should().BeOfType<Bar>();
+            Assert.Equal(10, oneOf.AsT1.BarProp);
+            Assert.IsType<Bar>(oneOf.Value);
         }
 
         [Fact]
@@ -57,8 +56,8 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
-            oneOf.AsT1.BarProp.Should().Be(10);
-            oneOf.Value.Should().BeOfType<Bar>();
+            Assert.Equal(10, oneOf.AsT1.BarProp);
+            Assert.IsType<Bar>(oneOf.Value);
         }
 
         [Fact]
@@ -72,8 +71,8 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, _options);
-            oneOf.AsT1.BarProp.Should().Be(10);
-            oneOf.Value.Should().BeOfType<Bar>();
+            Assert.Equal(10, oneOf.AsT1.BarProp);
+            Assert.IsType<Bar>(oneOf.Value);
         }
 
         [Fact]
@@ -89,12 +88,12 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<RefundPending, RefundAuthorized, RefundExecuted, RefundFailed>>(json, _options);
-            oneOf.Value.Should().BeOfType<RefundFailed>();
-            oneOf.AsT3.AmountInMinor.Should().Be(1000);
-            oneOf.AsT3.Status.Should().Be("failed");
-            oneOf.AsT3.CreatedAt.Should().Be(new System.DateTime(2021, 1, 1, 0, 0, 0, System.DateTimeKind.Utc));
-            oneOf.AsT3.FailedAt.Should().Be(new System.DateTime(2021, 1, 1, 0, 2, 0, System.DateTimeKind.Utc));
-            oneOf.AsT3.FailureReason.Should().Be("Something bad happened");
+            Assert.IsType<RefundFailed>(oneOf.Value);
+            Assert.Equal(1000u, oneOf.AsT3.AmountInMinor);
+            Assert.Equal("failed", oneOf.AsT3.Status);
+            Assert.Equal(new System.DateTime(2021, 1, 1, 0, 0, 0, System.DateTimeKind.Utc), oneOf.AsT3.CreatedAt);
+            Assert.Equal(new System.DateTime(2021, 1, 1, 0, 2, 0, System.DateTimeKind.Utc), oneOf.AsT3.FailedAt);
+            Assert.Equal("Something bad happened", oneOf.AsT3.FailureReason);
         }
 
         [Fact]
@@ -109,11 +108,11 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<RefundPending, RefundAuthorized, RefundExecuted, RefundFailed>>(json, _options);
-            oneOf.Value.Should().BeOfType<RefundExecuted>();
-            oneOf.AsT2.AmountInMinor.Should().Be(2000);
-            oneOf.AsT2.Status.Should().Be("executed");
-            oneOf.AsT2.CreatedAt.Should().Be(new System.DateTime(2021, 1, 1, 0, 0, 0, System.DateTimeKind.Utc));
-            oneOf.AsT2.ExecutedAt.Should().Be(new System.DateTime(2021, 1, 1, 0, 5, 0, System.DateTimeKind.Utc));
+            Assert.IsType<RefundExecuted>(oneOf.Value);
+            Assert.Equal(2000u, oneOf.AsT2.AmountInMinor);
+            Assert.Equal("executed", oneOf.AsT2.Status);
+            Assert.Equal(new System.DateTime(2021, 1, 1, 0, 0, 0, System.DateTimeKind.Utc), oneOf.AsT2.CreatedAt);
+            Assert.Equal(new System.DateTime(2021, 1, 1, 0, 5, 0, System.DateTimeKind.Utc), oneOf.AsT2.ExecutedAt);
         }
 
         [Fact]
@@ -164,21 +163,21 @@ namespace TrueLayer.Tests.Serialization
             }";
 
             var response = JsonSerializer.Deserialize<ListPaymentRefundsResponse>(json, _options);
-            response.Should().NotBeNull();
-            response!.Items.Should().HaveCount(4);
+            Assert.NotNull(response);
+            Assert.Equal(4, response!.Items.Count);
             
-            response.Items[0].Value.Should().BeOfType<RefundPending>();
-            response.Items[0].AsT0.Reference.Should().Be("ref-1");
+            Assert.IsType<RefundPending>(response.Items[0].Value);
+            Assert.Equal("ref-1", response.Items[0].AsT0.Reference);
             
-            response.Items[1].Value.Should().BeOfType<RefundAuthorized>();
-            response.Items[1].AsT1.Reference.Should().Be("ref-2");
+            Assert.IsType<RefundAuthorized>(response.Items[1].Value);
+            Assert.Equal("ref-2", response.Items[1].AsT1.Reference);
             
-            response.Items[2].Value.Should().BeOfType<RefundExecuted>();
-            response.Items[2].AsT2.Reference.Should().Be("ref-3");
+            Assert.IsType<RefundExecuted>(response.Items[2].Value);
+            Assert.Equal("ref-3", response.Items[2].AsT2.Reference);
             
-            response.Items[3].Value.Should().BeOfType<RefundFailed>();
-            response.Items[3].AsT3.Reference.Should().Be("TUOYAP");
-            response.Items[3].AsT3.FailureReason.Should().Be("Insufficient funds");
+            Assert.IsType<RefundFailed>(response.Items[3].Value);
+            Assert.Equal("TUOYAP", response.Items[3].AsT3.Reference);
+            Assert.Equal("Insufficient funds", response.Items[3].AsT3.FailureReason);
         }
 
         [Fact]
@@ -194,9 +193,9 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var wrapper = JsonSerializer.Deserialize<Wrapper>(json, _options);
-            wrapper.Should().NotBeNull();
-            wrapper!.Name.Should().Be("Nested");
-            wrapper.OneOf.AsT0.FooProp.Should().Be("test");
+            Assert.NotNull(wrapper);
+            Assert.Equal("Nested", wrapper!.Name);
+            Assert.Equal("test", wrapper.OneOf.AsT0.FooProp);
         }
 
         [Fact]
@@ -208,7 +207,7 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Other>>(json, _options);
-            oneOf.Value.Should().BeOfType<Other>();
+            Assert.IsType<Other>(oneOf.Value);
         }
 
         [Fact]
@@ -219,14 +218,14 @@ namespace TrueLayer.Tests.Serialization
             ";
 
             var oneOf = JsonSerializer.Deserialize<OneOf<Foo, Other>>(json, _options);
-            oneOf.Value.Should().Be(default);
+            Assert.Equal(default, oneOf.Value);
         }
 
         [Fact]
         public void Can_write_one_of_type()
         {
             OneOf<Foo, Bar> obj = new Foo();
-            JsonSerializer.Serialize(obj, _options).Should().NotBeNullOrWhiteSpace();
+            Assert.False(string.IsNullOrWhiteSpace(JsonSerializer.Serialize(obj, _options)));
         }
 
         public class Foo

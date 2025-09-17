@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
 using TrueLayer.Common;
 using TrueLayer.MerchantAccounts.Model;
 using TrueLayer.Payments.Model;
@@ -28,9 +27,9 @@ namespace TrueLayer.AcceptanceTests
             var response = await _fixture.TlClients[1].MerchantAccounts.ListMerchantAccounts();
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            response.Data.Should().NotBeNull();
-            response.Data!.Items.Should().BeOfType<List<MerchantAccount>>();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Data);
+            Assert.IsType<List<MerchantAccount>>(response.Data!.Items);
         }
 
         [Fact]
@@ -43,11 +42,11 @@ namespace TrueLayer.AcceptanceTests
             var merchantResponse = await _fixture.TlClients[0].MerchantAccounts.GetMerchantAccount(merchantId);
 
             // Assert
-            merchantResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            merchantResponse.Data.Should().NotBeNull();
-            merchantResponse.Data!.Id.Should().Be(merchantId);
-            merchantResponse.Data.AccountHolderName.Should().NotBeNullOrWhiteSpace();
-            merchantResponse.Data.Currency.Should().NotBeNullOrWhiteSpace();
+            Assert.Equal(HttpStatusCode.OK, merchantResponse.StatusCode);
+            Assert.NotNull(merchantResponse.Data);
+            Assert.Equal(merchantId, merchantResponse.Data!.Id);
+            Assert.False(string.IsNullOrWhiteSpace(merchantResponse.Data.AccountHolderName));
+            Assert.False(string.IsNullOrWhiteSpace(merchantResponse.Data.Currency));
         }
 
         [Fact]
@@ -64,9 +63,9 @@ namespace TrueLayer.AcceptanceTests
                 cancellationToken: CancellationToken.None);
 
             // Assert
-            merchantResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            merchantResponse.Data.Should().NotBeNull();
-            merchantResponse.Data!.Items.Should().NotBeEmpty();
+            Assert.Equal(HttpStatusCode.OK, merchantResponse.StatusCode);
+            Assert.NotNull(merchantResponse.Data);
+            Assert.NotEmpty(merchantResponse.Data!.Items);
             foreach (var item in merchantResponse.Data.Items)
             {
                 item.Match(
@@ -77,38 +76,38 @@ namespace TrueLayer.AcceptanceTests
                     refund => AssertTransaction(refund));
             }
 
-            merchantResponse.Data.Pagination?.NextCursor.Should().NotBeNullOrWhiteSpace();
+            Assert.False(string.IsNullOrWhiteSpace(merchantResponse.Data.Pagination?.NextCursor));
         }
 
         private static void AssertBaseTransaction(MerchantAccountTransactions.BaseTransaction baseTransaction,string[] expectedStatuses)
         {
-            baseTransaction.Should().NotBeNull();
-            baseTransaction.Id.Should().NotBeNullOrWhiteSpace();
-            baseTransaction.Currency.Should().NotBeNullOrWhiteSpace();
-            baseTransaction.AmountInMinor.Should().BeGreaterThan(0);
-            baseTransaction.Status.Should().BeOneOf(expectedStatuses);
+            Assert.NotNull(baseTransaction);
+            Assert.False(string.IsNullOrWhiteSpace(baseTransaction.Id));
+            Assert.False(string.IsNullOrWhiteSpace(baseTransaction.Currency));
+            Assert.True(baseTransaction.AmountInMinor > 0);
+            Assert.Contains(baseTransaction.Status, expectedStatuses);
         }
 
         private static bool AssertTransaction(MerchantAccountTransactions.MerchantAccountPayment payment)
         {
             AssertBaseTransaction(payment, ["settled"]);
-            payment.SettledAt.Should().NotBe(DateTimeOffset.MinValue);
-            payment.SettledAt.Should().NotBe(DateTimeOffset.MaxValue);
-            payment.PaymentSource.Should().NotBeNull();
-            payment.PaymentId.Should().NotBeNullOrWhiteSpace();
+            Assert.NotEqual(DateTimeOffset.MinValue, payment.SettledAt);
+            Assert.NotEqual(DateTimeOffset.MaxValue, payment.SettledAt);
+            Assert.NotNull(payment.PaymentSource);
+            Assert.False(string.IsNullOrWhiteSpace(payment.PaymentId));
             return true;
         }
 
         private static bool AssertTransaction(MerchantAccountTransactions.ExternalPayment externalPayment)
         {
             AssertBaseTransaction(externalPayment, ["settled"]);
-            externalPayment.SettledAt.Should().NotBe(DateTimeOffset.MinValue);
-            externalPayment.SettledAt.Should().NotBe(DateTimeOffset.MaxValue);
-            externalPayment.Remitter.Should().NotBeNull();
+            Assert.NotEqual(DateTimeOffset.MinValue, externalPayment.SettledAt);
+            Assert.NotEqual(DateTimeOffset.MaxValue, externalPayment.SettledAt);
+            Assert.NotNull(externalPayment.Remitter);
             externalPayment.ReturnFor.Match(
                 returnedBy =>
                 {
-                    returnedBy?.ReturnedId.Should().NotBeNullOrWhiteSpace();
+                    Assert.False(string.IsNullOrWhiteSpace(returnedBy?.ReturnedId));
                     return true;
                 },
                 returnedTo => true);
@@ -118,31 +117,31 @@ namespace TrueLayer.AcceptanceTests
         private static void AssertBaseTransactionPayout(MerchantAccountTransactions.BaseTransactionPayout baseTransaction)
         {
            AssertBaseTransaction(baseTransaction, ["executed", "pending"]);
-            baseTransaction.CreatedAt.Should().NotBe(DateTimeOffset.MinValue);
-            baseTransaction.CreatedAt.Should().NotBe(DateTimeOffset.MaxValue);
+            Assert.NotEqual(DateTimeOffset.MinValue, baseTransaction.CreatedAt);
+            Assert.NotEqual(DateTimeOffset.MaxValue, baseTransaction.CreatedAt);
             baseTransaction.Beneficiary.Match(
                 externalAccount =>
                 {
-                    externalAccount.Reference.Should().NotBeNullOrWhiteSpace();
+                    Assert.False(string.IsNullOrWhiteSpace(externalAccount.Reference));
                     return true;
                 },
                 paymentSource =>
                 {
-                    paymentSource.Reference.Should().NotBeNullOrWhiteSpace();
+                    Assert.False(string.IsNullOrWhiteSpace(paymentSource.Reference));
                     return true;
                 },
                 businessAccount =>
                 {
-                    businessAccount.Reference.Should().NotBeNullOrWhiteSpace();
+                    Assert.False(string.IsNullOrWhiteSpace(businessAccount.Reference));
                     return true;
                 },
                 userDetermined =>
                 {
-                    userDetermined.Reference.Should().NotBeNullOrWhiteSpace();
+                    Assert.False(string.IsNullOrWhiteSpace(userDetermined.Reference));
                     return true;
                 });
-            baseTransaction.ContextCode.Should().NotBeNullOrWhiteSpace();
-            baseTransaction.PayoutId.Should().NotBeNullOrWhiteSpace();
+            Assert.False(string.IsNullOrWhiteSpace(baseTransaction.ContextCode));
+            Assert.False(string.IsNullOrWhiteSpace(baseTransaction.PayoutId));
         }
 
         private static bool AssertTransaction(MerchantAccountTransactions.PendingPayout pendingPayout)
@@ -160,8 +159,8 @@ namespace TrueLayer.AcceptanceTests
         private static bool AssertTransaction(MerchantAccountTransactions.Refund refund)
         {
             AssertBaseTransaction(refund, ["executed", "pending"]);
-            refund.PaymentId.Should().NotBeNullOrWhiteSpace();
-            refund.RefundId.Should().NotBeNull();
+            Assert.False(string.IsNullOrWhiteSpace(refund.PaymentId));
+            Assert.NotNull(refund.RefundId);
             return true;
         }
 
@@ -176,7 +175,7 @@ namespace TrueLayer.AcceptanceTests
                 paymentRequest,
                 idempotencyKey: Guid.NewGuid().ToString());
 
-            createPaymentResponse.IsSuccessful.Should().BeTrue();
+            Assert.True(createPaymentResponse.IsSuccessful);
             var createPaymentUser = createPaymentResponse.Data.AsT0.User;
 
             // Act
@@ -184,10 +183,10 @@ namespace TrueLayer.AcceptanceTests
                 = await _fixture.TlClients[0].MerchantAccounts.GetPaymentSources(merchantId, createPaymentUser.Id);
 
             // Assert
-            getPaymentSourcesResponse.IsSuccessful.Should().BeTrue();
-            getPaymentSourcesResponse.Data.Should().NotBeNull();
+            Assert.True(getPaymentSourcesResponse.IsSuccessful);
+            Assert.NotNull(getPaymentSourcesResponse.Data);
             var responseBody = getPaymentSourcesResponse.Data!;
-            responseBody.Items.Should().BeEmpty();
+            Assert.Empty(responseBody.Items);
         }
 
         private static CreatePaymentRequest CreatePaymentRequest(string merchantId)

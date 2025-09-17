@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TrueLayer.Auth;
@@ -35,7 +34,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
                 .BuildServiceProvider();
 
             var client = services.GetRequiredService<ITrueLayerClient>();
-            client.Should().NotBeNull();
+            Assert.NotNull(client);
         }
 
 #if NET8_0_OR_GREATER
@@ -77,8 +76,8 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             var gbpClient = services.GetRequiredKeyedService<ITrueLayerClient>(gbpServiceKey);
             var eurClient = services.GetRequiredKeyedService<ITrueLayerClient>(eurServiceKey);
 
-            gbpClient.Should().NotBeNull();
-            eurClient.Should().NotBeNull();
+            Assert.NotNull(gbpClient);
+            Assert.NotNull(eurClient);
         }
 #endif
     }

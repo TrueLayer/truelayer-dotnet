@@ -1,5 +1,4 @@
 using System.Net;
-using FluentAssertions;
 using Xunit;
 
 namespace TrueLayer.Tests
@@ -16,7 +15,7 @@ namespace TrueLayer.Tests
         public void Is_successful_when_status_code_indicates_success(HttpStatusCode statusCode, bool expected)
         {
             var response = new ApiResponse<Stub>(statusCode, "trace-id");
-            response.IsSuccessful.Should().Be(expected);
+            Assert.Equal(expected, response.IsSuccessful);
         }
 
         class Stub
