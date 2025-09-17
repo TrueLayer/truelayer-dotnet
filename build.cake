@@ -1,5 +1,5 @@
 // Install .NET Core Global tools.
-#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.4.9"
+#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.4.13"
 #tool "dotnet:?package=coveralls.net&version=4.0.1"
 
 // Install addins

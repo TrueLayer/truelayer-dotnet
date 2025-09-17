@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable;</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\TrueLayer\TrueLayer.csproj"/>
