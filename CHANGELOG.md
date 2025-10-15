@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Added
+- Added support for **Verified Payouts** (UK-only feature)
+  - New `Verification` model with `VerifyName` and optional `TransactionSearchCriteria` for name and transaction verification
+  - New `PayoutUserRequest` and `PayoutUserResponse` models for user details in verified payouts
+  - Updated `CreatePayoutBeneficiary.UserDetermined` beneficiary type with verification support
+  - New `PayoutHppLinkBuilder` helper for generating Hosted Payment Page verification links
+  - New `CreatePayoutResponse.AuthorizationRequired` response type for verified payouts requiring authorization
+  - Separate `GetPayoutBeneficiary` namespace for GET response types (distinct from CREATE request types)
+  - Enhanced `OneOfJsonConverter` with `[DefaultJsonDiscriminator]` support for fallback deserialization
+
+### Changed
+- **BREAKING**: `CreatePayout` now returns `OneOf<AuthorizationRequired, Created>` instead of `CreatePayoutResponse`
+  - Consumers must use `.Match()` to handle both response types
+  - Standard payouts return `Created` with just the payout ID
+  - Verified payouts return `AuthorizationRequired` with ID, status, resource token, and user details
+- **BREAKING**: `GetPayout` now returns `OneOf<AuthorizationRequired, Pending, Authorized, Executed, Failed>` instead of `OneOf<Pending, Authorized, Executed, Failed>`
+  - Added `AuthorizationRequired` status for verified payouts awaiting user authorization
+  - Consumers must update `.Match()` calls to handle the new `AuthorizationRequired` type
+- **BREAKING**: Renamed `Beneficiary` to `CreatePayoutBeneficiary` for clarity
+- **BREAKING**: Simplified `CreatePayoutBeneficiary.BusinessAccount` to only require `Reference` (removed account holder name and identifier)
+- Updated `CreatePayoutBeneficiary.PaymentSource` GET response to include `AccountHolderName` and `AccountIdentifiers`
+- Updated `GetPayout` to return `GetPayoutBeneficiary` types with populated account details
+
 ### Removed
 - Removed support for .NET 6.0
 

@@ -6,15 +6,21 @@ using TrueLayer.Auth;
 using TrueLayer.Extensions;
 using TrueLayer.Models;
 using TrueLayer.Payouts.Model;
-using static TrueLayer.Payouts.Model.GetPayoutsResponse;
+using static TrueLayer.Payouts.Model.CreatePayoutResponse;
 
 namespace TrueLayer.Payouts
 {
     using GetPayoutUnion = OneOf<
-        Pending,
-        Authorized,
-        Executed,
-        Failed
+        GetPayoutsResponse.AuthorizationRequired,
+        GetPayoutsResponse.Pending,
+        GetPayoutsResponse.Authorized,
+        GetPayoutsResponse.Executed,
+        GetPayoutsResponse.Failed
+    >;
+
+    using CreatePayoutUnion = OneOf<
+        AuthorizationRequired,
+        Created
     >;
 
     internal class PayoutsApi : IPayoutsApi
@@ -37,7 +43,7 @@ namespace TrueLayer.Payouts
         }
 
         /// <inheritdoc />
-        public async Task<ApiResponse<CreatePayoutResponse>> CreatePayout(
+        public async Task<ApiResponse<CreatePayoutUnion>> CreatePayout(
             CreatePayoutRequest payoutRequest,
             string? idempotencyKey = null,
             CancellationToken cancellationToken = default)
@@ -51,7 +57,7 @@ namespace TrueLayer.Payouts
                 return new(authResponse.StatusCode, authResponse.TraceId);
             }
 
-            return await _apiClient.PostAsync<CreatePayoutResponse>(
+            return await _apiClient.PostAsync<CreatePayoutUnion>(
                 _baseUri,
                 payoutRequest,
                 idempotencyKey ?? Guid.NewGuid().ToString(),

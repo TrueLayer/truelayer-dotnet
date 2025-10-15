@@ -2,15 +2,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneOf;
 using TrueLayer.Payouts.Model;
-using static TrueLayer.Payouts.Model.GetPayoutsResponse;
+using static TrueLayer.Payouts.Model.CreatePayoutResponse;
 
 namespace TrueLayer.Payouts
 {
     using GetPayoutUnion = OneOf<
-        Pending,
-        Authorized,
-        Executed,
-        Failed
+        GetPayoutsResponse.AuthorizationRequired,
+        GetPayoutsResponse.Pending,
+        GetPayoutsResponse.Authorized,
+        GetPayoutsResponse.Executed,
+        GetPayoutsResponse.Failed
+    >;
+
+    using CreatePayoutUnion = OneOf<
+        AuthorizationRequired,
+        Created
     >;
 
     /// <summary>
@@ -29,7 +35,7 @@ namespace TrueLayer.Payouts
         /// </param>
         /// <param name="cancellationToken">The cancellation token to cancel the operation</param>
         /// <returns>An API response that includes details of the created payout if successful, otherwise problem details</returns>
-        Task<ApiResponse<CreatePayoutResponse>> CreatePayout(
+        Task<ApiResponse<CreatePayoutUnion>> CreatePayout(
             CreatePayoutRequest payoutRequest,
             string? idempotencyKey = null,
             CancellationToken cancellationToken = default);

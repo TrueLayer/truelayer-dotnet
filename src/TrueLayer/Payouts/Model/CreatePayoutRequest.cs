@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using OneOf;
-using static TrueLayer.Payouts.Model.Beneficiary;
+using static TrueLayer.Payouts.Model.CreatePayoutBeneficiary;
 
 namespace TrueLayer.Payouts.Model
 {
-    using BeneficiaryUnion = OneOf<PaymentSource, ExternalAccount, BusinessAccount>;
+    using BeneficiaryUnion = OneOf<PaymentSource, ExternalAccount, BusinessAccount, UserDetermined>;
     using SchemeSelectionUnion = OneOf<SchemeSelection.InstantPreferred, SchemeSelection.InstantOnly, SchemeSelection.Preselected>;
 
     /// <summary>

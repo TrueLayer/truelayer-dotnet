@@ -1,11 +1,18 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using TrueLayer.Common;
 using TrueLayer.Payouts.Model;
 using Xunit;
+using Beneficiary = TrueLayer.Payouts.Model.CreatePayoutBeneficiary;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
+using Provider = TrueLayer.Payments.Model.Provider;
+using ProviderFilter = TrueLayer.Payments.Model.ProviderFilter;
+using PayoutVerification = TrueLayer.Payouts.Model.Verification;
+using PayoutSchemeSelection = TrueLayer.Payouts.Model.SchemeSelection;
+using PayoutAccountIdentifier = TrueLayer.Payouts.Model.AccountIdentifier;
 
 namespace TrueLayer.AcceptanceTests
 {
@@ -27,7 +34,13 @@ namespace TrueLayer.AcceptanceTests
 
             response.StatusCode.Should().Be(HttpStatusCode.Accepted);
             response.Data.Should().NotBeNull();
-            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
+
+            // Extract payout ID - can be either Created or AuthorizationRequired depending on API behavior
+            var payoutId = response.Data!.Match(
+                authRequired => authRequired.Id,
+                created => created.Id);
+
+            payoutId.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
@@ -39,7 +52,13 @@ namespace TrueLayer.AcceptanceTests
 
             response.StatusCode.Should().Be(HttpStatusCode.Accepted);
             response.Data.Should().NotBeNull();
-            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
+
+            // Extract payout ID - can be either Created or AuthorizationRequired depending on API behavior
+            var payoutId = response.Data!.Match(
+                authRequired => authRequired.Id,
+                created => created.Id);
+
+            payoutId.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
@@ -52,16 +71,22 @@ namespace TrueLayer.AcceptanceTests
 
             response.StatusCode.Should().Be(HttpStatusCode.Accepted);
             response.Data.Should().NotBeNull();
-            response.Data!.Id.Should().NotBeNullOrWhiteSpace();
 
-            var getPayoutResponse = await _fixture.TlClients[0].Payouts.GetPayout(response.Data.Id);
+            // Extract the payout ID from the Created response
+            var payoutId = response.Data!.Match(
+                authRequired => authRequired.Id,
+                created => created.Id);
+
+            payoutId.Should().NotBeNullOrWhiteSpace();
+
+            var getPayoutResponse = await _fixture.TlClients[0].Payouts.GetPayout(payoutId);
 
             getPayoutResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             getPayoutResponse.Data.Value.Should().NotBeNull();
             PayoutDetails? details = getPayoutResponse.Data.Value as PayoutDetails;
 
             details.Should().NotBeNull();
-            details!.Id.Should().Be(response.Data.Id);
+            details!.Id.Should().Be(payoutId);
             details.Currency.Should().Be(payoutRequest.Currency);
             details.Beneficiary.AsT1.Should().NotBeNull();
             details.Status.Should().BeOneOf("pending", "authorized", "executed", "failed");
@@ -81,6 +106,190 @@ namespace TrueLayer.AcceptanceTests
             result.Message.Should().Be("Value is malformed (Parameter 'id')");
         }
 
+        [Fact]
+        public async Task Can_create_verified_payout_with_name_verification()
+        {
+            // Arrange - Create a verified payout with name verification only
+            // Based on https://docs.truelayer.com/docs/make-a-verified-payout#test-verified-payouts-in-sandbox
+            // For success: Account Holder Name must be "TRANSACTION ACCOUNT 1" and use "mock" provider
+            var verification = new PayoutVerification(verifyName: true);
+
+            var user = new PayoutUserRequest(
+                name: "John Doe",
+                email: "john.doe@example.com");
+
+            var providerSelection = new Provider.UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = new[] { "mock" } }
+            };
+
+            var beneficiary = new Beneficiary.UserDetermined(
+                reference: "verified-payout-name-check",
+                user: user,
+                verification: verification,
+                providerSelection: providerSelection);
+
+            var payoutRequest = new CreatePayoutRequest(
+                _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId,
+                100,
+                Currencies.GBP,
+                beneficiary,
+                metadata: new Dictionary<string, string> { { "test", "name-verification" } });
+
+            // Act
+            var response = await _fixture.TlClients[0].Payouts.CreatePayout(
+                payoutRequest,
+                idempotencyKey: Guid.NewGuid().ToString());
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.Data.Should().NotBeNull();
+
+            // For verified payouts, we should get an AuthorizationRequired response
+            response.Data!.Match(
+                authRequired =>
+                {
+                    authRequired.Id.Should().NotBeNullOrWhiteSpace();
+                    authRequired.Status.Should().Be("authorization_required");
+                    authRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+                    authRequired.User.Should().NotBeNull();
+                    authRequired.User.Id.Should().NotBeNullOrWhiteSpace();
+
+                    // Verify we can build an HPP link
+                    var hppLink = PayoutHppLinkBuilder.CreateVerificationLink(
+                        authRequired,
+                        "https://example.com/callback",
+                        useSandbox: true);
+                    hppLink.Should().NotBeNullOrWhiteSpace();
+                    hppLink.Should().Contain("app.truelayer-sandbox.com/payouts");
+                    hppLink.Should().Contain($"payout_id={authRequired.Id}");
+                    hppLink.Should().Contain($"resource_token={authRequired.ResourceToken}");
+
+                    return true;
+                },
+                created => throw new Exception("Expected AuthorizationRequired for verified payout, got Created"));
+        }
+
+        [Fact]
+        public async Task Can_create_verified_payout_with_transaction_verification()
+        {
+            // Arrange - Create a verified payout with both name and transaction verification
+            // Based on https://docs.truelayer.com/docs/make-a-verified-payout#test-verified-payouts-in-sandbox
+            // For success: use tokens "18db38", "Betropolis LTD", or "LC Betropolis"
+            // Amount: 1000 minor, Date: 1st-7th of any month
+            var transactionSearchCriteria = new TransactionSearchCriteria(
+                tokens: new[] { "18db38", "Betropolis LTD", "LC Betropolis" },
+                amountInMinor: 1000,
+                currency: Currencies.GBP,
+                createdAt: new DateTime(2024, 1, 5)); // 5th of January
+
+            var verification = new PayoutVerification(
+                verifyName: true,
+                transactionSearchCriteria: transactionSearchCriteria);
+
+            var user = new PayoutUserRequest(
+                name: "John Doe",
+                email: "john.doe@example.com");
+
+            var providerSelection = new Provider.UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = new[] { "mock" } }
+            };
+
+            var beneficiary = new Beneficiary.UserDetermined(
+                reference: "verified-payout-transaction-check",
+                user: user,
+                verification: verification,
+                providerSelection: providerSelection);
+
+            var payoutRequest = new CreatePayoutRequest(
+                _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId,
+                100,
+                Currencies.GBP,
+                beneficiary,
+                metadata: new Dictionary<string, string> { { "test", "transaction-verification" } });
+
+            // Act
+            var response = await _fixture.TlClients[0].Payouts.CreatePayout(
+                payoutRequest,
+                idempotencyKey: Guid.NewGuid().ToString());
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.Data.Should().NotBeNull();
+
+            // For verified payouts, we should get an AuthorizationRequired response
+            response.Data!.Match(
+                authRequired =>
+                {
+                    authRequired.Id.Should().NotBeNullOrWhiteSpace();
+                    authRequired.Status.Should().Be("authorization_required");
+                    authRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+                    authRequired.User.Should().NotBeNull();
+                    authRequired.User.Id.Should().NotBeNullOrWhiteSpace();
+
+                    // Verify we can build an HPP link using the base method
+                    var hppLink = PayoutHppLinkBuilder.CreateVerificationLink(
+                        authRequired.Id,
+                        authRequired.ResourceToken,
+                        "https://example.com/callback",
+                        useSandbox: true);
+                    hppLink.Should().NotBeNullOrWhiteSpace();
+                    hppLink.Should().Contain("app.truelayer-sandbox.com/payouts");
+
+                    return true;
+                },
+                created => throw new Exception("Expected AuthorizationRequired for verified payout, got Created"));
+        }
+
+        [Fact]
+        public async Task Can_create_verified_payout_with_preselected_provider()
+        {
+            // Arrange - Create a verified payout with preselected provider
+            var verification = new PayoutVerification(verifyName: true);
+
+            var user = new PayoutUserRequest(
+                name: "Jane Smith",
+                email: "jane.smith@example.com",
+                phone: "+442079460087");
+
+            var providerSelection = new Provider.Preselected(
+                providerId: "mock",
+                schemeId: "faster_payments_service");
+
+            var beneficiary = new Beneficiary.UserDetermined(
+                reference: "verified-payout-preselected",
+                user: user,
+                verification: verification,
+                providerSelection: providerSelection);
+
+            var payoutRequest = new CreatePayoutRequest(
+                _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId,
+                500,
+                Currencies.GBP,
+                beneficiary);
+
+            // Act
+            var response = await _fixture.TlClients[0].Payouts.CreatePayout(
+                payoutRequest,
+                idempotencyKey: Guid.NewGuid().ToString());
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.Data.Should().NotBeNull();
+
+            response.Data!.Match(
+                authRequired =>
+                {
+                    authRequired.Id.Should().NotBeNullOrWhiteSpace();
+                    authRequired.Status.Should().Be("authorization_required");
+                    authRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+                    authRequired.User.Should().NotBeNull();
+                    return true;
+                },
+                created => throw new Exception("Expected AuthorizationRequired for verified payout, got Created"));
+        }
+
         private CreatePayoutRequest CreatePayoutRequest()
             => new(
                 _fixture.ClientMerchantAccounts[0].GbpMerchantAccountId,
@@ -89,11 +298,11 @@ namespace TrueLayer.AcceptanceTests
                 new Beneficiary.ExternalAccount(
                     "Ms. Lucky",
                     "truelayer-dotnet",
-                    new AccountIdentifier.Iban("GB33BUKB20201555555555"),
+                    new PayoutAccountIdentifier.Iban("GB33BUKB20201555555555"),
                     dateOfBirth: new DateTime(1970, 12, 31),
                     address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
                 metadata: new() { { "a", "b" } },
-                schemeSelection: new SchemeSelection.InstantOnly()
+                schemeSelection: new PayoutSchemeSelection.InstantOnly()
             );
 
         private static CreatePayoutRequest CreatePlnPayoutRequest()
@@ -104,11 +313,11 @@ namespace TrueLayer.AcceptanceTests
                 new Beneficiary.ExternalAccount(
                     "Ms. Lucky",
                     "truelayer-dotnet",
-                    new AccountIdentifier.Iban("GB25CLRB04066800046876"),
+                    new PayoutAccountIdentifier.Iban("GB25CLRB04066800046876"),
                     dateOfBirth: new DateTime(1970, 12, 31),
                     address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
                 metadata: new() { { "a", "b" } },
-                schemeSelection: new SchemeSelection.InstantOnly()
+                schemeSelection: new PayoutSchemeSelection.InstantOnly()
             );
     }
 }
