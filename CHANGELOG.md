@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.25.0] - 2025-10-14
+### Added
+- Added `SchemeId` field to `ExecutedPayout` and `Refund` transaction types in Merchant Account transactions endpoint response
+
 ## [1.24.0] - 2025-01-24
 ### Added
 - Enhanced RefundUnion to include all refund statuses: `RefundExecuted` and `RefundFailed` in addition to existing `RefundPending` and `RefundAuthorized`
