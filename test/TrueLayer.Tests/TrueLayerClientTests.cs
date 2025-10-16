@@ -1,8 +1,6 @@
 using System;
 using System.Net.Http;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using TrueLayer.Payments;
 using TrueLayer.Tests.Mocks;
 using Xunit;

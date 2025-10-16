@@ -12,7 +12,7 @@
 
 The official [TrueLayer](https://truelayer.com) .NET client provides convenient access to TrueLayer APIs from applications built with .NET.
 
-The library currently supports .NET Standard 2.1, .NET 9.0 and .NET 8.0.
+The library currently supports .NET 9.0 and .NET 8.0.
 
 ## Installation
 
