@@ -22,26 +22,22 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           filter: tree:0
       - name: Setup .NET 9.0
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 9.0.x
       - name: Setup .NET 8.0
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
-      - name: Setup .NET 6.0
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
       - name: Restore tools
         run: dotnet tool restore
       - name: Run the build script
-        uses: cake-build/cake-action@v2
+        uses: cake-build/cake-action@v3
         env:
           COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
