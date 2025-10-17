@@ -13,7 +13,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - New `CreatePayoutResponse.AuthorizationRequired` response type for verified payouts requiring authorization
   - Separate `GetPayoutBeneficiary` namespace for GET response types (distinct from CREATE request types)
   - Enhanced `OneOfJsonConverter` with `[DefaultJsonDiscriminator]` support for fallback deserialization
-
 ### Changed
 - **BREAKING**: `CreatePayout` now returns `OneOf<AuthorizationRequired, Created>` instead of `CreatePayoutResponse`
   - Consumers must use `.Match()` to handle both response types
@@ -26,9 +25,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **BREAKING**: Simplified `CreatePayoutBeneficiary.BusinessAccount` to only require `Reference` (removed account holder name and identifier)
 - Updated `CreatePayoutBeneficiary.PaymentSource` GET response to include `AccountHolderName` and `AccountIdentifiers`
 - Updated `GetPayout` to return `GetPayoutBeneficiary` types with populated account details
-
+- Updated to C# 12.0 language version
+- Modernized code to use C# 11/12 features (ArgumentNullException.ThrowIfNull)
+- Removed all conditional compilation directives (no longer needed for .NET 8.0+)
 ### Removed
 - Removed support for .NET 6.0
+- Removed support for .NET Standard 2.1
+- Removed IsExternalInit shim (no longer needed for .NET 8.0+)
 
 ## [1.25.0] - 2025-10-14
 ### Added

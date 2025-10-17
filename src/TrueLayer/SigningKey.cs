@@ -1,7 +1,5 @@
 using System;
-using System.IO;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace TrueLayer
 {
@@ -35,37 +33,9 @@ namespace TrueLayer
 
             var key = ECDsa.Create();
 
-#if (NET8_0 || NET8_0_OR_GREATER)
-            // Ref https://www.scottbrady91.com/C-Sharp/PEM-Loading-in-dotnet-core-and-dotnet
             key.ImportFromPem(privateKey);
-#else
-            byte[] decodedPem = ReadPemContents(privateKey);
-            key.ImportECPrivateKey(decodedPem, out _);
-#endif
 
             return key;
-        }
-
-        /// <summary>
-        /// Reads and decodes the contents of the PEM private key, removing the header/trailer
-        /// Required before .NET 5.0
-        /// </summary>
-        /// <param name="privateKey"></param>
-        /// <returns></returns>
-        private static byte[] ReadPemContents(string privateKey)
-        {
-            var sb = new StringBuilder();
-            using (var reader = new StringReader(privateKey))
-            {
-                string? line = null;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (!line.StartsWith("--"))
-                        sb.Append(line);
-                }
-            }
-
-            return Convert.FromBase64String(sb.ToString());
         }
     }
 }

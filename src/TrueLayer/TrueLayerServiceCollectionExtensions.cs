@@ -30,8 +30,8 @@ namespace Microsoft.Extensions.DependencyInjection
             string configurationSectionName = "TrueLayer",
             AuthTokenCachingStrategies authTokenCachingStrategy = AuthTokenCachingStrategies.None)
         {
-            if (services is null) throw new ArgumentNullException(nameof(services));
-            if (configuration is null) throw new ArgumentNullException(nameof(configuration));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(configuration);
 
             services.Configure<TrueLayerOptions>(configurationSectionName, options =>
             {
@@ -64,7 +64,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-#if NET8_0_OR_GREATER
         /// <summary>
         /// Registers the keyed TrueLayer SDK services to the provided <paramref name="services"/>.
         /// Required for multi client support.
@@ -87,8 +86,8 @@ namespace Microsoft.Extensions.DependencyInjection
             string? configurationSectionName = null,
             AuthTokenCachingStrategies authTokenCachingStrategy = AuthTokenCachingStrategies.None)
         {
-            if (services is null) throw new ArgumentNullException(nameof(services));
-            if (configuration is null) throw new ArgumentNullException(nameof(configuration));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(configuration);
 
             var configName = configurationSectionName ?? serviceKey;
             services.Configure<TrueLayerOptions>(configName, options =>
@@ -127,6 +126,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
-#endif
     }
 }

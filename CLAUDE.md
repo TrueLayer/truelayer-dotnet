@@ -38,7 +38,6 @@ Each API area is encapsulated in its own module:
 ### Target Frameworks
 - .NET 9.0
 - .NET 8.0
-- .NET Standard 2.1
 ### Testing Structure
 - **Unit Tests**: `/test/TrueLayer.Tests/` - Fast, isolated tests with mocking
 - **Acceptance Tests**: `/test/TrueLayer.AcceptanceTests/` - Integration tests against real/mock APIs

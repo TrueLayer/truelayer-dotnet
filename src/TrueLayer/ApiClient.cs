@@ -12,9 +12,7 @@ using TrueLayer.Serialization;
 using System.Text.Json;
 using TrueLayer.Caching;
 using TrueLayer.Signing;
-#if NET8_0 || NET8_0_OR_GREATER
 using System.Net.Http.Json;
-#endif
 
 namespace TrueLayer
 {
@@ -34,7 +32,8 @@ namespace TrueLayer
         /// <param name="httpClient">The client used to make HTTP requests.</param>
         public ApiClient(HttpClient httpClient, IAuthTokenCache authTokenCache)
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            ArgumentNullException.ThrowIfNull(httpClient);
+            _httpClient = httpClient;
             _authTokenCache = authTokenCache;
         }
 
@@ -138,8 +137,7 @@ namespace TrueLayer
                 return new ApiResponse<TData>(data, httpResponse.StatusCode, traceId);
             }
 
-            // In .NET Standard 2.1 HttpResponse.Content can be null
-            if (httpResponse.Content?.Headers.ContentType?.MediaType == "application/problem+json")
+            if (httpResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
             {
                 var problemDetails = await DeserializeJsonAsync<ProblemDetails>(httpResponse, traceId, cancellationToken);
                 return new ApiResponse<TData>(problemDetails, httpResponse.StatusCode, traceId);
@@ -158,8 +156,7 @@ namespace TrueLayer
                 _authTokenCache.Clear();
             }
 
-            // In .NET Standard 2.1 HttpResponse.Content can be null
-            if (httpResponse.Content?.Headers.ContentType?.MediaType == "application/problem+json")
+            if (httpResponse.Content.Headers.ContentType?.MediaType == "application/problem+json")
             {
                 var problemDetails = await DeserializeJsonAsync<ProblemDetails>(httpResponse, traceId, cancellationToken);
                 return new ApiResponse(problemDetails, httpResponse.StatusCode, traceId);
@@ -170,26 +167,15 @@ namespace TrueLayer
 
         private async Task<TData> DeserializeJsonAsync<TData>(HttpResponseMessage httpResponse, string? traceId, CancellationToken cancellationToken)
         {
-            TData? data = default;
-
-            if (httpResponse.Content != null)
+            try
             {
-                try
-                {
-#if NET8_0 || NET8_0_OR_GREATER
-                    data = await httpResponse.Content.ReadFromJsonAsync<TData>(SerializerOptions.Default, cancellationToken);
-#else
-                    using var contentStream = await httpResponse.Content.ReadAsStreamAsync();
-                    data = await JsonSerializer.DeserializeAsync<TData>(contentStream, SerializerOptions.Default, cancellationToken);
-#endif
-                }
-                catch (NotSupportedException) // Unsupported media type or invalid JSON
-                {
-                    throw new TrueLayerApiException(httpResponse.StatusCode, traceId, additionalInformation: "Invalid JSON");
-                }
+                var data = await httpResponse.Content.ReadFromJsonAsync<TData>(SerializerOptions.Default, cancellationToken);
+                return data ?? throw new JsonException($"Failed to deserialize to type {typeof(TData).Name}");
             }
-
-            return data ?? throw new JsonException($"Failed to deserialize to type {typeof(TData).Name}");
+            catch (NotSupportedException) // Unsupported media type or invalid JSON
+            {
+                throw new TrueLayerApiException(httpResponse.StatusCode, traceId, additionalInformation: "Invalid JSON");
+            }
         }
 
         private Task<HttpResponseMessage> SendJsonRequestAsync(
@@ -228,15 +214,9 @@ namespace TrueLayer
 
                 signature = signer.Sign();
             }
-            else if (request is { }) // Otherwise we can serialize directly to stream for .NET 8.0 onwards
+            else if (request is { })
             {
-#if (NET8_0 || NET8_0_OR_GREATER)
                 httpContent = JsonContent.Create(request, request.GetType(), options: SerializerOptions.Default);
-#else
-                // for older versions of .NET we'll have to fall back to using StringContent
-                string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
-                httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
-#endif
             }
 
             return SendRequestAsync(
@@ -260,7 +240,7 @@ namespace TrueLayer
             IDictionary<string, string>? customHeaders = null,
             CancellationToken cancellationToken = default)
         {
-            if (uri is null) throw new ArgumentNullException(nameof(uri));
+            ArgumentNullException.ThrowIfNull(uri);
 
             var httpRequest = new HttpRequestMessage(httpMethod, uri)
             {
@@ -295,9 +275,9 @@ namespace TrueLayer
                 }
             }
 
-            // HttpCompletionOption.ResponseHeadersRead reduces allocations by avoiding the pre-buffering of the response content
-            // and allows us to access the content stream faster.
-            // Doing so requires that always dispose of HttpResponseMessage to free up the connection
+            // HttpCompletionOption.ResponseHeadersRead improves performance by avoiding buffering the entire response into memory.
+            // This reduces allocations and allows faster access to the content stream.
+            // Note: Requires proper disposal of HttpResponseMessage to free up the connection.
             // Ref: https://www.stevejgordon.co.uk/using-httpcompletionoption-responseheadersread-to-improve-httpclient-performance-dotnet
             return _httpClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         }
