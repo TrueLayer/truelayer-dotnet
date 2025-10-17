@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Removed
+- Removed support for .NET 6.0
+
 ## [1.25.0] - 2025-10-14
 ### Added
 - Added `SchemeId` field to `ExecutedPayout` and `Refund` transaction types in Merchant Account transactions endpoint response
+- Add support for polish payouts and `SubMerchants` field
 
 ## [1.24.0] - 2025-01-24
 ### Added
