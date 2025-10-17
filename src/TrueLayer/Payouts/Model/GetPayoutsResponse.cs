@@ -5,103 +5,102 @@ using TrueLayer.Serialization;
 using static TrueLayer.Payouts.Model.GetPayoutBeneficiary;
 
 
-namespace TrueLayer.Payouts.Model
-{
-    using GetPayoutBeneficiaryUnion = OneOf<PaymentSource, ExternalAccount, BusinessAccount, UserDetermined>;
+namespace TrueLayer.Payouts.Model;
 
+using GetPayoutBeneficiaryUnion = OneOf<PaymentSource, ExternalAccount, BusinessAccount, UserDetermined>;
+
+/// <summary>
+/// Get Payout Response Types
+/// </summary>
+public static class GetPayoutsResponse
+{
     /// <summary>
-    /// Get Payout Response Types
+    /// Base class containing common properties for all payout states
     /// </summary>
-    public static class GetPayoutsResponse
+    /// <value></value>
+    public record PayoutDetails
     {
         /// <summary>
-        /// Base class containing common properties for all payout states
+        /// Gets the unique identifier of the payout
+        /// </summary>
+        public string Id { get; init; } = null!;
+
+        /// <summary>
+        /// Gets the unique identifier of the merchant account
+        /// </summary>
+        public string MerchantAccountId { get; init; } = null!;
+
+        /// <summary>
+        /// Gets the Amount in the minor currency unit e.g. cents
+        /// </summary>
+        public long AmountInMinor { get; init; }
+
+        /// <summary>
+        /// Gets the three-letter ISO3 alpha currency code
+        /// </summary>
+        /// <example>EUR</example>
+        public string Currency { get; init; } = null!;
+
+        /// <summary>
+        /// Gets the beneficiary details
+        /// </summary>
+        public GetPayoutBeneficiaryUnion Beneficiary { get; init; }
+
+        /// <summary>
+        /// Gets the status of the payout
+        /// </summary>
+        public string Status { get; init; } = null!;
+
+        /// <summary>
+        /// Gets the data and time the payout was created
         /// </summary>
         /// <value></value>
-        public record PayoutDetails
-        {
-            /// <summary>
-            /// Gets the unique identifier of the payout
-            /// </summary>
-            public string Id { get; init; } = null!;
-
-            /// <summary>
-            /// Gets the unique identifier of the merchant account
-            /// </summary>
-            public string MerchantAccountId { get; init; } = null!;
-
-            /// <summary>
-            /// Gets the Amount in the minor currency unit e.g. cents
-            /// </summary>
-            public long AmountInMinor { get; init; }
-
-            /// <summary>
-            /// Gets the three-letter ISO3 alpha currency code
-            /// </summary>
-            /// <example>EUR</example>
-            public string Currency { get; init; } = null!;
-
-            /// <summary>
-            /// Gets the beneficiary details
-            /// </summary>
-            public GetPayoutBeneficiaryUnion Beneficiary { get; init; }
-
-            /// <summary>
-            /// Gets the status of the payout
-            /// </summary>
-            public string Status { get; init; } = null!;
-
-            /// <summary>
-            /// Gets the data and time the payout was created
-            /// </summary>
-            /// <value></value>
-            public DateTime CreatedAt { get; init; }
-
-            /// <summary>
-            /// Gets the scheme id
-            /// </summary>
-            public string? SchemeId { get; init; } = null;
-
-            /// <summary>
-            /// Gets metadata of the payout
-            /// </summary>
-            public Dictionary<string, string>? Metadata { get; init; }
-        }
+        public DateTime CreatedAt { get; init; }
 
         /// <summary>
-        /// Represents a verified payout that requires authorization
+        /// Gets the scheme id
         /// </summary>
-        [JsonDiscriminator("authorization_required")]
-        public record AuthorizationRequired : PayoutDetails;
+        public string? SchemeId { get; init; } = null;
 
         /// <summary>
-        /// Represents a payout that is pending
+        /// Gets metadata of the payout
         /// </summary>
-        [JsonDiscriminator("pending")]
-        public record Pending : PayoutDetails;
-
-        /// <summary>
-        /// Represents a payout that has been authorized by the end user
-        /// </summary>
-        /// <returns></returns>
-        [JsonDiscriminator("authorized")]
-        public record Authorized : PayoutDetails;
-
-        /// <summary>
-        /// Represents a payout that has been executed.
-        /// </summary>
-        /// <param name="ExecutedAt">The date and time the payout got executed</param>
-        /// <returns></returns>
-        [JsonDiscriminator("executed")]
-        public record Executed(DateTime ExecutedAt) : PayoutDetails;
-
-        /// <summary>
-        /// Represents an authorized payout that failed to complete. This is a terminate state.
-        /// </summary>
-        /// <param name="FailedAt">The date and time the payout failed</param>
-        /// <param name="FailureReason">The reason for failure</param>
-        /// <returns></returns>
-        [JsonDiscriminator("failed")]
-        public record Failed(DateTime FailedAt, string FailureReason) : PayoutDetails;
+        public Dictionary<string, string>? Metadata { get; init; }
     }
+
+    /// <summary>
+    /// Represents a verified payout that requires authorization
+    /// </summary>
+    [JsonDiscriminator("authorization_required")]
+    public record AuthorizationRequired : PayoutDetails;
+
+    /// <summary>
+    /// Represents a payout that is pending
+    /// </summary>
+    [JsonDiscriminator("pending")]
+    public record Pending : PayoutDetails;
+
+    /// <summary>
+    /// Represents a payout that has been authorized by the end user
+    /// </summary>
+    /// <returns></returns>
+    [JsonDiscriminator("authorized")]
+    public record Authorized : PayoutDetails;
+
+    /// <summary>
+    /// Represents a payout that has been executed.
+    /// </summary>
+    /// <param name="ExecutedAt">The date and time the payout got executed</param>
+    /// <returns></returns>
+    [JsonDiscriminator("executed")]
+    public record Executed(DateTime ExecutedAt) : PayoutDetails;
+
+    /// <summary>
+    /// Represents an authorized payout that failed to complete. This is a terminate state.
+    /// </summary>
+    /// <param name="FailedAt">The date and time the payout failed</param>
+    /// <param name="FailureReason">The reason for failure</param>
+    /// <returns></returns>
+    [JsonDiscriminator("failed")]
+    public record Failed(DateTime FailedAt, string FailureReason) : PayoutDetails;
 }

@@ -4,51 +4,50 @@ using Microsoft.AspNetCore.Mvc;
 using TrueLayer;
 using TrueLayer.PaymentsProviders.Model;
 
-namespace MvcExample.Controllers
+namespace MvcExample.Controllers;
+
+public class ProvidersController : Controller
 {
-    public class ProvidersController : Controller
+    private readonly ITrueLayerClient _trueLayerClient;
+
+    public ProvidersController(ITrueLayerClient trueLayerClient)
     {
-        private readonly ITrueLayerClient _trueLayerClient;
+        _trueLayerClient = trueLayerClient;
+    }
 
-        public ProvidersController(ITrueLayerClient trueLayerClient)
+    public IActionResult Index()
+    {
+        return View();
+    }
+
+
+    [HttpGet]
+    public async Task<IActionResult> GetProvider([FromQuery(Name = "id")] string providerId)
+    {
+        if (string.IsNullOrWhiteSpace(providerId))
         {
-            _trueLayerClient = trueLayerClient;
+            return StatusCode((int)HttpStatusCode.BadRequest);
         }
 
-        public IActionResult Index()
+        var apiResponse = await _trueLayerClient.PaymentsProviders.GetPaymentsProvider(providerId);
+
+        return apiResponse.IsSuccessful
+            ? Success(apiResponse.Data)
+            : Failed(apiResponse.StatusCode.ToString());
+
+        IActionResult Success(PaymentsProvider provider)
         {
-            return View();
+            ViewData["ProviderId"] = provider.Id;
+            ViewData["LogoUri"] = provider.LogoUri;
+            return View("Success");
         }
 
-
-        [HttpGet]
-        public async Task<IActionResult> GetProvider([FromQuery(Name = "id")] string providerId)
+        IActionResult Failed(string status)
         {
-            if (string.IsNullOrWhiteSpace(providerId))
-            {
-                return StatusCode((int)HttpStatusCode.BadRequest);
-            }
+            ViewData["Status"] = status;
+            ViewData["ProviderId"] = providerId;
 
-            var apiResponse = await _trueLayerClient.PaymentsProviders.GetPaymentsProvider(providerId);
-
-            return apiResponse.IsSuccessful
-                ? Success(apiResponse.Data)
-                : Failed(apiResponse.StatusCode.ToString());
-
-            IActionResult Success(PaymentsProvider provider)
-            {
-                ViewData["ProviderId"] = provider.Id;
-                ViewData["LogoUri"] = provider.LogoUri;
-                return View("Success");
-            }
-
-            IActionResult Failed(string status)
-            {
-                ViewData["Status"] = status;
-                ViewData["ProviderId"] = providerId;
-
-                return View("Failed");
-            }
+            return View("Failed");
         }
     }
 }

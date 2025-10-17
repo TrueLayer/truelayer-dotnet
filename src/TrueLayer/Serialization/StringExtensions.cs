@@ -1,79 +1,78 @@
 using System.Text;
 
-namespace TrueLayer.Serialization
+namespace TrueLayer.Serialization;
+
+internal static class StringExtensions
 {
-    internal static class StringExtensions
+    private enum SnakeCaseState
     {
-        private enum SnakeCaseState
+        Start,
+        Lower,
+        Upper,
+        NewWord
+    }
+
+    public static string ToSnakeCase(this string s)
+    {
+        const char separator = '_';
+        if (string.IsNullOrWhiteSpace(s))
         {
-            Start,
-            Lower,
-            Upper,
-            NewWord
+            return s;
         }
 
-        public static string ToSnakeCase(this string s)
+        var sb = new StringBuilder();
+        var state = SnakeCaseState.Start;
+
+        for (var i = 0; i < s.Length; i++)
         {
-            const char separator = '_';
-            if (string.IsNullOrWhiteSpace(s))
+            if (s[i] == ' ')
             {
-                return s;
+                if (state != SnakeCaseState.Start)
+                {
+                    state = SnakeCaseState.NewWord;
+                }
             }
-
-            var sb = new StringBuilder();
-            var state = SnakeCaseState.Start;
-
-            for (var i = 0; i < s.Length; i++)
+            else if (char.IsUpper(s[i]))
             {
-                if (s[i] == ' ')
+                switch (state)
                 {
-                    if (state != SnakeCaseState.Start)
-                    {
-                        state = SnakeCaseState.NewWord;
-                    }
-                }
-                else if (char.IsUpper(s[i]))
-                {
-                    switch (state)
-                    {
-                        case SnakeCaseState.Upper:
-                            var hasNext = (i + 1 < s.Length);
-                            if (i > 0 && hasNext)
+                    case SnakeCaseState.Upper:
+                        var hasNext = (i + 1 < s.Length);
+                        if (i > 0 && hasNext)
+                        {
+                            var nextChar = s[i + 1];
+                            if (!char.IsUpper(nextChar) && nextChar != separator)
                             {
-                                var nextChar = s[i + 1];
-                                if (!char.IsUpper(nextChar) && nextChar != separator)
-                                {
-                                    sb.Append(separator);
-                                }
+                                sb.Append(separator);
                             }
-                            break;
-                        case SnakeCaseState.Lower:
-                        case SnakeCaseState.NewWord:
-                            sb.Append(separator);
-                            break;
-                    }
-
-                    sb.Append(char.ToLowerInvariant(s[i]));
-                    state = SnakeCaseState.Upper;
+                        }
+                        break;
+                    case SnakeCaseState.Lower:
+                    case SnakeCaseState.NewWord:
+                        sb.Append(separator);
+                        break;
                 }
-                else if (s[i] == separator)
+
+                sb.Append(char.ToLowerInvariant(s[i]));
+                state = SnakeCaseState.Upper;
+            }
+            else if (s[i] == separator)
+            {
+                sb.Append(separator);
+                state = SnakeCaseState.Start;
+            }
+            else
+            {
+                if (state == SnakeCaseState.NewWord)
                 {
                     sb.Append(separator);
-                    state = SnakeCaseState.Start;
                 }
-                else
-                {
-                    if (state == SnakeCaseState.NewWord)
-                    {
-                        sb.Append(separator);
-                    }
 
-                    sb.Append(s[i]);
-                    state = SnakeCaseState.Lower;
-                }
+                sb.Append(s[i]);
+                state = SnakeCaseState.Lower;
             }
-
-            return sb.ToString();
         }
+
+        return sb.ToString();
     }
 }

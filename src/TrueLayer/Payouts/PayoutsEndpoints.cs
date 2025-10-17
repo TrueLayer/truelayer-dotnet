@@ -1,7 +1,6 @@
-namespace TrueLayer.Payouts
+namespace TrueLayer.Payouts;
+
+internal static class PayoutsEndpoints
 {
-    internal static class PayoutsEndpoints
-    {
-        internal const string V3Payouts = "/v3/payouts/";
-    }
+    internal const string V3Payouts = "/v3/payouts/";
 }

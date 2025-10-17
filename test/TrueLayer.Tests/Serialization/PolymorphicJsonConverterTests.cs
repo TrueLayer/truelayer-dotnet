@@ -4,55 +4,54 @@ using FluentAssertions;
 using TrueLayer.Serialization;
 using Xunit;
 
-namespace TrueLayer.Tests.Serialization
+namespace TrueLayer.Tests.Serialization;
+
+public class PolymorphicJsonConverterTests
 {
-    public class PolymorphicJsonConverterTests
+    [Fact]
+    public void Can_deserialize_derived_types()
     {
-        [Fact]
-        public void Can_deserialize_derived_types()
-        {
-            string json = @"{
+        string json = @"{
                ""Vehicle"": {
                    ""__Type"": ""car"",
                    ""Doors"": 3
                }
             }";
 
-            var options = new JsonSerializerOptions
-            {
-                Converters = { new PolymorphicJsonConverterFactory() }
-            };
-
-            var sut = JsonSerializer.Deserialize<Sut>(json, options);
-            sut.Should().NotBeNull();
-            sut!.Vehicle.Should().NotBeNull();
-            sut.Vehicle!.Type.Should().Be("car");
-            sut.Vehicle.Should().BeOfType<Car>().Which
-                .Doors.Should().Be(3);
-        }
-
-        class Sut
+        var options = new JsonSerializerOptions
         {
-            public Vehicle? Vehicle { get; set; }
-        }
+            Converters = { new PolymorphicJsonConverterFactory() }
+        };
 
-        [JsonKnownType(typeof(Car), "car")]
-        [JsonKnownType(typeof(Bike), "bike")]
-        [JsonDiscriminator("__Type")]
-        abstract class Vehicle
-        {
-            [JsonPropertyName("__Type")]
-            public string Type { get; set; } = null!;
-        }
+        var sut = JsonSerializer.Deserialize<Sut>(json, options);
+        sut.Should().NotBeNull();
+        sut!.Vehicle.Should().NotBeNull();
+        sut.Vehicle!.Type.Should().Be("car");
+        sut.Vehicle.Should().BeOfType<Car>().Which
+            .Doors.Should().Be(3);
+    }
 
-        class Car : Vehicle
-        {
-            public int Doors { get; set; }
-        }
+    class Sut
+    {
+        public Vehicle? Vehicle { get; set; }
+    }
 
-        class Bike : Vehicle
-        {
-            public int Gears { get; set; }
-        }
+    [JsonKnownType(typeof(Car), "car")]
+    [JsonKnownType(typeof(Bike), "bike")]
+    [JsonDiscriminator("__Type")]
+    abstract class Vehicle
+    {
+        [JsonPropertyName("__Type")]
+        public string Type { get; set; } = null!;
+    }
+
+    class Car : Vehicle
+    {
+        public int Doors { get; set; }
+    }
+
+    class Bike : Vehicle
+    {
+        public int Gears { get; set; }
     }
 }

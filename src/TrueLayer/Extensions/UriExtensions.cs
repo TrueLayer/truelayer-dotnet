@@ -2,35 +2,34 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TrueLayer.Extensions
+namespace TrueLayer.Extensions;
+
+public static class UriExtensions
 {
-    public static class UriExtensions
+    public static Uri Append(this Uri uri, params string?[] segments)
     {
-        public static Uri Append(this Uri uri, params string?[] segments)
+        string[] notNullSegments = segments.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray()!;
+        string newUri = string.Join("/", new[] { uri.AbsoluteUri.TrimEnd('/').Replace("\\", string.Empty) }
+            .Concat(notNullSegments.Select(s => s.Replace("\\", string.Empty).Trim('/'))));
+        return new Uri(newUri);
+    }
+
+    public static Uri AppendQueryParameters(this Uri uri, IDictionary<string, string?>? queryParams)
+    {
+        if (queryParams == null || !queryParams.Any())
         {
-            string[] notNullSegments = segments.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray()!;
-            string newUri = string.Join("/", new[] { uri.AbsoluteUri.TrimEnd('/').Replace("\\", string.Empty) }
-                .Concat(notNullSegments.Select(s => s.Replace("\\", string.Empty).Trim('/'))));
-            return new Uri(newUri);
+            return uri;
         }
 
-        public static Uri AppendQueryParameters(this Uri uri, IDictionary<string, string?>? queryParams)
+        var query = string.Join("&", queryParams
+            .Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && kvp.Value != null)
+            .Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={kvp.Value!.Trim()}"));
+
+        var uriBuilder = new UriBuilder(uri)
         {
-            if (queryParams == null || !queryParams.Any())
-            {
-                return uri;
-            }
+            Query = string.IsNullOrWhiteSpace(uri.Query) ? query : $"{uri.Query.TrimStart('?')}&{query}"
+        };
 
-            var query = string.Join("&", queryParams
-                .Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && kvp.Value != null)
-                .Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={kvp.Value!.Trim()}"));
-
-            var uriBuilder = new UriBuilder(uri)
-            {
-                Query = string.IsNullOrWhiteSpace(uri.Query) ? query : $"{uri.Query.TrimStart('?')}&{query}"
-            };
-
-            return uriBuilder.Uri;
-        }
+        return uriBuilder.Uri;
     }
 }
