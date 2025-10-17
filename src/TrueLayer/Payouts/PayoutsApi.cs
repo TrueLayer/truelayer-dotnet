@@ -8,84 +8,83 @@ using TrueLayer.Models;
 using TrueLayer.Payouts.Model;
 using static TrueLayer.Payouts.Model.CreatePayoutResponse;
 
-namespace TrueLayer.Payouts
+namespace TrueLayer.Payouts;
+
+using GetPayoutUnion = OneOf<
+    GetPayoutsResponse.AuthorizationRequired,
+    GetPayoutsResponse.Pending,
+    GetPayoutsResponse.Authorized,
+    GetPayoutsResponse.Executed,
+    GetPayoutsResponse.Failed
+>;
+
+using CreatePayoutUnion = OneOf<
+    AuthorizationRequired,
+    Created
+>;
+
+internal class PayoutsApi : IPayoutsApi
 {
-    using GetPayoutUnion = OneOf<
-        GetPayoutsResponse.AuthorizationRequired,
-        GetPayoutsResponse.Pending,
-        GetPayoutsResponse.Authorized,
-        GetPayoutsResponse.Executed,
-        GetPayoutsResponse.Failed
-    >;
+    private readonly IApiClient _apiClient;
+    private readonly TrueLayerOptions _options;
+    private readonly Uri _baseUri;
+    private readonly IAuthApi _auth;
 
-    using CreatePayoutUnion = OneOf<
-        AuthorizationRequired,
-        Created
-    >;
-
-    internal class PayoutsApi : IPayoutsApi
+    public PayoutsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
     {
-        private readonly IApiClient _apiClient;
-        private readonly TrueLayerOptions _options;
-        private readonly Uri _baseUri;
-        private readonly IAuthApi _auth;
+        _apiClient = apiClient.NotNull(nameof(apiClient));
+        _options = options.NotNull(nameof(options));
+        _auth = auth.NotNull(nameof(auth));
 
-        public PayoutsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
+        options.Payments.NotNull(nameof(options.Payments))!.Validate();
+
+        _baseUri = options.GetApiBaseUri()
+            .Append(PayoutsEndpoints.V3Payouts);
+    }
+
+    /// <inheritdoc />
+    public async Task<ApiResponse<CreatePayoutUnion>> CreatePayout(
+        CreatePayoutRequest payoutRequest,
+        string? idempotencyKey = null,
+        CancellationToken cancellationToken = default)
+    {
+        payoutRequest.NotNull(nameof(payoutRequest));
+
+        var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+
+        if (!authResponse.IsSuccessful)
         {
-            _apiClient = apiClient.NotNull(nameof(apiClient));
-            _options = options.NotNull(nameof(options));
-            _auth = auth.NotNull(nameof(auth));
-
-            options.Payments.NotNull(nameof(options.Payments))!.Validate();
-
-            _baseUri = options.GetApiBaseUri()
-                .Append(PayoutsEndpoints.V3Payouts);
+            return new(authResponse.StatusCode, authResponse.TraceId);
         }
 
-        /// <inheritdoc />
-        public async Task<ApiResponse<CreatePayoutUnion>> CreatePayout(
-            CreatePayoutRequest payoutRequest,
-            string? idempotencyKey = null,
-            CancellationToken cancellationToken = default)
+        return await _apiClient.PostAsync<CreatePayoutUnion>(
+            _baseUri,
+            payoutRequest,
+            idempotencyKey ?? Guid.NewGuid().ToString(),
+            authResponse.Data!.AccessToken,
+            _options.Payments!.SigningKey,
+            cancellationToken
+        );
+    }
+
+    public async Task<ApiResponse<GetPayoutUnion>> GetPayout(
+        string id,
+        CancellationToken cancellationToken = default)
+    {
+        id.NotNullOrWhiteSpace(nameof(id));
+        id.NotAUrl(nameof(id));
+
+        var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+
+        if (!authResponse.IsSuccessful)
         {
-            payoutRequest.NotNull(nameof(payoutRequest));
-
-            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.PostAsync<CreatePayoutUnion>(
-                _baseUri,
-                payoutRequest,
-                idempotencyKey ?? Guid.NewGuid().ToString(),
-                authResponse.Data!.AccessToken,
-                _options.Payments!.SigningKey,
-                cancellationToken
-            );
+            return new(authResponse.StatusCode, authResponse.TraceId);
         }
 
-        public async Task<ApiResponse<GetPayoutUnion>> GetPayout(
-            string id,
-            CancellationToken cancellationToken = default)
-        {
-            id.NotNullOrWhiteSpace(nameof(id));
-            id.NotAUrl(nameof(id));
-
-            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.GetAsync<GetPayoutUnion>(
-                _baseUri.Append(id),
-                authResponse.Data!.AccessToken,
-                cancellationToken: cancellationToken
-            );
-        }
+        return await _apiClient.GetAsync<GetPayoutUnion>(
+            _baseUri.Append(id),
+            authResponse.Data!.AccessToken,
+            cancellationToken: cancellationToken
+        );
     }
 }

@@ -3,47 +3,46 @@ using System.Threading;
 using System.Threading.Tasks;
 using TrueLayer.Caching;
 
-namespace TrueLayer.Auth
+namespace TrueLayer.Auth;
+
+internal class AuthApiCacheDecorator : IAuthApi
 {
-    internal class AuthApiCacheDecorator : IAuthApi
+    private readonly IAuthApi _client;
+    private readonly IAuthTokenCache _authTokenCache;
+    private readonly TrueLayerOptions _options;
+    private readonly TimeSpan _minTimeToRenew = TimeSpan.FromMinutes(1);
+    private const string KeyPrefix = "tl-auth-token";
+
+    public AuthApiCacheDecorator(IAuthApi client, IAuthTokenCache authTokenCache, TrueLayerOptions options)
     {
-        private readonly IAuthApi _client;
-        private readonly IAuthTokenCache _authTokenCache;
-        private readonly TrueLayerOptions _options;
-        private readonly TimeSpan _minTimeToRenew = TimeSpan.FromMinutes(1);
-        private const string KeyPrefix = "tl-auth-token";
+        _client = client;
+        _authTokenCache = authTokenCache;
+        _options = options;
+    }
 
-        public AuthApiCacheDecorator(IAuthApi client, IAuthTokenCache authTokenCache, TrueLayerOptions options)
+    public async ValueTask<ApiResponse<GetAuthTokenResponse>> GetAuthToken(
+        GetAuthTokenRequest authTokenRequest,
+        CancellationToken cancellationToken = default)
+    {
+        var key = $"{KeyPrefix}:{_options.ClientId}:{authTokenRequest.Scope}";
+        if (_authTokenCache.TryGetValue(key, out ApiResponse<GetAuthTokenResponse>? cachedResponse))
         {
-            _client = client;
-            _authTokenCache = authTokenCache;
-            _options = options;
+            return cachedResponse!;
         }
 
-        public async ValueTask<ApiResponse<GetAuthTokenResponse>> GetAuthToken(
-            GetAuthTokenRequest authTokenRequest,
-            CancellationToken cancellationToken = default)
+        var authTokenResponse = await _client.GetAuthToken(authTokenRequest, cancellationToken);
+
+        if (authTokenResponse.IsSuccessful && authTokenResponse.Data is not null)
         {
-            var key = $"{KeyPrefix}:{_options.ClientId}:{authTokenRequest.Scope}";
-            if (_authTokenCache.TryGetValue(key, out ApiResponse<GetAuthTokenResponse>? cachedResponse))
-            {
-                return cachedResponse!;
-            }
+            var expireIn = TimeSpan.FromSeconds(authTokenResponse.Data.ExpiresIn);
 
-            var authTokenResponse = await _client.GetAuthToken(authTokenRequest, cancellationToken);
+            var expiry = expireIn > _minTimeToRenew
+                ? expireIn - _minTimeToRenew
+                : expireIn;
 
-            if (authTokenResponse.IsSuccessful && authTokenResponse.Data is not null)
-            {
-                var expireIn = TimeSpan.FromSeconds(authTokenResponse.Data.ExpiresIn);
-
-                var expiry = expireIn > _minTimeToRenew
-                    ? expireIn - _minTimeToRenew
-                    : expireIn;
-
-                _authTokenCache.Set(key, authTokenResponse, expiry);
-            }
-
-            return authTokenResponse;
+            _authTokenCache.Set(key, authTokenResponse, expiry);
         }
+
+        return authTokenResponse;
     }
 }

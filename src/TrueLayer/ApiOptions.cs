@@ -1,22 +1,21 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace TrueLayer
+namespace TrueLayer;
+
+/// <summary>
+/// Represents default options for an API resource
+/// </summary>
+public class ApiOptions
 {
     /// <summary>
-    /// Represents default options for an API resource
+    /// Gets or sets the API base URI
     /// </summary>
-    public class ApiOptions
-    {
-        /// <summary>
-        /// Gets or sets the API base URI
-        /// </summary>
-        public Uri? Uri { get; set; }
+    public Uri? Uri { get; set; }
 
-        internal virtual void Validate()
-        {
-            if (Uri is not null && !Uri.IsAbsoluteUri)
-                throw new ValidationException("Uri must be a valid and absolute uri");
-        }
+    internal virtual void Validate()
+    {
+        if (Uri is not null && !Uri.IsAbsoluteUri)
+            throw new ValidationException("Uri must be a valid and absolute uri");
     }
 }
