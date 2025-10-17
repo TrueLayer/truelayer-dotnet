@@ -3,13 +3,17 @@ using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Common;
 using TrueLayer.Serialization;
+using Provider = TrueLayer.Payments.Model.Provider;
 using static TrueLayer.Payouts.Model.AccountIdentifier;
 
 namespace TrueLayer.Payouts.Model
 {
     using AccountIdentifierUnion = OneOf<Iban, SortCodeAccountNumber, Nrb>;
 
-    public static class Beneficiary
+    /// <summary>
+    /// Beneficiary types for CREATE payout requests
+    /// </summary>
+    public static class CreatePayoutBeneficiary
     {
         /// <summary>
         /// Represents a TrueLayer beneficiary merchant account
@@ -118,17 +122,10 @@ namespace TrueLayer.Payouts.Model
             /// <summary>
             /// Creates a new <see cref="BusinessAccount"/>.
             /// </summary>
-            /// <param name="reference">A reference for the payout.</param>
-            /// <param name="accountHolderName">The business account holder name</param>
-            /// <param name="accountIdentifier">The unique identifier for the business account</param>
-            public BusinessAccount(
-                string reference,
-                string? accountHolderName = null,
-                AccountIdentifierUnion? accountIdentifier = null)
+            /// <param name="reference">A reference for the payout</param>
+            public BusinessAccount(string reference)
             {
                 Reference = reference.NotNullOrWhiteSpace(nameof(reference));
-                AccountHolderName = accountHolderName;
-                AccountIdentifier = accountIdentifier;
             }
 
             /// <summary>
@@ -137,49 +134,62 @@ namespace TrueLayer.Payouts.Model
             public string Type => Discriminator;
 
             /// <summary>
-            /// Gets the name of the business account holder
-            /// </summary>
-            public string? AccountHolderName { get; } = "";
-
-            /// <summary>
-            /// Gets the reference for the business bank account holder
+            /// Gets the reference for the payout
             /// </summary>
             public string Reference { get; }
-
-            /// <summary>
-            /// Gets the unique scheme identifier for the business account
-            /// </summary>
-            public AccountIdentifierUnion? AccountIdentifier { get; }
         }
 
+        /// <summary>
+        /// Represents a beneficiary that is specified by the end-user during the verification flow
+        /// </summary>
         [JsonDiscriminator(Discriminator)]
         public sealed record UserDetermined : IDiscriminated
         {
             const string Discriminator = "user_determined";
 
-            public UserDetermined(string reference, string accountHolderName, AccountIdentifierUnion accountIdentifier)
+            /// <summary>
+            /// Creates a new <see cref="UserDetermined"/> beneficiary for verified payouts
+            /// </summary>
+            /// <param name="reference">The reference for the payout, which displays in the beneficiary's bank statement</param>
+            /// <param name="user">Details of the beneficiary of the payment</param>
+            /// <param name="verification">Object that represents the verification process associated to the payout</param>
+            /// <param name="providerSelection">Provider Selection used for User Determined beneficiaries</param>
+            public UserDetermined(
+                string reference,
+                PayoutUserRequest user,
+                Verification verification,
+                OneOf<Provider.UserSelected, Provider.Preselected> providerSelection)
             {
-                AccountHolderName = accountHolderName;
-                AccountIdentifier = accountIdentifier;
                 Reference = reference.NotNullOrWhiteSpace(nameof(reference));
+                User = user.NotNull(nameof(user));
+                Verification = verification.NotNull(nameof(verification));
+                ProviderSelection = providerSelection.NotNull(nameof(providerSelection));
             }
 
+            /// <summary>
+            /// Gets the type of beneficiary
+            /// </summary>
             public string Type => Discriminator;
 
             /// <summary>
-            /// Gets the name of the external account holder
-            /// </summary>
-            public string AccountHolderName { get; } = "";
-
-            /// <summary>
-            /// Gets the reference for the external bank account holder
+            /// Gets the reference for the payout, which displays in the beneficiary's bank statement
             /// </summary>
             public string Reference { get; }
 
             /// <summary>
-            /// Gets the unique scheme identifier for the external account
+            /// Gets the user details of the beneficiary
             /// </summary>
-            public AccountIdentifierUnion AccountIdentifier { get; }
+            public PayoutUserRequest User { get; }
+
+            /// <summary>
+            /// Gets the verification configuration
+            /// </summary>
+            public Verification Verification { get; }
+
+            /// <summary>
+            /// Gets the provider selection configuration
+            /// </summary>
+            public OneOf<Provider.UserSelected, Provider.Preselected> ProviderSelection { get; }
         }
     }
 }

@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using OneOf;
 using TrueLayer.Serialization;
-using static TrueLayer.Payouts.Model.Beneficiary;
+using static TrueLayer.Payouts.Model.GetPayoutBeneficiary;
 
 
 namespace TrueLayer.Payouts.Model
 {
-    using BeneficiaryUnion = OneOf<PaymentSource, ExternalAccount, BusinessAccount>;
+    using GetPayoutBeneficiaryUnion = OneOf<PaymentSource, ExternalAccount, BusinessAccount, UserDetermined>;
 
     /// <summary>
     /// Get Payout Response Types
@@ -44,7 +44,7 @@ namespace TrueLayer.Payouts.Model
             /// <summary>
             /// Gets the beneficiary details
             /// </summary>
-            public BeneficiaryUnion Beneficiary { get; init; }
+            public GetPayoutBeneficiaryUnion Beneficiary { get; init; }
 
             /// <summary>
             /// Gets the status of the payout
@@ -67,6 +67,12 @@ namespace TrueLayer.Payouts.Model
             /// </summary>
             public Dictionary<string, string>? Metadata { get; init; }
         }
+
+        /// <summary>
+        /// Represents a verified payout that requires authorization
+        /// </summary>
+        [JsonDiscriminator("authorization_required")]
+        public record AuthorizationRequired : PayoutDetails;
 
         /// <summary>
         /// Represents a payout that is pending

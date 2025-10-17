@@ -4,7 +4,7 @@ using OneOf;
 using TrueLayer.Models;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
-using PayoutBeneficiary = TrueLayer.Payouts.Model.Beneficiary;
+using PayoutBeneficiary = TrueLayer.Payouts.Model.GetPayoutBeneficiary;
 using static TrueLayer.MerchantAccounts.Model.MerchantAccountTransactions;
 
 namespace TrueLayer.MerchantAccounts.Model;

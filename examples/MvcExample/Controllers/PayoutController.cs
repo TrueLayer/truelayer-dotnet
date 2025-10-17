@@ -9,6 +9,8 @@ using TrueLayer;
 using TrueLayer.Common;
 using TrueLayer.Payouts.Model;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
+using static TrueLayer.Payouts.Model.CreatePayoutResponse;
+using Beneficiary = TrueLayer.Payouts.Model.CreatePayoutBeneficiary;
 
 namespace MvcExample.Controllers
 {
@@ -72,10 +74,15 @@ namespace MvcExample.Controllers
                 return View("Index");
             }
 
+            // Extract the payout ID from the response (works for both Created and AuthorizationRequired)
+            var payoutId = apiResponse.Data!.Match(
+                authRequired => authRequired.Id,
+                created => created.Id);
+
             var redirectLink = new Uri(string.Join(
                 "/",
                 Url.ActionLink("Complete").TrimEnd('/'),
-                $"?payoutId={apiResponse.Data?.Id}"));
+                $"?payoutId={payoutId}"));
 
             return Redirect(redirectLink.AbsoluteUri);
         }
@@ -112,7 +119,8 @@ namespace MvcExample.Controllers
                 return Failed(apiResponse.StatusCode.ToString());
 
             return apiResponse.Data.Match(
-                authorizing => Pending(authorizing),
+                authorizationRequired => Pending(authorizationRequired),
+                pending => Pending(pending),
                 authorized => Success(authorized),
                 executed => Success(executed),
                 failed => Failed(failed.Status)

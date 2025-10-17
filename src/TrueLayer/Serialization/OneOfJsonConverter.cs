@@ -57,6 +57,16 @@ namespace TrueLayer.Serialization
                 return InvokeDiscriminatorFactory(options, readerClone, typeFactory);
             }
 
+            // Fallback to the type marked with DefaultJsonDiscriminator attribute
+            // This handles cases like CreatePayoutResponse.Created which has no status field
+            var defaultType = _descriptor.TypeFactories.Values
+                .FirstOrDefault(tf => tf.FieldType.GetCustomAttributes(typeof(DefaultJsonDiscriminatorAttribute), false).Any());
+
+            if (defaultType != default)
+            {
+                return InvokeDiscriminatorFactory(options, readerClone, defaultType);
+            }
+
             throw new JsonException($"Unknown discriminator {discriminator}");
         }
 
