@@ -2,7 +2,7 @@ using OneOf;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
-using static TrueLayer.Payments.Model.CreateProviderSelection;
+using static TrueLayer.Mandates.Model.CreateProviderSelection;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -23,7 +23,7 @@ public static class MandatesTestCases
         new(
             RequestBuilders.CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
                 "sweeping",
-                ProviderUnion.FromT1(new Preselected(ProviderId, new SchemeSelection.Preselected { SchemeId = "faster_payments_service" })),
+                ProviderUnion.FromT1(new Preselected(ProviderId)),
                 new Mandates.Model.Beneficiary.ExternalAccount(
                     "external_account",
                     "Bob NET SDK",
@@ -33,7 +33,7 @@ public static class MandatesTestCases
         new(
             RequestBuilders.CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
                 "commercial",
-                ProviderUnion.FromT1(new Preselected(ProviderId, new SchemeSelection.Preselected { SchemeId = "faster_payments_service" })),
+                ProviderUnion.FromT1(new Preselected(ProviderId)),
                 new Mandates.Model.Beneficiary.ExternalAccount(
                     "external_account",
                     "My Bank Account",
