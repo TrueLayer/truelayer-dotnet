@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Common;
 using TrueLayer.Serialization;
-using Provider = TrueLayer.Payments.Model.Provider;
+using static TrueLayer.Payments.Model.CreateProvider;
 using static TrueLayer.Payouts.Model.AccountIdentifier;
 
 namespace TrueLayer.Payouts.Model;
@@ -158,7 +158,7 @@ public static class CreatePayoutBeneficiary
             string reference,
             PayoutUserRequest user,
             Verification verification,
-            OneOf<Provider.UserSelected, Provider.Preselected> providerSelection)
+            OneOf<UserSelected, Preselected> providerSelection)
         {
             Reference = reference.NotNullOrWhiteSpace(nameof(reference));
             User = user.NotNull(nameof(user));
@@ -189,6 +189,6 @@ public static class CreatePayoutBeneficiary
         /// <summary>
         /// Gets the provider selection configuration
         /// </summary>
-        public OneOf<Provider.UserSelected, Provider.Preselected> ProviderSelection { get; }
+        public OneOf<UserSelected, Preselected> ProviderSelection { get; }
     }
 }
