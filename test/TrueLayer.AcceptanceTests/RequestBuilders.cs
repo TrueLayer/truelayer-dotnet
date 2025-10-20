@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using OneOf;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Payments.Model;
-using static TrueLayer.Payments.Model.CreatePaymentMethod;
 using PaymentMandate = TrueLayer.Payments.Model.CreatePaymentMethod.Mandate;
 
 namespace TrueLayer.AcceptanceTests;

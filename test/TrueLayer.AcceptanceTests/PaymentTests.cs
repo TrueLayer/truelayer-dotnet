@@ -10,7 +10,7 @@ using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
-using static TrueLayer.Payments.Model.CreateProvider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace TrueLayer.AcceptanceTests;
@@ -26,8 +26,7 @@ using PaymentsSchemeSelectionUnion = OneOf<
     SchemeSelection.InstantPreferred,
     SchemeSelection.Preselected,
     SchemeSelection.UserSelected>;
-using CreateProviderUnion = OneOf<CreateProvider.UserSelected, CreateProvider.Preselected>;
-using GetProviderUnion = OneOf<GetProvider.UserSelected, GetProvider.Preselected>;
+using CreateProviderUnion = OneOf<CreateProviderSelection.UserSelected, CreateProviderSelection.Preselected>;
 using BeneficiaryUnion = OneOf<Beneficiary.MerchantAccount, Beneficiary.ExternalAccount>;
 
 using GetPaymentUnion = OneOf<

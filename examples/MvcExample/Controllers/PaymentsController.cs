@@ -11,7 +11,7 @@ using TrueLayer;
 using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using static TrueLayer.Payments.Model.GetPaymentResponse;
-using static TrueLayer.Payments.Model.CreateProvider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace MvcExample.Controllers;

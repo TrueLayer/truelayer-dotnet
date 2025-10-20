@@ -33,22 +33,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Consumers must update `.Match()` calls to handle the new `AuthorizationRequired` type
 - **BREAKING**: Renamed `Beneficiary` to `CreatePayoutBeneficiary` for clarity
 - **BREAKING**: Simplified `CreatePayoutBeneficiary.BusinessAccount` to only require `Reference` (removed account holder name and identifier)
-- **BREAKING**: Split Provider types into `CreateProvider` (for requests) and `GetProvider` (for responses)
-  - `CreateProvider.UserSelected` - Use for creating payments/payouts/mandates with user-selected provider
-  - `CreateProvider.Preselected` - Use for creating payments/payouts/mandates with preselected provider
-  - `GetProvider.UserSelected` - Returned in GET responses, includes `ProviderId` and `SchemeId` fields
-  - `GetProvider.Preselected` - Returned in GET responses, includes `SchemeId` field
-  - Migration: Replace `Provider.UserSelected` with `CreateProvider.UserSelected` or `GetProvider.UserSelected` as appropriate
-  - Migration: Replace `Provider.Preselected(providerId, schemeId)` with `CreateProvider.Preselected(providerId, new SchemeSelection.Preselected { SchemeId = schemeId })`
+- **BREAKING**: Split Provider types into `CreateProviderSelection` (for requests) and `GetProviderSelection` (for responses)
+  - `CreateProviderSelection.UserSelected` - Use for creating payments/payouts/mandates with user-selected provider
+  - `CreateProviderSelection.Preselected` - Use for creating payments/payouts/mandates with preselected provider
+  - `GetProviderSelection.UserSelected` - Returned in GET responses (payments/mandates), includes `ProviderId` and `SchemeId` fields
+  - `GetProviderSelection.Preselected` - Returned in GET responses (payments/mandates), includes `SchemeId` field
+  - Migration: Replace `Provider.UserSelected` with `CreateProviderSelection.UserSelected` or `GetProviderSelection.UserSelected` as appropriate
+  - Migration: Replace `Provider.Preselected(providerId, schemeId)` with `CreateProviderSelection.Preselected(providerId, new SchemeSelection.Preselected { SchemeId = schemeId })`
+- **BREAKING**: Updated Mandate models to use new provider selection types
+  - `Mandate.VRPCommercialMandate` and `Mandate.VRPSweepingMandate` now use `CreateProviderSelection` types
+  - `MandateDetail` response types (AuthorizationRequiredMandateDetail, AuthorizingMandateDetail, AuthorizedMandateDetail, FailedMandateDetail, RevokedMandateDetail) now use `GetProviderSelection` types
+  - Migration: Update mandate creation code to use `CreateProviderSelection.UserSelected` or `CreateProviderSelection.Preselected`
 - **BREAKING**: Split PaymentMethod types into `CreatePaymentMethod` (for requests) and `GetPaymentMethod` (for responses)
   - `CreatePaymentMethod.BankTransfer` - Use for creating payments
   - `CreatePaymentMethod.Mandate` - Use for creating payments with mandates
   - `GetPaymentMethod.BankTransfer` - Returned in GET payment responses, includes `SchemeId` field
   - `GetPaymentMethod.Mandate` - Returned in GET payment responses
   - Migration: Replace `PaymentMethod.BankTransfer` with `CreatePaymentMethod.BankTransfer` or `GetPaymentMethod.BankTransfer` as appropriate
-- **BREAKING**: `CreateProvider.Preselected` constructor now requires `SchemeSelection` parameter (no longer accepts optional `schemeId` string)
+- **BREAKING**: `CreateProviderSelection.Preselected` constructor now requires `SchemeSelection` parameter (no longer accepts optional `schemeId` string)
   - Old: `new Provider.Preselected("provider-id", "scheme-id")` or `new Provider.Preselected("provider-id")`
-  - New: `new CreateProvider.Preselected("provider-id", new SchemeSelection.Preselected { SchemeId = "scheme-id" })`
+  - New: `new CreateProviderSelection.Preselected("provider-id", new SchemeSelection.Preselected { SchemeId = "scheme-id" })`
 - Updated `CreatePayoutBeneficiary.PaymentSource` GET response to include `AccountHolderName` and `AccountIdentifiers`
 - Updated `GetPayout` to return `GetPayoutBeneficiary` types with populated account details
 - Updated to C# 12.0 language version

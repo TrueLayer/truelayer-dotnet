@@ -7,7 +7,7 @@ using FluentAssertions;
 using OneOf;
 using TrueLayer.Auth;
 using TrueLayer.Common;
-using static TrueLayer.Payments.Model.CreateProvider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 using TrueLayer.Payments;
 using TrueLayer.Payouts;
 using TrueLayer.Payouts.Model;

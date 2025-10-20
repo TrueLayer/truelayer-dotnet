@@ -6,7 +6,7 @@ using OneOf;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
-using static TrueLayer.Payments.Model.CreateProvider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace TrueLayer.AcceptanceTests;

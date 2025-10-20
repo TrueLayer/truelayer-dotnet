@@ -1,3 +1,4 @@
+using System;
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.SchemeSelection;
@@ -8,9 +9,9 @@ using PreselectedProviderSchemeSelectionUnion = OneOf<InstantOnly, InstantPrefer
 using UserSelectedProviderSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, UserSelected>;
 
 /// <summary>
-/// Provider types for GET payment responses
+/// Provider selection types for CREATE payment requests
 /// </summary>
-public static class GetProvider
+public static class CreateProviderSelection
 {
     /// <summary>
     /// Represents provider options that indicates that the provider is to be selected from a collection
@@ -29,19 +30,14 @@ public static class GetProvider
         public ProviderFilter? Filter { get; init; }
 
         /// <summary>
-        /// Gets the provider Id the PSU selected for this payment
-        /// </summary>
-        public string? ProviderId { get; init; }
-
-        /// <summary>
-        /// Gets the id of the scheme associated to the selected provider that was used to make the payment over
-        /// </summary>
-        public string? SchemeId { get; init; }
-
-        /// <summary>
         /// Gets or inits the scheme selection preferred to make the payment.
         /// </summary>
         public UserSelectedProviderSchemeSelectionUnion? SchemeSelection { get; init; }
+
+        /// <summary>
+        /// Gets or inits the account details for the remitter
+        /// </summary>
+        public UserSelectedRemitterAccount? Remitter { get; init; }
     }
 
     /// <summary>
@@ -50,6 +46,17 @@ public static class GetProvider
     [JsonDiscriminator("preselected")]
     public record Preselected : IDiscriminated
     {
+        public Preselected(string providerId, PreselectedProviderSchemeSelectionUnion? schemeSelection = null)
+        {
+            if (schemeSelection is null)
+            {
+                throw new ArgumentException("Please specify the SchemeSelection option", nameof(schemeSelection));
+            }
+
+            ProviderId = providerId.NotNull(nameof(providerId));
+            SchemeSelection = schemeSelection;
+        }
+
         /// <summary>
         /// Gets the provider type
         /// </summary>
@@ -58,12 +65,7 @@ public static class GetProvider
         /// <summary>
         /// Gets the provider Id the PSU will use for this payment
         /// </summary>
-        public string ProviderId { get; init; } = null!;
-
-        /// <summary>
-        /// Gets the id of the scheme to make the payment over
-        /// </summary>
-        public string? SchemeId { get; init; }
+        public string ProviderId { get; }
 
         /// <summary>
         /// Gets or inits the account details for the remitter

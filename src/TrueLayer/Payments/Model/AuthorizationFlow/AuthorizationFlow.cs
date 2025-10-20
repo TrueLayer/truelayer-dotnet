@@ -3,7 +3,7 @@ using OneOf;
 
 namespace TrueLayer.Payments.Model.AuthorizationFlow;
 
-using ProviderSelectionUnion = OneOf<CreateProvider.UserSelected, CreateProvider.Preselected>;
+using ProviderSelectionUnion = OneOf<CreateProviderSelection.UserSelected, CreateProviderSelection.Preselected>;
 using SchemeSelectionUnion = OneOf<
     SchemeSelection.UserSelected,
     SchemeSelection.Preselected,

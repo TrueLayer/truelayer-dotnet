@@ -1,17 +1,12 @@
-using System;
-using OneOf;
+using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
-using static TrueLayer.Payments.Model.SchemeSelection;
 
-namespace TrueLayer.Payments.Model;
-
-using PreselectedProviderSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, Preselected, UserSelected>;
-using UserSelectedProviderSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, UserSelected>;
+namespace TrueLayer.Mandates.Model;
 
 /// <summary>
-/// Provider types for CREATE payment requests
+/// Provider selection types for CREATE payment requests
 /// </summary>
-public static class CreateProvider
+public static class CreateProviderSelection
 {
     /// <summary>
     /// Represents provider options that indicates that the provider is to be selected from a collection
@@ -28,11 +23,6 @@ public static class CreateProvider
         /// Gets or inits the filter used to determine the banks that should be displayed on the bank selection screen
         /// </summary>
         public ProviderFilter? Filter { get; init; }
-
-        /// <summary>
-        /// Gets or inits the scheme selection preferred to make the payment.
-        /// </summary>
-        public UserSelectedProviderSchemeSelectionUnion? SchemeSelection { get; init; }
     }
 
     /// <summary>
@@ -41,15 +31,9 @@ public static class CreateProvider
     [JsonDiscriminator("preselected")]
     public record Preselected : IDiscriminated
     {
-        public Preselected(string providerId, PreselectedProviderSchemeSelectionUnion? schemeSelection = null)
+        public Preselected(string providerId)
         {
-            if (schemeSelection is null)
-            {
-                throw new ArgumentException("Please specify the SchemeSelection option", nameof(schemeSelection));
-            }
-
             ProviderId = providerId.NotNull(nameof(providerId));
-            SchemeSelection = schemeSelection;
         }
 
         /// <summary>
@@ -66,10 +50,5 @@ public static class CreateProvider
         /// Gets or inits the account details for the remitter
         /// </summary>
         public RemitterAccount? Remitter { get; init; }
-
-        /// <summary>
-        /// Gets or inits the scheme selection preferred to make the payment.
-        /// </summary>
-        public PreselectedProviderSchemeSelectionUnion? SchemeSelection { get; init; }
     }
 }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using OneOf;
 using TrueLayer.Common;
 using TrueLayer.Serialization;
-using static TrueLayer.Payments.Model.CreateProvider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 using static TrueLayer.Payouts.Model.AccountIdentifier;
 
 namespace TrueLayer.Payouts.Model;
