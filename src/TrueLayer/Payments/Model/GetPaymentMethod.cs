@@ -1,19 +1,19 @@
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.Beneficiary;
-using static TrueLayer.Payments.Model.Provider;
+using static TrueLayer.Payments.Model.GetProvider;
 using static TrueLayer.Payments.Model.Retry;
 
 namespace TrueLayer.Payments.Model;
 
 using BeneficiaryUnion = OneOf<MerchantAccount, ExternalAccount>;
-using ProviderUnion = OneOf<UserSelected, Preselected>;
+using GetProviderUnion = OneOf<UserSelected, Preselected>;
 using RetryUnion = OneOf<Standard, Smart>;
 
 /// <summary>
-/// Payment Method types
+/// Payment Method types for GET payment responses
 /// </summary>
-public static class PaymentMethod
+public static class GetPaymentMethod
 {
     /// <summary>
     /// Defines a payment via Bank Transfer
@@ -22,19 +22,6 @@ public static class PaymentMethod
     public record BankTransfer : IDiscriminated
     {
         /// <summary>
-        /// Creates a new <see cref="BankTransfer"/>
-        /// </summary>
-        /// <param name="providerSelection">The options for selecting a provider for the payment</param>
-        /// <param name="beneficiary">The details of the payment destination</param>
-        /// <param name="retry">The retry object flag for the payment</param>
-        public BankTransfer(ProviderUnion providerSelection, BeneficiaryUnion beneficiary, BaseRetry? retry = null)
-        {
-            ProviderSelection = providerSelection.NotNull(nameof(providerSelection));
-            Beneficiary = beneficiary.NotNull(nameof(beneficiary));
-            Retry = retry;
-        }
-
-        /// <summary>
         /// Gets the payment method type
         /// </summary>
         public string Type => "bank_transfer";
@@ -42,7 +29,7 @@ public static class PaymentMethod
         /// <summary>
         /// Gets or inits the provider selection options
         /// </summary>
-        public ProviderUnion ProviderSelection { get; init; }
+        public GetProviderUnion ProviderSelection { get; init; }
 
         /// <summary>
         /// Gets or inits the beneficiary details
@@ -62,18 +49,6 @@ public static class PaymentMethod
     public record Mandate : IDiscriminated
     {
         /// <summary>
-        /// Creates a new <see cref="Mandate"/>
-        /// </summary>
-        /// <param name="mandateId">The identifier of the mandate</param>
-        /// <param name="reference">The payment reference, useful for reconciliation needs</param>
-        public Mandate(string mandateId, string? reference, RetryUnion? retry)
-        {
-            MandateId = mandateId.NotNullOrWhiteSpace(nameof(mandateId));
-            Reference = reference.NotEmptyOrWhiteSpace(nameof(reference));
-            Retry = retry;
-        }
-
-        /// <summary>
         /// Gets the payment method type
         /// </summary>
         public string Type => "mandate";
@@ -81,13 +56,16 @@ public static class PaymentMethod
         /// <summary>
         /// The identifier of the mandate
         /// </summary>
-        public string MandateId { get; init; }
+        public string MandateId { get; init; } = null!;
 
         /// <summary>
         /// The payment reference, useful for reconciliation needs
         /// </summary>
         public string? Reference { get; init; }
 
+        /// <summary>
+        /// The retry configuration
+        /// </summary>
         public RetryUnion? Retry { get; init; }
     }
 }

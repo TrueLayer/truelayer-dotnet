@@ -186,8 +186,8 @@ public class MyService
         var paymentRequest = new CreatePaymentRequest(
             amountInMinor: amount.ToMinorCurrencyUnit(2),
             currency: Currencies.GBP,
-            paymentMethod: new PaymentMethod.BankTransfer(
-                new Provider.UserSelected
+            paymentMethod: new CreatePaymentMethod.BankTransfer(
+                new CreateProvider.UserSelected
                 {
                     Filter = new ProviderFilter
                     {
