@@ -18,3 +18,10 @@ public record RemitterAccount(string AccountHolderName, AccountIdentifierUnion A
     /// <summary>A reference for the remitter account</summary>
     public string Reference { get; init; } = null!;
 }
+
+/// <summary>
+/// Represent a user selected remitter account
+/// </summary>
+/// <param name="AccountHolderName">The name of the remitter account holder</param>
+public record UserSelectedRemitterAccount(string AccountHolderName);
+

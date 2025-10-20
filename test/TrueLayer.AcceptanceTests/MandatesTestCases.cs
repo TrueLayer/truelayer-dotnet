@@ -2,7 +2,7 @@ using OneOf;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
-using static TrueLayer.Payments.Model.CreateProvider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 
 namespace TrueLayer.AcceptanceTests;
 

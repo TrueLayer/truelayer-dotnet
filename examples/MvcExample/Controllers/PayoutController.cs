@@ -9,7 +9,6 @@ using TrueLayer;
 using TrueLayer.Common;
 using TrueLayer.Payouts.Model;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
-using static TrueLayer.Payouts.Model.CreatePayoutResponse;
 using Beneficiary = TrueLayer.Payouts.Model.CreatePayoutBeneficiary;
 
 namespace MvcExample.Controllers;

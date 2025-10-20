@@ -1,7 +1,7 @@
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Payments.Model.Beneficiary;
-using static TrueLayer.Payments.Model.GetProvider;
+using static TrueLayer.Payments.Model.GetProviderSelection;
 using static TrueLayer.Payments.Model.Retry;
 
 namespace TrueLayer.Payments.Model;

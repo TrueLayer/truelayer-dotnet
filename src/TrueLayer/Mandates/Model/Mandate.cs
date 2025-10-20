@@ -1,7 +1,7 @@
 using OneOf;
 using TrueLayer.Serialization;
 using static TrueLayer.Mandates.Model.Beneficiary;
-using static TrueLayer.Payments.Model.CreateProvider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 
 namespace TrueLayer.Mandates.Model;
 

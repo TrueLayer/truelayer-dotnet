@@ -8,7 +8,7 @@ using TrueLayer.Payouts.Model;
 using Xunit;
 using Beneficiary = TrueLayer.Payouts.Model.CreatePayoutBeneficiary;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
-using static TrueLayer.Payments.Model.CreateProvider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 using ProviderFilter = TrueLayer.Payments.Model.ProviderFilter;
 using PayoutVerification = TrueLayer.Payouts.Model.Verification;
 using PayoutSchemeSelection = TrueLayer.Payouts.Model.SchemeSelection;

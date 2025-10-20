@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
 using TrueLayer.Signing;
-using static TrueLayer.Payments.Model.CreateProvider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace TrueLayer.Benchmarks;

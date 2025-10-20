@@ -5,7 +5,7 @@ using TrueLayer.Models;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
 using static TrueLayer.Mandates.Model.Beneficiary;
-using static TrueLayer.Payments.Model.GetProvider;
+using static TrueLayer.Payments.Model.GetProviderSelection;
 
 namespace TrueLayer.Mandates.Model;
 
