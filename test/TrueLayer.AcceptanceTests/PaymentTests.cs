@@ -40,6 +40,7 @@ using GetPaymentUnion = OneOf<
 public partial class PaymentTests : IClassFixture<ApiTestFixture>
 {
     private readonly ApiTestFixture _fixture;
+    private const string ReturnUri = "http://localhost:3000/callback";
 
     public PaymentTests(ApiTestFixture fixture)
     {
@@ -62,12 +63,46 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             authorizationRequired.User.Should().NotBeNull();
             authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
             authorizationRequired.Status.Should().Be("authorization_required");
-
-            string hppUri = client.Payments.CreateHostedPaymentPageLink(
-                authorizationRequired.Id, authorizationRequired.ResourceToken,
-                new Uri("https://redirect.mydomain.com"));
-            hppUri.Should().NotBeNullOrWhiteSpace();
         }
+    }
+
+    [Fact]
+    public async Task Can_Create_Merchant_Account_Gbp_Payment_With_Hosted_Page()
+    {
+        var hostedPage = new HostedPageRequest(
+            returnUri: new Uri(ReturnUri),
+            countryCode: "GB",
+            languageCode: "en");
+
+        var paymentRequest = CreateTestPaymentRequest(
+            new Provider.UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
+                SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
+            },
+            beneficiary: new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].GbpMerchantAccountId)
+            {
+                AccountHolderName = "account holder name",
+                StatementReference = "statement-ref"
+            },
+            hostedPage: hostedPage);
+
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var authorizationRequired = response.Data.AsT0;
+
+        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.User.Should().NotBeNull();
+        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.Status.Should().Be("authorization_required");
+
+        // Verify the hosted page response is returned
+        authorizationRequired.HostedPage.Should().NotBeNull();
+        authorizationRequired.HostedPage!.Uri.Should().NotBeNull();
+        authorizationRequired.HostedPage.Uri.AbsoluteUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
@@ -96,10 +131,6 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         authorizationRequired.User.Should().NotBeNull();
         authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
         authorizationRequired.Status.Should().Be("authorization_required");
-
-        string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
-            authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
@@ -126,10 +157,6 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         authorizationRequired.User.Should().NotBeNull();
         authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
         authorizationRequired.Status.Should().Be("authorization_required");
-
-        string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
-            authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
@@ -156,10 +183,6 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         authorizationRequired.User.Should().NotBeNull();
         authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
         authorizationRequired.Status.Should().Be("authorization_required");
-
-        string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
-            authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
@@ -251,10 +274,6 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         // The next action is a redirect
         authorizing.AuthorizationFlow!.Actions.Next.IsT2.Should().BeTrue();
         authorizing.AuthorizationFlow.Actions.Next.AsT2.Uri.Should().NotBeNull();
-
-        string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
-            authorizing.Id, authorizing.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
@@ -590,7 +609,8 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         BeneficiaryUnion? beneficiary = null,
         Retry.BaseRetry? retry = null,
         bool initAuthorizationFlow = false,
-        SubMerchants? subMerchants = null)
+        SubMerchants? subMerchants = null,
+        HostedPageRequest? hostedPage = null)
     {
         accountIdentifier ??= new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
         providerSelection ??= new Provider.Preselected("mock-payments-gb-redirect",
@@ -623,6 +643,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
             relatedProducts,
             authorizationFlow,
+            hostedPage,
             metadata: new Dictionary<string, string>
             {
                 ["test-key-1"] = "test-value-1",
