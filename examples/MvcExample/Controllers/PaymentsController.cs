@@ -44,6 +44,13 @@ public class PaymentsController : Controller
                 schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service"})
             : new Provider.UserSelected();
 
+        // Return Uri must be whitelisted in TrueLayer console
+        var returnUri = new Uri(Url.ActionLink("Complete"));
+        var hostedPage = new HostedPageRequest(
+            returnUri: returnUri,
+            countryCode: "GB",
+            languageCode: "en");
+
         var paymentRequest = new CreatePaymentRequest(
             donateModel.AmountInMajor.ToMinorCurrencyUnit(2),
             Currencies.GBP,
@@ -55,7 +62,9 @@ public class PaymentsController : Controller
                     new AccountIdentifier.SortCodeAccountNumber("567890", "12345678"))),
             new PaymentUserRequest(name: donateModel.Name, email: donateModel.Email, dateOfBirth: new DateTime(1999, 1, 1),
                 address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St", "Awesome building")),
-            null
+            relatedProducts: null,
+            authorizationFlow: null,
+            hostedPage: hostedPage
         );
 
         var apiResponse = await _trueLayerClient.Payments.CreatePayment(
@@ -80,17 +89,8 @@ public class PaymentsController : Controller
         }
 
         return apiResponse.Data.Match<IActionResult>(
-            authorizationRequired =>
-            {
-                // Return Uri must be whitelisted in TrueLayer console
-                var returnUri = new Uri(Url.ActionLink("Success"));
 
-                var hppLink = _trueLayerClient.Payments.CreateHostedPaymentPageLink(
-                    authorizationRequired.Id,
-                    authorizationRequired.ResourceToken,
-                    returnUri);
-                return Redirect(hppLink);
-            },
+            authorizationRequired => Redirect(authorizationRequired.HostedPage!.Uri.AbsoluteUri),
             authorized =>
             {
                 ViewData["Status"] = authorized.Status;
