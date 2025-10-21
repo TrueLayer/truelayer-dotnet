@@ -27,7 +27,7 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
         Utf8JsonReader readerClone = reader;
 
         // Extract discriminators without allocating JsonDocument
-        var (discriminatorValue, statusValue, isEmpty) = ExtractDiscriminators(ref reader, _discriminatorFieldName);
+        (string? discriminatorValue, string? statusValue, bool isEmpty) = ExtractDiscriminators(ref reader, _discriminatorFieldName);
 
         if (isEmpty)
         {
@@ -102,7 +102,12 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
                 {
                     // Skip other properties
                     reader.Read();
-                    reader.Skip();
+                    // Use TrySkip to handle both complete buffers and streaming JSON
+                    if (!reader.TrySkip())
+                    {
+                        // If TrySkip fails, we need to manually skip the value
+                        reader.Skip();
+                    }
                 }
             }
         }
@@ -110,7 +115,7 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
         return (discriminatorValue, statusValue, propertyCount == 0);
     }
 
-    private static T? InvokeDiscriminatorFactory(JsonSerializerOptions options, Utf8JsonReader readerClone,
+    private static T InvokeDiscriminatorFactory(JsonSerializerOptions options, Utf8JsonReader readerClone,
         (Type FieldType, Delegate Factory) typeFactory)
     {
         object? deserializedObject = JsonSerializer.Deserialize(ref readerClone, typeFactory.FieldType, options);

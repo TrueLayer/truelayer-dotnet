@@ -10,7 +10,7 @@ namespace TrueLayer.Serialization;
 
 internal sealed class OneOfJsonConverterFactory : JsonConverterFactory
 {
-    private static readonly ConcurrentDictionary<Type, JsonConverter> _converterCache = new();
+    private static readonly ConcurrentDictionary<Type, JsonConverter> ConverterCache = new();
 
     public override bool CanConvert(Type typeToConvert)
     {
@@ -19,7 +19,7 @@ internal sealed class OneOfJsonConverterFactory : JsonConverterFactory
 
     public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions _)
     {
-        return _converterCache.GetOrAdd(typeToConvert, CreateConverterForType);
+        return ConverterCache.GetOrAdd(typeToConvert, CreateConverterForType);
     }
 
     private static JsonConverter CreateConverterForType(Type typeToConvert)
@@ -33,7 +33,7 @@ internal sealed class OneOfJsonConverterFactory : JsonConverterFactory
         var constructor = converterType.GetConstructor(
             BindingFlags.Public | BindingFlags.Instance,
             null,
-            new[] { typeof(OneOfTypeDescriptor), typeof(string) },
+            [typeof(OneOfTypeDescriptor), typeof(string)],
             null);
 
         if (constructor == null)
