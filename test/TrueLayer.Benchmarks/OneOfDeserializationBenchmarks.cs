@@ -66,6 +66,60 @@ public class OneOfDeserializationBenchmarks
         return JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, Options);
     }
 
+    [Benchmark]
+    public OneOf<Foo, Bar>? DeserializeWithNestedObjects()
+    {
+        var json = """
+                   {
+                               "type": "Bar",
+                               "status": "active",
+                               "BarProp": 42,
+                               "metadata": {
+                                   "nested1": "value1",
+                                   "nested2": {
+                                       "deep1": "value2",
+                                       "deep2": [1, 2, 3, 4, 5]
+                                   }
+                               },
+                               "config": {
+                                   "enabled": true,
+                                   "settings": {
+                                       "timeout": 30000,
+                                       "retries": 3
+                                   }
+                               }
+                           }
+                   """u8.ToArray();
+        return JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, Options);
+    }
+
+    [Benchmark]
+    public OneOf<Foo, Bar>? DeserializeWithLargeNestedArrays()
+    {
+        var json = """
+                   {
+                               "type": "Bar",
+                               "BarProp": 42,
+                               "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8"],
+                               "items": [
+                                   {"id": 1, "name": "item1", "active": true},
+                                   {"id": 2, "name": "item2", "active": false},
+                                   {"id": 3, "name": "item3", "active": true},
+                                   {"id": 4, "name": "item4", "active": false}
+                               ],
+                               "extraData": {
+                                   "values": [100, 200, 300, 400, 500],
+                                   "mapping": {
+                                       "key1": "value1",
+                                       "key2": "value2",
+                                       "key3": "value3"
+                                   }
+                               }
+                           }
+                   """u8.ToArray();
+        return JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, Options);
+    }
+
     public class Foo
     {
         public string? FooProp { get; set; }
