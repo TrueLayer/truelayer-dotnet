@@ -26,15 +26,15 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
 
         Utf8JsonReader readerClone = reader;
 
-        var doc = JsonDocument.ParseValue(ref reader);
+        // Extract discriminators without allocating JsonDocument
+        var (discriminatorValue, statusValue, isEmpty) = ExtractDiscriminators(ref reader, _discriminatorFieldName);
 
-        if (doc.RootElement.ValueKind == JsonValueKind.Object && !doc.RootElement.EnumerateObject().Any())
+        if (isEmpty)
         {
             return default;
         }
 
-        doc.RootElement.TryGetProperty(_discriminatorFieldName, out var discriminator);
-        string? discriminatorValue = GetStringValue(discriminator);
+        // Try primary discriminator field (type)
         if (!string.IsNullOrWhiteSpace(discriminatorValue)
             && (_descriptor.TypeFactories.TryGetValue(discriminatorValue, out var typeFactory)))
         {
@@ -42,14 +42,13 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
         }
 
         // Fallback to status field
-        doc.RootElement.TryGetProperty("status", out discriminator);
-        string? statusValue = GetStringValue(discriminator);
         if (!string.IsNullOrWhiteSpace(statusValue)
             && (_descriptor.TypeFactories.TryGetValue(statusValue, out typeFactory)))
         {
             return InvokeDiscriminatorFactory(options, readerClone, typeFactory);
         }
 
+        // Try combined status_type discriminator
         var statusTypeDiscriminator = string.Join("_", statusValue, discriminatorValue);
         if (!string.IsNullOrWhiteSpace(statusTypeDiscriminator)
             && (_descriptor.TypeFactories.TryGetValue(statusTypeDiscriminator, out typeFactory)))
@@ -67,11 +66,49 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
             return InvokeDiscriminatorFactory(options, readerClone, defaultType);
         }
 
-        throw new JsonException($"Unknown discriminator {discriminator}");
+        throw new JsonException($"Unknown discriminator: type='{discriminatorValue}', status='{statusValue}'");
     }
 
-    private static string? GetStringValue(JsonElement jsonElement)
-        => jsonElement.ValueKind == JsonValueKind.String ? jsonElement.GetString() : null;
+    private static (string? discriminatorValue, string? statusValue, bool isEmpty) ExtractDiscriminators(
+        ref Utf8JsonReader reader, string discriminatorFieldName)
+    {
+        string? discriminatorValue = null;
+        string? statusValue = null;
+        int propertyCount = 0;
+
+        // Read through the object to find discriminator fields
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndObject)
+            {
+                break;
+            }
+
+            if (reader.TokenType == JsonTokenType.PropertyName)
+            {
+                propertyCount++;
+
+                if (reader.ValueTextEquals(discriminatorFieldName))
+                {
+                    reader.Read();
+                    discriminatorValue = reader.TokenType == JsonTokenType.String ? reader.GetString() : null;
+                }
+                else if (reader.ValueTextEquals("status"))
+                {
+                    reader.Read();
+                    statusValue = reader.TokenType == JsonTokenType.String ? reader.GetString() : null;
+                }
+                else
+                {
+                    // Skip other properties
+                    reader.Read();
+                    reader.Skip();
+                }
+            }
+        }
+
+        return (discriminatorValue, statusValue, propertyCount == 0);
+    }
 
     private static T? InvokeDiscriminatorFactory(JsonSerializerOptions options, Utf8JsonReader readerClone,
         (Type FieldType, Delegate Factory) typeFactory)
