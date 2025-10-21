@@ -5,7 +5,7 @@ namespace TrueLayer.Serialization;
 
 internal static class SerializerOptions
 {
-    public static readonly JsonSerializerOptions Default = new JsonSerializerOptions
+    public static readonly JsonSerializerOptions Default = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         PropertyNamingPolicy = JsonSnakeCaseNamingPolicy.Instance,
