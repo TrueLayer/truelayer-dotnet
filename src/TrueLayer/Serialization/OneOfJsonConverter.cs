@@ -88,6 +88,14 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
             {
                 propertyCount++;
 
+                // Once we have both discriminators, skip all remaining properties
+                if (discriminatorValue != null && statusValue != null)
+                {
+                    reader.Read();
+                    reader.TrySkip();
+                    continue;
+                }
+
                 if (reader.ValueTextEquals(discriminatorFieldName))
                 {
                     reader.Read();
@@ -102,12 +110,7 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
                 {
                     // Skip other properties
                     reader.Read();
-                    // Use TrySkip to handle both complete buffers and streaming JSON
-                    if (!reader.TrySkip())
-                    {
-                        // If TrySkip fails, we need to manually skip the value
-                        reader.Skip();
-                    }
+                    reader.TrySkip();
                 }
             }
         }
