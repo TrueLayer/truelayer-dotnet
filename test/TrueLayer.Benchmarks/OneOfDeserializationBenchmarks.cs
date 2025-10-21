@@ -120,6 +120,41 @@ public class OneOfDeserializationBenchmarks
         return JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json, Options);
     }
 
+    /// <summary>
+    /// Tests converter caching by repeatedly deserializing the same OneOf type.
+    /// With caching, subsequent deserializations reuse the cached converter.
+    /// </summary>
+    [Benchmark]
+    public void RepeatedDeserializationSameType()
+    {
+        // Deserialize the same type 10 times - converter is cached after first call
+        for (int i = 0; i < 10; i++)
+        {
+            JsonSerializer.Deserialize<OneOf<Foo, Bar>>(SimpleJson, Options);
+        }
+    }
+
+    /// <summary>
+    /// Tests converter caching across different OneOf types.
+    /// Each unique type gets its own cached converter.
+    /// </summary>
+    [Benchmark]
+    public void RepeatedDeserializationMixedTypes()
+    {
+        var json1 = """{"type": "Bar", "BarProp": 42}"""u8.ToArray();
+        var json2 = """{"type": "sort_code_account_number", "sort_code": "12-34-56", "account_number": "12345678"}"""u8.ToArray();
+        var json3 = """{"type": "iban", "iban": "GB33BUKB20201555555555"}"""u8.ToArray();
+
+        // Deserialize 3 different OneOf types, 3 times each
+        // First iteration creates converters, subsequent iterations reuse them
+        for (int i = 0; i < 3; i++)
+        {
+            JsonSerializer.Deserialize<OneOf<Foo, Bar>>(json1, Options);
+            JsonSerializer.Deserialize<OneOf<AccountIdScan, AccountIdIban>>(json2, Options);
+            JsonSerializer.Deserialize<OneOf<AccountIdScan, AccountIdIban>>(json3, Options);
+        }
+    }
+
     public class Foo
     {
         public string? FooProp { get; set; }
