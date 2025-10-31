@@ -18,8 +18,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - New `HostedPageResponse` model containing the auto-constructed hosted page URI
   - Updated `CreatePaymentRequest` to accept `HostedPage` parameter
   - Updated `CreatePaymentResponse.AuthorizationRequired` to include `HostedPage` property with the hosted page URI
-### Removed
-- Removed `CreateHostedPaymentPageLink` method from `IPaymentsApi` (replaced by `HostedPage` parameter in `CreatePaymentRequest`)
 ### Changed
 - **BREAKING**: `CreatePayout` now returns `OneOf<AuthorizationRequired, Created>` instead of `CreatePayoutResponse`
   - Consumers must use `.Match()` to handle both response types
