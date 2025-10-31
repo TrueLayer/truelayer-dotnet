@@ -1,6 +1,7 @@
 // Install .NET Core Global tools.
 #tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.4.9"
 #tool "dotnet:?package=coveralls.net&version=4.0.1"
+#tool "dotnet:?package=dotnet-sonarscanner&version=11.0.0"
 
 // Install addins
 #addin nuget:?package=Cake.Coverlet&version=5.1.1
