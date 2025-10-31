@@ -5,11 +5,12 @@ using TrueLayer.Models;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
 using static TrueLayer.Mandates.Model.Beneficiary;
+using static TrueLayer.Payments.Model.GetProviderSelection;
 
 namespace TrueLayer.Mandates.Model;
 
 using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
-using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Provider.Preselected>;
+using ProviderUnion = OneOf<UserSelected, Preselected>;
 
 public static class MandateDetail
 {

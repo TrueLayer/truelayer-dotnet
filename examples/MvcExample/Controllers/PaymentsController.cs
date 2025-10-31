@@ -11,6 +11,8 @@ using TrueLayer;
 using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using static TrueLayer.Payments.Model.GetPaymentResponse;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
+using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace MvcExample.Controllers;
 
@@ -38,11 +40,11 @@ public class PaymentsController : Controller
             return View("Index");
         }
 
-        OneOf<Provider.UserSelected, Provider.Preselected> providerSelection = donateModel.UserPreSelectedFilter
-            ? new Provider.Preselected(
+        OneOf<UserSelected, Preselected> providerSelection = donateModel.UserPreSelectedFilter
+            ? new Preselected(
                 providerId: "mock-payments-gb-redirect",
                 schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service"})
-            : new Provider.UserSelected();
+            : new UserSelected();
 
         // Return Uri must be whitelisted in TrueLayer console
         var returnUri = new Uri(Url.ActionLink("Complete"));
@@ -54,7 +56,7 @@ public class PaymentsController : Controller
         var paymentRequest = new CreatePaymentRequest(
             donateModel.AmountInMajor.ToMinorCurrencyUnit(2),
             Currencies.GBP,
-            new PaymentMethod.BankTransfer(
+            new BankTransfer(
                 providerSelection,
                 new Beneficiary.ExternalAccount(
                     "TrueLayer",
@@ -136,7 +138,7 @@ public class PaymentsController : Controller
             return View("Success");
         }
 
-        void SetProviderAndSchemeId(OneOf<PaymentMethod.BankTransfer, PaymentMethod.Mandate>? paymentMethod)
+        void SetProviderAndSchemeId(OneOf<GetPaymentMethod.BankTransfer, GetPaymentMethod.Mandate>? paymentMethod)
         {
             (string providerId, string schemeId) = paymentMethod?.Match(
                 bankTransfer => bankTransfer.ProviderSelection.Match(
@@ -149,7 +151,7 @@ public class PaymentsController : Controller
             ViewData["SchemeId"] = schemeId;
         }
 
-        IActionResult Failed(string status, OneOf<PaymentMethod.BankTransfer, PaymentMethod.Mandate>? paymentMethod)
+        IActionResult Failed(string status, OneOf<GetPaymentMethod.BankTransfer, GetPaymentMethod.Mandate>? paymentMethod)
         {
             ViewData["Status"] = status;
 

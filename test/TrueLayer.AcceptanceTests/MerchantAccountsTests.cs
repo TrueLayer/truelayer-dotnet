@@ -8,6 +8,8 @@ using TrueLayer.Common;
 using TrueLayer.MerchantAccounts.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
+using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -193,8 +195,8 @@ public class MerchantTests : IClassFixture<ApiTestFixture>
         => new(
             100,
             Currencies.GBP,
-            new PaymentMethod.BankTransfer(
-                new Provider.UserSelected
+            new BankTransfer(
+                new UserSelected
                 {
                     Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] }
                 },

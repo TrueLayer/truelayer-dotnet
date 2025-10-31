@@ -7,7 +7,7 @@ using FluentAssertions;
 using OneOf;
 using TrueLayer.Auth;
 using TrueLayer.Common;
-using Provider = TrueLayer.Payments.Model.Provider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 using TrueLayer.Payments;
 using TrueLayer.Payouts;
 using TrueLayer.Payouts.Model;
@@ -126,7 +126,7 @@ public class PayoutsApiTests
         // Arrange
         var verification = new Verification(verifyName: true);
         var user = new PayoutUserRequest(name: "John Doe", email: "john@example.com");
-        var providerSelection = new Provider.UserSelected();
+        var providerSelection = new UserSelected();
         var beneficiary = new Beneficiary.UserDetermined(
             reference: "verified-payout-ref",
             user: user,

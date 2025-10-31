@@ -9,9 +9,9 @@ using PreselectedProviderSchemeSelectionUnion = OneOf<InstantOnly, InstantPrefer
 using UserSelectedProviderSchemeSelectionUnion = OneOf<InstantOnly, InstantPreferred, UserSelected>;
 
 /// <summary>
-/// Provider types
+/// Provider selection types for CREATE payment requests
 /// </summary>
-public static class Provider
+public static class CreateProviderSelection
 {
     /// <summary>
     /// Represents provider options that indicates that the provider is to be selected from a collection
@@ -30,22 +30,14 @@ public static class Provider
         public ProviderFilter? Filter { get; init; }
 
         /// <summary>
-        /// Gets the provider Id the PSU will selected for this payment
-        /// The field is populated only when a <see cref="GetPaymentResponse"/> is returned
-        /// </summary>
-        public string? ProviderId { get; init; }
-
-        /// <summary>
-        /// Gets the id of the scheme associated to the selected provider that was used to make the payment over.
-        /// The field is populated only when a <see cref="GetPaymentResponse"/> is returned
-        /// </summary>
-        [Obsolete("The field will be removed soon. Please start using the new <see cref=\"SchemeSelection\"/> field.", error: false)]
-        public string? SchemeId { get; init; }
-
-        /// <summary>
         /// Gets or inits the scheme selection preferred to make the payment.
         /// </summary>
         public UserSelectedProviderSchemeSelectionUnion? SchemeSelection { get; init; }
+
+        /// <summary>
+        /// Gets or inits the account details for the remitter
+        /// </summary>
+        public UserSelectedRemitterAccount? Remitter { get; init; }
     }
 
     /// <summary>
@@ -54,15 +46,14 @@ public static class Provider
     [JsonDiscriminator("preselected")]
     public record Preselected : IDiscriminated
     {
-        public Preselected(string providerId, string? schemeId = null, PreselectedProviderSchemeSelectionUnion? schemeSelection = null)
+        public Preselected(string providerId, PreselectedProviderSchemeSelectionUnion? schemeSelection = null)
         {
-            if (string.IsNullOrWhiteSpace(schemeId) && schemeSelection is null)
+            if (schemeSelection is null)
             {
-                throw new ArgumentException("Please specify either the SchemeId or the SchemeSelection option");
+                throw new ArgumentException("Please specify the SchemeSelection option", nameof(schemeSelection));
             }
 
             ProviderId = providerId.NotNull(nameof(providerId));
-            SchemeId = schemeId;
             SchemeSelection = schemeSelection;
         }
 
@@ -75,14 +66,6 @@ public static class Provider
         /// Gets the provider Id the PSU will use for this payment
         /// </summary>
         public string ProviderId { get; }
-
-        /// <summary>
-        /// Gets the id of the scheme to make the payment over
-        /// </summary>
-        [Obsolete(
-            "The field will be removed soon. Please start using the new <see cref=\"SchemeSelection\"/> field.",
-            error: false)]
-        public string? SchemeId { get; } = null;
 
         /// <summary>
         /// Gets or inits the account details for the remitter

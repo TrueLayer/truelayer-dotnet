@@ -5,6 +5,8 @@ using BenchmarkDotNet.Attributes;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
 using TrueLayer.Signing;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
+using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace TrueLayer.Benchmarks;
 
@@ -35,8 +37,8 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
         => new(
             100,
             Currencies.GBP,
-            new PaymentMethod.BankTransfer(
-                new Provider.UserSelected
+            new BankTransfer(
+                new UserSelected
                 {
                     Filter = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } }
                 },

@@ -7,6 +7,8 @@ using OneOf;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
+using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -28,7 +30,7 @@ public partial class PaymentTests
         var paymentResponse = await _fixture.TlClients[0].Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        PaymentMethod.BankTransfer bankTransfer = paymentRequest.PaymentMethod.AsT0;
+        BankTransfer bankTransfer = paymentRequest.PaymentMethod.AsT0;
         var authFlowRequest = new StartAuthorizationFlowRequest(
             bankTransfer.ProviderSelection,
             schemeSelection,
@@ -56,7 +58,7 @@ public partial class PaymentTests
         var userSelected = new SchemeSelection.UserSelected();
         yield return new object?[]
         {
-                CreateTestPaymentRequest(new Provider.UserSelected
+                CreateTestPaymentRequest(new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = instantOnlyWithRemitterFee,
@@ -67,7 +69,7 @@ public partial class PaymentTests
         };
         yield return new object?[]
         {
-                CreateTestPaymentRequest(new Provider.UserSelected
+                CreateTestPaymentRequest(new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = instantOnlyWithoutRemitterFee,
@@ -78,7 +80,7 @@ public partial class PaymentTests
 
         yield return new object?[]
         {
-                CreateTestPaymentRequest(new Provider.UserSelected
+                CreateTestPaymentRequest(new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = instantPreferredWithRemitterFee,
@@ -88,7 +90,7 @@ public partial class PaymentTests
         };
         yield return new object?[]
         {
-                CreateTestPaymentRequest(new Provider.UserSelected
+                CreateTestPaymentRequest(new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = instantPreferredWithoutRemitterFee,
@@ -98,7 +100,7 @@ public partial class PaymentTests
         };
         yield return new object?[]
         {
-                CreateTestPaymentRequest(new Provider.UserSelected
+                CreateTestPaymentRequest(new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = userSelected,
@@ -111,7 +113,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+                    new Preselected("mock-payments-gb-redirect", new SchemeSelection.Preselected { SchemeId = "faster_payments_service" })
                     {
                         Remitter = remitterSortAccountNumber,
                     },
@@ -121,7 +123,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected(
+                    new Preselected(
                         "mock-payments-gb-redirect",
                         schemeSelection: new SchemeSelection.Preselected() { SchemeId = "faster_payments_service"})
                     {
@@ -133,7 +135,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-gb-redirect", schemeSelection: userSelected)
+                    new Preselected("mock-payments-gb-redirect", schemeSelection: userSelected)
                     {
                         Remitter = remitterSortAccountNumber,
                     },
@@ -143,7 +145,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected(
+                    new Preselected(
                         "mock-payments-gb-redirect",
                         schemeSelection: instantOnlyWithRemitterFee)
                     {
@@ -155,7 +157,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected(
+                    new Preselected(
                         "mock-payments-gb-redirect",
                         schemeSelection: instantOnlyWithoutRemitterFee)
                     {
@@ -167,7 +169,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected(
+                    new Preselected(
                         "mock-payments-gb-redirect",
                         schemeSelection: instantPreferredWithRemitterFee)
                     {
@@ -179,7 +181,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected(
+                    new Preselected(
                         "mock-payments-gb-redirect",
                         schemeSelection: instantPreferredWithRemitterFee)
                     {
@@ -191,7 +193,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-fr-redirect", "sepa_credit_transfer_instant")
+                    new Preselected("mock-payments-fr-redirect", new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" })
                     {
                         Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606")),
                     },
@@ -203,14 +205,14 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service"),
+                    new Preselected("mock-payments-gb-redirect", new SchemeSelection.Preselected { SchemeId = "faster_payments_service" }),
                     sortCodeAccountNumber),
                 null,
         };
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-fr-redirect", "sepa_credit_transfer_instant"),
+                    new Preselected("mock-payments-fr-redirect", new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" }),
                     new AccountIdentifier.Iban("IT60X0542811101000000123456"),
                     Currencies.EUR),
                 null,
@@ -218,7 +220,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-pl-redirect", "polish_domestic_standard")
+                    new Preselected("mock-payments-pl-redirect", new SchemeSelection.Preselected { SchemeId = "polish_domestic_standard" })
                     {
                         Remitter = new RemitterAccount(
                             "John Doe", new AccountIdentifier.Nrb("12345678901234567890123456")),
@@ -230,7 +232,7 @@ public partial class PaymentTests
         yield return new object?[]
         {
                 CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-no-redirect", "norwegian_domestic_credit_transfer")
+                    new Preselected("mock-payments-no-redirect", new SchemeSelection.Preselected { SchemeId = "norwegian_domestic_credit_transfer" })
                     {
                         Remitter = new RemitterAccount(
                             "John Doe", new AccountIdentifier.Bban("12345678901234567890123456")),
