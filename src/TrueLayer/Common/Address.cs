@@ -7,18 +7,19 @@ public record Address
     /// </summary>
     public Address(
         string city,
-        string state,
+        string? state,
         string zip,
         string countryCode,
         string addressLine1,
         string? addressLine2 = null)
     {
         AddressLine1 = addressLine1.NotNullOrWhiteSpace(nameof(addressLine1));
-        AddressLine2 = addressLine2.NotEmptyOrWhiteSpace(nameof(addressLine2));
         City = city.NotNullOrWhiteSpace(nameof(city));
-        State = state.NotNullOrWhiteSpace(nameof(state));
         Zip = zip.NotNullOrWhiteSpace(nameof(zip));
         CountryCode = countryCode.NotNullOrWhiteSpace(nameof(countryCode));
+
+        AddressLine2 = addressLine2.NotEmptyOrWhiteSpace(nameof(addressLine2));
+        State = state.NotEmptyOrWhiteSpace(nameof(state));
     }
 
     /// <summary>
@@ -39,7 +40,7 @@ public record Address
     /// <summary>
     /// Gets the name of the country / stat.
     /// </summary>
-    public string State { get; }
+    public string? State { get; }
 
     /// <summary>
     /// Gets the zip code or postal code
