@@ -71,7 +71,7 @@ Task("SonarBegin")
                 Key = "TrueLayer_truelayer-dotnet",
                 Organization = "truelayer",
                 Url = "https://sonarcloud.io",
-                Exclusions = "test/**,examples/**,**/MvcExample/**,**/*.png,**/*.jpg,**/*.jpeg,**/*.gif,**/*.svg,**/*.ico,**/*.pem",
+                Exclusions = "test/**,examples/**,**/MvcExample/**,artifacts/**,**/*.png,**/*.jpg,**/*.jpeg,**/*.gif,**/*.svg,**/*.ico,**/*.pem",
                 OpenCoverReportsPath = $"{coveragePath}/*.xml",
                 Token = sonarToken,
                 VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
