@@ -28,6 +28,13 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
       - name: Restore tools
         run: dotnet tool restore
       - name: Run the build script
@@ -43,9 +50,23 @@ jobs:
           TrueLayer2__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer2__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
-          cake-version: 5.0.0
+          cake-version: 5.1.0
           target: CI
           verbosity: ${{ github.event.inputs.verbosity }}
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: artifacts/*.TestResults.xml
+          retention-days: 30
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: artifacts/*.TestResults.xml
+          check_name: Test Results
+          comment_mode: off
       - name: Upload pre-release packages
         uses: actions/upload-artifact@v4
         with:
