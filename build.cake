@@ -1,6 +1,5 @@
 // Install .NET Core Global tools.
 #tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.4.9"
-#tool "dotnet:?package=coveralls.net&version=4.0.1"
 #tool "dotnet:?package=dotnet-sonarscanner&version=11.0.0"
 
 // Install addins
@@ -71,7 +70,7 @@ Task("SonarBegin")
                 Key = "TrueLayer_truelayer-dotnet",
                 Organization = "truelayer",
                 Url = "https://sonarcloud.io",
-                Exclusions = "test/**,examples/**,**/MvcExample/**,artifacts/**,**/*.png,**/*.jpg,**/*.jpeg,**/*.gif,**/*.svg,**/*.ico,**/*.pem",
+                Exclusions = "test/**,examples/**,**/MvcExample/**,artifacts/**,docs/**,**/*.png,**/*.jpg,**/*.jpeg,**/*.gif,**/*.svg,**/*.ico,**/*.pem",
                 OpenCoverReportsPath = $"{coveragePath}/*.xml",
                 Token = sonarToken,
                 VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
