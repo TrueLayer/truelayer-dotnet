@@ -22,6 +22,7 @@ var packages = "./artifacts/*.nupkg";
 uint coverageThreshold = 50;
 
 var sonarToken = EnvironmentVariable("SONAR_TOKEN");
+var sonarStarted = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -64,6 +65,7 @@ Task("SonarBegin")
     {
         try
         {
+            Information("Starting SonarCloud analysis...");
             SonarBegin(new SonarBeginSettings
             {
                 Key = "TrueLayer_truelayer-dotnet",
@@ -74,11 +76,28 @@ Task("SonarBegin")
                 Token = sonarToken,
                 VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
             });
-            Information("SonarCloud analysis started successfully");
+
+            // Verify the config file was created
+            var configFile = ".sonarqube/conf/SonarQubeAnalysisConfig.xml";
+            if (FileExists(configFile))
+            {
+                sonarStarted = true;
+                Information("SonarCloud analysis started successfully - config file created");
+            }
+            else
+            {
+                sonarStarted = false;
+                Warning("SonarCloud analysis may not have started correctly - config file not found");
+            }
         }
         catch (Exception ex)
         {
+            sonarStarted = false;
             Warning($"SonarCloud analysis start failed (non-blocking): {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                Warning($"Inner exception: {ex.InnerException.Message}");
+            }
         }
     });
 
@@ -146,7 +165,7 @@ Task("GenerateReports")
     });
 
 Task("SonarEnd")
-    .WithCriteria(!string.IsNullOrEmpty(sonarToken))
+    .WithCriteria(() => sonarStarted)
     .ContinueOnError()
     .Does(() =>
     {
