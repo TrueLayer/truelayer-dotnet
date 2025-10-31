@@ -78,7 +78,6 @@ Task("SonarBegin")
                 ArgumentCustomization = args => args
                     .Append("/d:sonar.scm.disabled=true")
                     .Append("/d:sonar.scanner.skipJreProvisioning=true")
-                    .Append("/d:sonar.exclusions=**/test/**,**/examples/**,**/MvcExample/**")
             });
 
             // Verify the config file was created
