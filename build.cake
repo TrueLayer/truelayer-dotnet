@@ -77,6 +77,7 @@ Task("SonarBegin")
                 VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
                 ArgumentCustomization = args => args
                     .Append("/d:sonar.scm.disabled=true")
+                    .Append("/d:sonar.scanner.skipJreProvisioning=true")
             });
 
             // Verify the config file was created

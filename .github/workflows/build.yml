@@ -53,6 +53,20 @@ jobs:
           cake-version: 5.1.0
           target: CI
           verbosity: ${{ github.event.inputs.verbosity }}
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: artifacts/*.TestResults.xml
+          retention-days: 30
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: artifacts/*.TestResults.xml
+          check_name: Test Results
+          comment_mode: off
       - name: Upload pre-release packages
         uses: actions/upload-artifact@v4
         with:
