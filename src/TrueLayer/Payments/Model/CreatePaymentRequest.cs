@@ -22,6 +22,8 @@ public class CreatePaymentRequest
     /// <param name="relatedProducts">Related products</param>
     /// <param name="authorizationFlow">The authorization flow parameter.
     /// If provided, the start authorization flow endpoint does not need to be called</param>
+    /// <param name="hostedPage">Hosted page parameters for auto-constructed hosted page URI.
+    /// Cannot be provided if starting the authorization_flow explicitly.</param>
     /// <param name="metadata">Add to the payment a list of custom key-value pairs as metadata</param>
     /// <param name="riskAssessment">The risk assessment and the payment_creditable webhook configuration.</param>
     /// <param name="subMerchants">Sub-merchants information for the payment</param>
@@ -32,6 +34,7 @@ public class CreatePaymentRequest
         PaymentUserRequest? user = null,
         RelatedProducts? relatedProducts = null,
         StartAuthorizationFlowRequest? authorizationFlow = null,
+        HostedPageRequest? hostedPage = null,
         Dictionary<string, string>? metadata = null,
         RiskAssessment? riskAssessment = null,
         SubMerchants? subMerchants = null)
@@ -42,6 +45,7 @@ public class CreatePaymentRequest
         User = user;
         RelatedProducts = relatedProducts;
         AuthorizationFlow = authorizationFlow;
+        HostedPage = hostedPage;
         Metadata = metadata;
         RiskAssessment = riskAssessment;
         SubMerchants = subMerchants;
@@ -77,6 +81,11 @@ public class CreatePaymentRequest
     /// Gets the payments authorization flow request
     /// </summary>
     public StartAuthorizationFlowRequest? AuthorizationFlow { get; }
+
+    /// <summary>
+    /// Gets the hosted page parameters for auto-constructed hosted page URI
+    /// </summary>
+    public HostedPageRequest? HostedPage { get; }
 
     /// <summary>
     /// Gets the metadata for the payment

@@ -13,6 +13,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - New `CreatePayoutResponse.AuthorizationRequired` response type for verified payouts requiring authorization
   - Separate `GetPayoutBeneficiary` namespace for GET response types (distinct from CREATE request types)
   - Enhanced `OneOfJsonConverter` with `[DefaultJsonDiscriminator]` support for fallback deserialization
+- Added support for **Hosted Page** in Create Payment
+  - New `HostedPageRequest` model for configuring hosted payment page parameters (`ReturnUri`, `CountryCode`, `LanguageCode`, `MaxWaitForResult`)
+  - New `HostedPageResponse` model containing the auto-constructed hosted page URI
+  - Updated `CreatePaymentRequest` to accept `HostedPage` parameter
+  - Updated `CreatePaymentResponse.AuthorizationRequired` to include `HostedPage` property with the hosted page URI
 ### Changed
 - **BREAKING**: `CreatePayout` now returns `OneOf<AuthorizationRequired, Created>` instead of `CreatePayoutResponse`
   - Consumers must use `.Match()` to handle both response types

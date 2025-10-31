@@ -38,7 +38,14 @@ public static class CreatePaymentResponse
     /// Represents a payment that requires further authorization
     /// </summary>
     [JsonDiscriminator("authorization_required")]
-    public record AuthorizationRequired : PaymentDetails;
+    public record AuthorizationRequired : PaymentDetails
+    {
+        /// <summary>
+        /// Gets the hosted page response containing the URI to redirect the user.
+        /// Returned if the hosted_page object in the request body is populated.
+        /// </summary>
+        public HostedPageResponse? HostedPage { get; init; }
+    }
 
     /// <summary>
     /// Represents a payment that has been authorized by the end user
