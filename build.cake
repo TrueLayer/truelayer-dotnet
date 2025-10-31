@@ -4,6 +4,7 @@
 
 // Install addins
 #addin nuget:?package=Cake.Coverlet&version=5.1.1
+#addin nuget:?package=Cake.Sonar&version=5.0.0
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -18,6 +19,8 @@ var testFiles = "./test/**/*.csproj";
 var packages = "./artifacts/*.nupkg";
 
 uint coverageThreshold = 50;
+
+var sonarToken = EnvironmentVariable("SONAR_TOKEN");
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -51,6 +54,31 @@ Task("Clean")
     .Does(() =>
     {
         CleanDirectories(artifactsPath);
+    });
+
+Task("SonarBegin")
+    .WithCriteria(!string.IsNullOrEmpty(sonarToken))
+    .ContinueOnError()
+    .Does(() =>
+    {
+        try
+        {
+            SonarBegin(new SonarBeginSettings
+            {
+                Key = "TrueLayer_truelayer-dotnet",
+                Organization = "truelayer",
+                Url = "https://sonarcloud.io",
+                Exclusions = "test/**,examples/**",
+                OpenCoverReportsPath = $"{coveragePath}/*.xml",
+                Token = sonarToken,
+                VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
+            });
+            Information("SonarCloud analysis started successfully");
+        }
+        catch (Exception ex)
+        {
+            Warning($"SonarCloud analysis start failed (non-blocking): {ex.Message}");
+        }
     });
 
 Task("Build")
@@ -116,6 +144,25 @@ Task("GenerateReports")
         });
     });
 
+Task("SonarEnd")
+    .WithCriteria(!string.IsNullOrEmpty(sonarToken))
+    .ContinueOnError()
+    .Does(() =>
+    {
+        try
+        {
+            SonarEnd(new SonarEndSettings
+            {
+                Token = sonarToken
+            });
+            Information("SonarCloud analysis completed successfully");
+        }
+        catch (Exception ex)
+        {
+            Warning($"SonarCloud analysis end failed (non-blocking): {ex.Message}");
+        }
+    });
+
 Task("PublishPackages")
     .WithCriteria(() => BuildContext.ShouldPublishToNuget)
     .Does(() =>
@@ -140,7 +187,9 @@ Task("Default")
     .IsDependentOn("GenerateReports");
 
 Task("CI")
-    .IsDependentOn("Default");
+    .IsDependentOn("SonarBegin")
+    .IsDependentOn("Default")
+    .IsDependentOn("SonarEnd");
 
 Task("Publish")
     .IsDependentOn("CI")
