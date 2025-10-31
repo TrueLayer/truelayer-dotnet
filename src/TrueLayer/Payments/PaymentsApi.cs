@@ -39,12 +39,14 @@ internal class PaymentsApi : IPaymentsApi
     private readonly TrueLayerOptions _options;
     private readonly Uri _baseUri;
     private readonly IAuthApi _auth;
+    private readonly HppLinkBuilder _hppLinkBuilder;
 
     public PaymentsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
     {
         _apiClient = apiClient.NotNull(nameof(apiClient));
         _options = options.NotNull(nameof(options));
         _auth = auth.NotNull(nameof(auth));
+        _hppLinkBuilder = new HppLinkBuilder(options.Payments?.HppUri, options.UseSandbox ?? true);
 
         options.Payments.NotNull(nameof(options.Payments))!.Validate();
 
@@ -94,6 +96,10 @@ internal class PaymentsApi : IPaymentsApi
             cancellationToken: cancellationToken
         );
     }
+
+    /// <inheritdoc />
+    public string CreateHostedPaymentPageLink(string paymentId, string paymentToken, Uri returnUri)
+        => _hppLinkBuilder.Build(paymentId, paymentToken, returnUri);
 
     /// <inheritdoc />
     public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
