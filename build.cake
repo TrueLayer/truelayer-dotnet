@@ -71,13 +71,14 @@ Task("SonarBegin")
                 Key = "TrueLayer_truelayer-dotnet",
                 Organization = "truelayer",
                 Url = "https://sonarcloud.io",
-                Exclusions = "test/**,examples/**",
+                Exclusions = "test/**,examples/**,**/MvcExample/**",
                 OpenCoverReportsPath = $"{coveragePath}/*.xml",
                 Token = sonarToken,
                 VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
                 ArgumentCustomization = args => args
                     .Append("/d:sonar.scm.disabled=true")
                     .Append("/d:sonar.scanner.skipJreProvisioning=true")
+                    .Append("/d:sonar.exclusions=**/test/**,**/examples/**,**/MvcExample/**")
             });
 
             // Verify the config file was created
