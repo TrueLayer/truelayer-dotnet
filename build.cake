@@ -75,6 +75,8 @@ Task("SonarBegin")
                 OpenCoverReportsPath = $"{coveragePath}/*.xml",
                 Token = sonarToken,
                 VsTestReportsPath = $"{artifactsPath}/*.TestResults.xml",
+                ArgumentCustomization = args => args
+                    .Append("/d:sonar.scm.disabled=true")
             });
 
             // Verify the config file was created
