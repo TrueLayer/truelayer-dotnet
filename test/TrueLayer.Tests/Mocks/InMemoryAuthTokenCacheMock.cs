@@ -7,7 +7,7 @@ namespace TrueLayer.Tests.Mocks;
 
 public class InMemoryAuthTokenCacheMock : IAuthTokenCache
 {
-    private readonly Dictionary<string, ApiResponse<GetAuthTokenResponse>?> _dictionary = new();
+    private readonly Dictionary<string, ApiResponse<GetAuthTokenResponse>?> _dictionary = [];
 
     public bool TryGetValue(string key, out ApiResponse<GetAuthTokenResponse>? value) =>
         _dictionary.TryGetValue(key, out value);
