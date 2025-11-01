@@ -7,7 +7,7 @@ namespace TrueLayer.Tests.Payments;
 
 public class PaymentsOptionsTests
 {
-    private static Uri TestUri = new Uri("http://api.truelayer.com");
+    private static readonly Uri TestUri = new("http://api.truelayer.com");
 
     [Fact]
     public void Invalid_if_no_signing_key()

@@ -19,6 +19,8 @@ namespace TrueLayer.AcceptanceTests;
 public class PayoutTests : IClassFixture<ApiTestFixture>
 {
     private readonly ApiTestFixture _fixture;
+    private static readonly string[] MockProviderIds = ["mock"];
+    private static readonly string[] TransactionVerificationTokens = ["18db38", "Betropolis LTD", "LC Betropolis"];
 
     public PayoutTests(ApiTestFixture fixture)
     {
@@ -120,7 +122,7 @@ public class PayoutTests : IClassFixture<ApiTestFixture>
 
         var providerSelection = new Provider.UserSelected
         {
-            Filter = new ProviderFilter { ProviderIds = new[] { "mock" } }
+            Filter = new ProviderFilter { ProviderIds = MockProviderIds }
         };
 
         var beneficiary = new Beneficiary.UserDetermined(
@@ -178,7 +180,7 @@ public class PayoutTests : IClassFixture<ApiTestFixture>
         // For success: use tokens "18db38", "Betropolis LTD", or "LC Betropolis"
         // Amount: 1000 minor, Date: 1st-7th of any month
         var transactionSearchCriteria = new TransactionSearchCriteria(
-            tokens: new[] { "18db38", "Betropolis LTD", "LC Betropolis" },
+            tokens: TransactionVerificationTokens,
             amountInMinor: 1000,
             currency: Currencies.GBP,
             createdAt: new DateTime(2024, 1, 5)); // 5th of January
@@ -193,7 +195,7 @@ public class PayoutTests : IClassFixture<ApiTestFixture>
 
         var providerSelection = new Provider.UserSelected
         {
-            Filter = new ProviderFilter { ProviderIds = new[] { "mock" } }
+            Filter = new ProviderFilter { ProviderIds = MockProviderIds }
         };
 
         var beneficiary = new Beneficiary.UserDetermined(

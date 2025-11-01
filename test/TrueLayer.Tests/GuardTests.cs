@@ -16,7 +16,8 @@ public class GuardTests
     [Fact]
     public void Not_empty_or_whitespace_allows_null()
     {
-        _ = default(string?).NotEmptyOrWhiteSpace("value");
+        string? result = default(string?).NotEmptyOrWhiteSpace("value");
+        Assert.Null(result);
     }
 
     [Theory]
@@ -38,7 +39,10 @@ public class GuardTests
 
     [Fact]
     public void Greater_than_does_not_throw_if_greater_than_value()
-        => _ = 10.GreaterThan(5, "value");
+    {
+        int result = 10.GreaterThan(5, "value");
+        Assert.Equal(10, result);
+    }
 
     [Theory]
     [InlineData(null)]

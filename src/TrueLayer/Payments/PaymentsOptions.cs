@@ -27,12 +27,12 @@ public class PaymentsOptions : ApiOptions
             throw new ValidationException("The signing key is required");
         }
 
-        if (string.IsNullOrWhiteSpace(SigningKey?.KeyId))
+        if (string.IsNullOrWhiteSpace(SigningKey.KeyId))
         {
             throw new ValidationException("The signing key identifier is required");
         }
 
-        if (string.IsNullOrWhiteSpace(SigningKey?.PrivateKey))
+        if (string.IsNullOrWhiteSpace(SigningKey.PrivateKey))
         {
             throw new ValidationException("The signing key is required");
         }

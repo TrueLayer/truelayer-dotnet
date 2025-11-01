@@ -237,8 +237,10 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
             .Expect(HttpMethod.Get, "http://localhost/bad-request-error-details")
             .Respond(() =>
             {
-                var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
-                response.Content = new StringContent(json, Encoding.UTF8, "application/problem+json");
+                var response = new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent(json, Encoding.UTF8, "application/problem+json")
+                };
                 response.Headers.TryAddWithoutValidation(CustomHeaders.TraceId, "trace-id");
                 return Task.FromResult(response);
             });
@@ -342,7 +344,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
     private static void AssertSame(TestResponse? response, TestResponse expected)
     {
         response.Should().NotBeNull();
-        response!.FirstName.Should().Be(expected.FirstName);
+        response.FirstName.Should().Be(expected.FirstName);
         response.LastName.Should().Be(expected.LastName);
         response.Age.Should().Be(expected.Age);
     }
@@ -350,6 +352,7 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
     public void Dispose()
     {
         _httpMessageHandler.VerifyNoOutstandingExpectation();
+        GC.SuppressFinalize(this);
     }
 
     class TestResponse
@@ -358,6 +361,6 @@ WS1/11+TH1x/lgKckAws6sAzJLPtCUZLV4IZTb6ENg==
         public string LastName { get; set; } = null!;
         public int Age { get; set; }
 
-        public Dictionary<string, string> Headers { get; } = new();
+        public Dictionary<string, string> Headers { get; } = [];
     }
 }
