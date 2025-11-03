@@ -6,7 +6,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using RichardSzalay.MockHttp;
 using TrueLayer.Auth;
 using TrueLayer.Serialization;

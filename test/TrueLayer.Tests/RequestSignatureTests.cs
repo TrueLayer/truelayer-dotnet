@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Text.Json;
-using FluentAssertions;
+using AwesomeAssertions;
 using TrueLayer.Signing;
 using Xunit;
 

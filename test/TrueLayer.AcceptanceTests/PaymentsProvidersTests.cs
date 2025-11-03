@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using TrueLayer.PaymentsProviders.Model;
 using Xunit;
 using AuthorizationFlow = TrueLayer.PaymentsProviders.Model.AuthorizationFlow;
@@ -34,7 +34,7 @@ public class PaymentProvidersTests : IClassFixture<ApiTestFixture>
         response.Data.CountryCode.Should().NotBeNullOrWhiteSpace();
         response.Data.Capabilities.Payments?.BankTransfer.Should().NotBeNull();
         response.Data.Capabilities.Payments?.BankTransfer?.ReleaseChannel.Should().NotBeNullOrWhiteSpace();
-        response.Data.Capabilities.Payments?.BankTransfer?.Schemes.Count().Should().BeGreaterOrEqualTo(1);
+        response.Data.Capabilities.Payments?.BankTransfer?.Schemes.Count().Should().BeGreaterThanOrEqualTo(1);
     }
 
     [Fact]

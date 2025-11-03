@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using TrueLayer.Common;
 using TrueLayer.Payouts.Model;
 using Xunit;

@@ -1,6 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using TrueLayer.Auth;
 using TrueLayer.Models;
 using TrueLayer.Tests.Mocks;
