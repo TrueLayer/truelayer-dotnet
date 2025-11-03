@@ -4,7 +4,7 @@ using OneOf;
 using TrueLayer.Models;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;
-using PayoutBeneficiary = TrueLayer.Payouts.Model.Beneficiary;
+using PayoutBeneficiary = TrueLayer.Payouts.Model.GetPayoutBeneficiary;
 using static TrueLayer.MerchantAccounts.Model.MerchantAccountTransactions;
 
 namespace TrueLayer.MerchantAccounts.Model;
@@ -134,6 +134,7 @@ public static class MerchantAccountTransactions
     /// <inheritdoc cref="BaseTransactionPayout"/>
     /// <param name="ExecutedAt">The date and time the transaction was executed</param>
     /// <param name="ReturnedBy">Unique ID for the external payment that returned this payout</param>
+    /// <param name="SchemeId">The id of the scheme used to execute the payout</param>
     [JsonDiscriminator(Discriminator)]
     public sealed record ExecutedPayout(
         string Id,
@@ -145,7 +146,8 @@ public static class MerchantAccountTransactions
         PayoutBeneficiaryUnion Beneficiary,
         string ContextCode,
         string PayoutId,
-        string ReturnedBy)
+        string ReturnedBy,
+        string? SchemeId)
         : BaseTransactionPayout(
             Id,
             Currency,
@@ -171,6 +173,7 @@ public static class MerchantAccountTransactions
     /// <param name="RefundId">Unique ID for the refund</param>
     /// <param name="PaymentId">Unique ID for the payment</param>
     /// <param name="ReturnedBy">Unique ID for the external payment that returned this payout</param>
+    /// <param name="SchemeId">The id of the scheme used to execute the payout</param>
     [JsonDiscriminator(Discriminator)]
     public sealed record Refund(
         string Id,
@@ -183,7 +186,8 @@ public static class MerchantAccountTransactions
         string ContextCode,
         string RefundId,
         string PaymentId,
-        string ReturnedBy)
+        string ReturnedBy,
+        string? SchemeId)
         : BaseTransaction(
             Id,
             Currency,

@@ -2,17 +2,17 @@
 
 [![NuGet](https://img.shields.io/nuget/v/TrueLayer.Client.svg)](https://www.nuget.org/packages/TrueLayer.Client)
 [![NuGet](https://img.shields.io/nuget/dt/TrueLayer.Client.svg)](https://www.nuget.org/packages/TrueLayer.Client)
-[![License](https://img.shields.io/:license-mit-blue.svg)](https://truelayer.mit-license.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://truelayer.mit-license.org/)
 
 ![Build](https://github.com/TrueLayer/truelayer-dotnet/workflows/Build/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/TrueLayer/truelayer-dotnet/badge.svg?t=KxNahQ)](https://coveralls.io/github/TrueLayer/truelayer-dotnet)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=TrueLayer_truelayer-dotnet&metric=alert_status&token=98a2b0e3a6f70e0f4ad81d4a0aa23e04bcb19225)](https://sonarcloud.io/dashboard?id=TrueLayer_truelayer-dotnet)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=TrueLayer_truelayer-dotnet&metric=coverage&token=98a2b0e3a6f70e0f4ad81d4a0aa23e04bcb19225)](https://sonarcloud.io/summary/overall?id=TrueLayer_truelayer-dotnet)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=TrueLayer_truelayer-dotnet&metric=alert_status&token=98a2b0e3a6f70e0f4ad81d4a0aa23e04bcb19225)](https://sonarcloud.io/summary/overall?id=TrueLayer_truelayer-dotnet)
 
 
 
 The official [TrueLayer](https://truelayer.com) .NET client provides convenient access to TrueLayer APIs from applications built with .NET.
 
-The library currently supports .NET Standard 2.1, .NET 9.0 and .NET 8.0.
+The library currently supports .NET 9.0 and .NET 8.0.
 
 ## Installation
 
@@ -101,7 +101,7 @@ Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other
 
 ### Initialize TrueLayer.NET
 
-Register the TrueLayer client in `Startup.cs` or `Program.cs` (.NET 9.0/.NET 8.0/.NET 6.0):
+Register the TrueLayer client in `Startup.cs` or `Program.cs` (.NET 9.0/.NET 8.0):
 
 ```c#
 public IConfiguration Configuration { get; }
@@ -186,8 +186,8 @@ public class MyService
         var paymentRequest = new CreatePaymentRequest(
             amountInMinor: amount.ToMinorCurrencyUnit(2),
             currency: Currencies.GBP,
-            paymentMethod: new PaymentMethod.BankTransfer(
-                new Provider.UserSelected
+            paymentMethod: new CreatePaymentMethod.BankTransfer(
+                new CreateProviderSelection.UserSelected
                 {
                     Filter = new ProviderFilter
                     {

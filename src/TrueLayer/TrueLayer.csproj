@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net9.0;net8.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
         <RootNamespace>TrueLayer</RootNamespace>
         <AssemblyName>TrueLayer.Client</AssemblyName>
         <PackageId>TrueLayer.Client</PackageId>
         <Description>.NET client for the TrueLayer API</Description>
         <PackageIcon>icon.png</PackageIcon>
-        <LangVersion>10.0</LangVersion>
+        <LangVersion>12.0</LangVersion>
         <Authors>TrueLayer</Authors>
         <Company>TrueLayer</Company>
         <RepositoryUrl>https://github.com/TrueLayer/truelayer-dotnet</RepositoryUrl>
@@ -19,11 +19,6 @@
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1"/>
         <PackageReference Include="OneOf" Version="3.0.271"/>
         <PackageReference Include="TrueLayer.Signing" Version="0.1.15"/>
-    </ItemGroup>
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-        <PackageReference Include="System.Text.Json" Version="5.0.2"/>
-        <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
-        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     </ItemGroup>
     <ItemGroup>
         <None Include="..\shared\icon.png" Pack="true" PackagePath="\"/>

@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 
-namespace TrueLayer.PaymentsProviders.Model
-{
-    public record Capabilities(PaymentsCapabilities? Payments, MandatesCapabilities? Mandates);
+namespace TrueLayer.PaymentsProviders.Model;
 
-    public record PaymentsCapabilities(BankTransferCapabilities? BankTransfer);
+public record Capabilities(PaymentsCapabilities? Payments, MandatesCapabilities? Mandates);
 
-    public record MandatesCapabilities(VrpSweepingCapabilities? VrpSweeping, VrpCommercialCapabilities? VrpCommercial);
+public record PaymentsCapabilities(BankTransferCapabilities? BankTransfer);
 
-    public record BankTransferCapabilities(string ReleaseChannel, IEnumerable<Scheme> Schemes);
+public record MandatesCapabilities(VrpSweepingCapabilities? VrpSweeping, VrpCommercialCapabilities? VrpCommercial);
 
-    public record VrpSweepingCapabilities(string ReleaseChannel);
+public record BankTransferCapabilities(string ReleaseChannel, IEnumerable<Scheme> Schemes);
 
-    public record VrpCommercialCapabilities(string ReleaseChannel);
-}
+public record VrpSweepingCapabilities(string ReleaseChannel);
+
+public record VrpCommercialCapabilities(string ReleaseChannel);

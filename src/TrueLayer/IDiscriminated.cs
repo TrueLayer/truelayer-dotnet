@@ -1,7 +1,6 @@
-namespace TrueLayer
+namespace TrueLayer;
+
+internal interface IDiscriminated
 {
-    internal interface IDiscriminated
-    {
-        string Type { get; }
-    }
+    string Type { get; }
 }

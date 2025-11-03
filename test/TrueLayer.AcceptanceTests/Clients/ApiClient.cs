@@ -13,7 +13,7 @@ public class ApiClient
         _httpClient = httpClient;
     }
 
-    public async Task<HttpResponseMessage> SubmitPaymentsProviderReturnAsync(string query, string fragment)
+    public async Task SubmitPaymentsProviderReturnAsync(string query, string fragment)
     {
         var requestBody = new SubmitProviderReturnParametersRequest { Query = query, Fragment = fragment };
 
@@ -21,8 +21,8 @@ public class ApiClient
         {
             Content = JsonContent.Create(requestBody)
         };
-        var response = await _httpClient.SendAsync(request);
-        return response;
+
+        await _httpClient.SendAsync(request);
     }
 }
 
