@@ -109,10 +109,7 @@ internal class PaymentsApi : IPaymentsApi
         CancellationToken cancellationToken = default)
     {
         paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-
         paymentId.NotAUrl(nameof(paymentId));
-        idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-            
         request.NotNull(nameof(request));
 
         var authResponse = await _auth.GetAuthToken(
@@ -214,9 +211,7 @@ internal class PaymentsApi : IPaymentsApi
         CancellationToken cancellationToken = default)
     {
         paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-
         paymentId.NotAUrl(nameof(paymentId));
-        idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
 
         var authResponse = await _auth.GetAuthToken(
             new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
