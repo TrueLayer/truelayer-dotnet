@@ -1,5 +1,5 @@
 using System.Text.Json;
-using FluentAssertions;
+using AwesomeAssertions;
 using OneOf;
 using TrueLayer.Payments.Model;
 using TrueLayer.Serialization;

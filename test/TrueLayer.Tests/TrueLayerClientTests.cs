@@ -1,6 +1,6 @@
 using System;
 using System.Net.Http;
-using FluentAssertions;
+using AwesomeAssertions;
 using TrueLayer.Payments;
 using TrueLayer.Tests.Mocks;
 using Xunit;
