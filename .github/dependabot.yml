@@ -10,6 +10,11 @@ updates:
     labels:
       - "dependencies"
       - "nuget"
+    ignore:
+      # Block major version updates for production dependencies only
+      - dependency-name: "*"
+        dependency-type: "production"
+        update-types: ["version-update:semver-major"]
     groups:
       production-dependencies:
         dependency-type: "production"
@@ -19,6 +24,7 @@ updates:
       development-dependencies:
         dependency-type: "development"
         update-types:
+          - "major"
           - "minor"
           - "patch"
 
