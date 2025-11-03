@@ -8,7 +8,7 @@ using TrueLayer.Payouts.Model;
 using Xunit;
 using Beneficiary = TrueLayer.Payouts.Model.CreatePayoutBeneficiary;
 using static TrueLayer.Payouts.Model.GetPayoutsResponse;
-using Provider = TrueLayer.Payments.Model.Provider;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
 using ProviderFilter = TrueLayer.Payments.Model.ProviderFilter;
 using PayoutVerification = TrueLayer.Payouts.Model.Verification;
 using PayoutSchemeSelection = TrueLayer.Payouts.Model.SchemeSelection;
@@ -120,7 +120,7 @@ public class PayoutTests : IClassFixture<ApiTestFixture>
             name: "John Doe",
             email: "john.doe@example.com");
 
-        var providerSelection = new Provider.UserSelected
+        var providerSelection = new UserSelected
         {
             Filter = new ProviderFilter { ProviderIds = MockProviderIds }
         };
@@ -193,7 +193,7 @@ public class PayoutTests : IClassFixture<ApiTestFixture>
             name: "John Doe",
             email: "john.doe@example.com");
 
-        var providerSelection = new Provider.UserSelected
+        var providerSelection = new UserSelected
         {
             Filter = new ProviderFilter { ProviderIds = MockProviderIds }
         };
@@ -255,9 +255,9 @@ public class PayoutTests : IClassFixture<ApiTestFixture>
             email: "jane.smith@example.com",
             phone: "+442079460087");
 
-        var providerSelection = new Provider.Preselected(
+        var providerSelection = new Preselected(
             providerId: "mock",
-            schemeId: "faster_payments_service");
+            schemeSelection: new Payments.Model.SchemeSelection.Preselected { SchemeId = "faster_payments_service" });
 
         var beneficiary = new Beneficiary.UserDetermined(
             reference: "verified-payout-preselected",

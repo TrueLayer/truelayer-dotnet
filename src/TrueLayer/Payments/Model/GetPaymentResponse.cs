@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using OneOf;
 using TrueLayer.Serialization;
-using static TrueLayer.Payments.Model.PaymentMethod;
+using static TrueLayer.Payments.Model.GetPaymentMethod;
 
 namespace TrueLayer.Payments.Model;
 
-using PaymentMethodUnion = OneOf<BankTransfer, Mandate>;
+using GetPaymentMethodUnion = OneOf<BankTransfer, Mandate>;
 
 /// <summary>
 /// Get Payment Response Types
@@ -49,7 +49,7 @@ public static class GetPaymentResponse
         /// <summary>
         /// Gets the payment method details
         /// </summary>
-        public PaymentMethodUnion PaymentMethod { get; init; }
+        public GetPaymentMethodUnion PaymentMethod { get; init; }
 
         /// <summary>
         /// Gets the end user details

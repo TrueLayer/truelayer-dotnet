@@ -2,6 +2,7 @@ using OneOf;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Payments.Model;
 using Xunit;
+using static TrueLayer.Mandates.Model.CreateProviderSelection;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -11,7 +12,7 @@ using AccountIdentifierUnion = OneOf<
     AccountIdentifier.Bban,
     AccountIdentifier.Nrb>;
 using MandateUnion = OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>;
-using ProviderUnion = OneOf<Payments.Model.Provider.UserSelected, Mandates.Model.Provider.Preselected>;
+using ProviderUnion = OneOf<UserSelected, Preselected>;
 
 public static class MandatesTestCases
 {
@@ -22,7 +23,7 @@ public static class MandatesTestCases
         new(
             RequestBuilders.CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
                 "sweeping",
-                ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", ProviderId)),
+                ProviderUnion.FromT1(new Preselected(ProviderId)),
                 new Mandates.Model.Beneficiary.ExternalAccount(
                     "external_account",
                     "Bob NET SDK",
@@ -32,7 +33,7 @@ public static class MandatesTestCases
         new(
             RequestBuilders.CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
                 "commercial",
-                ProviderUnion.FromT1(new Mandates.Model.Provider.Preselected("preselected", ProviderId)),
+                ProviderUnion.FromT1(new Preselected(ProviderId)),
                 new Mandates.Model.Beneficiary.ExternalAccount(
                     "external_account",
                     "My Bank Account",
@@ -42,7 +43,7 @@ public static class MandatesTestCases
         new(
             RequestBuilders.CreateTestMandateRequest(MandateUnion.FromT1(new Mandate.VRPSweepingMandate(
                 "sweeping",
-                ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
+                ProviderUnion.FromT0(new UserSelected
                 {
                     Filter = new ProviderFilter { Countries = ["GB"], ReleaseChannel = ReleaseChannels.PrivateBeta },
                 }),
@@ -55,7 +56,7 @@ public static class MandatesTestCases
         new(
             RequestBuilders.CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
                 "commercial",
-                ProviderUnion.FromT0(new Payments.Model.Provider.UserSelected
+                ProviderUnion.FromT0(new UserSelected
                 {
                     Filter = new ProviderFilter { Countries = ["GB"], ReleaseChannel = ReleaseChannels.PrivateBeta },
                 }),

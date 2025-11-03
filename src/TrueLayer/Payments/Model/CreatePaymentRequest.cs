@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using OneOf;
 using TrueLayer.Payments.Model.AuthorizationFlow;
-using static TrueLayer.Payments.Model.PaymentMethod;
+using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace TrueLayer.Payments.Model;
 
-using PaymentMethodUnion = OneOf<BankTransfer, Mandate>;
+using CreatePaymentMethodUnion = OneOf<BankTransfer, Mandate>;
 
 /// <summary>
 /// Represents a request for payment
@@ -30,7 +30,7 @@ public class CreatePaymentRequest
     public CreatePaymentRequest(
         long amountInMinor,
         string currency,
-        PaymentMethodUnion paymentMethod,
+        CreatePaymentMethodUnion paymentMethod,
         PaymentUserRequest? user = null,
         RelatedProducts? relatedProducts = null,
         StartAuthorizationFlowRequest? authorizationFlow = null,
@@ -65,7 +65,7 @@ public class CreatePaymentRequest
     /// <summary>
     /// Gets the method of payment
     /// </summary>
-    public PaymentMethodUnion PaymentMethod { get; }
+    public CreatePaymentMethodUnion PaymentMethod { get; }
 
     /// <summary>
     /// Gets the end user details
