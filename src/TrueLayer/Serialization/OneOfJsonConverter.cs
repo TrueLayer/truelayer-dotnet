@@ -87,35 +87,55 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
             if (reader.TokenType == JsonTokenType.PropertyName)
             {
                 propertyCount++;
-
-                // Once we have both discriminators, skip all remaining properties
-                if (discriminatorValue != null && statusValue != null)
-                {
-                    reader.Read();
-                    reader.TrySkip();
-                    continue;
-                }
-
-                if (reader.ValueTextEquals(discriminatorFieldName))
-                {
-                    reader.Read();
-                    discriminatorValue = reader.TokenType == JsonTokenType.String ? reader.GetString() : null;
-                }
-                else if (reader.ValueTextEquals("status"))
-                {
-                    reader.Read();
-                    statusValue = reader.TokenType == JsonTokenType.String ? reader.GetString() : null;
-                }
-                else
-                {
-                    // Skip other properties
-                    reader.Read();
-                    reader.TrySkip();
-                }
+                ProcessProperty(ref reader, discriminatorFieldName, ref discriminatorValue, ref statusValue);
             }
         }
 
         return (discriminatorValue, statusValue, propertyCount == 0);
+    }
+
+    private static void ProcessProperty(
+        ref Utf8JsonReader reader,
+        string discriminatorFieldName,
+        ref string? discriminatorValue,
+        ref string? statusValue)
+    {
+        // Once we have both discriminators, skip all remaining properties
+        if (BothDiscriminatorsFound(discriminatorValue, statusValue))
+        {
+            SkipPropertyValue(ref reader);
+            return;
+        }
+
+        if (reader.ValueTextEquals(discriminatorFieldName))
+        {
+            discriminatorValue = ReadStringPropertyValue(ref reader);
+        }
+        else if (reader.ValueTextEquals("status"))
+        {
+            statusValue = ReadStringPropertyValue(ref reader);
+        }
+        else
+        {
+            SkipPropertyValue(ref reader);
+        }
+    }
+
+    private static bool BothDiscriminatorsFound(string? discriminatorValue, string? statusValue)
+    {
+        return discriminatorValue != null && statusValue != null;
+    }
+
+    private static string? ReadStringPropertyValue(ref Utf8JsonReader reader)
+    {
+        reader.Read();
+        return reader.TokenType == JsonTokenType.String ? reader.GetString() : null;
+    }
+
+    private static void SkipPropertyValue(ref Utf8JsonReader reader)
+    {
+        reader.Read();
+        reader.TrySkip();
     }
 
     private static T InvokeDiscriminatorFactory(JsonSerializerOptions options, Utf8JsonReader readerClone,

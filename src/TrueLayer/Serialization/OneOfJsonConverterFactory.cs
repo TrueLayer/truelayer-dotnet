@@ -17,7 +17,7 @@ internal sealed class OneOfJsonConverterFactory : JsonConverterFactory
         return typeof(IOneOf).IsAssignableFrom(typeToConvert);
     }
 
-    public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions _)
+    public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
         return ConverterCache.GetOrAdd(typeToConvert, CreateConverterForType);
     }
@@ -34,12 +34,7 @@ internal sealed class OneOfJsonConverterFactory : JsonConverterFactory
             BindingFlags.Public | BindingFlags.Instance,
             null,
             [typeof(OneOfTypeDescriptor), typeof(string)],
-            null);
-
-        if (constructor == null)
-        {
-            throw new InvalidOperationException($"Could not find constructor for {converterType.FullName}");
-        }
+            null) ?? throw new InvalidOperationException($"Could not find constructor for {converterType.FullName}");
 
         // Use compiled expression instead of Activator.CreateInstance for better performance
         var descriptorParam = Expression.Constant(descriptor, typeof(OneOfTypeDescriptor));
