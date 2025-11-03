@@ -101,7 +101,7 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
         ref string? statusValue)
     {
         // Once we have both discriminators, skip all remaining properties
-        if (BothDiscriminatorsFound(discriminatorValue, statusValue))
+        if (discriminatorValue != null && statusValue != null)
         {
             SkipPropertyValue(ref reader);
             return;
@@ -119,11 +119,6 @@ internal sealed class OneOfJsonConverter<T> : JsonConverter<T> where T : IOneOf
         {
             SkipPropertyValue(ref reader);
         }
-    }
-
-    private static bool BothDiscriminatorsFound(string? discriminatorValue, string? statusValue)
-    {
-        return discriminatorValue != null && statusValue != null;
     }
 
     private static string? ReadStringPropertyValue(ref Utf8JsonReader reader)
