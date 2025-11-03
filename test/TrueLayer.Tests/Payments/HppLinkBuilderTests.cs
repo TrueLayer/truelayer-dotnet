@@ -1,5 +1,5 @@
 using System;
-using FluentAssertions;
+using AwesomeAssertions;
 using TrueLayer.Payments;
 using TrueLayer.Payments.Model;
 using Xunit;

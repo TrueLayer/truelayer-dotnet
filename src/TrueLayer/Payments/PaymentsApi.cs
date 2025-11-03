@@ -9,221 +9,223 @@ using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using StartAuthorizationFlowRequest = TrueLayer.Payments.Model.AuthorizationFlow.StartAuthorizationFlowRequest;
 
-namespace TrueLayer.Payments
+namespace TrueLayer.Payments;
+
+using AuthorizationResponseUnion = OneOf<
+    AuthorizationFlowResponse.AuthorizationFlowAuthorizing,
+    AuthorizationFlowResponse.AuthorizationFlowAuthorizationFailed
+>;
+using CreatePaymentUnion = OneOf<
+    CreatePaymentResponse.AuthorizationRequired,
+    CreatePaymentResponse.Authorized,
+    CreatePaymentResponse.Failed,
+    CreatePaymentResponse.Authorizing
+>;
+using GetPaymentUnion = OneOf<
+    GetPaymentResponse.AuthorizationRequired,
+    GetPaymentResponse.Authorizing,
+    GetPaymentResponse.Authorized,
+    GetPaymentResponse.Executed,
+    GetPaymentResponse.Settled,
+    GetPaymentResponse.Failed,
+    GetPaymentResponse.AttemptFailed
+>;
+
+using RefundUnion = OneOf<RefundPending, RefundAuthorized, RefundExecuted, RefundFailed>;
+
+internal class PaymentsApi : IPaymentsApi
 {
-    using AuthorizationResponseUnion = OneOf<
-        AuthorizationFlowResponse.AuthorizationFlowAuthorizing,
-        AuthorizationFlowResponse.AuthorizationFlowAuthorizationFailed
-    >;
-    using CreatePaymentUnion = OneOf<
-        CreatePaymentResponse.AuthorizationRequired,
-        CreatePaymentResponse.Authorized,
-        CreatePaymentResponse.Failed,
-        CreatePaymentResponse.Authorizing
-    >;
-    using GetPaymentUnion = OneOf<
-        GetPaymentResponse.AuthorizationRequired,
-        GetPaymentResponse.Authorizing,
-        GetPaymentResponse.Authorized,
-        GetPaymentResponse.Executed,
-        GetPaymentResponse.Settled,
-        GetPaymentResponse.Failed,
-        GetPaymentResponse.AttemptFailed
-    >;
+    private readonly IApiClient _apiClient;
+    private readonly TrueLayerOptions _options;
+    private readonly Uri _baseUri;
+    private readonly IAuthApi _auth;
+    private readonly HppLinkBuilder _hppLinkBuilder;
 
-    using RefundUnion = OneOf<RefundPending, RefundAuthorized>;
-
-    internal class PaymentsApi : IPaymentsApi
+    public PaymentsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
     {
-        private readonly IApiClient _apiClient;
-        private readonly TrueLayerOptions _options;
-        private readonly Uri _baseUri;
-        private readonly IAuthApi _auth;
-        private readonly HppLinkBuilder _hppLinkBuilder;
+        _apiClient = apiClient.NotNull(nameof(apiClient));
+        _options = options.NotNull(nameof(options));
+        _auth = auth.NotNull(nameof(auth));
+        _hppLinkBuilder = new HppLinkBuilder(options.Payments?.HppUri, options.UseSandbox ?? true);
 
-        public PaymentsApi(IApiClient apiClient, IAuthApi auth, TrueLayerOptions options)
+        options.Payments.NotNull(nameof(options.Payments))!.Validate();
+
+        _baseUri = options.GetApiBaseUri()
+            .Append(PaymentsEndpoints.V3Payments);
+    }
+
+    /// <inheritdoc />
+    public async Task<ApiResponse<CreatePaymentUnion>> CreatePayment(CreatePaymentRequest paymentRequest, string? idempotencyKey = null, CancellationToken cancellationToken = default)
+    {
+        paymentRequest.NotNull(nameof(paymentRequest));
+
+        var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+
+        if (!authResponse.IsSuccessful)
         {
-            _apiClient = apiClient.NotNull(nameof(apiClient));
-            _options = options.NotNull(nameof(options));
-            _auth = auth.NotNull(nameof(auth));
-            _hppLinkBuilder = new HppLinkBuilder(options.Payments?.HppUri, options.UseSandbox ?? true);
-
-            options.Payments.NotNull(nameof(options.Payments))!.Validate();
-
-            _baseUri = options.GetApiBaseUri()
-                .Append(PaymentsEndpoints.V3Payments);
+            return new(authResponse.StatusCode, authResponse.TraceId);
         }
 
-        /// <inheritdoc />
-        public async Task<ApiResponse<CreatePaymentUnion>> CreatePayment(CreatePaymentRequest paymentRequest, string idempotencyKey, CancellationToken cancellationToken = default)
+        return await _apiClient.PostAsync<CreatePaymentUnion>(
+            _baseUri,
+            paymentRequest,
+            idempotencyKey ?? Guid.NewGuid().ToString(),
+            authResponse.Data!.AccessToken,
+            _options.Payments!.SigningKey,
+            cancellationToken
+        );
+    }
+
+
+    /// <inheritdoc />
+    public async Task<ApiResponse<GetPaymentUnion>> GetPayment(string id, CancellationToken cancellationToken = default)
+    {
+        id.NotNullOrWhiteSpace(nameof(id));
+        id.NotAUrl(nameof(id));
+
+        var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+
+        if (!authResponse.IsSuccessful)
         {
-            paymentRequest.NotNull(nameof(paymentRequest));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-
-            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.PostAsync<CreatePaymentUnion>(
-                _baseUri,
-                paymentRequest,
-                idempotencyKey,
-                authResponse.Data!.AccessToken,
-                _options.Payments!.SigningKey,
-                cancellationToken
-            );
+            return new(authResponse.StatusCode, authResponse.TraceId);
         }
 
+        return await _apiClient.GetAsync<GetPaymentUnion>(
+            _baseUri.Append(id),
+            authResponse.Data!.AccessToken,
+            cancellationToken: cancellationToken
+        );
+    }
 
-        /// <inheritdoc />
-        public async Task<ApiResponse<GetPaymentUnion>> GetPayment(string id, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public string CreateHostedPaymentPageLink(string paymentId, string paymentToken, Uri returnUri)
+        => _hppLinkBuilder.Build(paymentId, paymentToken, returnUri);
+
+    /// <inheritdoc />
+    public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
+        string paymentId,
+        string? idempotencyKey,
+        StartAuthorizationFlowRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+        paymentId.NotAUrl(nameof(paymentId));
+        request.NotNull(nameof(request));
+
+        var authResponse = await _auth.GetAuthToken(
+            new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+
+        if (!authResponse.IsSuccessful)
         {
-            id.NotNullOrWhiteSpace(nameof(id));
-            id.NotAUrl(nameof(id));
-
-            var authResponse = await _auth.GetAuthToken(new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.GetAsync<GetPaymentUnion>(
-                _baseUri.Append(id),
-                authResponse.Data!.AccessToken,
-                cancellationToken: cancellationToken
-            );
+            return new(authResponse.StatusCode, authResponse.TraceId);
         }
 
-        /// <inheritdoc />
-        public string CreateHostedPaymentPageLink(string paymentId, string paymentToken, Uri returnUri)
-            => _hppLinkBuilder.Build(paymentId, paymentToken, returnUri);
+        return await _apiClient.PostAsync<AuthorizationResponseUnion>(
+            _baseUri.Append(paymentId).Append(PaymentsEndpoints.AuthorizationFlow),
+            request,
+            idempotencyKey ?? Guid.NewGuid().ToString(),
+            authResponse.Data!.AccessToken,
+            _options.Payments!.SigningKey,
+            cancellationToken
+        );
+    }
 
-        /// <inheritdoc />
-        public async Task<ApiResponse<AuthorizationResponseUnion>> StartAuthorizationFlow(
-            string paymentId,
-            string idempotencyKey,
-            StartAuthorizationFlowRequest request,
-            CancellationToken cancellationToken = default)
+    public async Task<ApiResponse<CreatePaymentRefundResponse>> CreatePaymentRefund(
+        string paymentId,
+        string? idempotencyKey,
+        CreatePaymentRefundRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+        paymentId.NotAUrl(nameof(paymentId));
+        request.NotNull(nameof(request));
+
+        var authResponse = await _auth.GetAuthToken(
+            new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+
+        if (!authResponse.IsSuccessful)
         {
-            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            paymentId.NotAUrl(nameof(paymentId));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-            request.NotNull(nameof(request));
-
-            var authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.PostAsync<AuthorizationResponseUnion>(
-                _baseUri.Append(paymentId).Append(PaymentsEndpoints.AuthorizationFlow),
-                request,
-                idempotencyKey,
-                authResponse.Data!.AccessToken,
-                _options.Payments!.SigningKey,
-                cancellationToken
-            );
+            return new(authResponse.StatusCode, authResponse.TraceId);
         }
 
-        public async Task<ApiResponse<CreatePaymentRefundResponse>> CreatePaymentRefund(string paymentId,
-            string idempotencyKey, CreatePaymentRefundRequest request, CancellationToken cancellationToken = default)
+        return await _apiClient.PostAsync<CreatePaymentRefundResponse>(
+            _baseUri.Append(paymentId).Append(PaymentsEndpoints.Refunds),
+            request,
+            idempotencyKey ?? Guid.NewGuid().ToString(),
+            authResponse.Data!.AccessToken,
+            _options.Payments!.SigningKey,
+            cancellationToken
+        );
+    }
+
+    public async Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(
+        string paymentId,
+        CancellationToken cancellationToken = default)
+    {
+        paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+        paymentId.NotAUrl(nameof(paymentId));
+
+        var authResponse = await _auth.GetAuthToken(
+            new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+
+        if (!authResponse.IsSuccessful)
         {
-            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            paymentId.NotAUrl(nameof(paymentId));
-            request.NotNull(nameof(request));
-
-            var authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.PostAsync<CreatePaymentRefundResponse>(
-                _baseUri.Append(paymentId).Append(PaymentsEndpoints.Refunds),
-                request,
-                idempotencyKey,
-                authResponse.Data!.AccessToken,
-                _options.Payments!.SigningKey,
-                cancellationToken
-            );
+            return new(authResponse.StatusCode, authResponse.TraceId);
         }
 
-        public async Task<ApiResponse<ListPaymentRefundsResponse>> ListPaymentRefunds(
-            string paymentId,
-            CancellationToken cancellationToken = default)
+        return await _apiClient.GetAsync<ListPaymentRefundsResponse>(
+            _baseUri.Append(paymentId).Append(PaymentsEndpoints.Refunds),
+            authResponse.Data!.AccessToken,
+            cancellationToken: cancellationToken
+        );
+    }
+
+    public async Task<ApiResponse<RefundUnion>> GetPaymentRefund(
+        string paymentId,
+        string refundId,
+        CancellationToken cancellationToken = default)
+    {
+        paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+        paymentId.NotAUrl(nameof(paymentId));
+        refundId.NotNullOrWhiteSpace(nameof(refundId));
+        refundId.NotAUrl(nameof(refundId));
+
+        var authResponse = await _auth.GetAuthToken(
+            new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+
+        if (!authResponse.IsSuccessful)
         {
-            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            paymentId.NotAUrl(nameof(paymentId));
-
-            var authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.GetAsync<ListPaymentRefundsResponse>(
-                _baseUri.Append(paymentId).Append(PaymentsEndpoints.Refunds),
-                authResponse.Data!.AccessToken,
-                cancellationToken: cancellationToken
-            );
+            return new(authResponse.StatusCode, authResponse.TraceId);
         }
 
-        public async Task<ApiResponse<RefundUnion>> GetPaymentRefund(
-            string paymentId,
-            string refundId,
-            CancellationToken cancellationToken = default)
+        return await _apiClient.GetAsync<RefundUnion>(
+            _baseUri.Append(paymentId).Append(PaymentsEndpoints.Refunds).Append(refundId),
+            authResponse.Data!.AccessToken,
+            cancellationToken: cancellationToken
+        );
+    }
+
+    public async Task<ApiResponse> CancelPayment(
+        string paymentId,
+        string? idempotencyKey = null,
+        CancellationToken cancellationToken = default)
+    {
+        paymentId.NotNullOrWhiteSpace(nameof(paymentId));
+        paymentId.NotAUrl(nameof(paymentId));
+
+        var authResponse = await _auth.GetAuthToken(
+            new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
+
+        if (!authResponse.IsSuccessful)
         {
-            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            paymentId.NotAUrl(nameof(paymentId));
-            refundId.NotNullOrWhiteSpace(nameof(refundId));
-            refundId.NotAUrl(nameof(refundId));
-
-            var authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.GetAsync<RefundUnion>(
-                _baseUri.Append(paymentId).Append(PaymentsEndpoints.Refunds).Append(refundId),
-                authResponse.Data!.AccessToken,
-                cancellationToken: cancellationToken
-            );
+            return new ApiResponse(authResponse.StatusCode, authResponse.TraceId);
         }
 
-        public async Task<ApiResponse> CancelPayment(string paymentId, string idempotencyKey, CancellationToken cancellationToken = default)
-        {
-            paymentId.NotNullOrWhiteSpace(nameof(paymentId));
-            paymentId.NotAUrl(nameof(paymentId));
-            idempotencyKey.NotNullOrWhiteSpace(nameof(idempotencyKey));
-
-            var authResponse = await _auth.GetAuthToken(
-                new GetAuthTokenRequest(AuthorizationScope.Payments), cancellationToken);
-
-            if (!authResponse.IsSuccessful)
-            {
-                return new ApiResponse(authResponse.StatusCode, authResponse.TraceId);
-            }
-
-            return await _apiClient.PostAsync(
-                _baseUri.Append(paymentId).Append(PaymentsEndpoints.Cancel),
-                idempotencyKey: idempotencyKey,
-                accessToken: authResponse.Data!.AccessToken,
-                signingKey: _options.Payments!.SigningKey,
-                cancellationToken: cancellationToken);
-        }
+        return await _apiClient.PostAsync(
+            _baseUri.Append(paymentId).Append(PaymentsEndpoints.Cancel),
+            idempotencyKey: idempotencyKey ?? Guid.NewGuid().ToString(),
+            accessToken: authResponse.Data!.AccessToken,
+            signingKey: _options.Payments!.SigningKey,
+            cancellationToken: cancellationToken);
     }
 }

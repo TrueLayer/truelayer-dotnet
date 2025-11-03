@@ -11,7 +11,7 @@ public class AddressTests
     [InlineData(" ")]
     public void New_address_throws_if_address_line_1_empty_or_whitespace(string addressLine1)
     {
-        Assert.Throws<ArgumentException>("addressLine1",
+        Assert.Throws<ArgumentException>(nameof(addressLine1),
             () => new Address("city", "state", "country Code", "zip", addressLine1));
     }
 
@@ -20,7 +20,7 @@ public class AddressTests
     [InlineData(" ")]
     public void New_address_throws_if_city_is_empty_or_whitespace(string city)
     {
-        Assert.Throws<ArgumentException>("city",
+        Assert.Throws<ArgumentException>(nameof(city),
             () => new Address(city, "state", "zip", "country Code", "addressLine1"));
     }
 
@@ -29,7 +29,7 @@ public class AddressTests
     [InlineData(" ")]
     public void New_address_throws_if_state_is_empty_or_whitespace(string state)
     {
-        Assert.Throws<ArgumentException>("state",
+        Assert.Throws<ArgumentException>(nameof(state),
             () => new Address("city", state, "zip", "country Code", "addressLine1"));
     }
 
@@ -43,7 +43,7 @@ public class AddressTests
     [InlineData(" ")]
     public void New_address_throws_if_zip_is_empty_or_whitespace(string zip)
     {
-        Assert.Throws<ArgumentException>("zip",
+        Assert.Throws<ArgumentException>(nameof(zip),
             () => new Address("city", "state", zip, "country Code", "addressLine1"));
     }
 
@@ -52,7 +52,7 @@ public class AddressTests
     [InlineData(" ")]
     public void New_address_throws_if_country_code_is_empty_or_whitespace(string countryCode)
     {
-        Assert.Throws<ArgumentException>("countryCode",
+        Assert.Throws<ArgumentException>(nameof(countryCode),
             () => new Address("city", "state", "zip", countryCode, "addressLine1"));
     }
 
@@ -61,7 +61,7 @@ public class AddressTests
     [InlineData(" ")]
     public void New_address_throws_if_address_line_2_is_empty_or_whitespace(string addressLine2)
     {
-        Assert.Throws<ArgumentException>("addressLine2",
+        Assert.Throws<ArgumentException>(nameof(addressLine2),
             () => new Address("city", "state", "zip", "countryCode", "addressLine1", addressLine2));
     }
 

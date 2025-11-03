@@ -1,7 +1,6 @@
-namespace TrueLayer.Auth
+namespace TrueLayer.Auth;
+
+internal static class AuthEndpoints
 {
-    internal static class AuthEndpoints
-    {
-        internal const string Token = "connect/token";
-    }
+    internal const string Token = "connect/token";
 }

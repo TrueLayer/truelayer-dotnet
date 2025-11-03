@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using OneOf;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Payments.Model;
+using PaymentMandate = TrueLayer.Payments.Model.CreatePaymentMethod.Mandate;
 
 namespace TrueLayer.AcceptanceTests;
 
-using MandateUnion = OneOf<Mandate.VRPCommercialMandate, Mandate.VRPSweepingMandate>;
+using MandateUnion = OneOf<TrueLayer.Mandates.Model.Mandate.VRPCommercialMandate, TrueLayer.Mandates.Model.Mandate.VRPSweepingMandate>;
 
 public static class RequestBuilders
 {
@@ -32,7 +33,7 @@ public static class RequestBuilders
         => new(
             mandateRequest.Constraints.MaximumIndividualAmount,
             mandateRequest.Currency,
-            new PaymentMethod.Mandate(mandateId, "reference", null),
+            new PaymentMandate(mandateId, "reference", null),
             mandateRequest.User,
             setRelatedProducts ? new RelatedProducts(new SignupPlus()) : null);
 

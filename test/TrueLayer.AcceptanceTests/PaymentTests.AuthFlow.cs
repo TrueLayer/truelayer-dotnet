@@ -1,12 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using OneOf;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
+using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -20,7 +21,7 @@ using SchemeSelectionUnion = OneOf<
 public partial class PaymentTests
 {
     [Theory]
-    [MemberData(nameof(CreateTestStartAuthorizationFlowRequests))]
+    [MemberData(nameof(CreateTestStartAuthorizationFlowRequests), DisableDiscoveryEnumeration = true)]
     public async Task Can_start_auth_flow(
         CreatePaymentRequest paymentRequest,
         SchemeSelectionUnion? schemeSelection)
@@ -28,7 +29,7 @@ public partial class PaymentTests
         var paymentResponse = await _fixture.TlClients[0].Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
-        PaymentMethod.BankTransfer bankTransfer = paymentRequest.PaymentMethod.AsT0;
+        BankTransfer bankTransfer = paymentRequest.PaymentMethod.AsT0;
         var authFlowRequest = new StartAuthorizationFlowRequest(
             bankTransfer.ProviderSelection,
             schemeSelection,
@@ -45,199 +46,191 @@ public partial class PaymentTests
         authorizing.AuthorizationFlow.Actions.Next.Value.Should().NotBeNull();
     }
 
-    public static IEnumerable<object?[]> CreateTestStartAuthorizationFlowRequests()
+    public static TheoryData<CreatePaymentRequest, SchemeSelectionUnion?> CreateTestStartAuthorizationFlowRequests()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
         var providerFilterMockGbRedirect = new ProviderFilter { ProviderIds = new[] { "mock-payments-gb-redirect" } };
         var instantOnlyWithRemitterFee = new SchemeSelection.InstantOnly { AllowRemitterFee = false };
         var instantOnlyWithoutRemitterFee = new SchemeSelection.InstantOnly { AllowRemitterFee = false };
-        var instantPreferredWithRemitterFee = new SchemeSelection.InstantPreferred() { AllowRemitterFee = true };
-        var instantPreferredWithoutRemitterFee = new SchemeSelection.InstantPreferred() { AllowRemitterFee = false };
+        var instantPreferredWithRemitterFee = new SchemeSelection.InstantPreferred { AllowRemitterFee = true };
+        var instantPreferredWithoutRemitterFee = new SchemeSelection.InstantPreferred { AllowRemitterFee = false };
         var userSelected = new SchemeSelection.UserSelected();
-        yield return new object?[]
+
+        var data = new TheoryData<CreatePaymentRequest, SchemeSelectionUnion?>
         {
-                CreateTestPaymentRequest(new Provider.UserSelected
+            {
+                CreateTestPaymentRequest(
+                    new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = instantOnlyWithRemitterFee,
                     },
                     sortCodeAccountNumber),
-                (SchemeSelectionUnion?)instantOnlyWithRemitterFee,
-
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(new Provider.UserSelected
+                instantOnlyWithRemitterFee
+            },
+            {
+                CreateTestPaymentRequest(
+                    new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = instantOnlyWithoutRemitterFee,
                     },
                     sortCodeAccountNumber),
-                (SchemeSelectionUnion?)instantOnlyWithoutRemitterFee,
-        };
-
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(new Provider.UserSelected
+                instantOnlyWithoutRemitterFee
+            },
+            {
+                CreateTestPaymentRequest(
+                    new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = instantPreferredWithRemitterFee,
                     },
                     sortCodeAccountNumber),
-                (SchemeSelectionUnion?)instantOnlyWithRemitterFee,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(new Provider.UserSelected
+                instantOnlyWithRemitterFee
+            },
+            {
+                CreateTestPaymentRequest(
+                    new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = instantPreferredWithoutRemitterFee,
                     },
                     sortCodeAccountNumber),
-                (SchemeSelectionUnion?)instantOnlyWithoutRemitterFee,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(new Provider.UserSelected
+                instantOnlyWithoutRemitterFee
+            },
+            {
+                CreateTestPaymentRequest(
+                    new UserSelected
                     {
                         Filter = providerFilterMockGbRedirect,
                         SchemeSelection = userSelected,
                     },
                     sortCodeAccountNumber),
-                (SchemeSelectionUnion?)userSelected,
+                userSelected
+            }
         };
 
         var remitterSortAccountNumber = new RemitterAccount("John Doe", sortCodeAccountNumber);
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
-                    {
-                        Remitter = remitterSortAccountNumber,
-                    },
-                    sortCodeAccountNumber),
-                null,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected(
-                        "mock-payments-gb-redirect",
-                        schemeSelection: new SchemeSelection.Preselected() { SchemeId = "faster_payments_service"})
-                    {
-                        Remitter = remitterSortAccountNumber,
-                    },
-                    sortCodeAccountNumber),
-                null,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-gb-redirect", schemeSelection: userSelected)
-                    {
-                        Remitter = remitterSortAccountNumber,
-                    },
-                    sortCodeAccountNumber),
-                (SchemeSelectionUnion?)userSelected,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected(
-                        "mock-payments-gb-redirect",
-                        schemeSelection: instantOnlyWithRemitterFee)
-                    {
-                        Remitter = remitterSortAccountNumber,
-                    },
-                    sortCodeAccountNumber),
-                (SchemeSelectionUnion?)instantOnlyWithRemitterFee,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected(
-                        "mock-payments-gb-redirect",
-                        schemeSelection: instantOnlyWithoutRemitterFee)
-                    {
-                        Remitter = remitterSortAccountNumber,
-                    },
-                    sortCodeAccountNumber),
-                (SchemeSelectionUnion?)instantOnlyWithoutRemitterFee,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected(
-                        "mock-payments-gb-redirect",
-                        schemeSelection: instantPreferredWithRemitterFee)
-                    {
-                        Remitter = remitterSortAccountNumber,
-                    },
-                    sortCodeAccountNumber),
-                (SchemeSelectionUnion?)instantPreferredWithRemitterFee
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected(
-                        "mock-payments-gb-redirect",
-                        schemeSelection: instantPreferredWithRemitterFee)
-                    {
-                        Remitter = remitterSortAccountNumber,
-                    },
-                    sortCodeAccountNumber),
-                (SchemeSelectionUnion?)instantPreferredWithRemitterFee
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-fr-redirect", "sepa_credit_transfer_instant")
-                    {
-                        Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606")),
-                    },
-                    new AccountIdentifier.Iban("IT60X0542811101000000123456"),
-                    Currencies.EUR,
-                    new RelatedProducts(new SignupPlus())),
-                null,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service"),
-                    sortCodeAccountNumber),
-                null,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-fr-redirect", "sepa_credit_transfer_instant"),
-                    new AccountIdentifier.Iban("IT60X0542811101000000123456"),
-                    Currencies.EUR),
-                null,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-pl-redirect", "polish_domestic_standard")
-                    {
-                        Remitter = new RemitterAccount(
-                            "John Doe", new AccountIdentifier.Nrb("12345678901234567890123456")),
-                    },
-                    new AccountIdentifier.Nrb("12345678901234567890123456"),
-                    Currencies.PLN),
-                null,
-        };
-        yield return new object?[]
-        {
-                CreateTestPaymentRequest(
-                    new Provider.Preselected("mock-payments-no-redirect", "norwegian_domestic_credit_transfer")
-                    {
-                        Remitter = new RemitterAccount(
-                            "John Doe", new AccountIdentifier.Bban("12345678901234567890123456")),
-                    },
-                    new AccountIdentifier.Bban("IT60X0542811101000000123456"),
-                    Currencies.NOK),
-                null,
-        };
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected("mock-payments-gb-redirect", new SchemeSelection.Preselected { SchemeId = "faster_payments_service" })
+                {
+                    Remitter = remitterSortAccountNumber,
+                },
+                sortCodeAccountNumber),
+            null);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected(
+                    "mock-payments-gb-redirect",
+                    schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service" })
+                {
+                    Remitter = remitterSortAccountNumber,
+                },
+                sortCodeAccountNumber),
+            null);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected("mock-payments-gb-redirect", schemeSelection: userSelected)
+                {
+                    Remitter = remitterSortAccountNumber,
+                },
+                sortCodeAccountNumber),
+            userSelected);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected(
+                    "mock-payments-gb-redirect",
+                    schemeSelection: instantOnlyWithRemitterFee)
+                {
+                    Remitter = remitterSortAccountNumber,
+                },
+                sortCodeAccountNumber),
+            instantOnlyWithRemitterFee);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected(
+                    "mock-payments-gb-redirect",
+                    schemeSelection: instantOnlyWithoutRemitterFee)
+                {
+                    Remitter = remitterSortAccountNumber,
+                },
+                sortCodeAccountNumber),
+            instantOnlyWithoutRemitterFee);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected(
+                    "mock-payments-gb-redirect",
+                    schemeSelection: instantPreferredWithRemitterFee)
+                {
+                    Remitter = remitterSortAccountNumber,
+                },
+                sortCodeAccountNumber),
+            instantPreferredWithRemitterFee);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected(
+                    "mock-payments-gb-redirect",
+                    schemeSelection: instantPreferredWithRemitterFee)
+                {
+                    Remitter = remitterSortAccountNumber,
+                },
+                sortCodeAccountNumber),
+            instantPreferredWithRemitterFee);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected("mock-payments-fr-redirect", new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" })
+                {
+                    Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606")),
+                },
+                new AccountIdentifier.Iban("IT60X0542811101000000123456"),
+                Currencies.EUR,
+                new RelatedProducts(new SignupPlus())),
+            null);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected("mock-payments-gb-redirect", new SchemeSelection.Preselected { SchemeId = "faster_payments_service" }),
+                sortCodeAccountNumber),
+            null);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected("mock-payments-fr-redirect", new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" }),
+                new AccountIdentifier.Iban("IT60X0542811101000000123456"),
+                Currencies.EUR),
+            null);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected("mock-payments-pl-redirect", new SchemeSelection.Preselected { SchemeId = "polish_domestic_standard" })
+                {
+                    Remitter = new RemitterAccount(
+                        "John Doe", new AccountIdentifier.Nrb("12345678901234567890123456")),
+                },
+                new AccountIdentifier.Nrb("12345678901234567890123456"),
+                Currencies.PLN),
+            null);
+
+        data.Add(
+            CreateTestPaymentRequest(
+                new Preselected("mock-payments-no-redirect", new SchemeSelection.Preselected { SchemeId = "norwegian_domestic_credit_transfer" })
+                {
+                    Remitter = new RemitterAccount(
+                        "John Doe", new AccountIdentifier.Bban("12345678901234567890123456")),
+                },
+                new AccountIdentifier.Bban("IT60X0542811101000000123456"),
+                Currencies.NOK),
+            null);
+
+        return data;
     }
 }

@@ -1,15 +1,14 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace TrueLayer.Serialization
+namespace TrueLayer.Serialization;
+
+internal static class SerializerOptions
 {
-    internal static class SerializerOptions
+    public static readonly JsonSerializerOptions Default = new()
     {
-        public static readonly JsonSerializerOptions Default = new JsonSerializerOptions
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonSnakeCaseNamingPolicy.Instance,
-            Converters = { new OneOfJsonConverterFactory(), new JsonStringEnumConverter(JsonSnakeCaseNamingPolicy.Instance) }
-        };
-    }
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        Converters = { new OneOfJsonConverterFactory(), new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) }
+    };
 }

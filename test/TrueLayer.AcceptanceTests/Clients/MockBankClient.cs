@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace TrueLayer.AcceptanceTests.Clients;
 

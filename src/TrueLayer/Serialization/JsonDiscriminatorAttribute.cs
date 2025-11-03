@@ -1,15 +1,14 @@
 using System;
 
-namespace TrueLayer.Serialization
-{
-    [AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
-    internal sealed class JsonDiscriminatorAttribute : Attribute
-    {
-        public JsonDiscriminatorAttribute(string discriminator)
-        {
-            Discriminator = discriminator.NotNullOrWhiteSpace(nameof(discriminator));
-        }
+namespace TrueLayer.Serialization;
 
-        public string Discriminator { get; }
+[AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
+internal sealed class JsonDiscriminatorAttribute : Attribute
+{
+    public JsonDiscriminatorAttribute(string discriminator)
+    {
+        Discriminator = discriminator.NotNullOrWhiteSpace(nameof(discriminator));
     }
+
+    public string Discriminator { get; }
 }

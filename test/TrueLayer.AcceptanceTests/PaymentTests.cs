@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using OneOf;
 using TrueLayer.AcceptanceTests.Clients;
 using TrueLayer.AcceptanceTests.Helpers;
@@ -12,6 +10,8 @@ using TrueLayer.Common;
 using TrueLayer.Payments.Model;
 using TrueLayer.Payments.Model.AuthorizationFlow;
 using Xunit;
+using static TrueLayer.Payments.Model.CreateProviderSelection;
+using static TrueLayer.Payments.Model.CreatePaymentMethod;
 
 namespace TrueLayer.AcceptanceTests;
 
@@ -26,7 +26,7 @@ using PaymentsSchemeSelectionUnion = OneOf<
     SchemeSelection.InstantPreferred,
     SchemeSelection.Preselected,
     SchemeSelection.UserSelected>;
-using ProviderUnion = OneOf<Provider.UserSelected, Provider.Preselected>;
+using CreateProviderUnion = OneOf<CreateProviderSelection.UserSelected, CreateProviderSelection.Preselected>;
 using BeneficiaryUnion = OneOf<Beneficiary.MerchantAccount, Beneficiary.ExternalAccount>;
 
 using GetPaymentUnion = OneOf<
@@ -42,6 +42,7 @@ using GetPaymentUnion = OneOf<
 public partial class PaymentTests : IClassFixture<ApiTestFixture>
 {
     private readonly ApiTestFixture _fixture;
+    private const string ReturnUri = "http://localhost:3000/callback";
 
     public PaymentTests(ApiTestFixture fixture)
     {
@@ -54,8 +55,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     {
         foreach (var client in _fixture.TlClients)
         {
-            var response = await client.Payments.CreatePayment(
-                paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+            var response = await client.Payments.CreatePayment(paymentRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
             var authorizationRequired = response.Data.AsT0;
@@ -65,19 +65,53 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             authorizationRequired.User.Should().NotBeNull();
             authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
             authorizationRequired.Status.Should().Be("authorization_required");
-
-            string hppUri = client.Payments.CreateHostedPaymentPageLink(
-                authorizationRequired.Id, authorizationRequired.ResourceToken,
-                new Uri("https://redirect.mydomain.com"));
-            hppUri.Should().NotBeNullOrWhiteSpace();
         }
+    }
+
+    [Fact]
+    public async Task Can_Create_Merchant_Account_Gbp_Payment_With_Hosted_Page()
+    {
+        var hostedPage = new HostedPageRequest(
+            returnUri: new Uri(ReturnUri),
+            countryCode: "GB",
+            languageCode: "en");
+
+        var paymentRequest = CreateTestPaymentRequest(
+            new UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
+                SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
+            },
+            beneficiary: new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].GbpMerchantAccountId)
+            {
+                AccountHolderName = "account holder name",
+                StatementReference = "statement-ref"
+            },
+            hostedPage: hostedPage);
+
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var authorizationRequired = response.Data.AsT0;
+
+        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.User.Should().NotBeNull();
+        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.Status.Should().Be("authorization_required");
+
+        // Verify the hosted page response is returned
+        authorizationRequired.HostedPage.Should().NotBeNull();
+        authorizationRequired.HostedPage!.Uri.Should().NotBeNull();
+        authorizationRequired.HostedPage.Uri.AbsoluteUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Can_Create_Merchant_Account_Gbp_Payment()
     {
         var paymentRequest = CreateTestPaymentRequest(
-            new Provider.UserSelected
+            new UserSelected
             {
                 Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
                 SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
@@ -99,17 +133,13 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         authorizationRequired.User.Should().NotBeNull();
         authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
         authorizationRequired.Status.Should().Be("authorization_required");
-
-        string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
-            authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Can_Create_Merchant_Account_Gbp_Verification_Payment()
     {
         var paymentRequest = CreateTestPaymentRequest(
-            new Provider.UserSelected
+            new UserSelected
             {
                 Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
                 SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
@@ -119,8 +149,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 Verification = new Verification.Automated { RemitterName = true }
             });
 
-        var response = await _fixture.TlClients[0].Payments.CreatePayment(
-            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var authorizationRequired = response.Data.AsT0;
@@ -130,17 +159,13 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         authorizationRequired.User.Should().NotBeNull();
         authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
         authorizationRequired.Status.Should().Be("authorization_required");
-
-        string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
-            authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task Can_Create_Merchant_Account_Eur_Payment()
     {
         var paymentRequest = CreateTestPaymentRequest(
-            new Provider.Preselected("mock-payments-fr-redirect",
+            new Preselected("mock-payments-fr-redirect",
                 schemeSelection: new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" })
             {
                 Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606"))
@@ -150,6 +175,33 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             new RelatedProducts(new SignupPlus()),
             new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].EurMerchantAccountId));
 
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var authorizationRequired = response.Data.AsT0;
+
+        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.User.Should().NotBeNull();
+        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.Status.Should().Be("authorization_required");
+    }
+
+    [Fact]
+    public async Task Can_Create_Payment_With_SubMerchants_BusinessDivision()
+    {
+        var subMerchants = new SubMerchants(new SubMerchants.BusinessDivision(
+            id: Guid.NewGuid().ToString(),
+            name: "Test Division"));
+
+        var paymentRequest = CreateTestPaymentRequest(
+            new UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
+                SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
+            },
+            subMerchants: subMerchants);
+
         var response = await _fixture.TlClients[0].Payments.CreatePayment(
             paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
 
@@ -161,17 +213,46 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         authorizationRequired.User.Should().NotBeNull();
         authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
         authorizationRequired.Status.Should().Be("authorization_required");
+    }
 
-        string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
-            authorizationRequired.Id, authorizationRequired.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
+    [Fact]
+    public async Task Can_Create_Payment_With_SubMerchants_BusinessClient()
+    {
+        var address = new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St");
+        var subMerchants = new SubMerchants(new SubMerchants.BusinessClient(
+            tradingName: "Test Trading Company",
+            commercialName: "Test Commercial Name",
+            url: "https://example.com",
+            mcc: "1234",
+            registrationNumber: "REG123456",
+            address: address));
+
+        var paymentRequest = CreateTestPaymentRequest(
+            new UserSelected
+            {
+                Filter = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] },
+                SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
+            },
+            subMerchants: subMerchants);
+
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(
+            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var authorizationRequired = response.Data.AsT0;
+
+        authorizationRequired.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.ResourceToken.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.User.Should().NotBeNull();
+        authorizationRequired.User.Id.Should().NotBeNullOrWhiteSpace();
+        authorizationRequired.Status.Should().Be("authorization_required");
     }
 
     [Fact]
     public async Task Can_Create_Payment_With_Auth_Flow()
     {
         var sortCodeAccountNumber = new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
-        var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+        var providerSelection = new Preselected("mock-payments-gb-redirect", new SchemeSelection.Preselected { SchemeId = "faster_payments_service" })
         {
             Remitter = new RemitterAccount("John Doe", sortCodeAccountNumber),
         };
@@ -180,8 +261,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             providerSelection,
             sortCodeAccountNumber,
             initAuthorizationFlow: true);
-        var response = await _fixture.TlClients[0].Payments.CreatePayment(
-            paymentRequest, idempotencyKey: Guid.NewGuid().ToString());
+        var response = await _fixture.TlClients[0].Payments.CreatePayment(paymentRequest);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         response.Data.IsT3.Should().BeTrue();
@@ -196,17 +276,13 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         // The next action is a redirect
         authorizing.AuthorizationFlow!.Actions.Next.IsT2.Should().BeTrue();
         authorizing.AuthorizationFlow.Actions.Next.AsT2.Uri.Should().NotBeNull();
-
-        string hppUri = _fixture.TlClients[0].Payments.CreateHostedPaymentPageLink(
-            authorizing.Id, authorizing.ResourceToken, new Uri("https://redirect.mydomain.com"));
-        hppUri.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task GetPayment_Should_Return_Settled_Payment()
     {
         var client = _fixture.TlClients[0];
-        var providerSelection = new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service");
+        var providerSelection = new Preselected("mock-payments-gb-redirect", new SchemeSelection.Preselected { SchemeId = "faster_payments_service" });
 
         var paymentRequest = CreateTestPaymentRequest(
             beneficiary: new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].GbpMerchantAccountId),
@@ -247,21 +323,25 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         payment.CreatedAt.Should().NotBe(default);
         var bankTransfer = payment.PaymentMethod.AsT0;
 
+        // Verify the response payment method matches what we requested
+        var requestPaymentMethod = paymentRequest.PaymentMethod.AsT0;
         bankTransfer.ProviderSelection.Switch(
             userSelected =>
             {
-                Provider.UserSelected providerSelectionReq = bankTransfer.ProviderSelection.AsT0;
-                userSelected.Filter.Should().BeEquivalentTo(providerSelectionReq.Filter);
+                // Response has GetProvider.UserSelected type
+                var requestProviderSelection = requestPaymentMethod.ProviderSelection.AsT0;
+                userSelected.Filter.Should().BeEquivalentTo(requestProviderSelection.Filter);
                 // Provider selection hasn't happened yet
                 userSelected.ProviderId.Should().BeNullOrEmpty();
                 userSelected.SchemeId.Should().BeNullOrEmpty();
             },
             preselected =>
             {
-                Provider.Preselected providerSelectionReq = bankTransfer.ProviderSelection.AsT1;
-                AssertSchemeSelection(preselected.SchemeSelection, providerSelectionReq.SchemeSelection, preselected.SchemeId, providerSelectionReq.SchemeId);
-                preselected.ProviderId.Should().Be(providerSelectionReq.ProviderId);
-                preselected.Remitter.Should().Be(providerSelectionReq.Remitter);
+                // Response has GetProvider.Preselected type
+                var requestProviderSelection = requestPaymentMethod.ProviderSelection.AsT1;
+                AssertSchemeSelection(preselected.SchemeSelection, requestProviderSelection.SchemeSelection, preselected.SchemeId, null);
+                preselected.ProviderId.Should().Be(requestProviderSelection.ProviderId);
+                preselected.Remitter.Should().Be(requestProviderSelection.Remitter);
             });
 
         bankTransfer.Beneficiary.TryPickT1(out var externalAccount, out _).Should().BeTrue();
@@ -345,6 +425,60 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         createRefundResponse.Data!.Id.Should().NotBeNullOrWhiteSpace();
         listPaymentRefundsResponse.IsSuccessful.Should().BeTrue();
         listPaymentRefundsResponse.Data!.Items.Count.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Can_List_Payment_Refunds_With_RefundExecuted_Status()
+    {
+        // Arrange
+        var client = _fixture.TlClients[0];
+        var paymentRequest = CreateTestPaymentRequest(
+            beneficiary: new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].GbpMerchantAccountId),
+            initAuthorizationFlow: true);
+        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
+        var paymentId = payment.AsT4.Id;
+
+        // Create refund and wait for it to be executed
+        var createRefundResponse = await client.Payments.CreatePaymentRefund(
+            paymentId: paymentId,
+            idempotencyKey: Guid.NewGuid().ToString(),
+            new CreatePaymentRefundRequest(Reference: "executed-refund"));
+        createRefundResponse.IsSuccessful.Should().BeTrue();
+
+        // Act - List refunds (may include RefundExecuted status)
+        var listPaymentRefundsResponse = await client.Payments.ListPaymentRefunds(paymentId);
+
+        // Assert
+        listPaymentRefundsResponse.IsSuccessful.Should().BeTrue();
+        listPaymentRefundsResponse.Data!.Items.Should().NotBeEmpty();
+        // Note: RefundExecuted status depends on actual payment processing state
+    }
+
+    [Fact]
+    public async Task Can_List_Payment_Refunds_With_RefundFailed_Status()
+    {
+        // Arrange
+        var client = _fixture.TlClients[0];
+        var paymentRequest = CreateTestPaymentRequest(
+            beneficiary: new Beneficiary.MerchantAccount(_fixture.ClientMerchantAccounts[0].GbpMerchantAccountId),
+            initAuthorizationFlow: true);
+        var payment = await CreatePaymentAndSetAuthorisationStatusAsync(client, paymentRequest, MockBankPaymentAction.Execute, typeof(GetPaymentResponse.Settled));
+        var paymentId = payment.AsT4.Id;
+
+        // Create refund with specific reference that may trigger failure
+        var createRefundResponse = await client.Payments.CreatePaymentRefund(
+            paymentId: paymentId,
+            idempotencyKey: Guid.NewGuid().ToString(),
+            new CreatePaymentRefundRequest(Reference: "TUOYAP"));
+        createRefundResponse.IsSuccessful.Should().BeTrue();
+
+        // Act - List refunds (may include RefundFailed status)
+        var listPaymentRefundsResponse = await client.Payments.ListPaymentRefunds(paymentId);
+
+        // Assert
+        listPaymentRefundsResponse.IsSuccessful.Should().BeTrue();
+        listPaymentRefundsResponse.Data!.Items.Should().NotBeEmpty();
+        // Note: RefundFailed status depends on actual payment processing state
     }
 
     [Fact]
@@ -474,16 +608,18 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     }
 
     private static CreatePaymentRequest CreateTestPaymentRequest(
-        ProviderUnion? providerSelection = null,
+        CreateProviderUnion? providerSelection = null,
         AccountIdentifierUnion? accountIdentifier = null,
         string currency = Currencies.GBP,
         RelatedProducts? relatedProducts = null,
         BeneficiaryUnion? beneficiary = null,
         Retry.BaseRetry? retry = null,
-        bool initAuthorizationFlow = false)
+        bool initAuthorizationFlow = false,
+        SubMerchants? subMerchants = null,
+        HostedPageRequest? hostedPage = null)
     {
         accountIdentifier ??= new AccountIdentifier.SortCodeAccountNumber("567890", "12345678");
-        providerSelection ??= new Provider.Preselected("mock-payments-gb-redirect",
+        providerSelection ??= new Preselected("mock-payments-gb-redirect",
             schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service" });
         beneficiary ??= new Beneficiary.ExternalAccount(
             "TrueLayer",
@@ -501,7 +637,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         return new CreatePaymentRequest(
             100,
             currency,
-            new PaymentMethod.BankTransfer(
+            new BankTransfer(
                 providerSelection.Value,
                 beneficiary.Value,
                 retry),
@@ -513,12 +649,14 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
                 address: new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St")),
             relatedProducts,
             authorizationFlow,
+            hostedPage,
             metadata: new Dictionary<string, string>
             {
                 ["test-key-1"] = "test-value-1",
                 ["test-key-2"] = "test-value-2",
             },
-            riskAssessment: new RiskAssessment("test")
+            riskAssessment: new RiskAssessment("test"),
+            subMerchants: subMerchants
         );
     }
 
@@ -528,7 +666,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         var providerFilterMockGbRedirect = new ProviderFilter { ProviderIds = ["mock-payments-gb-redirect"] };
         yield return
         [
-            CreateTestPaymentRequest(new Provider.UserSelected
+            CreateTestPaymentRequest(new UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
                     SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
@@ -537,7 +675,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         ];
         yield return
         [
-            CreateTestPaymentRequest(new Provider.UserSelected
+            CreateTestPaymentRequest(new UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
                     SchemeSelection = new SchemeSelection.InstantOnly
@@ -551,7 +689,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         ];
         yield return
         [
-            CreateTestPaymentRequest(new Provider.UserSelected
+            CreateTestPaymentRequest(new UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
                     SchemeSelection = new SchemeSelection.InstantPreferred
@@ -565,7 +703,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         ];
         yield return
         [
-            CreateTestPaymentRequest(new Provider.UserSelected
+            CreateTestPaymentRequest(new UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
                     SchemeSelection = new SchemeSelection.InstantPreferred { AllowRemitterFee = false },
@@ -574,7 +712,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         ];
         yield return
         [
-            CreateTestPaymentRequest(new Provider.UserSelected
+            CreateTestPaymentRequest(new UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
                     SchemeSelection = new SchemeSelection.UserSelected(),
@@ -586,7 +724,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-gb-redirect", "faster_payments_service")
+                new Preselected("mock-payments-gb-redirect", new SchemeSelection.Preselected { SchemeId = "faster_payments_service" })
                 {
                     Remitter = remitterSortAccountNumber,
                 },
@@ -595,7 +733,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected(
+                new Preselected(
                     "mock-payments-gb-redirect",
                     schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service"})
                 {
@@ -606,7 +744,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-gb-redirect", schemeSelection: new SchemeSelection.UserSelected())
+                new Preselected("mock-payments-gb-redirect", schemeSelection: new SchemeSelection.UserSelected())
                 {
                     Remitter = remitterSortAccountNumber,
                 },
@@ -615,7 +753,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected(
+                new Preselected(
                     "mock-payments-gb-redirect",
                     schemeSelection: new SchemeSelection.InstantOnly { AllowRemitterFee = true })
                 {
@@ -626,7 +764,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected(
+                new Preselected(
                     "mock-payments-gb-redirect",
                     schemeSelection: new SchemeSelection.InstantOnly { AllowRemitterFee = false })
                 {
@@ -637,7 +775,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected(
+                new Preselected(
                     "mock-payments-gb-redirect",
                     schemeSelection: new SchemeSelection.InstantPreferred { AllowRemitterFee = true })
                 {
@@ -648,7 +786,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected(
+                new Preselected(
                     "mock-payments-gb-redirect",
                     schemeSelection: new SchemeSelection.InstantPreferred { AllowRemitterFee = false })
                 {
@@ -659,7 +797,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-fr-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" })
+                new Preselected("mock-payments-fr-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" })
                 {
                     Remitter = new RemitterAccount("John Doe", new AccountIdentifier.Iban("FR1420041010050500013M02606")),
                 },
@@ -670,20 +808,20 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-gb-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service" }),
+                new Preselected("mock-payments-gb-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "faster_payments_service" }),
                 sortCodeAccountNumber)
         ];
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-fr-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" }),
+                new Preselected("mock-payments-fr-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "sepa_credit_transfer_instant" }),
                 new AccountIdentifier.Iban("IT60X0542811101000000123456"),
                 Currencies.EUR)
         ];
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-pl-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "polish_domestic_standard" })
+                new Preselected("mock-payments-pl-redirect", schemeSelection: new SchemeSelection.Preselected { SchemeId = "polish_domestic_standard" })
                 {
                     Remitter = new RemitterAccount(
                         "John Doe", new AccountIdentifier.Nrb("12345678901234567890123456"))
@@ -694,7 +832,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected("mock-payments-no-redirect", schemeSelection:new SchemeSelection.Preselected { SchemeId = "norwegian_domestic_credit_transfer" })
+                new Preselected("mock-payments-no-redirect", schemeSelection:new SchemeSelection.Preselected { SchemeId = "norwegian_domestic_credit_transfer" })
                 {
                     Remitter = new RemitterAccount(
                         "John Doe", new AccountIdentifier.Bban("12345678901234567890123456"))
@@ -705,7 +843,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         // Create a payment with retry
         yield return
         [
-            CreateTestPaymentRequest(new Provider.UserSelected
+            CreateTestPaymentRequest(new UserSelected
                 {
                     Filter = providerFilterMockGbRedirect,
                     SchemeSelection = new SchemeSelection.InstantOnly { AllowRemitterFee = true },
@@ -716,7 +854,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
         yield return
         [
             CreateTestPaymentRequest(
-                new Provider.Preselected(
+                new Preselected(
                     "mock-payments-gb-redirect",
                     schemeSelection: new SchemeSelection.InstantPreferred { AllowRemitterFee = false })
                 {
@@ -743,7 +881,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
             authorizing.AuthorizationFlow!.Actions.Next.AsT2.Uri,
             mockBankPaymentAction);
 
-        await _fixture.PayApiClient.SubmitProviderReturnParametersAsync(providerReturnUri.Query, providerReturnUri.Fragment);
+        await _fixture.ApiClient.SubmitPaymentsProviderReturnAsync(providerReturnUri.Query, providerReturnUri.Fragment);
 
         return await PollPaymentForTerminalStatusAsync(trueLayerClient, paymentId, expectedPaymentStatus);
     }

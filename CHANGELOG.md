@@ -3,6 +3,84 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+- Added support for **Verified Payouts** (UK-only feature)
+  - New `Verification` model with `VerifyName` and optional `TransactionSearchCriteria` for name and transaction verification
+  - New `PayoutUserRequest` and `PayoutUserResponse` models for user details in verified payouts
+  - Updated `CreatePayoutBeneficiary.UserDetermined` beneficiary type with verification support
+  - New `PayoutHppLinkBuilder` helper for generating Hosted Payment Page verification links
+  - New `CreatePayoutResponse.AuthorizationRequired` response type for verified payouts requiring authorization
+  - Separate `GetPayoutBeneficiary` namespace for GET response types (distinct from CREATE request types)
+  - Enhanced `OneOfJsonConverter` with `[DefaultJsonDiscriminator]` support for fallback deserialization
+- Added support for **Hosted Page** in Create Payment (alternative to `CreateHostedPaymentPageLink`)
+  - New `HostedPageRequest` model for configuring hosted payment page parameters (`ReturnUri`, `CountryCode`, `LanguageCode`, `MaxWaitForResult`)
+  - New `HostedPageResponse` model containing the auto-constructed hosted page URI
+  - Updated `CreatePaymentRequest` to accept optional `HostedPage` parameter to receive the hosted page URI directly in the response
+  - Updated `CreatePaymentResponse.AuthorizationRequired` to include `HostedPage` property with the hosted page URI when requested
+  - The existing `CreateHostedPaymentPageLink` method remains available for backward compatibility
+### Removed
+- Removed support for .NET 6.0
+- Removed support for .NET Standard 2.1
+- Removed IsExternalInit shim (no longer needed for .NET 8.0+)
+### Changed
+- **BREAKING**: `CreatePayout` now returns `OneOf<AuthorizationRequired, Created>` instead of `CreatePayoutResponse`
+  - Consumers must use `.Match()` to handle both response types
+  - Standard payouts return `Created` with just the payout ID
+  - Verified payouts return `AuthorizationRequired` with ID, status, resource token, and user details
+- **BREAKING**: `GetPayout` now returns `OneOf<AuthorizationRequired, Pending, Authorized, Executed, Failed>` instead of `OneOf<Pending, Authorized, Executed, Failed>`
+  - Added `AuthorizationRequired` status for verified payouts awaiting user authorization
+  - Consumers must update `.Match()` calls to handle the new `AuthorizationRequired` type
+- **BREAKING**: Renamed `Beneficiary` to `CreatePayoutBeneficiary` for clarity
+- **BREAKING**: Simplified `CreatePayoutBeneficiary.BusinessAccount` to only require `Reference` (removed account holder name and identifier)
+- **BREAKING**: Split Provider types into `CreateProviderSelection` (for requests) and `GetProviderSelection` (for responses)
+  - `CreateProviderSelection.UserSelected` - Use for creating payments/payouts/mandates with user-selected provider
+  - `CreateProviderSelection.Preselected` - Use for creating payments/payouts/mandates with preselected provider
+  - `GetProviderSelection.UserSelected` - Returned in GET responses (payments/mandates), includes `ProviderId` and `SchemeId` fields
+  - `GetProviderSelection.Preselected` - Returned in GET responses (payments/mandates), includes `SchemeId` field
+  - Migration: Replace `Provider.UserSelected` with `CreateProviderSelection.UserSelected` or `GetProviderSelection.UserSelected` as appropriate
+  - Migration: Replace `Provider.Preselected(providerId, schemeId)` with `CreateProviderSelection.Preselected(providerId, new SchemeSelection.Preselected { SchemeId = schemeId })`
+- **BREAKING**: Updated Mandate models to use new provider selection types
+  - `Mandate.VRPCommercialMandate` and `Mandate.VRPSweepingMandate` now use `CreateProviderSelection` types
+  - `MandateDetail` response types (AuthorizationRequiredMandateDetail, AuthorizingMandateDetail, AuthorizedMandateDetail, FailedMandateDetail, RevokedMandateDetail) now use `GetProviderSelection` types
+  - Migration: Update mandate creation code to use `CreateProviderSelection.UserSelected` or `CreateProviderSelection.Preselected`
+- **BREAKING**: Split PaymentMethod types into `CreatePaymentMethod` (for requests) and `GetPaymentMethod` (for responses)
+  - `CreatePaymentMethod.BankTransfer` - Use for creating payments
+  - `CreatePaymentMethod.Mandate` - Use for creating payments with mandates
+  - `GetPaymentMethod.BankTransfer` - Returned in GET payment responses, includes `SchemeId` field
+  - `GetPaymentMethod.Mandate` - Returned in GET payment responses
+  - Migration: Replace `PaymentMethod.BankTransfer` with `CreatePaymentMethod.BankTransfer` or `GetPaymentMethod.BankTransfer` as appropriate
+- **BREAKING**: `CreateProviderSelection.Preselected` constructor now requires `SchemeSelection` parameter (no longer accepts optional `schemeId` string)
+  - Old: `new Provider.Preselected("provider-id", "scheme-id")` or `new Provider.Preselected("provider-id")`
+  - New: `new CreateProviderSelection.Preselected("provider-id", new SchemeSelection.Preselected { SchemeId = "scheme-id" })`
+- Updated `CreatePayoutBeneficiary.PaymentSource` GET response to include `AccountHolderName` and `AccountIdentifiers`
+- Updated `GetPayout` to return `GetPayoutBeneficiary` types with populated account details
+- Updated to C# 12.0 language version
+- Modernized code to use C# 11/12 features (ArgumentNullException.ThrowIfNull)
+- Removed all conditional compilation directives (no longer needed for .NET 8.0+)
+
+## [1.25.0] - 2025-10-14
+### Added
+- Added `SchemeId` field to `ExecutedPayout` and `Refund` transaction types in Merchant Account transactions endpoint response
+- Add support for polish payouts and `SubMerchants` field
+
+## [1.24.0] - 2025-01-24
+### Added
+- Enhanced RefundUnion to include all refund statuses: `RefundExecuted` and `RefundFailed` in addition to existing `RefundPending` and `RefundAuthorized`
+- Updated `ListPaymentRefunds` and `GetPaymentRefund` methods to support returning refunds in all possible states
+
+## [1.23.0] - 2025-01-15
+### Added
+- Added support for additional payment features
+
+## [1.22.0] - 2024-12-20
+### Added
+- Added support for enhanced payment processing
+
+## [1.21.0] - 2024-12-15
+### Added
+- Added support for improved API responses
+
 ## [1.20.0] - 2024-12-11
 ### Added
 - Added support for `CreditableAt` in `GetPaymentResult`
