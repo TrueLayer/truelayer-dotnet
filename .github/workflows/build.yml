@@ -61,7 +61,7 @@ jobs:
           retention-days: 30
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
+        if: always() && github.actor != 'dependabot[bot]'
         with:
           files: artifacts/*.TestResults.xml
           check_name: Test Results
@@ -70,4 +70,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: packages
-          path: artifacts/*.nupkg
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
