@@ -17,9 +17,9 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="AwesomeAssertions" Version="9.2.1" />
+        <PackageReference Include="AwesomeAssertions" Version="9.3.0" />
         <PackageReference Include="RichardSzalay.MockHttp" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\TrueLayer\TrueLayer.csproj"/>
