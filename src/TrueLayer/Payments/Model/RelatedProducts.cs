@@ -14,7 +14,7 @@ public record RelatedProducts
         SignupPlus = signupPlus;
     }
     /// <summary>
-    /// Gets signup+ product.
+    /// Gets Signup+ product.
     /// </summary>
     public SignupPlus? SignupPlus { get; }
 }

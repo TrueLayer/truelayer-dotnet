@@ -6,7 +6,7 @@ namespace TrueLayer.Common;
 public record Address
 {
     /// <summary>
-    /// Creates a new physical address
+    /// Initializes a new instance of the <see cref="Address"/> class with the specified address components.
     /// </summary>
     /// <param name="city">The city or locality name</param>
     /// <param name="state">The state or county name</param>
