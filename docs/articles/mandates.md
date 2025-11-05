@@ -211,17 +211,166 @@ public async Task RevokeMandate(string mandateId)
 }
 ```
 
-## Mandate States
+## Mandate Status
 
-A mandate can be in one of the following states:
+Mandates transition through various statuses during their lifecycle. Understanding these statuses helps you track mandate progress and handle different scenarios appropriately.
 
-| State | Description |
-|-------|-------------|
-| `AuthorizationRequired` | User needs to authorize the mandate |
-| `Authorizing` | Authorization is in progress |
-| `Authorized` | Mandate is active and can be used for payments |
-| `Failed` | Mandate authorization failed |
-| `Revoked` | Mandate has been cancelled |
+For complete details, see the [TrueLayer Mandate Status documentation](https://docs.truelayer.com/docs/mandate-statuses).
+
+### Status Overview
+
+| Status | Description | Terminal | Notes |
+|--------|-------------|----------|-------|
+| `authorization_required` | Mandate created but no further action taken | No | User needs to authorize the mandate |
+| `authorizing` | User has started but not completed authorization journey | No | Wait for webhook notification |
+| `authorized` | User has successfully completed authorization flow | No | Mandate is active and can be used for payments |
+| `revoked` | Mandate has been cancelled | Yes | Can be revoked by client or user's bank |
+| `failed` | Mandate could not be authorized | Yes | Check `FailureReason` for details |
+
+### Common Failure Reasons
+
+When a mandate reaches `failed` status, check the `FailureReason` property for details:
+
+| Failure Reason | Description |
+|----------------|-------------|
+| `authorization_failed` | User failed to complete authorization |
+| `provider_error` | Error with the provider/bank |
+| `provider_rejected` | Provider rejected the mandate |
+| `internal_server_error` | TrueLayer processing error |
+| `invalid_sort_code` | Invalid bank account sort code |
+| `invalid_request` | Request validation failed |
+| `expired` | Mandate authorization expired |
+| `unknown_error` | Unspecified failure reason |
+
+**Note:** Always handle unexpected failure reasons defensively, as new reasons may be added.
+
+### Checking Mandate Status
+
+```csharp
+var response = await _client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
+
+if (response.IsSuccessful)
+{
+    response.Data.Match(
+        authRequired =>
+        {
+            Console.WriteLine($"Status: {authRequired.Status}");
+            Console.WriteLine("Action: User needs to authorize the mandate");
+        },
+        authorizing =>
+        {
+            Console.WriteLine($"Status: {authorizing.Status}");
+            Console.WriteLine("Action: User is authorizing, wait for completion");
+        },
+        authorized =>
+        {
+            Console.WriteLine($"Status: {authorized.Status}");
+            Console.WriteLine("Action: Mandate is active and can be used");
+        },
+        failed =>
+        {
+            Console.WriteLine($"Status: {failed.Status}");
+            Console.WriteLine($"Failure Reason: {failed.FailureReason}");
+            Console.WriteLine($"Failed At: {failed.FailedAt}");
+            Console.WriteLine($"Failure Stage: {failed.FailureStage}");
+            Console.WriteLine("Terminal: Mandate failed");
+        },
+        revoked =>
+        {
+            Console.WriteLine($"Status: {revoked.Status}");
+            Console.WriteLine($"Revoked At: {revoked.RevokedAt}");
+            Console.WriteLine($"Revoked By: {revoked.RevokedBy}");
+            Console.WriteLine("Terminal: Mandate has been cancelled");
+        }
+    );
+}
+```
+
+### Handling Terminal Statuses
+
+```csharp
+public bool IsTerminalStatus(GetMandateResponse mandate)
+{
+    return mandate.Match(
+        authRequired => false,
+        authorizing => false,
+        authorized => false,
+        failed => true,    // Terminal - mandate failed
+        revoked => true    // Terminal - mandate cancelled
+    );
+}
+
+public async Task WaitForAuthorization(string mandateId, TimeSpan timeout)
+{
+    var startTime = DateTime.UtcNow;
+
+    while (DateTime.UtcNow - startTime < timeout)
+    {
+        var response = await _client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
+
+        if (!response.IsSuccessful)
+        {
+            throw new Exception($"Failed to get mandate status: {response.Problem?.Detail}");
+        }
+
+        var isComplete = response.Data.Match(
+            authRequired => false,
+            authorizing => false,
+            authorized => true,  // Success
+            failed => throw new Exception($"Mandate failed: {failed.FailureReason}"),
+            revoked => throw new Exception("Mandate was revoked")
+        );
+
+        if (isComplete)
+        {
+            return; // Mandate authorized successfully
+        }
+
+        await Task.Delay(TimeSpan.FromSeconds(5));
+    }
+
+    throw new TimeoutException("Mandate did not complete authorization within timeout");
+}
+```
+
+### Handling Specific Failure Reasons
+
+```csharp
+public async Task<MandateResult> HandleMandateFailure(string mandateId)
+{
+    var response = await _client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
+
+    if (!response.IsSuccessful)
+    {
+        return MandateResult.Error("Failed to retrieve mandate status");
+    }
+
+    return response.Data.Match<MandateResult>(
+        authRequired => MandateResult.RequiresAuth(),
+        authorizing => MandateResult.Authorizing(),
+        authorized => MandateResult.Success(),
+        failed => failed.FailureReason switch
+        {
+            "authorization_failed" => MandateResult.Error(
+                "User failed to complete authorization. Please create a new mandate."
+            ),
+            "provider_rejected" => MandateResult.Error(
+                "Provider rejected the mandate. The bank may not support this operation."
+            ),
+            "expired" => MandateResult.Error(
+                "Mandate authorization expired. Please create a new mandate."
+            ),
+            "invalid_sort_code" => MandateResult.Error(
+                "Invalid bank account details. Please verify and create new mandate."
+            ),
+            _ => MandateResult.Error($"Mandate failed: {failed.FailureReason}")
+        },
+        revoked => MandateResult.Error(
+            $"Mandate was revoked by {revoked.RevokedBy} on {revoked.RevokedAt}"
+        )
+    );
+}
+```
 
 ## Mandate Constraints
 
@@ -286,11 +435,25 @@ public class User
 
 ### 2. Check Mandate Status Before Payment
 
-Always verify mandate is in `Authorized` state:
+Always verify mandate is in `authorized` status:
 
 ```csharp
-var mandate = await GetMandate(mandateId);
-if (mandate is not MandateDetail.AuthorizedMandateDetail)
+var response = await _client.Mandates.GetMandate(mandateId, MandateType.Sweeping);
+
+if (!response.IsSuccessful)
+{
+    throw new Exception("Failed to retrieve mandate");
+}
+
+var isAuthorized = response.Data.Match(
+    authRequired => false,
+    authorizing => false,
+    authorized => true,
+    failed => false,
+    revoked => false
+);
+
+if (!isAuthorized)
 {
     throw new InvalidOperationException("Mandate is not authorized");
 }

@@ -2,6 +2,8 @@
 
 Create and manage payments using the TrueLayer Payments API. Payments allow you to initiate bank transfers from your users' accounts.
 
+> **See also**: The [MVC Example](https://github.com/TrueLayer/truelayer-dotnet/tree/main/examples/MvcExample) demonstrates a complete payment flow in [PaymentsController.cs](https://github.com/TrueLayer/truelayer-dotnet/blob/main/examples/MvcExample/Controllers/PaymentsController.cs).
+
 ## Basic Payment Creation
 
 ### User-Selected Provider
@@ -95,7 +97,11 @@ var request = new CreatePaymentRequest(
 
 ## Beneficiary Types
 
-### External Account (Sort Code & Account Number)
+### External Account
+
+Pay to an external bank account using different account identifier types:
+
+#### Sort Code & Account Number
 
 ```csharp
 var beneficiary = new Beneficiary.ExternalAccount(
@@ -105,7 +111,7 @@ var beneficiary = new Beneficiary.ExternalAccount(
 );
 ```
 
-### IBAN
+#### IBAN
 
 ```csharp
 var beneficiary = new Beneficiary.ExternalAccount(
@@ -160,7 +166,9 @@ var user = new PaymentUserRequest(
 
 ### Recommended Approach
 
-The recommended way to use TrueLayer's Hosted Payment Page is to include `HostedPageRequest` when creating the payment. This ensures the HPP URL is generated with the payment and returned in the response:
+The recommended way to use TrueLayer's Hosted Payment Page is to include `HostedPageRequest` when creating the payment. This ensures the HPP URL is generated with the payment and returned in the response.
+
+> **See also**: The [MVC Example](https://github.com/TrueLayer/truelayer-dotnet/tree/main/examples/MvcExample) uses `HostedPageRequest` in [PaymentsController.cs](https://github.com/TrueLayer/truelayer-dotnet/blob/main/examples/MvcExample/Controllers/PaymentsController.cs#L51-L69).
 
 ```csharp
 var hostedPage = new HostedPageRequest(
@@ -249,6 +257,8 @@ public async Task<IActionResult> CreatePaymentWithHostedPage(Order order)
 Payments transition through various statuses as they progress. Understanding these statuses helps you track payment progress and handle different scenarios appropriately.
 
 For complete details, see the [TrueLayer Payment Status documentation](https://docs.truelayer.com/docs/payment-statuses).
+
+> **See also**: The [MVC Example](https://github.com/TrueLayer/truelayer-dotnet/tree/main/examples/MvcExample) demonstrates handling all payment statuses in [PaymentsController.cs](https://github.com/TrueLayer/truelayer-dotnet/blob/main/examples/MvcExample/Controllers/PaymentsController.cs#L114-L161).
 
 ### Status Overview
 

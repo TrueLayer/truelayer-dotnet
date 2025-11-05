@@ -46,7 +46,9 @@ if (response.IsSuccessful)
 
 ## Get Provider Details
 
-Get detailed information about a specific provider:
+Get detailed information about a specific provider.
+
+> **See also**: The [MVC Example](https://github.com/TrueLayer/truelayer-dotnet/tree/main/examples/MvcExample) demonstrates getting provider details in [ProvidersController.cs](https://github.com/TrueLayer/truelayer-dotnet/blob/main/examples/MvcExample/Controllers/ProvidersController.cs).
 
 ```csharp
 var response = await _client.PaymentsProviders.GetPaymentsProvider("mock-payments-gb-redirect");
@@ -121,7 +123,7 @@ public async Task<List<PaymentsProvider>> GetVRPProviders()
         Capabilities: new Capabilities(
             Payments: null,
             Mandates: new MandatesCapabilities(
-                VrpSweeping: new VrpSweepingCapabilities("general_availability"),
+                VrpSweeping: new VrpSweepingCapabilities(ReleaseChannels.GeneralAvailability),
                 VrpCommercial: null
             )
         )
@@ -145,7 +147,7 @@ public async Task<List<PaymentsProvider>> GetPaymentProviders()
         Capabilities: new Capabilities(
             Payments: new PaymentsCapabilities(
                 BankTransfer: new BankTransferCapabilities(
-                    ReleaseChannel: "general_availability",
+                    ReleaseChannel: ReleaseChannels.GeneralAvailability,
                     Schemes: new List<Scheme> { new Scheme("faster_payments_service") }
                 )
             ),
@@ -175,11 +177,11 @@ public async Task<List<PaymentsProvider>> GetUKPaymentProviders()
         new AuthorizationFlow(new AuthorizationFlowConfiguration()),
         Countries: new List<string> { "GB" },
         Currencies: new List<string> { "GBP" },
-        ReleaseChannel: "general_availability",
+        ReleaseChannel: ReleaseChannels.GeneralAvailability,
         Capabilities: new Capabilities(
             Payments: new PaymentsCapabilities(
                 BankTransfer: new BankTransferCapabilities(
-                    ReleaseChannel: "general_availability",
+                    ReleaseChannel: ReleaseChannels.GeneralAvailability,
                     Schemes: new List<Scheme> { new Scheme("faster_payments_service") }
                 )
             ),
@@ -202,6 +204,8 @@ public async Task<List<PaymentsProvider>> GetUKPaymentProviders()
 
 ## Provider Selection Patterns
 
+> **See also**: The [MVC Example](https://github.com/TrueLayer/truelayer-dotnet/tree/main/examples/MvcExample) demonstrates both preselected and user-selected provider patterns in [PaymentsController.cs](https://github.com/TrueLayer/truelayer-dotnet/blob/main/examples/MvcExample/Controllers/PaymentsController.cs).
+
 ### User Selection with Filtering
 
 Allow users to choose from a filtered list of providers:
@@ -220,7 +224,7 @@ public async Task<CreatePaymentRequest> CreatePaymentWithFilteredProviders(
         Capabilities: new Capabilities(
             Payments: new PaymentsCapabilities(
                 BankTransfer: new BankTransferCapabilities(
-                    ReleaseChannel: "general_availability",
+                    ReleaseChannel: ReleaseChannels.GeneralAvailability,
                     Schemes: new List<Scheme> { new Scheme("faster_payments_service") }
                 )
             ),
@@ -402,7 +406,7 @@ public async Task<List<ProviderGroup>> GetProvidersByCapability()
         Capabilities: new Capabilities(
             Payments: null,
             Mandates: new MandatesCapabilities(
-                VrpSweeping: new VrpSweepingCapabilities("general_availability"),
+                VrpSweeping: new VrpSweepingCapabilities(ReleaseChannels.GeneralAvailability),
                 VrpCommercial: null
             )
         )
@@ -425,7 +429,7 @@ public async Task<List<ProviderGroup>> GetProvidersByCapability()
         Capabilities: new Capabilities(
             Payments: new PaymentsCapabilities(
                 BankTransfer: new BankTransferCapabilities(
-                    ReleaseChannel: "general_availability",
+                    ReleaseChannel: ReleaseChannels.GeneralAvailability,
                     Schemes: new List<Scheme> { new Scheme("faster_payments_service") }
                 )
             ),
@@ -535,27 +539,7 @@ services.AddMemoryCache();
 services.AddSingleton<ProviderCache>();
 ```
 
-### 2. Handle Provider Availability
-
-Providers may be temporarily unavailable:
-
-```csharp
-public async Task<bool> IsProviderAvailable(string providerId)
-{
-    var response = await _client.PaymentsProviders.GetPaymentsProvider(providerId);
-
-    if (!response.IsSuccessful)
-    {
-        return false;
-    }
-
-    // Additional checks for provider status if available
-    // Check if provider supports required capability
-    return response.Data.Capabilities.Payments?.BankTransfer != null;
-}
-```
-
-### 3. Validate Provider Before Use
+### 2. Validate Provider Before Use
 
 Always verify a provider exists before creating a payment:
 
@@ -586,7 +570,7 @@ public async Task<ApiResponse<CreatePaymentResponse>> CreatePaymentSafely(
 }
 ```
 
-### 4. Display Provider Logos
+### 3. Display Provider Logos
 
 Use provider logos for better UX:
 
@@ -602,7 +586,7 @@ public string GetProviderLogoUrl(PaymentsProvider provider)
 // <img src="@provider.LogoUrl" alt="@provider.Name" style="background-color: @provider.BackgroundColor" />
 ```
 
-### 5. Filter by User's Country
+### 4. Filter by User's Country
 
 Show only relevant providers to users:
 
@@ -644,7 +628,7 @@ public async Task<IActionResult> SelectBank(string paymentId)
         Capabilities: new Capabilities(
             Payments: new PaymentsCapabilities(
                 BankTransfer: new BankTransferCapabilities(
-                    ReleaseChannel: "general_availability",
+                    ReleaseChannel: ReleaseChannels.GeneralAvailability,
                     Schemes: new List<Scheme> { new Scheme("faster_payments_service") }
                 )
             ),
@@ -701,7 +685,7 @@ public async Task<List<PaymentsProvider>> GetProvidersForTransaction(
         capabilities = new Capabilities(
             Payments: null,
             Mandates: new MandatesCapabilities(
-                VrpSweeping: new VrpSweepingCapabilities("general_availability"),
+                VrpSweeping: new VrpSweepingCapabilities(ReleaseChannels.GeneralAvailability),
                 VrpCommercial: null
             )
         );
@@ -711,7 +695,7 @@ public async Task<List<PaymentsProvider>> GetProvidersForTransaction(
         capabilities = new Capabilities(
             Payments: new PaymentsCapabilities(
                 BankTransfer: new BankTransferCapabilities(
-                    ReleaseChannel: "general_availability",
+                    ReleaseChannel: ReleaseChannels.GeneralAvailability,
                     Schemes: new List<Scheme> { new Scheme("faster_payments_service") }
                 )
             ),
@@ -723,7 +707,7 @@ public async Task<List<PaymentsProvider>> GetProvidersForTransaction(
         new AuthorizationFlow(new AuthorizationFlowConfiguration()),
         Countries: new List<string> { countryCode },
         Currencies: new List<string> { currency },
-        ReleaseChannel: "general_availability",
+        ReleaseChannel: ReleaseChannels.GeneralAvailability,
         Capabilities: capabilities
     );
 

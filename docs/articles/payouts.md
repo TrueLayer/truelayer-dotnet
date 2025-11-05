@@ -2,6 +2,8 @@
 
 Process payouts to send funds from your merchant account to beneficiaries. Payouts are perfect for marketplace disbursements, refunds, and payments to suppliers.
 
+> **See also**: The [MVC Example](https://github.com/TrueLayer/truelayer-dotnet/tree/main/examples/MvcExample) demonstrates a complete payout flow in [PayoutController.cs](https://github.com/TrueLayer/truelayer-dotnet/blob/main/examples/MvcExample/Controllers/PayoutController.cs).
+
 ## Basic Payout Creation
 
 ### Payout to UK Account
@@ -103,6 +105,8 @@ var request = new CreatePayoutRequest(
 Payouts transition through various statuses as they are processed. Understanding these statuses helps you track payout progress and handle different scenarios appropriately.
 
 For complete details, see the [TrueLayer Payout and Refund Status documentation](https://docs.truelayer.com/docs/payout-and-refund-statuses).
+
+> **See also**: The [MVC Example](https://github.com/TrueLayer/truelayer-dotnet/tree/main/examples/MvcExample) demonstrates handling all payout statuses in [PayoutController.cs](https://github.com/TrueLayer/truelayer-dotnet/blob/main/examples/MvcExample/Controllers/PayoutController.cs#L90-L127).
 
 ### Status Overview
 
