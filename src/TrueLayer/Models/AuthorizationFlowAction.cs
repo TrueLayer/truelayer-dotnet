@@ -8,6 +8,9 @@ namespace TrueLayer.Models;
 
 using InputUnion = OneOf<Input.Text, Input.TextWithImage, Input.Select>;
 
+/// <summary>
+/// Contains authorization flow action types for payment and mandate flows.
+/// </summary>
 public static class AuthorizationFlowAction
 {
     /// <summary>
@@ -18,7 +21,21 @@ public static class AuthorizationFlowAction
     [JsonDiscriminator("provider_selection")]
     public record ProviderSelection(string Type, List<Provider> Providers) : IDiscriminated;
 
-    public enum SubsequentActionHint { Redirect = 0, Form = 1 };
+    /// <summary>
+    /// Represents the hint for the type of action that will follow.
+    /// </summary>
+    public enum SubsequentActionHint
+    {
+        /// <summary>
+        /// The next action will be a redirect.
+        /// </summary>
+        Redirect = 0,
+
+        /// <summary>
+        /// The next action will require form submission.
+        /// </summary>
+        Form = 1
+    };
 
     /// <summary>
     /// Consent action.

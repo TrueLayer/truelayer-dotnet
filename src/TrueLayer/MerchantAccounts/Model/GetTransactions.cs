@@ -17,13 +17,31 @@ using PayoutBeneficiaryUnion = OneOf<
         PayoutBeneficiary.BusinessAccount,
         PayoutBeneficiary.UserDetermined>;
 
+/// <summary>
+/// Represents the response from a request to retrieve merchant account transactions.
+/// </summary>
+/// <param name="Items">The list of transactions in the merchant account.</param>
+/// <param name="Pagination">Pagination information for the transaction list.</param>
 public record GetTransactionsResponse(IList<MerchantAccountTransactionUnion> Items, Pagination Pagination);
 
+/// <summary>
+/// Contains all transaction types and models for merchant account transactions.
+/// </summary>
 public static class MerchantAccountTransactions
 {
+    /// <summary>
+    /// Defines the transaction type constants.
+    /// </summary>
     public static class TransactionTypes
     {
+        /// <summary>
+        /// Represents a payment transaction type.
+        /// </summary>
         public const string Payment = "payment";
+
+        /// <summary>
+        /// Represents a payout transaction type.
+        /// </summary>
         public const string Payout = "payout";
     }
 
@@ -82,6 +100,10 @@ public static class MerchantAccountTransactions
         string PaymentId) : BaseTransaction(Id, Currency, AmountInMinor, Status), IDiscriminated
     {
         const string Discriminator = "merchant_account_payment";
+
+        /// <summary>
+        /// Gets the type discriminator for merchant account payment transactions.
+        /// </summary>
         public string Type => Discriminator;
     }
 
@@ -106,6 +128,10 @@ public static class MerchantAccountTransactions
         ReturnForUnion ReturnFor) : BaseTransaction(Id, Currency, AmountInMinor, Status), IDiscriminated
     {
         const string Discriminator = "external_payment";
+
+        /// <summary>
+        /// Gets the type discriminator for external payment transactions.
+        /// </summary>
         public string Type => Discriminator;
     }
 
@@ -134,6 +160,10 @@ public static class MerchantAccountTransactions
             PayoutId), IDiscriminated
     {
         const string Discriminator = "pending_payout";
+
+        /// <summary>
+        /// Gets the type discriminator for pending payout transactions.
+        /// </summary>
         public string Type => Discriminator;
     }
 
@@ -175,6 +205,10 @@ public static class MerchantAccountTransactions
             PayoutId), IDiscriminated
     {
         const string Discriminator = "executed_payout";
+
+        /// <summary>
+        /// Gets the type discriminator for executed payout transactions.
+        /// </summary>
         public string Type => Discriminator;
     }
 
@@ -214,6 +248,10 @@ public static class MerchantAccountTransactions
             Status), IDiscriminated
     {
         const string Discriminator = "refund";
+
+        /// <summary>
+        /// Gets the type discriminator for refund transactions.
+        /// </summary>
         public string Type => Discriminator;
     }
 }

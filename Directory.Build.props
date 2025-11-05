@@ -3,7 +3,7 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
     <PropertyGroup>
-        <Authors>TrueLayer</Authors>
+        <Authors>TrueLayer and contributors</Authors>
         <Company>TrueLayer</Company>
         <PackageProjectUrl>https://github.com/TrueLayer/truelayer-dotnet</PackageProjectUrl>
         <RepositoryUrl>https://github.com/TrueLayer/truelayer-dotnet</RepositoryUrl>

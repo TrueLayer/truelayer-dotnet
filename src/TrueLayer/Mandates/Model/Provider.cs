@@ -3,6 +3,9 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Mandates.Model;
 
+/// <summary>
+/// Contains provider selection types for mandates.
+/// </summary>
 public static class Provider
 {
     /// <summary>

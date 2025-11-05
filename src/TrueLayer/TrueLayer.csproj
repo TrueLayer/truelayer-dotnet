@@ -17,11 +17,8 @@
     </PropertyGroup>
 
     <PropertyGroup Label="Package info">
-        <Authors>TrueLayer and contributors</Authors>
         <Description>.NET client for the TrueLayer API</Description>
         <Copyright>© TrueLayer Ltd. 2025</Copyright>
-        <PackageProjectUrl>https://github.com/TrueLayer/truelayer-dotnet</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/TrueLayer/truelayer-dotnet</RepositoryUrl>
         <PackageTags>truelayer;payments;banking;open-banking;api-client;fintech</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
