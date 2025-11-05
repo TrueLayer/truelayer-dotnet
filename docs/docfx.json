@@ -13,46 +13,70 @@
           ]
         }
       ],
-      "dest": "obj/api"
+      "dest": "api",
+      "includePrivateMembers": false,
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false
     }
   ],
   "build": {
     "content": [
       {
         "files": [
-          "**/*.yml"
-        ],
-        "src": "obj/api",
-        "dest": "api"
+          "api/**.yml",
+          "api/index.md"
+        ]
       },
       {
         "files": [
           "*.md",
           "toc.yml"
         ]
+      },
+      {
+        "files": [
+          "articles/**.md",
+          "articles/**/toc.yml"
+        ]
       }
     ],
     "resource": [
       {
         "files": [
-          "img/**"
+          "img/**",
+          "articles/img/**"
         ]
       }
     ],
-    "overwrite": "specs/*.md",
     "globalMetadata": {
       "_appTitle": "TrueLayer.NET Documentation",
+      "_appName": "TrueLayer.NET",
+      "_appLogoPath": "img/tl-logo.svg",
+      "_appFaviconPath": "img/tl-logo.svg",
       "_enableSearch": true,
-      "_appLogoPath": "https://truelayer-public-assets.s3-eu-west-1.amazonaws.com/logo/mark/tl-yellow.svg"
+      "_gitContribute": {
+        "repo": "https://github.com/TrueLayer/truelayer-dotnet",
+        "branch": "main"
+      },
+      "_gitUrlPattern": "github"
     },
-    "markdownEngineName": "markdig",
-    "dest": "../artifacts/docs",
+    "fileMetadata": {
+      "_disableContribution": {
+        "api/**.yml": true
+      }
+    },
     "template": [
-      "default",
-      "templates/material"
+      "default"
     ],
+    "markdownEngineName": "markdig",
+    "markdownEngineProperties": {
+      "markdigExtensions": [
+        "advanced"
+      ]
+    },
     "xrefService": [
       "https://xref.docs.microsoft.com/query?uid={uid}"
-    ]
+    ],
+    "dest": "_site"
   }
 }

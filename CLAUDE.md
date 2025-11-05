@@ -3,7 +3,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Common Development Commands
 
 ### Build and Test
-- **Build the solution**: `./build.sh` (Mac/Linux) or use Cake directly: `dotnet cake`
+- **Build the solution**: `dotnet build`
 - **Run unit tests**: `dotnet test test/TrueLayer.Tests/TrueLayer.Tests.csproj`
 - **Run acceptance tests**: `dotnet test test/TrueLayer.AcceptanceTests/TrueLayer.AcceptanceTests.csproj`
 - **Run specific test**: `dotnet test --filter "TestMethodName"`
@@ -59,7 +59,7 @@ Uses Cake build system (`build.cake`) with tasks for:
 - NuGet package publishing
 - CI/CD integration with GitHub Actions
 ### Code Style
-- C# 10.0 language features
+- C# 12.0 language features
 - Nullable reference types enabled
 - Code style enforcement via `EnforceCodeStyleInBuild`
 - EditorConfig and analyzer rules applied
