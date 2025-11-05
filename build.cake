@@ -151,7 +151,8 @@ Task("Pack")
         {
             Configuration = configuration,
             OutputDirectory = artifactsPath,
-            NoBuild = true
+            NoBuild = true,
+            IncludeSymbols = true
         };
 
         foreach (var file in GetFiles(packFiles))
@@ -264,7 +265,7 @@ public static class BuildContext
         context.Information("Printing Build Parameters...");
         context.Information("IsTag: {0}", IsTag);
         context.Information("NugetApiUrl: {0}", NugetApiUrl);
-        context.Information("NugetApiKey: {0}", NugetApiKey);
+        context.Information("NugetApiKey: {0}", string.IsNullOrEmpty(NugetApiKey) ? "<not set>" : "***");
         context.Information("ShouldPublishToNuget: {0}", ShouldPublishToNuget);
     }
 }

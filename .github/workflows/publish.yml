@@ -71,10 +71,10 @@ jobs:
         with:
           name: test-results
           path: artifacts/*.TestResults.xml
-          retention-days: 90
+          retention-days: 30
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
+        if: always() && github.actor != 'dependabot[bot]'
         with:
           files: artifacts/*.TestResults.xml
           check_name: Test Results
