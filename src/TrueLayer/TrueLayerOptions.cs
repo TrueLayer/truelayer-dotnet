@@ -24,9 +24,19 @@ public class TrueLayerOptions
     /// </summary>
     public bool? UseSandbox { get; init; }
 
+    /// <summary>
+    /// Gets or sets the authentication API options.
+    /// </summary>
     public ApiOptions? Auth { get; set; }
+
+    /// <summary>
+    /// Gets or sets the payments API options.
+    /// </summary>
     public PaymentsOptions? Payments { get; set; }
 
+    /// <summary>
+    /// Validates that all required options are configured correctly.
+    /// </summary>
     public void Validate()
     {
         if (string.IsNullOrWhiteSpace(ClientId))

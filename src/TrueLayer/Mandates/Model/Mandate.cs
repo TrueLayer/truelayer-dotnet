@@ -7,6 +7,9 @@ namespace TrueLayer.Mandates.Model;
 using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
 using ProviderUnion = OneOf<CreateProviderSelection.UserSelected, CreateProviderSelection.Preselected>;
 
+/// <summary>
+/// Contains mandate types for Variable Recurring Payments (VRP).
+/// </summary>
 public static class Mandate
 {
     /// <summary>

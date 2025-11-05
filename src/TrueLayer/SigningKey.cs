@@ -10,6 +10,9 @@ public class SigningKey
 {
     private readonly Lazy<ECDsa> _key;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SigningKey"/> class.
+    /// </summary>
     public SigningKey()
     {
         _key = new Lazy<ECDsa>(() => CreateECDsaKey(PrivateKey));

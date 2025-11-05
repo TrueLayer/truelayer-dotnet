@@ -12,8 +12,24 @@ namespace TrueLayer.Mandates.Model;
 using BeneficiaryUnion = OneOf<ExternalAccount, MerchantAccount>;
 using ProviderUnion = OneOf<UserSelected, Preselected>;
 
+/// <summary>
+/// Contains all mandate detail types representing different states of a mandate.
+/// </summary>
 public static class MandateDetail
 {
+    /// <summary>
+    /// Base record for all mandate detail types, containing common mandate properties.
+    /// </summary>
+    /// <param name="Id">Unique identifier for the mandate.</param>
+    /// <param name="Currency">Three-letter ISO currency code.</param>
+    /// <param name="Beneficiary">The beneficiary account for the mandate.</param>
+    /// <param name="Reference">Reference set on the mandate.</param>
+    /// <param name="CreatedAt">The date and time when the mandate was created.</param>
+    /// <param name="Constraints">The limits for payments that can be created by the mandate.</param>
+    /// <param name="ProviderSelection">Provider selection information.</param>
+    /// <param name="Status">The current status of the mandate.</param>
+    /// <param name="User">Optional user information associated with the mandate.</param>
+    /// <param name="Metadata">Optional custom key-value data associated with the mandate.</param>
     public abstract record MandateDetailBase(
         string Id,
         string Currency,

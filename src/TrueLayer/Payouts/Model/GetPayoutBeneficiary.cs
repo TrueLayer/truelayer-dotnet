@@ -59,9 +59,24 @@ public static class GetPayoutBeneficiary
     {
         const string Discriminator = "external_account";
 
+        /// <summary>
+        /// Gets the type of beneficiary.
+        /// </summary>
         public string Type => Discriminator;
+
+        /// <summary>
+        /// Gets the name of the account holder.
+        /// </summary>
         public string AccountHolderName { get; init; } = null!;
+
+        /// <summary>
+        /// Gets the reference for the payout.
+        /// </summary>
         public string Reference { get; init; } = null!;
+
+        /// <summary>
+        /// Gets the account identifier for the external account.
+        /// </summary>
         public AccountIdentifierUnion AccountIdentifier { get; init; }
     }
 
@@ -73,9 +88,24 @@ public static class GetPayoutBeneficiary
     {
         const string Discriminator = "business_account";
 
+        /// <summary>
+        /// Gets the type of beneficiary.
+        /// </summary>
         public string Type => Discriminator;
+
+        /// <summary>
+        /// Gets the name of the account holder.
+        /// </summary>
         public string? AccountHolderName { get; init; }
+
+        /// <summary>
+        /// Gets the reference for the payout.
+        /// </summary>
         public string Reference { get; init; } = null!;
+
+        /// <summary>
+        /// Gets the account identifier for the business account.
+        /// </summary>
         public AccountIdentifierUnion? AccountIdentifier { get; init; }
     }
 
@@ -87,6 +117,9 @@ public static class GetPayoutBeneficiary
     {
         const string Discriminator = "user_determined";
 
+        /// <summary>
+        /// Gets the type of beneficiary.
+        /// </summary>
         public string Type => Discriminator;
 
         /// <summary>

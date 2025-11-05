@@ -14,6 +14,9 @@ public static class AccountIdentifier
     [JsonDiscriminator(Discriminator)]
     public record Iban : IDiscriminated
     {
+        /// <summary>
+        /// The discriminator value for IBAN type.
+        /// </summary>
         public const string Discriminator = "iban";
 
         /// <summary>
@@ -41,9 +44,15 @@ public static class AccountIdentifier
         public string Value { get; }
     }
 
+    /// <summary>
+    /// Defines a bank account identified by sort code and account number.
+    /// </summary>
     [JsonDiscriminator(Discriminator)]
     public record SortCodeAccountNumber : IDiscriminated
     {
+        /// <summary>
+        /// The discriminator value for sort code account number type.
+        /// </summary>
         public const string Discriminator = "sort_code_account_number";
 
         /// <summary>
@@ -81,6 +90,9 @@ public static class AccountIdentifier
     [JsonDiscriminator(Discriminator)]
     public record Nrb : IDiscriminated
     {
+        /// <summary>
+        /// The discriminator value for NRB type.
+        /// </summary>
         public const string Discriminator = "nrb";
 
         /// <summary>

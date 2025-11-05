@@ -33,6 +33,9 @@ public record ProviderFilter
     /// </summary>
     public ExcludesFilter? Excludes { get; init; }
 
+    /// <summary>
+    /// Represents filters to exclude specific providers from the selection.
+    /// </summary>
     public record ExcludesFilter
     {
         /// <summary>

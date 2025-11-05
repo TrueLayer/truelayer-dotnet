@@ -1,5 +1,8 @@
 namespace TrueLayer.Payments.Model;
 
+/// <summary>
+/// Represents related products that can be associated with a payment.
+/// </summary>
 public record RelatedProducts
 {
     /// <summary>
@@ -11,15 +14,14 @@ public record RelatedProducts
         SignupPlus = signupPlus;
     }
     /// <summary>
-    /// Gets signup+ product.
+    /// Gets Signup+ product.
     /// </summary>
     public SignupPlus? SignupPlus { get; }
 }
 
 /// <summary>
-/// Creates a Signup+ products.
+/// Represents a Signup+ product.
 /// </summary>
-/// <param name="signupPlus">Signup+</param>
 public record SignupPlus
 {
 }

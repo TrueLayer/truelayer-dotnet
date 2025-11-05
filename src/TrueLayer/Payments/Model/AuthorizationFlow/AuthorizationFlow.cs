@@ -20,6 +20,9 @@ using SchemeSelectionUnion = OneOf<
 /// We recommend that your return_uri is a URI that can handle a non-direct return scenario. This ensures that if the direct_return_uri isn't registered with the user's chosen provider, the payment can still be authorized through a Truelayer domain.</param>
 public record Redirect(Uri ReturnUri, Uri? DirectReturnUri = null);
 
+/// <summary>
+/// Indicates that the UI can render a user account selection screen for saved accounts.
+/// </summary>
 public record UserAccountSelection();
 
 /// <summary>
