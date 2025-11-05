@@ -5,8 +5,8 @@
     <PropertyGroup>
         <Authors>TrueLayer</Authors>
         <Company>TrueLayer</Company>
-        <PackageProjectUrl>https://github.com/truelayer/truelayer-dotnet</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/truelayer/truelayer-dotnet.git</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/TrueLayer/truelayer-dotnet</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/TrueLayer/truelayer-dotnet</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
     <PropertyGroup Label="MinVer">
