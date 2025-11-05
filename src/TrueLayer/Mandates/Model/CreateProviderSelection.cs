@@ -31,6 +31,10 @@ public static class CreateProviderSelection
     [JsonDiscriminator("preselected")]
     public record Preselected : IDiscriminated
     {
+        /// <summary>
+        /// Creates a new <see cref="Preselected"/> instance with the specified provider.
+        /// </summary>
+        /// <param name="providerId">The provider Id the PSU will use for this mandate.</param>
         public Preselected(string providerId)
         {
             ProviderId = providerId.NotNull(nameof(providerId));

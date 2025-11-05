@@ -1,5 +1,8 @@
 namespace TrueLayer.Payments.Model;
 
+/// <summary>
+/// Represents related products that can be associated with a payment.
+/// </summary>
 public record RelatedProducts
 {
     /// <summary>

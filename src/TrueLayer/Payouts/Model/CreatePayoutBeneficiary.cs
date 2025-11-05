@@ -65,6 +65,14 @@ public static class CreatePayoutBeneficiary
     {
         const string Discriminator = "external_account";
 
+        /// <summary>
+        /// Creates a new <see cref="ExternalAccount"/> beneficiary.
+        /// </summary>
+        /// <param name="accountHolderName">The name of the external account holder.</param>
+        /// <param name="reference">A reference for the payout.</param>
+        /// <param name="accountIdentifier">The unique scheme identifier for the external account.</param>
+        /// <param name="dateOfBirth">Optional user's date of birth.</param>
+        /// <param name="address">Optional user's physical address.</param>
         public ExternalAccount(
             string accountHolderName,
             string reference,

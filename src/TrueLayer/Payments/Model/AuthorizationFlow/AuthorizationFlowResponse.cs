@@ -2,6 +2,9 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Payments.Model.AuthorizationFlow;
 
+/// <summary>
+/// Contains authorization flow response types for payment operations.
+/// </summary>
 public static class AuthorizationFlowResponse
 {
     /// <summary>

@@ -59,6 +59,9 @@ public static class CreatePaymentResponse
     [JsonDiscriminator("authorizing")]
     public record Authorizing : PaymentDetails
     {
+        /// <summary>
+        /// Gets or inits the authorization flow configuration and state information.
+        /// </summary>
         public AuthorizationFlow.AuthorizationFlow? AuthorizationFlow { get; init; } = null;
     }
 

@@ -3,6 +3,9 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Models;
 
+/// <summary>
+/// Contains image types for provider logos and other images.
+/// </summary>
 public static class Image
 {
     /// <summary>

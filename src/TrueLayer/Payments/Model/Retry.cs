@@ -7,6 +7,9 @@ namespace TrueLayer.Payments.Model;
 /// </summary>
 public static class Retry
 {
+    /// <summary>
+    /// Base record for all retry types.
+    /// </summary>
     public record BaseRetry();
 
     /// <summary>

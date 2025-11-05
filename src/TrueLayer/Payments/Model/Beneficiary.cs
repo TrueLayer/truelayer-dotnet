@@ -7,6 +7,9 @@ namespace TrueLayer.Payments.Model;
 using AccountIdentifierUnion = OneOf<SortCodeAccountNumber, Iban, Bban, Nrb>;
 using VerificationUnion = OneOf<Verification.Automated>;
 
+/// <summary>
+/// Contains beneficiary types for payment operations.
+/// </summary>
 public static class Beneficiary
 {
     /// <summary>

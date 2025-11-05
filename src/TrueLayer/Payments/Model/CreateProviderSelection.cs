@@ -46,6 +46,11 @@ public static class CreateProviderSelection
     [JsonDiscriminator("preselected")]
     public record Preselected : IDiscriminated
     {
+        /// <summary>
+        /// Creates a new <see cref="Preselected"/> instance with the specified provider and scheme selection.
+        /// </summary>
+        /// <param name="providerId">The provider Id the PSU will use for this payment.</param>
+        /// <param name="schemeSelection">The scheme selection option for the payment.</param>
         public Preselected(string providerId, PreselectedProviderSchemeSelectionUnion? schemeSelection = null)
         {
             if (schemeSelection is null)

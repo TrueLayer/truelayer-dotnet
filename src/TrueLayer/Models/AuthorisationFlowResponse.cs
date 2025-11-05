@@ -2,6 +2,9 @@ using TrueLayer.Serialization;
 
 namespace TrueLayer.Models;
 
+/// <summary>
+/// Contains authorization flow response types for mandate operations.
+/// </summary>
 public static class AuthorisationFlowResponse
 {
     /// <summary>
