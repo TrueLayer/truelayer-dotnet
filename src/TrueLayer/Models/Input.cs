@@ -7,6 +7,9 @@ namespace TrueLayer.Models;
 
 using ImageUnion = OneOf<Image.Uri, Image.Base64>;
 
+/// <summary>
+/// Contains input types and models for user form interactions in the authorization flow.
+/// </summary>
 public static class Input
 {
     /// <summary>
@@ -28,16 +31,55 @@ public static class Input
     /// </summary>
     public enum Format
     {
+        /// <summary>
+        /// Accepts any text format.
+        /// </summary>
         Any = 0,
+
+        /// <summary>
+        /// Accepts only numerical input.
+        /// </summary>
         Numerical = 1,
+
+        /// <summary>
+        /// Accepts only alphabetical characters.
+        /// </summary>
         Alphabetical = 2,
+
+        /// <summary>
+        /// Accepts alphanumerical characters (letters and numbers).
+        /// </summary>
         Alphanumerical = 3,
+
+        /// <summary>
+        /// Accepts email address format.
+        /// </summary>
         Email = 4,
+
+        /// <summary>
+        /// Accepts sort code format.
+        /// </summary>
         SortCode = 5,
+
+        /// <summary>
+        /// Accepts account number format.
+        /// </summary>
         AccountNumber = 6,
+
+        /// <summary>
+        /// Accepts International Bank Account Number (IBAN) format.
+        /// </summary>
         Iban = 7
     };
 
+    /// <summary>
+    /// Base record for all input types.
+    /// </summary>
+    /// <param name="Type">The discriminator type for the input.</param>
+    /// <param name="Id">The identifier for the input field.</param>
+    /// <param name="Mandatory">Indicates whether the input is mandatory.</param>
+    /// <param name="DisplayText">The display text for the input label.</param>
+    /// <param name="Description">Optional description providing additional information about the input.</param>
     public abstract record InputBase(
         string Type,
         string Id,
@@ -45,6 +87,19 @@ public static class Input
         DisplayText DisplayText,
         DisplayText? Description) : IDiscriminated;
 
+    /// <summary>
+    /// Base record for text-based input types.
+    /// </summary>
+    /// <param name="Type">The discriminator type for the input.</param>
+    /// <param name="Id">The identifier for the input field.</param>
+    /// <param name="Mandatory">Indicates whether the input is mandatory.</param>
+    /// <param name="DisplayText">The display text for the input label.</param>
+    /// <param name="Format">The text format that the input accepts.</param>
+    /// <param name="Sensitive">Indicates whether the input contains sensitive information.</param>
+    /// <param name="MinLength">The minimum length of the text input value.</param>
+    /// <param name="MaxLength">The maximum length of the text input value.</param>
+    /// <param name="Description">Optional description providing additional information about the input.</param>
+    /// <param name="Regexes">Optional list of regex patterns for validation.</param>
     public abstract record TextBase(
         string Type,
         string Id,
