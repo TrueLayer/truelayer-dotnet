@@ -6,10 +6,22 @@
         <PackageId>TrueLayer.Client</PackageId>
         <Description>.NET client for the TrueLayer API</Description>
         <PackageIcon>icon.png</PackageIcon>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadme>README.md</PackageReadme>
+        <PackageTags>truelayer;payments;banking;open-banking;api-client;fintech</PackageTags>
         <LangVersion>12.0</LangVersion>
         <Authors>TrueLayer</Authors>
         <Company>TrueLayer</Company>
         <RepositoryUrl>https://github.com/TrueLayer/truelayer-dotnet</RepositoryUrl>
+
+        <!-- Source Link: Enable debugging into the source code -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <!-- Deterministic builds -->
+        <Deterministic>true</Deterministic>
+        <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0"/>
@@ -19,8 +31,12 @@
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1"/>
         <PackageReference Include="OneOf" Version="3.0.271"/>
         <PackageReference Include="TrueLayer.Signing" Version="0.1.15"/>
+
+        <!-- Source Link support for GitHub -->
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
     </ItemGroup>
     <ItemGroup>
         <None Include="..\shared\icon.png" Pack="true" PackagePath="\"/>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 </Project>

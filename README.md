@@ -39,8 +39,8 @@ From within Visual Studio:
 1. Open the Solution Explorer.
 2. Right-click on a project within your solution.
 3. Click on *Manage NuGet Packages...*
-4. Click on the *Browse* tab and search for "TrueLayer".
-5. Click on the `TrueLayer` package, select the appropriate version in the
+4. Click on the *Browse* tab and search for "TrueLayer.Client".
+5. Click on the `TrueLayer.Client` package, select the appropriate version in the
    right-tab and click *Install*.
 
 ### Pre-release Packages
@@ -116,7 +116,7 @@ public void ConfigureServices(IServiceCollection services)
             options.Payments.SigningKey.PrivateKey = File.ReadAllText("ec512-private-key.pem");
         }
     },
-    // For best performance and reliability we advice to cache the auth token
+    // For best performance and reliability we advise to cache the auth token
     authCachingStrategy: AuthCachingStrategy.InMemory)
 
 }
@@ -214,7 +214,7 @@ public class MyService
                 apiResponse.StatusCode,
                 // Includes details of any errors
                 apiResponse.Problem
-            )
+            );
         }
 
         // Pass the ResourceToken to the TrueLayer Web or Mobile SDK
@@ -256,10 +256,10 @@ public class MyService
                 apiResponse.StatusCode,
                 // Includes details of any errors
                 apiResponse.Problem
-            )
+            );
         }
 
-        return OkObjectResult(apiResponse.Data.Id);
+        return Ok(apiResponse.Data.Id);
     }
 }
 ```
@@ -293,7 +293,7 @@ public class MyService
             )
         );
 
-        var apiResponse = await _client.Payments.CreatePayout(
+        var apiResponse = await _client.Payouts.CreatePayout(
             payoutRequest,
             idempotencyKey: Guid.NewGuid().ToString()
         );
@@ -304,7 +304,7 @@ public class MyService
                 apiResponse.StatusCode,
                 // Includes details of any errors
                 apiResponse.Problem
-            )
+            );
         }
 
 
