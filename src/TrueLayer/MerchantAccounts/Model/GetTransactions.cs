@@ -41,13 +41,16 @@ public static class MerchantAccountTransactions
         string Status);
 
     /// <summary>
-    ///
+    /// Base class for payout transactions in the merchant account
     /// </summary>
-    /// <inheritdoc cref="BaseTransaction"/>
+    /// <param name="Id">Unique ID for the Transaction</param>
+    /// <param name="Currency">The payment's currency</param>
+    /// <param name="AmountInMinor">Payment's amount in minor. It has to be >= 1</param>
+    /// <param name="Status">Status of the payment</param>
     /// <param name="CreatedAt">The date and time the transaction was created</param>
     /// <param name="Beneficiary">The transaction's payout beneficiary</param>
-    /// <param name="ContextCode"></param>
-    /// <param name="PayoutId"></param>
+    /// <param name="ContextCode">The context code for the payout</param>
+    /// <param name="PayoutId">Unique ID for the payout</param>
     public abstract record BaseTransactionPayout(
         string Id,
         string Currency,
@@ -61,10 +64,13 @@ public static class MerchantAccountTransactions
     /// <summary>
     /// Represents a payment into the merchant account initiated by a TrueLayer Payment
     /// </summary>
-    /// <inheritdoc cref="BaseTransaction"/>
+    /// <param name="Id">Unique ID for the Transaction</param>
+    /// <param name="Currency">The payment's currency</param>
+    /// <param name="AmountInMinor">Payment's amount in minor. It has to be >= 1</param>
+    /// <param name="Status">Status of the payment (settled)</param>
     /// <param name="SettledAt">The date and time the transaction was settled</param>
-    /// <param name="PaymentSource"></param>
-    /// <param name="PaymentId"></param>
+    /// <param name="PaymentSource">The source of the payment</param>
+    /// <param name="PaymentId">Unique ID for the payment</param>
     [JsonDiscriminator(Discriminator)]
     public sealed record MerchantAccountPayment(
         string Id,
@@ -82,7 +88,10 @@ public static class MerchantAccountTransactions
     /// <summary>
     /// Represents a payment into the merchant account not initiated by a TrueLayer Payment
     /// </summary>
-    /// <inheritdoc cref="BaseTransaction"/>
+    /// <param name="Id">Unique ID for the Transaction</param>
+    /// <param name="Currency">The payment's currency</param>
+    /// <param name="AmountInMinor">Payment's amount in minor. It has to be >= 1</param>
+    /// <param name="Status">Status of the payment (settled)</param>
     /// <param name="SettledAt">The date and time the transaction was settled</param>
     /// <param name="Remitter">Defines the remitter account</param>
     /// <param name="ReturnFor">Defines type of outbound transaction</param>
@@ -131,8 +140,15 @@ public static class MerchantAccountTransactions
     /// <summary>
     /// Represents an executed payment out of the merchant account
     /// </summary>
-    /// <inheritdoc cref="BaseTransactionPayout"/>
+    /// <param name="Id">Unique ID for the Transaction</param>
+    /// <param name="Currency">The payment's currency</param>
+    /// <param name="AmountInMinor">Payment's amount in minor. It has to be >= 1</param>
+    /// <param name="Status">Status of the payment</param>
+    /// <param name="CreatedAt">The date and time the transaction was created</param>
     /// <param name="ExecutedAt">The date and time the transaction was executed</param>
+    /// <param name="Beneficiary">The transaction's payout beneficiary</param>
+    /// <param name="ContextCode">The context code for the payout</param>
+    /// <param name="PayoutId">Unique ID for the payout</param>
     /// <param name="ReturnedBy">Unique ID for the external payment that returned this payout</param>
     /// <param name="SchemeId">The id of the scheme used to execute the payout</param>
     [JsonDiscriminator(Discriminator)]
@@ -165,7 +181,10 @@ public static class MerchantAccountTransactions
     /// <summary>
     /// Represents payment refund out of the merchant account
     /// </summary>
-    /// <inheritdoc cref="BaseTransaction"/>
+    /// <param name="Id">Unique ID for the Transaction</param>
+    /// <param name="Currency">The payment's currency</param>
+    /// <param name="AmountInMinor">Payment's amount in minor. It has to be >= 1</param>
+    /// <param name="Status">Status of the payment</param>
     /// <param name="CreatedAt">The date and time the transaction was created</param>
     /// <param name="ExecutedAt">The date and time the transaction was executed</param>
     /// <param name="Beneficiary">The transaction's payout beneficiary</param>

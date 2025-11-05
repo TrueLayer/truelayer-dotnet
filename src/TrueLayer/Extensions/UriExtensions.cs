@@ -4,8 +4,17 @@ using System.Linq;
 
 namespace TrueLayer.Extensions;
 
+/// <summary>
+/// Extension methods for URI manipulation
+/// </summary>
 public static class UriExtensions
 {
+    /// <summary>
+    /// Appends path segments to the URI
+    /// </summary>
+    /// <param name="uri">The base URI</param>
+    /// <param name="segments">The path segments to append</param>
+    /// <returns>A new URI with the appended segments</returns>
     public static Uri Append(this Uri uri, params string?[] segments)
     {
         string[] notNullSegments = segments.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray()!;
@@ -14,6 +23,12 @@ public static class UriExtensions
         return new Uri(newUri);
     }
 
+    /// <summary>
+    /// Appends query parameters to the URI
+    /// </summary>
+    /// <param name="uri">The base URI</param>
+    /// <param name="queryParams">The query parameters to append</param>
+    /// <returns>A new URI with the appended query parameters</returns>
     public static Uri AppendQueryParameters(this Uri uri, IDictionary<string, string?>? queryParams)
     {
         if (queryParams == null || !queryParams.Any())

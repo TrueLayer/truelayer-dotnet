@@ -7,12 +7,23 @@ namespace TrueLayer;
 /// </summary>
 public class ApiResponse
 {
+    /// <summary>
+    /// Creates a new API response
+    /// </summary>
+    /// <param name="statusCode">The HTTP status code</param>
+    /// <param name="traceId">The TrueLayer trace identifier</param>
     public ApiResponse(HttpStatusCode statusCode, string? traceId)
     {
         StatusCode = statusCode;
         TraceId = traceId;
     }
 
+    /// <summary>
+    /// Creates a new API response with problem details
+    /// </summary>
+    /// <param name="problemDetails">The problem details describing the error</param>
+    /// <param name="statusCode">The HTTP status code</param>
+    /// <param name="traceId">The TrueLayer trace identifier</param>
     public ApiResponse(ProblemDetails problemDetails, HttpStatusCode statusCode, string? traceId)
     {
         StatusCode = statusCode;

@@ -30,6 +30,7 @@ internal class ApiClient : IApiClient
     /// Creates a new <see cref="ApiClient"/> instance with the provided configuration, HTTP client factory and serializer.
     /// </summary>
     /// <param name="httpClient">The client used to make HTTP requests.</param>
+    /// <param name="authTokenCache">The authentication token cache.</param>
     public ApiClient(HttpClient httpClient, IAuthTokenCache authTokenCache)
     {
         ArgumentNullException.ThrowIfNull(httpClient);

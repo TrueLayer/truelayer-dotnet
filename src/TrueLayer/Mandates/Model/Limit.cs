@@ -1,6 +1,20 @@
 namespace TrueLayer.Mandates.Model;
 
-public enum PeriodAlignment { Consent = 0, Calendar = 1 }
+/// <summary>
+/// Specifies how the periodic limit period is aligned
+/// </summary>
+public enum PeriodAlignment
+{
+    /// <summary>
+    /// Period starts on the date of consent creation
+    /// </summary>
+    Consent = 0,
+
+    /// <summary>
+    /// Period aligns with calendar periods (e.g., monthly, weekly). The limit is pro-rated in the first period.
+    /// </summary>
+    Calendar = 1
+}
 
 /// <summary>
 /// The state of the constraints utilisation within the periodic limit defined in the mandate creation

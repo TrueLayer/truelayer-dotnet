@@ -130,7 +130,7 @@ public static class GetPaymentResponse
         public AuthorizationFlow.AuthorizationFlow? AuthorizationFlow { get; init; } = null;
 
         /// <summary>
-        /// Gets the details of the source of funds for the payment<
+        /// Gets the details of the source of funds for the payment
         /// </summary>
         public PaymentSource? PaymentSource { get; init; } = null;
     }

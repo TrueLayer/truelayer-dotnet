@@ -17,9 +17,8 @@ public record RelatedProducts
 }
 
 /// <summary>
-/// Creates a Signup+ products.
+/// Represents a Signup+ product.
 /// </summary>
-/// <param name="signupPlus">Signup+</param>
 public record SignupPlus
 {
 }

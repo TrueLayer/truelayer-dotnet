@@ -1,10 +1,19 @@
 namespace TrueLayer.Common;
 
+/// <summary>
+/// Represents a physical address
+/// </summary>
 public record Address
 {
     /// <summary>
-    /// Represents a physical address
+    /// Creates a new physical address
     /// </summary>
+    /// <param name="city">The city or locality name</param>
+    /// <param name="state">The state or county name</param>
+    /// <param name="zip">The zip code or postal code</param>
+    /// <param name="countryCode">The country code according to ISO-3166-1 alpha-2</param>
+    /// <param name="addressLine1">Full street address including house number and street name</param>
+    /// <param name="addressLine2">Optional details like building name, suite, apartment number</param>
     public Address(
         string city,
         string state,
