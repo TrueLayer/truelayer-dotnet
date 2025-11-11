@@ -12,7 +12,7 @@
 
 The official [TrueLayer](https://truelayer.com) .NET client provides convenient access to TrueLayer APIs from applications built with .NET.
 
-The library currently supports .NET 9.0 and .NET 8.0.
+The library currently supports .NET 10.0, .NET 9.0 and .NET 8.0.
 
 ## Installation
 
@@ -101,7 +101,7 @@ Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other
 
 ### Initialize TrueLayer.NET
 
-Register the TrueLayer client in `Startup.cs` or `Program.cs` (.NET 9.0/.NET 8.0):
+Register the TrueLayer client in `Startup.cs` or `Program.cs` (.NET 10.0/.NET 9.0/.NET 8.0):
 
 ```c#
 public IConfiguration Configuration { get; }
@@ -124,7 +124,7 @@ public void ConfigureServices(IServiceCollection services)
 
 ### Multiple TrueLayer Clients
 
-Use keyed version of TrueLayer client (.NET 9.0/.NET 8.0):
+Use keyed version of TrueLayer client (.NET 10.0/.NET 9.0/.NET 8.0):
 
 ```c#
 .AddKeyedTrueLayer("TrueLayerGbp",
