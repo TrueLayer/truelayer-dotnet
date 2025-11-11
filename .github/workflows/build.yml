@@ -53,7 +53,7 @@ jobs:
           verbosity: ${{ github.event.inputs.verbosity }}
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-results
           path: artifacts/*.TestResults.xml
@@ -66,7 +66,7 @@ jobs:
           check_name: Test Results
           comment_mode: off
       - name: Upload pre-release packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: packages
           path: |
