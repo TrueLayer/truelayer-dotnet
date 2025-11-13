@@ -36,6 +36,7 @@ Each API area is encapsulated in its own module:
 - **Request Signing**: Cryptographic signing using EC512 keys via TrueLayer.Signing package
 - **Polymorphic Serialization**: OneOf types for discriminated unions, custom JSON converters
 ### Target Frameworks
+- .NET 10.0
 - .NET 9.0
 - .NET 8.0
 ### Testing Structure

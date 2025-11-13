@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-      <TargetFramework>net9.0</TargetFramework>
+      <TargetFramework>net10.0</TargetFramework>
       <IsPackable>false</IsPackable>
       <RootNamespace>TrueLayer.AcceptanceTests</RootNamespace>
       <AssemblyName>TrueLayer.AcceptanceTests</AssemblyName>
@@ -9,7 +9,7 @@
     </PropertyGroup>
     <ItemGroup>
       <PackageReference Include="AwesomeAssertions" Version="9.3.0" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
       <PackageReference Include="xunit" Version="2.9.3" />
       <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,8 +19,8 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\src\TrueLayer\TrueLayer.csproj" />
