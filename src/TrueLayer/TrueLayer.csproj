@@ -33,7 +33,7 @@
         <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0"/>
         <PackageReference Include="OneOf" Version="3.0.271"/>
-        <PackageReference Include="TrueLayer.Signing" Version="0.2.2" />
+        <PackageReference Include="TrueLayer.Signing" Version="0.2.4" />
 
         <!-- Source Link support for GitHub -->
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>

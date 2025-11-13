@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Mime;
@@ -200,12 +199,14 @@ internal class ApiClient : IApiClient
 
             if (request is { })
             {
-                // Only serialize to string if signing is required,
-                string json = JsonSerializer.Serialize(request, request.GetType(), SerializerOptions.Default);
+                byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(request, request.GetType(), SerializerOptions.Default);
 
-                signer.Body(json);
+                signer.Body(jsonBytes);
 
-                httpContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+                httpContent = new ByteArrayContent(jsonBytes)
+                {
+                    Headers = { ContentType = new MediaTypeHeaderValue(MediaTypeNames.Application.Json) }
+                };
             }
 
             if (!string.IsNullOrWhiteSpace(idempotencyKey))
