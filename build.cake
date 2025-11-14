@@ -1,9 +1,6 @@
 // Install .NET Core Global tools.
-#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.4.9"
+#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.4.18"
 #tool "dotnet:?package=dotnet-sonarscanner&version=11.0.0"
-
-#tool "dotnet:?package=dotnet-reportgenerator-globaltool&version=5.4.17"
-#tool "dotnet:?package=coveralls.net&version=4.0.1"
 
 // Install addins
 #addin nuget:?package=Cake.Coverlet&version=5.1.1
@@ -228,7 +225,6 @@ public static class BuildContext
     public static bool IsTag { get; private set; }
     public static string NugetApiUrl { get; private set; }
     public static string NugetApiKey { get; private set; }
-    public static bool ForcePushDocs { get; private set; }
 
     public static bool ShouldPublishToNuget
         => !string.IsNullOrWhiteSpace(BuildContext.NugetApiUrl) && !string.IsNullOrWhiteSpace(BuildContext.NugetApiKey);
@@ -256,8 +252,6 @@ public static class BuildContext
             NugetApiUrl = context.EnvironmentVariable("NUGET_PRE_API_URL");
             NugetApiKey = context.EnvironmentVariable("NUGET_PRE_API_KEY");
         }
-
-        ForcePushDocs = context.Argument<bool>("force-docs", false);
     }
 
     public static void PrintParameters(ICakeContext context)

@@ -1,4 +1,8 @@
 ﻿- name: Home
   href: index.md
-- name: API Documentation
-  href: obj/api/
+- name: Articles
+  href: articles/
+- name: API Reference
+  href: api/
+- name: GitHub
+  href: https://github.com/TrueLayer/truelayer-dotnet
