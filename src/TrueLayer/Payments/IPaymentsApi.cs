@@ -62,21 +62,6 @@ public interface IPaymentsApi
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Generates a link to the TrueLayer hosted payment page
-    /// </summary>
-    /// <param name="paymentId">The payment identifier</param>
-    /// <param name="paymentToken">The payment token, returned from <see cref="CreatePayment"/></param>
-    /// <param name="returnUri">
-    /// Your return URI to which the end user will be redirected after the payment is completed.
-    /// Note this should be configured in the TrueLayer console under your application settings.
-    /// </param>
-    /// <returns>The HPP link you can redirect the end user to</returns>
-    string CreateHostedPaymentPageLink(
-        string paymentId,
-        string paymentToken,
-        Uri returnUri);
-
-    /// <summary>
     /// Start the authorization flow for a payment.
     /// </summary>
     /// <param name="paymentId">The payment identifier</param>

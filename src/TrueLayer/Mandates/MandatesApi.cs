@@ -6,7 +6,6 @@ using TrueLayer.Auth;
 using TrueLayer.Extensions;
 using TrueLayer.Mandates.Model;
 using TrueLayer.Models;
-using TrueLayer.Payments;
 
 namespace TrueLayer.Mandates;
 
