@@ -3,8 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [2.0.0]
 ### Added
+- Added support for .NET 10.0
 - Added support for **Verified Payouts** (UK-only feature)
   - New `Verification` model with `VerifyName` and optional `TransactionSearchCriteria` for name and transaction verification
   - New `PayoutUserRequest` and `PayoutUserResponse` models for user details in verified payouts
@@ -18,8 +19,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - New `HostedPageResponse` model containing the auto-constructed hosted page URI
   - Updated `CreatePaymentRequest` to accept optional `HostedPage` parameter to receive the hosted page URI directly in the response
   - Updated `CreatePaymentResponse.AuthorizationRequired` to include `HostedPage` property with the hosted page URI when requested
-  - The existing `CreateHostedPaymentPageLink` method remains available for backward compatibility
 ### Removed
+- **BREAKING**: Removed `CreateHostedPaymentPageLink` method from `IPaymentsApi`
+  - This method is no longer supported for payments
+  - Use the new `HostedPage` parameter in `CreatePaymentRequest` instead to receive the hosted page URI directly in the response
+  - For mandates, `CreateHostedPaymentPageLink` remains available in `IMandatesApi`
 - Removed support for .NET 6.0
 - Removed support for .NET Standard 2.1
 - Removed IsExternalInit shim (no longer needed for .NET 8.0+)
