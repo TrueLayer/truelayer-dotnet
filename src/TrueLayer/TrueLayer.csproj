@@ -29,7 +29,7 @@
     <!-- Common dependencies -->
     <ItemGroup>
         <PackageReference Include="OneOf" Version="3.0.271"/>
-        <PackageReference Include="TrueLayer.Signing" Version="0.2.4" />
+        <PackageReference Include="TrueLayer.Signing" Version="0.2.5" />
 
         <!-- Source Link support for GitHub -->
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
