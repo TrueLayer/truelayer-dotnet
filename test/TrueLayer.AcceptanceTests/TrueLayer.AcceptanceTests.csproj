@@ -19,8 +19,8 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.1" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\src\TrueLayer\TrueLayer.csproj" />
@@ -30,6 +30,9 @@
       <None Update="*.pem" CopyToOutputDirectory="Always" />
     </ItemGroup>
     <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1" />
       <Content Update="ec512-private-key.pem">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
