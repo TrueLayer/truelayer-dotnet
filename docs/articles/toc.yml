@@ -1,0 +1,26 @@
+- name: Getting Started
+  items:
+    - name: Installation
+      href: installation.md
+    - name: Authentication
+      href: authentication.md
+    - name: Error Handling
+      href: error-handling.md
+- name: Core Features
+  items:
+    - name: Payments
+      href: payments.md
+    - name: Payouts
+      href: payouts.md
+    - name: Mandates
+      href: mandates.md
+    - name: Providers
+      href: providers.md
+    - name: Merchant Accounts
+      href: merchant-accounts.md
+- name: Advanced Topics
+  items:
+    - name: Multiple Clients
+      href: multiple-clients.md
+    - name: Configuration
+      href: configuration.md

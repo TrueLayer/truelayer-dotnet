@@ -442,3 +442,14 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 appsettings.local*.json
+
+##
+## DocFX
+##
+# DocFX build output
+docs/_site/
+docs/api/
+docs/obj/
+
+# DocFX log files
+docs/*.log
