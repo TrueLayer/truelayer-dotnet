@@ -16,19 +16,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           filter: tree:0
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: |
             10.0.x
             9.0.x
             8.0.x
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -48,12 +48,12 @@ jobs:
           TrueLayer2__ClientSecret: ${{ secrets.TRUELAYER__CLIENTSECRET }}
           TrueLayer2__Payments__SigningKey__KeyId: ${{ secrets.TRUELAYER__PAYMENTS__SIGNINGKEY__KEYID }}
         with:
-          cake-version: 5.1.0
+          cake-version: tool-manifest
           target: CI
           verbosity: ${{ github.event.inputs.verbosity }}
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results
           path: artifacts/*.TestResults.xml
@@ -66,7 +66,7 @@ jobs:
           check_name: Test Results
           comment_mode: off
       - name: Upload pre-release packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: packages
           path: |
