@@ -220,6 +220,7 @@ public partial class PaymentTests : IClassFixture<ApiTestFixture>
     {
         var address = new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St");
         var subMerchants = new SubMerchants(new SubMerchants.BusinessClient(
+            id: Guid.NewGuid().ToString(),
             tradingName: "Test Trading Company",
             commercialName: "Test Commercial Name",
             url: "https://example.com",

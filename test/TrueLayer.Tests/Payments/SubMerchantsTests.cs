@@ -53,10 +53,11 @@ public class SubMerchantsTests
         var tradingName = "Test Trading Name";
 
         // Act
-        var businessClient = new SubMerchants.BusinessClient(tradingName);
+        var businessClient = new SubMerchants.BusinessClient("client-id", tradingName);
 
         // Assert
         businessClient.Type.Should().Be("business_client");
+        businessClient.Id.Should().Be("client-id");
         businessClient.TradingName.Should().Be(tradingName);
         businessClient.CommercialName.Should().BeNull();
         businessClient.Url.Should().BeNull();
@@ -78,10 +79,11 @@ public class SubMerchantsTests
 
         // Act
         var businessClient = new SubMerchants.BusinessClient(
-            tradingName, commercialName, url, mcc, registrationNumber, address);
+            "client-id", tradingName, commercialName, url, mcc, registrationNumber, address);
 
         // Assert
         businessClient.Type.Should().Be("business_client");
+        businessClient.Id.Should().Be("client-id");
         businessClient.TradingName.Should().Be(tradingName);
         businessClient.CommercialName.Should().Be(commercialName);
         businessClient.Url.Should().Be(url);
@@ -94,10 +96,21 @@ public class SubMerchantsTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
+    public void BusinessClient_Constructor_Should_Throw_When_Id_Is_Invalid(string? id)
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new SubMerchants.BusinessClient(id!, "Test Trading Name"));
+        exception.ParamName.Should().Be("id");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
     public void BusinessClient_Constructor_Should_Throw_When_TradingName_Is_Invalid(string? tradingName)
     {
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => new SubMerchants.BusinessClient(tradingName!));
+        var exception = Assert.Throws<ArgumentException>(() => new SubMerchants.BusinessClient("client-id", tradingName!));
         exception.ParamName.Should().Be("tradingName");
     }
 
@@ -108,7 +121,7 @@ public class SubMerchantsTests
     {
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() => new SubMerchants.BusinessClient(
-            "Trading Name", emptyValue, emptyValue, emptyValue, emptyValue));
+            "client-id", "Trading Name", emptyValue, emptyValue, emptyValue, emptyValue));
         exception.ParamName.Should().Be("commercialName");
     }
 
@@ -133,7 +146,7 @@ public class SubMerchantsTests
     public void SubMerchants_Constructor_Should_Set_UltimateCounterparty_With_BusinessClient()
     {
         // Arrange
-        var businessClient = new SubMerchants.BusinessClient("Test Trading Name");
+        var businessClient = new SubMerchants.BusinessClient("client-id", "Test Trading Name");
 
         // Act
         var subMerchants = new SubMerchants(businessClient);

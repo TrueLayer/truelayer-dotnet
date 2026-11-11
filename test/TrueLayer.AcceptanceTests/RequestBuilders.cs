@@ -33,7 +33,11 @@ public static class RequestBuilders
         => new(
             mandateRequest.Constraints.MaximumIndividualAmount,
             mandateRequest.Currency,
-            new PaymentMandate(mandateId, "reference", null),
+            new PaymentMandate(
+                mandateId,
+                "reference",
+                null,
+                mandateRequest.Mandate.IsT0 ? UserInteraction.NotPresent : null),
             mandateRequest.User,
             setRelatedProducts ? new RelatedProducts(new SignupPlus()) : null);
 
