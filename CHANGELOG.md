@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - New `HostedPageResponse` model containing the auto-constructed hosted page URI
   - Updated `CreatePaymentRequest` to accept optional `HostedPage` parameter to receive the hosted page URI directly in the response
   - Updated `CreatePaymentResponse.AuthorizationRequired` to include `HostedPage` property with the hosted page URI when requested
+- Added `StatementReference` to `Mandate.VRPCommercialMandate`
+- Added optional `UserInteraction` (`Present`, `NotPresent`) to `CreatePaymentMethod.Mandate`, serialized as `user_interaction`. Only allowed for commercial mandates; required when the mandate was created with a `UseCase`
 ### Removed
 - **BREAKING**: Removed `CreateHostedPaymentPageLink` method from `IPaymentsApi`
   - This method is no longer supported for payments
@@ -28,6 +30,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Removed support for .NET Standard 2.1
 - Removed IsExternalInit shim (no longer needed for .NET 8.0+)
 ### Changed
+- **BREAKING**: `Mandate.VRPCommercialMandate` now requires `UseCase` (`CommercialMandateUseCase`: `Charity`, `FinancialServices`, `Government`, `Utilities`), serialized as `use_case`
+  - Migration: pass the use case after `Type`, e.g. `new Mandate.VRPCommercialMandate("commercial", CommercialMandateUseCase.Utilities, providerSelection, beneficiary)`
+- Deprecated `Mandate.VRPCommercialMandate.Reference` in favour of `StatementReference`
 - **BREAKING**: `CreatePayout` now returns `OneOf<AuthorizationRequired, Created>` instead of `CreatePayoutResponse`
   - Consumers must use `.Match()` to handle both response types
   - Standard payouts return `Created` with just the payout ID

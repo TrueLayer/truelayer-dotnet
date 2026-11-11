@@ -67,11 +67,13 @@ public static class CreatePaymentMethod
         /// <param name="mandateId">The identifier of the mandate</param>
         /// <param name="reference">The payment reference, useful for reconciliation needs</param>
         /// <param name="retry">The retry configuration</param>
-        public Mandate(string mandateId, string? reference, RetryUnion? retry)
+        /// <param name="userInteraction">Whether the user is present when the payment is created. Only allowed for commercial mandates, and required when the mandate was created with a use case</param>
+        public Mandate(string mandateId, string? reference, RetryUnion? retry, UserInteraction? userInteraction = null)
         {
             MandateId = mandateId.NotNullOrWhiteSpace(nameof(mandateId));
             Reference = reference.NotEmptyOrWhiteSpace(nameof(reference));
             Retry = retry;
+            UserInteraction = userInteraction;
         }
 
         /// <summary>
@@ -93,5 +95,10 @@ public static class CreatePaymentMethod
         /// The retry configuration
         /// </summary>
         public RetryUnion? Retry { get; init; }
+
+        /// <summary>
+        /// Whether the user is present when the payment is created
+        /// </summary>
+        public UserInteraction? UserInteraction { get; init; }
     }
 }

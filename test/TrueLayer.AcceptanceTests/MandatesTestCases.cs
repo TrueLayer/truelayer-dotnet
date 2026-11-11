@@ -33,6 +33,7 @@ public static class MandatesTestCases
         new(
             RequestBuilders.CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
                 "commercial",
+                CommercialMandateUseCase.Utilities,
                 ProviderUnion.FromT1(new Preselected(ProviderId)),
                 new Mandates.Model.Beneficiary.ExternalAccount(
                     "external_account",
@@ -56,6 +57,7 @@ public static class MandatesTestCases
         new(
             RequestBuilders.CreateTestMandateRequest(MandateUnion.FromT0(new Mandate.VRPCommercialMandate(
                 "commercial",
+                CommercialMandateUseCase.Utilities,
                 ProviderUnion.FromT0(new UserSelected
                 {
                     Filter = new ProviderFilter { Countries = ["GB"], ReleaseChannel = ReleaseChannels.PrivateBeta },
