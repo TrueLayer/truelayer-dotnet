@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **BREAKING**: `Mandate.VRPCommercialMandate` now requires `UseCase` (`CommercialMandateUseCase`: `Charity`, `FinancialServices`, `Government`, `Utilities`), serialized as `use_case`
   - Migration: pass the use case after `Type`, e.g. `new Mandate.VRPCommercialMandate("commercial", CommercialMandateUseCase.Utilities, providerSelection, beneficiary)`
 - Deprecated `Mandate.VRPCommercialMandate.Reference` in favour of `StatementReference`
+- **BREAKING**: `SubMerchants.BusinessClient` now requires `id` as first constructor parameter, as required by the API
 - **BREAKING**: `CreatePayout` now returns `OneOf<AuthorizationRequired, Created>` instead of `CreatePayoutResponse`
   - Consumers must use `.Match()` to handle both response types
   - Standard payouts return `Created` with just the payout ID

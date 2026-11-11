@@ -68,6 +68,7 @@ public class SubMerchants
         /// <summary>
         /// Creates a new <see cref="BusinessClient"/> instance
         /// </summary>
+        /// <param name="id">The identifier of the business client</param>
         /// <param name="tradingName">Trading name of the merchant</param>
         /// <param name="commercialName">Commercial name different from trading name (optional)</param>
         /// <param name="url">Business website URL (optional)</param>
@@ -75,6 +76,7 @@ public class SubMerchants
         /// <param name="registrationNumber">Business registration number (optional if address provided)</param>
         /// <param name="address">Business address (optional)</param>
         public BusinessClient(
+            string id,
             string tradingName,
             string? commercialName = null,
             string? url = null,
@@ -83,6 +85,7 @@ public class SubMerchants
             Address? address = null)
         {
             Type = "business_client";
+            Id = id.NotNullOrWhiteSpace(nameof(id));
             TradingName = tradingName.NotNullOrWhiteSpace(nameof(tradingName));
             CommercialName = commercialName.NotEmptyOrWhiteSpace(nameof(commercialName));
             Url = url.NotEmptyOrWhiteSpace(nameof(url));
@@ -95,6 +98,11 @@ public class SubMerchants
         /// Gets the type of the counterparty
         /// </summary>
         public string Type { get; }
+
+        /// <summary>
+        /// Gets the identifier of the business client
+        /// </summary>
+        public string Id { get; }
 
         /// <summary>
         /// Gets the trading name of the merchant

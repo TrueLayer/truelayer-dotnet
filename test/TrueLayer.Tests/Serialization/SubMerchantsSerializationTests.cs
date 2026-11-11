@@ -35,6 +35,7 @@ public class SubMerchantsSerializationTests
         // Arrange
         var address = new Address("London", "England", "EC1R 4RB", "GB", "1 Hardwick St");
         var businessClient = new SubMerchants.BusinessClient(
+            id: "client-id-123",
             tradingName: "Test Trading Company",
             commercialName: "Test Commercial Name",
             url: "https://example.com",
@@ -52,6 +53,7 @@ public class SubMerchantsSerializationTests
         deserialized!.UltimateCounterparty.IsT1.Should().BeTrue();
         var deserializedBusinessClient = deserialized.UltimateCounterparty.AsT1;
         deserializedBusinessClient.Type.Should().Be("business_client");
+        deserializedBusinessClient.Id.Should().Be("client-id-123");
         deserializedBusinessClient.TradingName.Should().Be("Test Trading Company");
         deserializedBusinessClient.CommercialName.Should().Be("Test Commercial Name");
         deserializedBusinessClient.Url.Should().Be("https://example.com");
@@ -69,7 +71,7 @@ public class SubMerchantsSerializationTests
     public void BusinessClient_With_Required_Properties_Only_Should_Serialize_And_Deserialize_Correctly()
     {
         // Arrange
-        var businessClient = new SubMerchants.BusinessClient("Test Trading Company");
+        var businessClient = new SubMerchants.BusinessClient("client-id-123", "Test Trading Company");
         var subMerchants = new SubMerchants(businessClient);
 
         // Act
@@ -81,6 +83,7 @@ public class SubMerchantsSerializationTests
         deserialized!.UltimateCounterparty.IsT1.Should().BeTrue();
         var deserializedBusinessClient = deserialized.UltimateCounterparty.AsT1;
         deserializedBusinessClient.Type.Should().Be("business_client");
+        deserializedBusinessClient.Id.Should().Be("client-id-123");
         deserializedBusinessClient.TradingName.Should().Be("Test Trading Company");
         deserializedBusinessClient.CommercialName.Should().BeNull();
         deserializedBusinessClient.Url.Should().BeNull();
@@ -111,6 +114,7 @@ public class SubMerchantsSerializationTests
     {
         // Arrange
         var businessClient = new SubMerchants.BusinessClient(
+            id: "client-id-123",
             tradingName: "Test Trading Company",
             commercialName: "Test Commercial Name",
             url: "https://example.com",
@@ -124,6 +128,7 @@ public class SubMerchantsSerializationTests
         // Assert
         json.Should().Contain("\"ultimate_counterparty\"");
         json.Should().Contain("\"type\":\"business_client\"");
+        json.Should().Contain("\"id\":\"client-id-123\"");
         json.Should().Contain("\"trading_name\":\"Test Trading Company\"");
         json.Should().Contain("\"commercial_name\":\"Test Commercial Name\"");
         json.Should().Contain("\"registration_number\":\"REG123456\"");
