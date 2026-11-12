@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.0.0]
+## [2.0.1] - 2026-11-12
 ### Added
 - Added support for .NET 10.0
 - Added support for **Verified Payouts** (UK-only feature)
@@ -23,26 +23,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added optional `UserInteraction` (`Present`, `NotPresent`) to `CreatePaymentMethod.Mandate`, serialized as `user_interaction`. Only allowed for commercial mandates; required when the mandate was created with a `UseCase`
 ### Removed
 - **BREAKING**: Removed `CreateHostedPaymentPageLink` method from `IPaymentsApi`
+  - Only affects integrations that redirect users to the Hosted Payment Page (HPP) for payments. Other integrations need no change
   - This method is no longer supported for payments
-  - Use the new `HostedPage` parameter in `CreatePaymentRequest` instead to receive the hosted page URI directly in the response
+  - Instead, pass `hostedPage: new HostedPageRequest(returnUri)` to the `CreatePaymentRequest` constructor. The hosted page URI is then returned in `CreatePaymentResponse.AuthorizationRequired.HostedPage.Uri` (only set when `hostedPage` is provided)
   - For mandates, `CreateHostedPaymentPageLink` remains available in `IMandatesApi`
-- Removed support for .NET 6.0
-- Removed support for .NET Standard 2.1
+  - Migration:
+    ```csharp
+    // Before
+    var response = await client.Payments.CreatePayment(new CreatePaymentRequest(amount, currency, paymentMethod, user));
+    var link = client.Payments.CreateHostedPaymentPageLink(response.Data.AsT0.Id, response.Data.AsT0.ResourceToken, returnUri);
+
+    // After
+    var response = await client.Payments.CreatePayment(new CreatePaymentRequest(
+        amount, currency, paymentMethod, user, hostedPage: new HostedPageRequest(returnUri)));
+    var link = response.Data.AsT0.HostedPage!.Uri;
+    ```
+- **BREAKING**: Removed support for .NET 6.0 and .NET Standard 2.1. The minimum supported framework is now .NET 8.0
+  - Migration: move to .NET 10.0 (LTS). .NET 8.0 and .NET 9.0 are still targeted but reached end of support in November 2026
+- **BREAKING**: Removed the `ResourceType` enum (only used by the removed payments HPP link builder)
 - Removed IsExternalInit shim (no longer needed for .NET 8.0+)
 ### Changed
 - **BREAKING**: `Mandate.VRPCommercialMandate` now requires `UseCase` (`CommercialMandateUseCase`: `Charity`, `FinancialServices`, `Government`, `Utilities`), serialized as `use_case`
   - Migration: pass the use case after `Type`, e.g. `new Mandate.VRPCommercialMandate("commercial", CommercialMandateUseCase.Utilities, providerSelection, beneficiary)`
 - Deprecated `Mandate.VRPCommercialMandate.Reference` in favour of `StatementReference`
 - **BREAKING**: `SubMerchants.BusinessClient` now requires `id` as first constructor parameter, as required by the API
+  - Migration: `new SubMerchants.BusinessClient(id: "client-id", tradingName: "Trading Name", ...)`
 - **BREAKING**: `CreatePayout` now returns `OneOf<AuthorizationRequired, Created>` instead of `CreatePayoutResponse`
   - Consumers must use `.Match()` to handle both response types
   - Standard payouts return `Created` with just the payout ID
   - Verified payouts return `AuthorizationRequired` with ID, status, resource token, and user details
+  - Migration:
+    ```csharp
+    // Before
+    var payoutId = response.Data!.Id;
+
+    // After
+    var payoutId = response.Data.Match(
+        authorizationRequired => authorizationRequired.Id,
+        created => created.Id);
+    ```
 - **BREAKING**: `GetPayout` now returns `OneOf<AuthorizationRequired, Pending, Authorized, Executed, Failed>` instead of `OneOf<Pending, Authorized, Executed, Failed>`
   - Added `AuthorizationRequired` status for verified payouts awaiting user authorization
-  - Consumers must update `.Match()` calls to handle the new `AuthorizationRequired` type
+  - Consumers must update `.Match()` calls to handle the new `AuthorizationRequired` type, passed as the first argument
 - **BREAKING**: Renamed `Beneficiary` to `CreatePayoutBeneficiary` for clarity
+  - Migration: replace `Beneficiary.*` with `CreatePayoutBeneficiary.*` when creating payouts. `GetPayout` responses now return the new `GetPayoutBeneficiary.*` types
 - **BREAKING**: Simplified `CreatePayoutBeneficiary.BusinessAccount` to only require `Reference` (removed account holder name and identifier)
+  - The payout goes to the client's preconfigured business account, so the account details are no longer sent
+  - Migration: `new CreatePayoutBeneficiary.BusinessAccount(reference)`
 - **BREAKING**: Split Provider types into `CreateProviderSelection` (for requests) and `GetProviderSelection` (for responses)
   - `CreateProviderSelection.UserSelected` - Use for creating payments/payouts/mandates with user-selected provider
   - `CreateProviderSelection.Preselected` - Use for creating payments/payouts/mandates with preselected provider
