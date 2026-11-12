@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added optional `UserInteraction` (`Present`, `NotPresent`) to `CreatePaymentMethod.Mandate`, serialized as `user_interaction`. Only allowed for commercial mandates; required when the mandate was created with a `UseCase`
 ### Removed
 - **BREAKING**: Removed `CreateHostedPaymentPageLink` method from `IPaymentsApi`
+  - Only affects integrations that redirect users to the Hosted Payment Page (HPP) for payments. Other integrations need no change
   - This method is no longer supported for payments
   - Instead, pass `hostedPage: new HostedPageRequest(returnUri)` to the `CreatePaymentRequest` constructor. The hosted page URI is then returned in `CreatePaymentResponse.AuthorizationRequired.HostedPage.Uri` (only set when `hostedPage` is provided)
   - For mandates, `CreateHostedPaymentPageLink` remains available in `IMandatesApi`
