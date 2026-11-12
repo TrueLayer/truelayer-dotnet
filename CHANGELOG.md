@@ -4,8 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.0.1] - 2026-11-12
-`2.0.0` was tagged but never published to NuGet: `2.0.1` is the first 2.x release and includes all the changes below.
-
 ### Added
 - Added support for .NET 10.0
 - Added support for **Verified Payouts** (UK-only feature)
