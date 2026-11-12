@@ -24,7 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Removed
 - **BREAKING**: Removed `CreateHostedPaymentPageLink` method from `IPaymentsApi`
   - This method is no longer supported for payments
-  - Use the new `HostedPage` parameter in `CreatePaymentRequest` instead to receive the hosted page URI directly in the response
+  - Instead, pass `hostedPage: new HostedPageRequest(returnUri)` to the `CreatePaymentRequest` constructor. The hosted page URI is then returned in `CreatePaymentResponse.AuthorizationRequired.HostedPage.Uri` (only set when `hostedPage` is provided). `returnUri` must be registered in Console
   - For mandates, `CreateHostedPaymentPageLink` remains available in `IMandatesApi`
   - Migration:
     ```csharp
