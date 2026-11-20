@@ -23,10 +23,15 @@ public class CurrencyExtensionsTests
         Assert.Throws<ArgumentOutOfRangeException>(() => default(decimal).ToMinorCurrencyUnit(-1));
     }
 
+    public static TheoryData<long, decimal> MajorCurrencyUnitData => new()
+    {
+        { 0, 0m },
+        { 50000, 500.00m },
+        { -1099, -10.99m },
+    };
+
     [Theory]
-    [InlineData(0, 0)]
-    [InlineData(50000, 500.00)]
-    [InlineData(-1099, -10.99)]
+    [MemberData(nameof(MajorCurrencyUnitData))]
     public void Can_convert_to_major_currency_unit(long minorValue, decimal expected)
     {
         minorValue.ToMajorCurrencyUnit(2).Should().Be(expected);
