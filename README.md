@@ -101,7 +101,7 @@ Add your Client ID, Secret and Signing Key ID to `appsettings.json` or any other
 
 ### Initialize TrueLayer.NET
 
-Register the TrueLayer client in `Startup.cs` or `Program.cs` (.NET 11.0/.NET 10.0/.NET 9.0/.NET 8.0):
+Register the TrueLayer client in `Startup.cs` or `Program.cs`:
 
 ```c#
 public IConfiguration Configuration { get; }
@@ -124,7 +124,7 @@ public void ConfigureServices(IServiceCollection services)
 
 ### Multiple TrueLayer Clients
 
-Use keyed version of TrueLayer client (.NET 11.0/.NET 10.0/.NET 9.0/.NET 8.0):
+Use keyed version of TrueLayer client:
 
 ```c#
 .AddKeyedTrueLayer("TrueLayerGbp",
